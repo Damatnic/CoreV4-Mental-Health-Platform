@@ -45,10 +45,14 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 window.scrollTo = vi.fn();
 
 // Mock localStorage
-const localStorageMock = {
+const localStorageMock: Storage = {
   getItem: vi.fn(),
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
+  get length() {
+    return 0;
+  },
+  key: vi.fn(),
 };
-global.localStorage = localStorageMock as Storage;
+global.localStorage = localStorageMock;

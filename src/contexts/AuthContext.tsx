@@ -47,13 +47,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, _password: string) => {
     try {
       // TODO: Implement actual login
       const mockUser: User = {
         id: '1',
         email,
-        name: email.split('@')[0],
+        name: email.split('@')[0] || 'User',
         role: 'user',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (email: string, _password: string, name: string) => {
     try {
       // TODO: Implement actual registration
       const mockUser: User = {
