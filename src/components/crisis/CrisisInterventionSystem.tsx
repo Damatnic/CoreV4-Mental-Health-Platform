@@ -1,0 +1,369 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
+import { EmergencyContacts } from './EmergencyContacts';
+import { SafetyPlan } from './SafetyPlan';
+import { CrisisResources } from './CrisisResources';
+import { CrisisChat } from './CrisisChat';
+
+interface CrisisLevel {
+  level: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+const CRISIS_LEVELS: Record<string, CrisisLevel> = {
+  low: {
+    level: 'low',
+    description: 'Feeling stressed or overwhelmed',
+    color: 'text-yellow-700',
+    bgColor: 'bg-yellow-50',
+    borderColor: 'border-yellow-300'
+  },
+  medium: {
+    level: 'medium',
+    description: 'Experiencing distress or anxiety',
+    color: 'text-orange-700',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-orange-300'
+  },
+  high: {
+    level: 'high',
+    description: 'In significant emotional pain',
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-300'
+  },
+  critical: {
+    level: 'critical',
+    description: 'In immediate danger or crisis',
+    color: 'text-red-900',
+    bgColor: 'bg-red-100',
+    borderColor: 'border-red-500'
+  }
+};
+
+export function CrisisInterventionSystem() {
+  const [currentCrisisLevel, setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
+  const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
+  const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
+  const [nearbyResources, setNearbyResources] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'assessment' | 'resources' | 'safety' | 'chat'>('assessment');
+  const [responseTime, setResponseTime] = useState(0);
+
+  // Track response time for critical features
+  useEffect(() => {
+    const startTime = performance.now();
+    setResponseTime(performance.now() - startTime);
+  }, []);
+
+  // Get user location for emergency services
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => setUserLocation(position),
+        (error) => console.error('Location access denied:', error),
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
+
+  // Emergency hotline handlers with immediate response
+  const handleEmergencyCall = useCallback((number: string, service: string) => {
+    // Log the emergency call attempt for safety tracking
+    const timestamp = new Date().toISOString();
+    console.log(`Emergency call initiated: ${service} at ${timestamp}`);
+    
+    // Immediate tel: link for mobile devices
+    window.location.href = `tel:${number}`;
+    
+    // Track interaction for crisis analytics
+    trackCrisisInteraction('emergency_call', { service, number, timestamp });
+  }, []);
+
+  // Crisis text line handler
+  const handleCrisisText = useCallback((number: string, keyword: string) => {
+    // Open SMS app with pre-filled message
+    const smsUrl = `sms:${number}?body=${encodeURIComponent(keyword)}`;
+    window.location.href = smsUrl;
+    
+    trackCrisisInteraction('crisis_text', { number, keyword });
+  }, []);
+
+  // Track crisis interactions for improvement
+  const trackCrisisInteraction = (action: string, data: any) => {
+    // In production, this would send to analytics service
+    console.log('Crisis interaction tracked:', { action, data, responseTime });
+  };
+
+  // Crisis level assessment
+  const assessCrisisLevel = (responses: Record<string, number>) => {
+    const score = Object.values(responses).reduce((sum, val) => sum + val, 0);
+    const maxScore = Object.keys(responses).length * 5;
+    const percentage = (score / maxScore) * 100;
+
+    if (percentage >= 80) {
+      setCurrentCrisisLevel(CRISIS_LEVELS.critical);
+      setShowEmergencyDialog(true);
+    } else if (percentage >= 60) {
+      setCurrentCrisisLevel(CRISIS_LEVELS.high);
+    } else if (percentage >= 40) {
+      setCurrentCrisisLevel(CRISIS_LEVELS.medium);
+    } else {
+      setCurrentCrisisLevel(CRISIS_LEVELS.low);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Critical Response Time Monitor */}
+      {responseTime > 200 && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 text-sm">
+          <p>Response time: {responseTime.toFixed(2)}ms - Optimizing for faster crisis response...</p>
+        </div>
+      )}
+
+      {/* Emergency Header - Always Visible */}
+      <div className="sticky top-0 z-50 bg-red-600 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <AlertTriangle className="h-6 w-6 animate-pulse" />
+              <span className="font-semibold">Crisis Support Available 24/7</span>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => handleEmergencyCall('988', 'Suicide & Crisis Lifeline')}
+                className="bg-white text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors flex items-center space-x-2"
+                aria-label="Call 988 Suicide and Crisis Lifeline"
+              >
+                <Phone className="h-4 w-4" />
+                <span>988</span>
+              </button>
+              <button
+                onClick={() => handleCrisisText('741741', 'HOME')}
+                className="bg-white text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors flex items-center space-x-2"
+                aria-label="Text HOME to 741741 Crisis Text Line"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>Text</span>
+              </button>
+              <button
+                onClick={() => handleEmergencyCall('911', 'Emergency Services')}
+                className="bg-red-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-900 transition-colors flex items-center space-x-2"
+                aria-label="Call 911 Emergency Services"
+              >
+                <Shield className="h-4 w-4" />
+                <span>911</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Crisis Intervention Interface */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Crisis Level Indicator */}
+        {currentCrisisLevel && (
+          <div className={`${currentCrisisLevel.bgColor} ${currentCrisisLevel.borderColor} border-2 rounded-xl p-6 mb-6`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className={`text-2xl font-bold ${currentCrisisLevel.color}`}>
+                  Current Status: {currentCrisisLevel.description}
+                </h2>
+                <p className={`mt-2 ${currentCrisisLevel.color}`}>
+                  We're here to help. You're not alone in this.
+                </p>
+              </div>
+              <Heart className={`h-12 w-12 ${currentCrisisLevel.color}`} />
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-xl shadow-lg mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px">
+              {[
+                { id: 'assessment', label: 'Crisis Assessment', icon: AlertTriangle },
+                { id: 'resources', label: 'Resources', icon: MapPin },
+                { id: 'safety', label: 'Safety Plan', icon: Shield },
+                { id: 'chat', label: 'Crisis Chat', icon: MessageSquare }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex-1 py-4 px-6 flex items-center justify-center space-x-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <tab.icon className="h-5 w-5" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'assessment' && (
+              <CrisisAssessment onAssessmentComplete={assessCrisisLevel} />
+            )}
+            {activeTab === 'resources' && (
+              <CrisisResources location={userLocation} />
+            )}
+            {activeTab === 'safety' && (
+              <SafetyPlan />
+            )}
+            {activeTab === 'chat' && (
+              <CrisisChat />
+            )}
+          </div>
+        </div>
+
+        {/* Emergency Contacts Widget */}
+        <EmergencyContacts />
+
+        {/* Quick Access Tools */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <QuickToolCard
+            title="Breathing Exercise"
+            description="Calm your mind with guided breathing"
+            icon={<Clock className="h-8 w-8 text-blue-500" />}
+            onClick={() => window.location.href = '/wellness#breathing'}
+          />
+          <QuickToolCard
+            title="Grounding Techniques"
+            description="5-4-3-2-1 sensory grounding exercise"
+            icon={<Heart className="h-8 w-8 text-purple-500" />}
+            onClick={() => window.location.href = '/wellness#grounding'}
+          />
+          <QuickToolCard
+            title="Support Groups"
+            description="Connect with peer support communities"
+            icon={<Users className="h-8 w-8 text-green-500" />}
+            onClick={() => window.location.href = '/community#support-groups'}
+          />
+        </div>
+      </div>
+
+      {/* Emergency Dialog Modal */}
+      {showEmergencyDialog && (
+        <EmergencyDialog onClose={() => setShowEmergencyDialog(false)} />
+      )}
+    </div>
+  );
+}
+
+// Crisis Assessment Component
+function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (responses: Record<string, number>) => void }) {
+  const [responses, setResponses] = useState<Record<string, number>>({});
+  
+  const questions = [
+    { id: 'safety', text: 'Do you feel safe right now?', inverse: true },
+    { id: 'thoughts', text: 'Are you having thoughts of self-harm?', inverse: false },
+    { id: 'plan', text: 'Do you have a plan to hurt yourself?', inverse: false },
+    { id: 'support', text: 'Do you have someone you can talk to?', inverse: true },
+    { id: 'overwhelm', text: 'How overwhelmed do you feel? (1-5)', inverse: false }
+  ];
+
+  const handleResponse = (questionId: string, value: number) => {
+    const newResponses = { ...responses, [questionId]: value };
+    setResponses(newResponses);
+    
+    if (Object.keys(newResponses).length === questions.length) {
+      onAssessmentComplete(newResponses);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900">Quick Crisis Assessment</h3>
+      <p className="text-gray-600">Please answer honestly. Your responses help us provide the right support.</p>
+      
+      <div className="space-y-4">
+        {questions.map((question) => (
+          <div key={question.id} className="bg-gray-50 p-4 rounded-lg">
+            <p className="font-medium text-gray-900 mb-3">{question.text}</p>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleResponse(question.id, question.inverse ? 6 - value : value)}
+                  className={`flex-1 py-2 px-3 rounded-lg transition-colors ${
+                    responses[question.id] === (question.inverse ? 6 - value : value)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Quick Tool Card Component
+function QuickToolCard({ title, description, icon, onClick }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow text-left"
+    >
+      <div className="flex items-start space-x-4">
+        <div className="flex-shrink-0">{icon}</div>
+        <div>
+          <h3 className="font-semibold text-gray-900">{title}</h3>
+          <p className="mt-1 text-sm text-gray-600">{description}</p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// Emergency Dialog Component
+function EmergencyDialog({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="fixed inset-0 bg-black opacity-75" onClick={onClose}></div>
+        <div className="relative bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+          <div className="text-center">
+            <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Immediate Help Available</h2>
+            <p className="text-gray-600 mb-6">
+              Based on your responses, we strongly encourage you to reach out for immediate support.
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => window.location.href = 'tel:988'}
+                className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              >
+                Call 988 Now
+              </button>
+              <button
+                onClick={() => window.location.href = 'sms:741741?body=HOME'}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Text Crisis Line
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+              >
+                Continue to Resources
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
