@@ -445,10 +445,10 @@ describe('Crisis Intervention Workflow', () => {
         http.get('/api/wellness/history', () => {
           return HttpResponse.json({
             moodHistory: [
-              { date: '2024-01-01', score: 2, mood: 'very low' },
-              { date: '2024-01-02', score: 3, mood: 'low' },
-              { date: '2024-01-03', score: 5, mood: 'neutral' },
-              { date: '2024-01-04', score: 6, mood: 'okay' }
+              { date: '2025-01-01', score: 2, mood: 'very low' },
+              { date: '2025-01-02', score: 3, mood: 'low' },
+              { date: '2025-01-03', score: 5, mood: 'neutral' },
+              { date: '2025-01-04', score: 6, mood: 'okay' }
             ],
             trend: 'improving',
             milestones: ['3 days of improvement', 'Joined support group']

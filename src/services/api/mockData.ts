@@ -76,9 +76,9 @@ export const mockUsers: User[] = [
         reducedMotion: false
       }
     },
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-08-30'),
-    lastActive: new Date('2024-08-30T14:30:00'),
+    createdAt: new Date('2025-01-15'),
+    updatedAt: new Date('2025-08-30'),
+    lastActive: new Date('2025-08-30T14:30:00'),
     isVerified: true,
     twoFactorEnabled: true
   },
@@ -127,8 +127,8 @@ export const mockUsers: User[] = [
       }
     },
     createdAt: new Date('2023-06-01'),
-    updatedAt: new Date('2024-08-30'),
-    lastActive: new Date('2024-08-30T16:00:00'),
+    updatedAt: new Date('2025-08-30'),
+    lastActive: new Date('2025-08-30T16:00:00'),
     isVerified: true,
     twoFactorEnabled: true
   }
@@ -139,7 +139,7 @@ export const mockMoodEntries: MoodEntry[] = [
   {
     id: 'mood-1',
     userId: 'user-1',
-    timestamp: new Date('2024-08-30T09:00:00'),
+    timestamp: new Date('2025-08-30T09:00:00'),
     mood: 4,
     emotions: [
       { type: 'happy', intensity: 70 },
@@ -164,7 +164,7 @@ export const mockMoodEntries: MoodEntry[] = [
       {
         medicationId: 'med-1',
         taken: true,
-        time: new Date('2024-08-30T08:00:00'),
+        time: new Date('2025-08-30T08:00:00'),
         dosage: '20mg'
       }
     ]
@@ -172,7 +172,7 @@ export const mockMoodEntries: MoodEntry[] = [
   {
     id: 'mood-2',
     userId: 'user-1',
-    timestamp: new Date('2024-08-29T20:00:00'),
+    timestamp: new Date('2025-08-29T20:00:00'),
     mood: 2,
     emotions: [
       { type: 'anxious', intensity: 85 },
@@ -270,13 +270,13 @@ export const mockTherapists: Therapist[] = [
         userId: 'user-1',
         rating: 5,
         review: 'Dr. Chen has been incredibly helpful in my journey. Highly recommended!',
-        date: new Date('2024-07-15')
+        date: new Date('2025-07-15')
       },
       {
         userId: 'user-2',
         rating: 5,
         review: 'Very professional and understanding. Great listener.',
-        date: new Date('2024-06-20')
+        date: new Date('2025-06-20')
       }
     ],
     verified: true,
@@ -299,7 +299,7 @@ export const mockAppointments: Appointment[] = [
     id: 'appt-1',
     patientId: 'user-1',
     therapistId: 'therapist-1',
-    scheduledTime: new Date('2024-09-05T14:00:00'),
+    scheduledTime: new Date('2025-09-05T14:00:00'),
     duration: 50,
     type: 'followup',
     format: 'video',
@@ -320,7 +320,7 @@ export const mockAppointments: Appointment[] = [
       method: 'insurance',
       status: 'pending',
       insuranceClaim: {
-        claimNumber: 'CLM-2024-0905',
+        claimNumber: 'CLM-2025-0905',
         provider: 'Blue Cross Blue Shield',
         status: 'submitted',
         copay: 30
@@ -341,8 +341,8 @@ export const mockCrisisSessions: CrisisSession[] = [
     id: 'crisis-1',
     userId: 'user-1',
     counselorId: 'counselor-1',
-    startTime: new Date('2024-08-25T22:30:00'),
-    endTime: new Date('2024-08-25T23:15:00'),
+    startTime: new Date('2025-08-25T22:30:00'),
+    endTime: new Date('2025-08-25T23:15:00'),
     severity: 'high',
     type: 'chat',
     status: 'resolved',
@@ -351,14 +351,14 @@ export const mockCrisisSessions: CrisisSession[] = [
         id: 'msg-1',
         senderId: 'user-1',
         content: "I'm having a really hard time right now",
-        timestamp: new Date('2024-08-25T22:30:00'),
+        timestamp: new Date('2025-08-25T22:30:00'),
         type: 'text'
       },
       {
         id: 'msg-2',
         senderId: 'counselor-1',
         content: "I'm here to help. You're not alone. Can you tell me what's happening?",
-        timestamp: new Date('2024-08-25T22:31:00'),
+        timestamp: new Date('2025-08-25T22:31:00'),
         type: 'text'
       }
     ],
@@ -367,7 +367,7 @@ export const mockCrisisSessions: CrisisSession[] = [
       escalatedToEmergency: false,
       referralMade: true,
       safetyPlanReviewed: true,
-      followUpScheduled: new Date('2024-08-26T10:00:00'),
+      followUpScheduled: new Date('2025-08-26T10:00:00'),
       notes: 'User was experiencing acute anxiety. Utilized grounding techniques and reviewed safety plan.'
     },
     followUpRequired: true
@@ -390,25 +390,25 @@ export const mockSafetyPlan: SafetyPlan = {
       id: 'cope-1',
       strategy: 'Deep breathing exercises (4-7-8 technique)',
       effectiveness: 8,
-      lastUsed: new Date('2024-08-29')
+      lastUsed: new Date('2025-08-29')
     },
     {
       id: 'cope-2',
       strategy: 'Go for a walk in nature',
       effectiveness: 7,
-      lastUsed: new Date('2024-08-28')
+      lastUsed: new Date('2025-08-28')
     },
     {
       id: 'cope-3',
       strategy: 'Call a friend or family member',
       effectiveness: 9,
-      lastUsed: new Date('2024-08-27')
+      lastUsed: new Date('2025-08-27')
     },
     {
       id: 'cope-4',
       strategy: 'Practice progressive muscle relaxation',
       effectiveness: 6,
-      lastUsed: new Date('2024-08-26')
+      lastUsed: new Date('2025-08-26')
     }
   ],
   distractions: [
@@ -473,9 +473,9 @@ export const mockSafetyPlan: SafetyPlan = {
     'Travel goals I want to achieve',
     'Making a difference in my community'
   ],
-  createdAt: new Date('2024-01-20'),
-  updatedAt: new Date('2024-08-25'),
-  lastReviewed: new Date('2024-08-25'),
+  createdAt: new Date('2025-01-20'),
+  updatedAt: new Date('2025-08-25'),
+  lastReviewed: new Date('2025-08-25'),
   sharedWith: ['therapist-1', 'user-spouse']
 };
 
@@ -489,16 +489,16 @@ export const mockCommunityPosts: CommunityPost[] = [
     tags: ['depression', 'small-wins', 'self-care'],
     type: 'achievement',
     visibility: 'public',
-    createdAt: new Date('2024-08-30T10:00:00'),
-    updatedAt: new Date('2024-08-30T10:00:00'),
+    createdAt: new Date('2025-08-30T10:00:00'),
+    updatedAt: new Date('2025-08-30T10:00:00'),
     likes: ['user-2', 'user-3', 'user-4', 'user-5'],
     comments: [
       {
         id: 'comment-1',
         authorId: 'user-2',
         content: 'Thank you for sharing this! I needed to hear it today.',
-        createdAt: new Date('2024-08-30T10:30:00'),
-        updatedAt: new Date('2024-08-30T10:30:00'),
+        createdAt: new Date('2025-08-30T10:30:00'),
+        updatedAt: new Date('2025-08-30T10:30:00'),
         likes: ['user-1', 'user-3'],
         replies: [],
         reported: false,
@@ -517,16 +517,16 @@ export const mockCommunityPosts: CommunityPost[] = [
     tags: ['anxiety', 'tips', 'social-anxiety'],
     type: 'question',
     visibility: 'public',
-    createdAt: new Date('2024-08-29T15:00:00'),
-    updatedAt: new Date('2024-08-29T15:00:00'),
+    createdAt: new Date('2025-08-29T15:00:00'),
+    updatedAt: new Date('2025-08-29T15:00:00'),
     likes: ['user-1', 'user-2'],
     comments: [
       {
         id: 'comment-2',
         authorId: 'user-1',
         content: 'The 5-4-3-2-1 grounding technique has been really helpful for me. Also, carrying a small stress ball helps in social situations.',
-        createdAt: new Date('2024-08-29T15:30:00'),
-        updatedAt: new Date('2024-08-29T15:30:00'),
+        createdAt: new Date('2025-08-29T15:30:00'),
+        updatedAt: new Date('2025-08-29T15:30:00'),
         likes: ['user-3', 'user-4'],
         replies: [],
         reported: false,
@@ -573,7 +573,7 @@ export const mockSupportGroups: SupportGroup[] = [
         description: 'Learn about different types of anxiety disorders and treatment options',
         tags: ['anxiety', 'education', 'treatment'],
         addedBy: 'mod-1',
-        addedAt: new Date('2024-07-01')
+        addedAt: new Date('2025-07-01')
       },
       {
         id: 'resource-2',
@@ -583,10 +583,10 @@ export const mockSupportGroups: SupportGroup[] = [
         description: 'Guided breathing exercises to help manage anxiety',
         tags: ['anxiety', 'breathing', 'exercises'],
         addedBy: 'mod-2',
-        addedAt: new Date('2024-07-15')
+        addedAt: new Date('2025-07-15')
       }
     ],
-    createdAt: new Date('2024-01-01')
+    createdAt: new Date('2025-01-01')
   },
   {
     id: 'group-2',
@@ -620,10 +620,10 @@ export const mockSupportGroups: SupportGroup[] = [
         description: 'Printable mood tracking journal to monitor patterns',
         tags: ['depression', 'mood-tracking', 'tools'],
         addedBy: 'mod-3',
-        addedAt: new Date('2024-06-15')
+        addedAt: new Date('2025-06-15')
       }
     ],
-    createdAt: new Date('2024-02-01')
+    createdAt: new Date('2025-02-01')
   }
 ];
 

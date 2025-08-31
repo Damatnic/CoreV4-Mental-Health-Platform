@@ -123,9 +123,9 @@ const wellnessHandlers = [
     
     return HttpResponse.json({
       moodHistory: [
-        { date: '2024-01-01', score: 7, mood: 'good' },
-        { date: '2024-01-02', score: 6, mood: 'okay' },
-        { date: '2024-01-03', score: 8, mood: 'great' },
+        { date: '2025-01-01', score: 7, mood: 'good' },
+        { date: '2025-01-02', score: 6, mood: 'okay' },
+        { date: '2025-01-03', score: 8, mood: 'great' },
       ],
       wellnessScore: 75,
       streaks: {
@@ -150,7 +150,7 @@ const professionalHandlers = [
           specialization: 'Anxiety & Depression',
           rating: 4.8,
           availability: 'Available',
-          nextSlot: '2024-01-05 10:00 AM',
+          nextSlot: '2025-01-05 10:00 AM',
         },
         {
           id: 'prof-2',
@@ -158,7 +158,7 @@ const professionalHandlers = [
           specialization: 'Trauma & PTSD',
           rating: 4.9,
           availability: 'Busy',
-          nextSlot: '2024-01-06 2:00 PM',
+          nextSlot: '2025-01-06 2:00 PM',
         },
       ],
     });

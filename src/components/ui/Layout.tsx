@@ -225,7 +225,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-            <p>© 2024 CoreV4 Mental Health Platform. Built with care for your wellbeing.</p>
+            <p>© 2025 CoreV4 Mental Health Platform. Built with care for your wellbeing.</p>
           </div>
         </div>
       </footer>

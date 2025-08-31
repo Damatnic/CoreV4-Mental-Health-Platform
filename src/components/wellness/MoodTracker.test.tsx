@@ -245,9 +245,9 @@ describe('MoodTracker', () => {
         http.get('/api/wellness/history', () => {
           return HttpResponse.json({
             moodHistory: [
-              { date: '2024-01-01', score: 7, mood: 'good' },
-              { date: '2024-01-02', score: 5, mood: 'okay' },
-              { date: '2024-01-03', score: 3, mood: 'poor' },
+              { date: '2025-01-01', score: 7, mood: 'good' },
+              { date: '2025-01-02', score: 5, mood: 'okay' },
+              { date: '2025-01-03', score: 3, mood: 'poor' },
             ],
             wellnessScore: 45,
             trend: 'declining'
