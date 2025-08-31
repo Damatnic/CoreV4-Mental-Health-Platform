@@ -29,7 +29,7 @@ import {
   Circle,
   AlertCircle
 } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
+import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
 
 // Wellness metrics categories
 const WELLNESS_CATEGORIES = {
@@ -428,7 +428,7 @@ export const WellnessDashboard: React.FC = () => {
         goals
       }, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const exportFileDefaultName = `wellness-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+      const exportFileDefaultName = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
@@ -446,14 +446,14 @@ export const WellnessDashboard: React.FC = () => {
         const sleepQuality = data.sleep?.quality || '';
         const score = calculateWellnessScore();
         
-        csvContent += `${format(data.date, 'yyyy-MM-dd')},${habits},${exercise},${water},${sleepHours},${sleepQuality},${score}\n`;
+        csvContent += `${formatDate(data.date, 'yyyy-MM-dd')},${habits},${exercise},${water},${sleepHours},${sleepQuality},${score}\n`;
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `wellness-data-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      link.download = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.csv`;
       link.click();
     }
   };
@@ -723,7 +723,7 @@ export const WellnessDashboard: React.FC = () => {
                   }`}
                 >
                   <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {format(day.date, 'EEE')}
+                    {formatDate(day.date, 'EEE')}
                   </p>
                   <div className="space-y-1">
                     <div className="flex justify-center">
@@ -792,7 +792,7 @@ export const WellnessDashboard: React.FC = () => {
                     </div>
                     {goal.deadline && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Due: {format(goal.deadline, 'MMM d')}
+                        Due: {formatDate(goal.deadline, 'MMM d')}
                       </p>
                     )}
                   </div>
@@ -843,7 +843,7 @@ export const WellnessDashboard: React.FC = () => {
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   Most consistent: {
                     habitStreaks.length > 0
-                      ? DAILY_HABITS.find(h => h.id === habitStreaks.sort((a, b) => b.current - a.current)[0].habitId)?.name
+                      ? DAILY_HABITS.find(h => h.id === habitStreaks.sort((a, b) => b.current - a.current)[0]?.habitId)?.name || 'Unknown habit'
                       : 'Start tracking habits'
                   }
                 </p>
@@ -950,7 +950,7 @@ export const WellnessDashboard: React.FC = () => {
                   </label>
                   <input
                     type="date"
-                    value={newGoal.deadline ? format(newGoal.deadline, 'yyyy-MM-dd') : ''}
+                    value={newGoal.deadline ? formatDate(newGoal.deadline, 'yyyy-MM-dd') : ''}
                     onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value ? new Date(e.target.value) : undefined })}
                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
                   />

@@ -383,9 +383,8 @@ export function MoodTracker() {
                 style={{
                   backgroundColor: selectedEmotions.includes(emotion.value) ? emotion.color + '20' : undefined,
                   color: selectedEmotions.includes(emotion.value) ? emotion.color : undefined,
-                  borderColor: selectedEmotions.includes(emotion.value) ? emotion.color : undefined,
-                  ringColor: selectedEmotions.includes(emotion.value) ? emotion.color : undefined
-                }}
+                  borderColor: selectedEmotions.includes(emotion.value) ? emotion.color : undefined
+                } as React.CSSProperties}
               >
                 {emotion.label}
               </button>

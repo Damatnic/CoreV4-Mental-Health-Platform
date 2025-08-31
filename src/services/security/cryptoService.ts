@@ -92,7 +92,7 @@ class CryptographyService {
       combined.set(new Uint8Array(encryptedData), iv.length);
       
       // Convert to base64 for storage
-      return this.arrayBufferToBase64(combined);
+      return this.arrayBufferToBase64(combined.buffer);
     } catch (error) {
       console.error('Encryption failed:', error);
       throw new Error('Failed to encrypt data');
@@ -178,7 +178,7 @@ class CryptographyService {
       combined.set(new Uint8Array(saltBytes), 0);
       combined.set(new Uint8Array(derivedBits), saltBytes.byteLength);
       
-      return this.arrayBufferToBase64(combined);
+      return this.arrayBufferToBase64(combined.buffer);
     } catch (error) {
       console.error('Password hashing failed:', error);
       throw new Error('Failed to hash password');
@@ -197,7 +197,7 @@ class CryptographyService {
       const originalHash = combinedArray.slice(this.SALT_LENGTH);
       
       // Hash the provided password with the same salt
-      const saltBase64 = this.arrayBufferToBase64(salt);
+      const saltBase64 = this.arrayBufferToBase64(salt.buffer);
       const newHashWithSalt = await this.hashPassword(password, saltBase64);
       
       // Extract the hash part from the new result
@@ -218,7 +218,7 @@ class CryptographyService {
    */
   generateSecureToken(length: number = 32): string {
     const bytes = crypto.getRandomValues(new Uint8Array(length));
-    return this.arrayBufferToBase64(bytes);
+    return this.arrayBufferToBase64(bytes.buffer);
   }
 
   /**
@@ -417,7 +417,7 @@ class CryptographyService {
     const bytes = new Uint8Array(buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
+      binary += String.fromCharCode(bytes[i] || 0);
     }
     return btoa(binary);
   }
@@ -438,7 +438,7 @@ class CryptographyService {
     
     let result = 0;
     for (let i = 0; i < a.length; i++) {
-      result |= a[i] ^ b[i];
+      result |= (a[i] || 0) ^ (b[i] || 0);
     }
     
     return result === 0;

@@ -336,7 +336,7 @@ export function SafetyPlan() {
               title="Warning Signals"
               description="Early signs that I'm beginning to feel unwell"
               items={safetyPlan.warningSignals}
-              onUpdate={(items) => handleUpdateSection('warningSignals', items)}
+              onUpdate={(items: any) => handleUpdateSection('warningSignals', items)}
               isEditing={isEditing}
               placeholder="e.g., Feeling isolated, trouble sleeping..."
             />
@@ -347,7 +347,7 @@ export function SafetyPlan() {
               title="Coping Strategies"
               description="Things I can do on my own to feel better"
               items={safetyPlan.copingStrategies}
-              onUpdate={(items) => handleUpdateSection('copingStrategies', items)}
+              onUpdate={(items: any) => handleUpdateSection('copingStrategies', items)}
               isEditing={isEditing}
               placeholder="e.g., Deep breathing, take a walk..."
             />
@@ -358,7 +358,7 @@ export function SafetyPlan() {
               title="Distraction Techniques"
               description="Activities to take my mind off problems"
               items={safetyPlan.distractionTechniques}
-              onUpdate={(items) => handleUpdateSection('distractionTechniques', items)}
+              onUpdate={(items: any) => handleUpdateSection('distractionTechniques', items)}
               isEditing={isEditing}
               placeholder="e.g., Watch a movie, call a friend..."
             />
@@ -367,7 +367,7 @@ export function SafetyPlan() {
           {activeSection === 'supportPeople' && (
             <SupportPeopleEditor
               people={safetyPlan.supportPeople}
-              onUpdate={(people) => handleUpdateSection('supportPeople', people)}
+              onUpdate={(people: any) => handleUpdateSection('supportPeople', people)}
               isEditing={isEditing}
             />
           )}
@@ -377,7 +377,7 @@ export function SafetyPlan() {
               title="Safe Places"
               description="Places where I feel calm and secure"
               items={safetyPlan.safePlaces}
-              onUpdate={(items) => handleUpdateSection('safePlaces', items)}
+              onUpdate={(items: any) => handleUpdateSection('safePlaces', items)}
               isEditing={isEditing}
               placeholder="e.g., Library, park, friend's house..."
             />
@@ -386,7 +386,7 @@ export function SafetyPlan() {
           {activeSection === 'professionalContacts' && (
             <ProfessionalContactsEditor
               contacts={safetyPlan.professionalContacts}
-              onUpdate={(contacts) => handleUpdateSection('professionalContacts', contacts)}
+              onUpdate={(contacts: any) => handleUpdateSection('professionalContacts', contacts)}
               isEditing={isEditing}
             />
           )}
@@ -396,7 +396,7 @@ export function SafetyPlan() {
               title="Reasons to Live"
               description="Things that are important to me and worth living for"
               items={safetyPlan.reasonsToLive}
-              onUpdate={(items) => handleUpdateSection('reasonsToLive', items)}
+              onUpdate={(items: any) => handleUpdateSection('reasonsToLive', items)}
               isEditing={isEditing}
               placeholder="e.g., Family, goals, beliefs..."
             />
@@ -407,7 +407,7 @@ export function SafetyPlan() {
               title="Making Environment Safe"
               description="Steps to remove or reduce access to harmful means"
               items={safetyPlan.safeEnvironmentSteps}
-              onUpdate={(items) => handleUpdateSection('safeEnvironmentSteps', items)}
+              onUpdate={(items: any) => handleUpdateSection('safeEnvironmentSteps', items)}
               isEditing={isEditing}
               placeholder="e.g., Give medications to trusted person..."
             />

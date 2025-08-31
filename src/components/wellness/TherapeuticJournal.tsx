@@ -29,7 +29,7 @@ import {
   Share2,
   FileText
 } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
+import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 
 // Journal entry types based on therapeutic approaches
 const JOURNAL_TYPES = {
@@ -245,7 +245,7 @@ export const TherapeuticJournal: React.FC = () => {
     const newEntry: JournalEntry = {
       id: Date.now().toString(),
       type: currentEntry.type || 'freeform',
-      title: currentEntry.title || `${JOURNAL_TYPES[currentEntry.type || 'freeform'].name} - ${format(new Date(), 'MMM d, yyyy')}`,
+      title: currentEntry.title || `${JOURNAL_TYPES[currentEntry.type || 'freeform'].name} - ${formatDate(new Date(), 'MMM d, yyyy')}`,
       content: currentEntry.content,
       mood: currentEntry.mood,
       tags: currentEntry.tags || [],
@@ -315,7 +315,7 @@ export const TherapeuticJournal: React.FC = () => {
     if (format === 'json') {
       const dataStr = JSON.stringify(entries, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const exportFileDefaultName = `journal-export-${format(new Date(), 'yyyy-MM-dd')}.json`;
+      const exportFileDefaultName = `journal-export-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
@@ -326,7 +326,7 @@ export const TherapeuticJournal: React.FC = () => {
       textContent += '=' .repeat(50) + '\n\n';
       
       entries.forEach(entry => {
-        textContent += `Date: ${format(entry.timestamp, 'PPP')}\n`;
+        textContent += `Date: ${formatDate(entry.timestamp, 'PPP')}\n`;
         textContent += `Type: ${JOURNAL_TYPES[entry.type].name}\n`;
         textContent += `Title: ${entry.title}\n`;
         if (entry.mood) textContent += `Mood: ${entry.mood}\n`;
@@ -348,7 +348,7 @@ export const TherapeuticJournal: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `journal-export-${format(new Date(), 'yyyy-MM-dd')}.txt`;
+      link.download = `journal-export-${formatDate(new Date(), 'yyyy-MM-dd')}.txt`;
       link.click();
     }
   };
@@ -390,7 +390,7 @@ export const TherapeuticJournal: React.FC = () => {
     
     return days.map(day => {
       const dayEntries = entries.filter(entry => 
-        format(entry.timestamp, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
+        formatDate(entry.timestamp, 'yyyy-MM-dd') === formatDate(day, 'yyyy-MM-dd')
       );
       
       return {
@@ -456,7 +456,7 @@ export const TherapeuticJournal: React.FC = () => {
                     }`}
                   >
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {format(day.date, 'EEE')}
+                      {formatDate(day.date, 'EEE')}
                     </p>
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {day.count}
@@ -623,7 +623,7 @@ export const TherapeuticJournal: React.FC = () => {
                             }
                           </p>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
-                            <span>{format(entry.timestamp, 'MMM d, yyyy')}</span>
+                            <span>{formatDate(entry.timestamp, 'MMM d, yyyy')}</span>
                             <span>{entry.wordCount} words</span>
                             {entry.mood && (
                               <span className="flex items-center gap-1">
@@ -656,7 +656,7 @@ export const TherapeuticJournal: React.FC = () => {
                       {JOURNAL_TYPES[selectedType].name}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {format(new Date(), 'EEEE, MMMM d, yyyy')}
+                      {formatDate(new Date(), 'EEEE, MMMM d, yyyy')}
                     </p>
                   </div>
                 </div>
@@ -896,7 +896,7 @@ export const TherapeuticJournal: React.FC = () => {
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Date</p>
                     <p className="text-gray-700 dark:text-gray-300">
-                      {format(selectedEntry.timestamp, 'PPP')}
+                      {formatDate(selectedEntry.timestamp, 'PPP')}
                     </p>
                   </div>
                   

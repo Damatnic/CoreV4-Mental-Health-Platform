@@ -104,14 +104,14 @@ export function CrisisInterventionSystem() {
     const percentage = (score / maxScore) * 100;
 
     if (percentage >= 80) {
-      setCurrentCrisisLevel(CRISIS_LEVELS.critical);
+      setCurrentCrisisLevel(CRISIS_LEVELS['critical'] || null);
       setShowEmergencyDialog(true);
     } else if (percentage >= 60) {
-      setCurrentCrisisLevel(CRISIS_LEVELS.high);
+      setCurrentCrisisLevel(CRISIS_LEVELS['high'] || null);
     } else if (percentage >= 40) {
-      setCurrentCrisisLevel(CRISIS_LEVELS.medium);
+      setCurrentCrisisLevel(CRISIS_LEVELS['medium'] || null);
     } else {
-      setCurrentCrisisLevel(CRISIS_LEVELS.low);
+      setCurrentCrisisLevel(CRISIS_LEVELS['low'] || null);
     }
   };
 

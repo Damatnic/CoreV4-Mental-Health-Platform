@@ -215,7 +215,7 @@ class HIPAAComplianceService {
         event: 'SYSTEM_ERROR',
         userId: params.userId,
         details: {
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           context: 'PHI access request',
         },
         severity: 'error',
@@ -482,7 +482,7 @@ class HIPAAComplianceService {
       };
 
       const avgSeverity = findings.length > 0
-        ? findings.reduce((sum, f) => sum + severityScores[f.severity], 0) / findings.length
+        ? findings.reduce((sum, f) => sum + (severityScores[f.severity as keyof typeof severityScores] || 0), 0) / findings.length
         : 0;
 
       let overallRisk: 'low' | 'medium' | 'high' | 'critical';
@@ -537,7 +537,7 @@ class HIPAAComplianceService {
       emergency: ['read', 'write'],
     };
 
-    return permissions[userRole]?.includes(accessLevel) || false;
+    return (permissions[userRole as keyof typeof permissions] || []).includes(accessLevel);
   }
 
   private async assessMinimumNecessary(
@@ -567,8 +567,9 @@ class HIPAAComplianceService {
     };
 
     const purposeCategory = this.categorizePurpose(purpose);
-    if (necessaryData[purposeCategory]) {
-      assessment.assessment.necessary = necessaryData[purposeCategory].filter(
+    const categoryData = necessaryData[purposeCategory as keyof typeof necessaryData];
+    if (categoryData) {
+      assessment.assessment.necessary = categoryData.filter(
         d => d === resourceType
       );
       assessment.assessment.unnecessary = [resourceType].filter(

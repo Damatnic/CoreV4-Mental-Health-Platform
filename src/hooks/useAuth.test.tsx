@@ -1,6 +1,15 @@
 // useAuth Hook Integration Tests
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
+const waitFor = async (callback: () => boolean | void, options?: { timeout?: number }) => {
+  const timeout = options?.timeout || 1000;
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    if (callback()) return;
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  throw new Error('waitFor timeout');
+};
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { server } from '../test/mocks/server';

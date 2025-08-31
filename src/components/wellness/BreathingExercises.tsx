@@ -74,7 +74,7 @@ interface BreathingSession {
 export const BreathingExercises: React.FC = () => {
   const [selectedPattern, setSelectedPattern] = useState<keyof typeof BREATHING_PATTERNS>('4-7-8');
   const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'holdOut'>('inhale');
+  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'holdIn' | 'exhale' | 'holdOut'>('inhale');
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [cycleCount, setCycleCount] = useState(0);
   const [sessionDuration, setSessionDuration] = useState(0);
@@ -216,7 +216,7 @@ export const BreathingExercises: React.FC = () => {
             exhale: 349,   // F4
             holdOut: 392   // G4
           };
-          playSound(frequencies[nextPhase], 0.2);
+          playSound(frequencies[nextPhase] || 261, 0.2);
           
           setCurrentPhase(nextPhase);
           

@@ -354,7 +354,7 @@ function ResourceCard({ resource, onCall, onGetDirections }: any) {
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 mb-1">Services:</p>
           <div className="flex flex-wrap gap-1">
-            {resource.services.map((service, index) => (
+            {resource.services.map((service: any, index: any) => (
               <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
                 {service}
               </span>

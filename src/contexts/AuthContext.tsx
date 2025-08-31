@@ -82,7 +82,7 @@ interface RegisterOptions {
   anonymousMode?: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -311,7 +311,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await privacyService.recordConsent({
           userId: result.data.id,
           type: 'data_processing',
-          granted: true,
+          consentGiven: true,
           purpose: 'Account creation and platform usage',
           dataCategories: ['personal_info'],
         });
@@ -455,7 +455,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await privacyService.recordConsent({
       userId: user.id,
       type,
-      granted: true,
+      consentGiven: true,
       purpose,
       dataCategories: categories,
     });

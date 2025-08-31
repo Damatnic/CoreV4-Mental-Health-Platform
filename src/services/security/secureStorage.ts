@@ -122,7 +122,7 @@ class SecureStorageService {
       this.logStorageEvent('SET', key, { encrypted, persistent });
     } catch (error) {
       console.error(`Failed to store item ${key}:`, error);
-      throw new Error(`Storage failed: ${error.message}`);
+      throw new Error(`Storage failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -144,7 +144,7 @@ class SecureStorageService {
           storageItem = JSON.parse(stored) as StorageItem;
         } else {
           // Try IndexedDB as fallback
-          storageItem = await this.getFromIndexedDB(storageKey);
+          storageItem = await this.getFromIndexedDB(storageKey) || undefined;
         }
 
         // Cache in memory if found

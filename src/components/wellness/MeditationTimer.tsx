@@ -19,7 +19,8 @@ import {
   Zap,
   Heart,
   Brain,
-  Wind
+  Wind,
+  Star
 } from 'lucide-react';
 
 // Meditation types and their benefits

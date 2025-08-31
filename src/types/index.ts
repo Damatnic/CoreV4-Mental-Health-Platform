@@ -46,6 +46,21 @@ export interface PrivacySettings {
   showMoodHistory: boolean;
 }
 
+export interface ConsentRecord {
+  id: string;
+  userId: string;
+  type: 'terms' | 'privacy' | 'data_processing' | 'marketing' | 'data_sharing' | 'analytics' | 'cookies' | 'health_data' | 'crisis_intervention' | 'emergency_contact' | 'therapist_access' | 'research' | 'third_party';
+  version: string;
+  consentGiven: boolean;
+  timestamp: Date;
+  ipAddress?: string;
+  userAgent?: string;
+  purpose?: string;
+  dataCategories?: string[];
+  expiresAt?: Date;
+  withdrawable?: boolean;
+}
+
 // Mental Health types
 export interface MentalHealthProfile {
   conditions?: string[];

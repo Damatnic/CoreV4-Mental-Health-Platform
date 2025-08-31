@@ -118,7 +118,7 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
   
   // Get current tool component
   const currentToolData = WELLNESS_TOOLS.find(tool => tool.id === selectedTool) || WELLNESS_TOOLS[0];
-  const CurrentComponent = currentToolData.component;
+  const CurrentComponent = currentToolData?.component || (() => null);
 
   // Handle tool selection
   const handleToolSelect = (toolId: string) => {
@@ -235,15 +235,15 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 p-4">
             <div className="max-w-4xl mx-auto flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {React.createElement(WELLNESS_TIPS[currentTipIndex].icon, {
+                {WELLNESS_TIPS[currentTipIndex] && React.createElement(WELLNESS_TIPS[currentTipIndex].icon, {
                   className: "w-5 h-5 text-blue-500"
                 })}
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {WELLNESS_TIPS[currentTipIndex].category} Tip
+                    {WELLNESS_TIPS[currentTipIndex]?.category} Tip
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {WELLNESS_TIPS[currentTipIndex].tip}
+                    {WELLNESS_TIPS[currentTipIndex]?.tip}
                   </p>
                 </div>
               </div>

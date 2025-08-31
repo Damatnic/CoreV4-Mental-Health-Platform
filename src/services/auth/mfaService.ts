@@ -105,7 +105,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'mfa_setup_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -122,7 +122,7 @@ class MultiFactorAuthService {
         throw new Error('TOTP not configured');
       }
 
-      const secret = await cryptoService.decrypt(setup.metadata.secret);
+      const secret = await cryptoService.decrypt(setup.metadata?.secret || '');
       const isValid = await this.verifyTOTPCode(secret, code);
 
       if (isValid) {
@@ -144,7 +144,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'totp_verification_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'totp_verification_failed' },
         severity: 'warning',
       });
       return false;
@@ -183,7 +183,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'sms_setup_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'sms_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -219,7 +219,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'email_setup_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'email_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -260,7 +260,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'biometric_setup_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'biometric_setup_failed' },
         severity: 'error',
       });
       return false;
@@ -309,7 +309,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
         userId,
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'warning',
       });
       throw error;
@@ -402,7 +402,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
         userId,
-        details: { error: error.message, challengeId },
+        details: { error: error instanceof Error ? error.message : String(error), challengeId },
         severity: 'error',
       });
       return false;
@@ -426,7 +426,7 @@ class MultiFactorAuthService {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         userId,
-        details: { error: error.message, action: 'mfa_disable_failed' },
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_disable_failed' },
         severity: 'error',
       });
       throw error;
@@ -618,7 +618,7 @@ class MultiFactorAuthService {
     const setup = await this.getMFASetup(userId, 'totp');
     if (!setup) return false;
     
-    const secret = await cryptoService.decrypt(setup.metadata.secret);
+    const secret = await cryptoService.decrypt(setup.metadata?.secret || '');
     return await this.verifyTOTPCode(secret, code);
   }
 
@@ -627,9 +627,9 @@ class MultiFactorAuthService {
     if (!setup) return false;
     
     const backupCodes = JSON.parse(
-      await cryptoService.decrypt(setup.metadata.backupCodes)
+      await cryptoService.decrypt(setup.metadata?.backupCodes || '[]')
     );
-    const usedCodes = setup.metadata.usedBackupCodes || [];
+    const usedCodes = setup.metadata?.usedBackupCodes || [];
     
     if (usedCodes.includes(code)) {
       return false;
@@ -640,7 +640,9 @@ class MultiFactorAuthService {
     if (isValid) {
       // Mark code as used
       usedCodes.push(code);
-      setup.metadata.usedBackupCodes = usedCodes;
+      if (setup.metadata) {
+        setup.metadata.usedBackupCodes = usedCodes;
+      }
       await this.storeMFASetup(userId, setup);
     }
     
@@ -723,14 +725,14 @@ class MultiFactorAuthService {
       case 'sms':
         const smsSetup = await this.getMFASetup(userId, 'sms');
         if (smsSetup) {
-          const phone = await cryptoService.decrypt(smsSetup.metadata.phoneNumber);
+          const phone = await cryptoService.decrypt(smsSetup.metadata?.phoneNumber || '');
           await this.sendSMSCode(userId, phone);
         }
         break;
       case 'email':
         const emailSetup = await this.getMFASetup(userId, 'email');
         if (emailSetup) {
-          const email = await cryptoService.decrypt(emailSetup.metadata.email);
+          const email = await cryptoService.decrypt(emailSetup.metadata?.email || '');
           await this.sendEmailCode(userId, email);
         }
         break;

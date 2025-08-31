@@ -12,7 +12,7 @@ export interface ConsentRecord {
   id: string;
   userId: string;
   type: ConsentType;
-  granted: boolean;
+  consentGiven: boolean;
   purpose: string;
   dataCategories: DataCategory[];
   expiresAt?: Date;
@@ -51,6 +51,7 @@ export interface PrivacySettings {
   userId: string;
   dataMinimization: boolean;
   anonymousMode: boolean;
+  shareData: boolean;
   shareWithTherapist: boolean;
   shareWithEmergencyContacts: boolean;
   allowAnalytics: boolean;
@@ -120,7 +121,7 @@ class PrivacyService {
   async recordConsent(params: {
     userId: string;
     type: ConsentType;
-    granted: boolean;
+    consentGiven: boolean;
     purpose: string;
     dataCategories: DataCategory[];
     expiresInDays?: number;
@@ -131,7 +132,7 @@ class PrivacyService {
         id: cryptoService.generateSecureUUID(),
         userId: params.userId,
         type: params.type,
-        granted: params.granted,
+        consentGiven: params.consentGiven,
         purpose: params.purpose,
         dataCategories: params.dataCategories,
         expiresAt: params.expiresInDays 
@@ -148,7 +149,7 @@ class PrivacyService {
 
       // Log consent event
       await auditLogger.log({
-        event: params.granted ? 'CONSENT_GRANTED' : 'CONSENT_REVOKED',
+        event: params.consentGiven ? 'CONSENT_GRANTED' : 'CONSENT_REVOKED',
         userId: params.userId,
         details: {
           type: params.type,
@@ -188,7 +189,7 @@ class PrivacyService {
       }
 
       // Mark consent as withdrawn
-      consent.granted = false;
+      consent.consentGiven = false;
       await this.storeConsentRecord(consent);
 
       // Trigger data deletion if required
@@ -237,6 +238,7 @@ class PrivacyService {
         userId,
         dataMinimization: true,
         anonymousMode: false,
+        shareData: false,
         shareWithTherapist: false,
         shareWithEmergencyContacts: false,
         allowAnalytics: false,
@@ -456,7 +458,7 @@ class PrivacyService {
       await this.recordConsent({
         userId: params.userId,
         type: 'data_sharing',
-        granted: true,
+        consentGiven: true,
         purpose: params.purpose,
         dataCategories: params.dataCategories,
         expiresInDays: params.durationDays,
@@ -538,7 +540,7 @@ class PrivacyService {
       
       const relevantConsents = consents.filter(c => 
         c.type === type && 
-        c.granted &&
+        c.consentGiven &&
         (!c.expiresAt || new Date() < new Date(c.expiresAt))
       );
 

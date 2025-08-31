@@ -139,7 +139,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'REGISTRATION_FAILED',
-        details: { error: error.message, email: data.email },
+        details: { error: error instanceof Error ? error.message : String(error), email: data.email },
         severity: 'warning',
       });
       throw error;
@@ -203,7 +203,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
-        details: { error: error.message, email: credentials.email },
+        details: { error: error instanceof Error ? error.message : String(error), email: credentials.email },
         severity: 'warning',
       });
       throw error;
@@ -345,7 +345,7 @@ class AuthenticationService {
       await auditLogger.log({
         event: 'PROFILE_UPDATE_FAILED',
         userId: this.currentSession?.user.id,
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'error',
       });
       throw error;
@@ -373,8 +373,8 @@ class AuthenticationService {
       };
     } catch (error) {
       await auditLogger.log({
-        event: 'PASSWORD_RESET_REQUEST_FAILED',
-        details: { error: error.message },
+        event: 'PASSWORD_RESET_FAILED',
+        details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'warning',
       });
       throw error;
@@ -418,7 +418,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'PASSWORD_RESET_FAILED',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'error',
       });
       throw error;
