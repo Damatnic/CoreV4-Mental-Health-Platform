@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Plus, Edit2, Trash2, User, Star, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface EmergencyContact {
   id: string;
@@ -99,12 +100,13 @@ export function EmergencyContacts() {
   const handleDeleteContact = (id: string) => {
     // Don't allow deletion of default crisis lines
     if (id.startsWith('default-')) {
-      alert('Default crisis support contacts cannot be deleted.');
+      toast.error('Default crisis support contacts cannot be deleted.');
       return;
     }
 
-    if (confirm('Are you sure you want to delete this contact?')) {
+    if (window.confirm('Are you sure you want to delete this contact?')) {
       setContacts(contacts.filter(c => c.id !== id));
+      toast.success('Contact deleted successfully');
     }
   };
 

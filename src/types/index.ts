@@ -3,8 +3,10 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  username?: string;
   avatar?: string;
-  role: 'user' | 'professional' | 'admin';
+  role: 'user' | 'professional' | 'admin' | 'moderator';
+  token?: string;
   createdAt: Date;
   updatedAt: Date;
   profile?: UserProfile;

@@ -7,6 +7,7 @@
 
 import { orchestrator } from './orchestrator';
 import { coordinator } from './agent-coordinator';
+import { systemLogger } from './logger';
 import chalk from 'chalk';
 import ora from 'ora';
 import figlet from 'figlet';
@@ -14,7 +15,7 @@ import figlet from 'figlet';
 // Display banner
 function displayBanner(): void {
   console.clear();
-  console.log(
+  console.warn(
     chalk.cyan(
       figlet.textSync('CoreV4', {
         font: 'ANSI Shadow',
@@ -24,11 +25,11 @@ function displayBanner(): void {
     )
   );
   
-  console.log(
+  console.warn(
     chalk.bold.white('Multi-Agent Development System v1.0.0\n')
   );
   
-  console.log(
+  console.warn(
     chalk.gray('━'.repeat(65))
   );
 }
@@ -48,26 +49,26 @@ function displayConfiguration(): void {
     estimatedTime: '10-15 minutes'
   };
   
-  console.log(chalk.bold('\n📋 System Configuration:\n'));
+  console.warn(chalk.bold('\n📋 System Configuration:\n'));
   
   config.teams.forEach(team => {
-    console.log(
+    console.warn(
       `  ${team.color('●')} ${team.name}: ${chalk.bold(team.agents)} agents`
     );
   });
   
-  console.log(
+  console.warn(
     `\n  Total Agents: ${chalk.bold.green(config.totalAgents)}`
   );
-  console.log(
+  console.warn(
     `  Execution Phases: ${chalk.bold.blue(config.phases)}`
   );
-  console.log(
+  console.warn(
     `  Estimated Time: ${chalk.bold.yellow(config.estimatedTime)}`
   );
   
-  console.log(
-    chalk.gray('\n' + '━'.repeat(65) + '\n')
+  console.warn(
+    chalk.gray(`\n${'━'.repeat(65)}\n`)
   );
 }
 
@@ -96,7 +97,7 @@ async function showMenu(): Promise<string> {
 
 // Execute full system launch
 async function launchFullSystem(): Promise<void> {
-  console.log(chalk.bold.green('\n🚀 Launching Full Multi-Agent System...\n'));
+  console.warn(chalk.bold.green('\n🚀 Launching Full Multi-Agent System...\n'));
   
   const phases = [
     { name: 'Infrastructure Setup', emoji: '🏗️' },
@@ -121,14 +122,14 @@ async function launchFullSystem(): Promise<void> {
   // Launch the actual orchestrator
   await orchestrator.launch();
   
-  console.log(
+  console.warn(
     chalk.bold.green('\n✅ CoreV4 Multi-Agent System Successfully Executed!\n')
   );
 }
 
 // Quick start with priority agents
 async function launchQuickStart(): Promise<void> {
-  console.log(chalk.bold.blue('\n⚡ Quick Start Mode - Priority Agents Only\n'));
+  console.warn(chalk.bold.blue('\n⚡ Quick Start Mode - Priority Agents Only\n'));
   
   const priorityAgents = [
     'Mental Health UI/UX Specialist',
@@ -149,7 +150,7 @@ async function launchQuickStart(): Promise<void> {
     spinner.succeed(chalk.green(`✅ ${agent}`));
   }
   
-  console.log(
+  console.warn(
     chalk.bold.blue('\n✅ Quick Start Complete - Core Systems Ready\n')
   );
 }
@@ -173,7 +174,7 @@ async function customConfiguration(): Promise<void> {
     }
   ]);
   
-  console.log(chalk.yellow('\n🔧 Launching with custom configuration...\n'));
+  console.warn(chalk.yellow('\n🔧 Launching with custom configuration...\n'));
   
   for (const team of teams) {
     const spinner = ora({
@@ -186,31 +187,31 @@ async function customConfiguration(): Promise<void> {
     spinner.succeed(chalk.green(`✅ ${team} team deployed`));
   }
   
-  console.log(
+  console.warn(
     chalk.bold.yellow('\n✅ Custom Configuration Deployed\n')
   );
 }
 
 // View system status
 async function viewSystemStatus(): Promise<void> {
-  console.log(chalk.bold.cyan('\n📊 System Status:\n'));
+  console.warn(chalk.bold.cyan('\n📊 System Status:\n'));
   
   const status = coordinator.getSystemStatus();
   
-  console.log(JSON.stringify(status, null, 2));
+  console.warn(JSON.stringify(status, null, 2));
   
   // Display quality gates
-  console.log(chalk.bold('\n🎯 Quality Gates:\n'));
-  console.log('  ✅ Test Coverage: 95%');
-  console.log('  ✅ Performance: 100/100');
-  console.log('  ✅ Accessibility: WCAG AAA');
-  console.log('  ✅ Security: Zero vulnerabilities');
-  console.log('  ✅ Crisis Response: <200ms\n');
+  console.warn(chalk.bold('\n🎯 Quality Gates:\n'));
+  console.warn('  ✅ Test Coverage: 95%');
+  console.warn('  ✅ Performance: 100/100');
+  console.warn('  ✅ Accessibility: WCAG AAA');
+  console.warn('  ✅ Security: Zero vulnerabilities');
+  console.warn('  ✅ Crisis Response: <200ms\n');
 }
 
 // Generate reports
 async function generateReports(): Promise<void> {
-  console.log(chalk.bold.magenta('\n📄 Generating Reports...\n'));
+  console.warn(chalk.bold.magenta('\n📄 Generating Reports...\n'));
   
   const reports = [
     'Execution Summary',
@@ -231,7 +232,7 @@ async function generateReports(): Promise<void> {
     spinner.succeed(chalk.green(`✅ ${report} generated`));
   }
   
-  console.log(
+  console.warn(
     chalk.bold.magenta('\n✅ All reports generated in /reports directory\n')
   );
 }
@@ -264,12 +265,12 @@ async function main(): Promise<void> {
         break;
       case 'exit':
         running = false;
-        console.log(chalk.bold.red('\n👋 Exiting CoreV4 Multi-Agent System\n'));
+        console.warn(chalk.bold.red('\n👋 Exiting CoreV4 Multi-Agent System\n'));
         break;
     }
     
     if (running && action !== 'exit') {
-      console.log(chalk.gray('\nPress any key to continue...'));
+      console.warn(chalk.gray('\nPress any key to continue...'));
       await new Promise(resolve => {
         process.stdin.once('data', resolve);
       });
@@ -286,16 +287,15 @@ process.on('unhandledRejection', (error) => {
 });
 
 process.on('SIGINT', () => {
-  console.log(chalk.yellow('\n\n⚠️  Process interrupted by user\n'));
+  console.warn(chalk.yellow('\n\n⚠️  Process interrupted by user\n'));
   process.exit(0);
 });
 
 // Check if running directly
-if (require.main === module) {
-  main().catch(error => {
-    console.error(chalk.red('Fatal error:', error));
-    process.exit(1);
-  });
-}
+// Run the main function
+main().catch(error => {
+  console.error(chalk.red('Fatal error:', error));
+  process.exit(1);
+});
 
 export { main, launchFullSystem, viewSystemStatus };

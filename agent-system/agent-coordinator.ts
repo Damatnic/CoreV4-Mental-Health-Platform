@@ -77,12 +77,48 @@ export interface QualityGate {
   status: 'pending' | 'passing' | 'failing';
 }
 
+export interface SystemStatus {
+  totalAgents: number;
+  teams: {
+    Frontend: number;
+    Backend: number;
+    'Mental Health': number;
+    'Quality & Testing': number;
+    'DevOps & Deployment': number;
+  };
+  statuses: {
+    idle: number;
+    working: number;
+    blocked: number;
+    completed: number;
+  };
+  tasks: {
+    total: number;
+    pending: number;
+    inProgress: number;
+    completed: number;
+  };
+  qualityGates: {
+    total: number;
+    passing: number;
+    failing: number;
+  };
+  integrationPoints: number;
+}
+
+export interface ExecutionLogEntry {
+  timestamp: Date;
+  agent: AgentRole;
+  action: string;
+  details?: string;
+}
+
 export class AgentCoordinator extends EventEmitter {
   private agents: Map<AgentRole, AgentConfig>;
   private tasks: Map<string, TaskAssignment>;
   private integrationPoints: IntegrationPoint[];
   private qualityGates: QualityGate[];
-  private executionLog: any[];
+  private executionLog: ExecutionLogEntry[];
   
   constructor() {
     super();
@@ -509,7 +545,7 @@ export class AgentCoordinator extends EventEmitter {
     });
   }
   
-  public getSystemStatus(): object {
+  public getSystemStatus(): SystemStatus {
     const teams = {
       Frontend: 0,
       Backend: 0,
@@ -556,28 +592,28 @@ export class AgentCoordinator extends EventEmitter {
 Generated: ${new Date().toISOString()}
 
 ## System Overview
-- Total Agents: ${(status as any).totalAgents}
+- Total Agents: ${status.totalAgents}
 - Active Teams: 5
-- Integration Points: ${(status as any).integrationPoints}
+- Integration Points: ${status.integrationPoints}
 
 ## Team Status
-${Object.entries((status as any).teams).map(([team, count]) => 
+${Object.entries(status.teams).map(([team, count]) => 
   `- ${team}: ${count} agents`).join('\\n')}
 
 ## Agent Status
-${Object.entries((status as any).statuses).map(([status, count]) => 
-  `- ${status}: ${count} agents`).join('\\n')}
+${Object.entries(status.statuses).map(([statusKey, count]) => 
+  `- ${statusKey}: ${count} agents`).join('\\n')}
 
 ## Task Progress
-- Total Tasks: ${(status as any).tasks.total}
-- Pending: ${(status as any).tasks.pending}
-- In Progress: ${(status as any).tasks.inProgress}
-- Completed: ${(status as any).tasks.completed}
+- Total Tasks: ${status.tasks.total}
+- Pending: ${status.tasks.pending}
+- In Progress: ${status.tasks.inProgress}
+- Completed: ${status.tasks.completed}
 
 ## Quality Gates
-- Total Gates: ${(status as any).qualityGates.total}
-- Passing: ${(status as any).qualityGates.passing}
-- Failing: ${(status as any).qualityGates.failing}
+- Total Gates: ${status.qualityGates.total}
+- Passing: ${status.qualityGates.passing}
+- Failing: ${status.qualityGates.failing}
 
 ## Recent Activity
 ${this.executionLog.slice(-5).map(log => 

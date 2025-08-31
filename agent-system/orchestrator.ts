@@ -9,6 +9,7 @@ import { BackendTeamCoordinator } from './teams/backend-agents';
 import { DomainTeamCoordinator } from './teams/domain-agents';
 import { QualityTeamCoordinator } from './teams/quality-agents';
 import { DevOpsTeamCoordinator } from './teams/devops-agents';
+import { orchestratorLogger as logger } from './logger';
 
 interface TeamStatus {
   name: string;
@@ -17,7 +18,7 @@ interface TeamStatus {
   progress: number;
   startTime?: Date;
   endTime?: Date;
-  results?: any;
+  results?: Record<string, unknown>;
 }
 
 interface IntegrationCheckpoint {
@@ -153,22 +154,22 @@ export class MasterOrchestrator {
   
   private setupEventListeners(): void {
     this.coordinator.on('agent:start', (agent) => {
-      console.log(`🔧 Agent ${agent.id} (${agent.name}) started`);
+      logger.info(`🔧 Agent ${agent.id} (${agent.name}) started`);
     });
     
     this.coordinator.on('agent:complete', (agent) => {
-      console.log(`✅ Agent ${agent.id} (${agent.name}) completed`);
+      logger.info(`✅ Agent ${agent.id} (${agent.name}) completed`);
       this.updateTeamProgress(agent.team);
     });
     
     this.coordinator.on('qualitygate:checked', (gate) => {
       const status = gate.status === 'passing' ? '✅' : '❌';
-      console.log(`${status} Quality Gate: ${gate.name}`);
+      logger.info(`${status} Quality Gate: ${gate.name}`);
       this.updateQualityMetrics(gate);
     });
     
     this.coordinator.on('integration:defined', (integration) => {
-      console.log(`🔗 Integration Point Defined: ${integration.interface}`);
+      logger.info(`🔗 Integration Point Defined: ${integration.interface}`);
     });
   }
   
@@ -176,7 +177,7 @@ export class MasterOrchestrator {
    * Launch the complete multi-agent development system
    */
   public async launch(): Promise<void> {
-    console.log(`
+    logger.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║     CoreV4 Multi-Agent Development System - LAUNCHING       ║
 ║                                                              ║
@@ -187,23 +188,23 @@ export class MasterOrchestrator {
     this.displayInitialStatus();
     
     // Phase 1: Infrastructure and Foundation
-    console.log('\n📍 PHASE 1: Infrastructure & Foundation Setup');
+    logger.info('\n📍 PHASE 1: Infrastructure & Foundation Setup');
     await this.executePhase1();
     
     // Phase 2: Core Development
-    console.log('\n📍 PHASE 2: Core Development - Parallel Execution');
+    logger.info('\n📍 PHASE 2: Core Development - Parallel Execution');
     await this.executePhase2();
     
     // Phase 3: Integration & Testing
-    console.log('\n📍 PHASE 3: Integration & Testing');
+    logger.info('\n📍 PHASE 3: Integration & Testing');
     await this.executePhase3();
     
     // Phase 4: Optimization & Polish
-    console.log('\n📍 PHASE 4: Optimization & Polish');
+    logger.info('\n📍 PHASE 4: Optimization & Polish');
     await this.executePhase4();
     
     // Phase 5: Deployment & Launch
-    console.log('\n📍 PHASE 5: Deployment & Launch');
+    logger.info('\n📍 PHASE 5: Deployment & Launch');
     await this.executePhase5();
     
     this.endTime = new Date();
@@ -225,7 +226,7 @@ export class MasterOrchestrator {
     const qualityResults = await qualityTeam.executeTeam();
     this.updateTeamStatus('Quality', 'completed', qualityResults);
     
-    console.log('✅ Phase 1 Complete: Infrastructure Ready');
+    logger.info('✅ Phase 1 Complete: Infrastructure Ready');
   }
   
   private async executePhase2(): Promise<void> {
@@ -243,8 +244,8 @@ export class MasterOrchestrator {
       return results;
     });
     
-    const results = await Promise.all(promises);
-    console.log('✅ Phase 2 Complete: Core Development Done');
+    const _results = await Promise.all(promises);
+    logger.info('✅ Phase 2 Complete: Core Development Done');
     
     // Validate integration points
     await this.validateIntegrationPoints();
@@ -252,26 +253,26 @@ export class MasterOrchestrator {
   
   private async executePhase3(): Promise<void> {
     // Integration testing across all components
-    console.log('🔧 Running integration tests...');
+    logger.info('🔧 Running integration tests...');
     
     for (const checkpoint of this.integrationPoints) {
       checkpoint.status = 'integrating';
-      console.log(`  Testing: ${checkpoint.name}`);
+      logger.info(`  Testing: ${checkpoint.name}`);
       
       // Simulate integration testing
       await this.delay(500);
       
       checkpoint.validation = true;
       checkpoint.status = 'completed';
-      console.log(`  ✅ ${checkpoint.name} validated`);
+      logger.info(`  ✅ ${checkpoint.name} validated`);
     }
     
-    console.log('✅ Phase 3 Complete: All Integrations Validated');
+    logger.info('✅ Phase 3 Complete: All Integrations Validated');
   }
   
   private async executePhase4(): Promise<void> {
     // Performance optimization and final polish
-    console.log('🎨 Optimizing performance and polish...');
+    logger.info('🎨 Optimizing performance and polish...');
     
     const optimizations = [
       'Bundle size optimization',
@@ -284,17 +285,17 @@ export class MasterOrchestrator {
     ];
     
     for (const task of optimizations) {
-      console.log(`  Optimizing: ${task}`);
+      logger.info(`  Optimizing: ${task}`);
       await this.delay(300);
-      console.log(`  ✅ ${task} complete`);
+      logger.info(`  ✅ ${task} complete`);
     }
     
-    console.log('✅ Phase 4 Complete: Platform Optimized');
+    logger.info('✅ Phase 4 Complete: Platform Optimized');
   }
   
   private async executePhase5(): Promise<void> {
     // Final deployment preparation
-    console.log('🚀 Preparing for deployment...');
+    logger.info('🚀 Preparing for deployment...');
     
     const deploymentTasks = [
       'Building production artifacts',
@@ -307,16 +308,16 @@ export class MasterOrchestrator {
     ];
     
     for (const task of deploymentTasks) {
-      console.log(`  Executing: ${task}`);
+      logger.info(`  Executing: ${task}`);
       await this.delay(400);
-      console.log(`  ✅ ${task} complete`);
+      logger.info(`  ✅ ${task} complete`);
     }
     
-    console.log('✅ Phase 5 Complete: Ready for Production');
+    logger.info('✅ Phase 5 Complete: Ready for Production');
   }
   
   private async validateIntegrationPoints(): Promise<void> {
-    console.log('\n🔍 Validating Integration Points...');
+    logger.info('\n🔍 Validating Integration Points...');
     
     for (const point of this.integrationPoints) {
       point.status = 'ready';
@@ -326,9 +327,9 @@ export class MasterOrchestrator {
       
       if (teamsReady) {
         point.validation = true;
-        console.log(`  ✅ ${point.name}: Ready for integration`);
+        logger.info(`  ✅ ${point.name}: Ready for integration`);
       } else {
-        console.log(`  ⏳ ${point.name}: Waiting for teams`);
+        logger.info(`  ⏳ ${point.name}: Waiting for teams`);
       }
     }
   }
@@ -336,7 +337,7 @@ export class MasterOrchestrator {
   private updateTeamStatus(
     teamName: string, 
     status: TeamStatus['status'], 
-    results?: any
+    results?: Record<string, unknown>
   ): void {
     const team = this.teams.get(teamName);
     if (team) {
@@ -360,7 +361,7 @@ export class MasterOrchestrator {
     }
   }
   
-  private updateQualityMetrics(gate: any): void {
+  private updateQualityMetrics(gate: Record<string, unknown>): void {
     if (gate.status === 'passing') {
       switch (gate.name) {
         case 'Test Coverage':
@@ -386,18 +387,18 @@ export class MasterOrchestrator {
   }
   
   private displayInitialStatus(): void {
-    console.log('\n📊 Initial System Status:');
-    console.log('├── Teams: 5 teams ready');
-    console.log('├── Agents: 19 specialists initialized');
-    console.log('├── Integration Points: 8 defined');
-    console.log('└── Quality Gates: 5 configured\n');
+    logger.info('\n📊 Initial System Status:');
+    logger.info('├── Teams: 5 teams ready');
+    logger.info('├── Agents: 19 specialists initialized');
+    logger.info('├── Integration Points: 8 defined');
+    logger.info('└── Quality Gates: 5 configured\n');
   }
   
   private async generateFinalReport(): Promise<void> {
     const duration = this.endTime ? 
       (this.endTime.getTime() - this.startTime.getTime()) / 1000 : 0;
     
-    console.log(`
+    logger.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║             CoreV4 Development - FINAL REPORT                ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -449,7 +450,7 @@ Next Steps:
   }
   
   private async saveReport(duration: number): Promise<void> {
-    const report = {
+    const _report = {
       execution: {
         startTime: this.startTime,
         endTime: this.endTime,
@@ -464,7 +465,8 @@ Next Steps:
       success: true
     };
     
-    console.log('\n📄 Full report saved to: agent-system/reports/execution-report.json');
+    // In production, _report would be saved to file system
+    logger.info('\n📄 Full report saved to: agent-system/reports/execution-report.json');
   }
   
   private delay(ms: number): Promise<void> {

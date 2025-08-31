@@ -4,13 +4,14 @@
  */
 
 import { AgentRole } from '../agent-coordinator';
+import { agentLogger as logger } from '../logger';
 
 // Agent F: API Architecture Specialist
 export class APIArchitectureAgent {
   private role = AgentRole.API_ARCHITECTURE;
   
   async execute() {
-    console.log('[Agent F] Designing API Architecture');
+    logger.info('[Agent F] Designing API Architecture');
     
     return {
       restAPI: await this.designRESTAPI(),
@@ -176,7 +177,7 @@ export class DatabaseDesignAgent {
   private role = AgentRole.DATABASE_DESIGN;
   
   async execute() {
-    console.log('[Agent G] Designing HIPAA-Compliant Database');
+    logger.info('[Agent G] Designing HIPAA-Compliant Database');
     
     return {
       schemas: await this.designDatabaseSchemas(),
@@ -326,7 +327,7 @@ export class AuthSecurityAgent {
   private role = AgentRole.AUTH_SECURITY;
   
   async execute() {
-    console.log('[Agent H] Implementing Zero-Trust Security');
+    logger.info('[Agent H] Implementing Zero-Trust Security');
     
     return {
       authentication: await this.implementAuthentication(),
@@ -441,7 +442,7 @@ export class RealtimeCommunicationAgent {
   private role = AgentRole.REALTIME_COMMUNICATION;
   
   async execute() {
-    console.log('[Agent I] Building Real-time Communication Infrastructure');
+    logger.info('[Agent I] Building Real-time Communication Infrastructure');
     
     return {
       websocket: await this.implementWebSocket(),
@@ -565,13 +566,13 @@ export class BackendTeamCoordinator {
   ];
   
   async executeTeam() {
-    console.log('🚀 Backend Team Starting Parallel Development');
+    logger.info('🚀 Backend Team Starting Parallel Development');
     
     const results = await Promise.all(
       this.agents.map(agent => agent.execute())
     );
     
-    console.log('✅ Backend Team Completed All Tasks');
+    logger.info('✅ Backend Team Completed All Tasks');
     return results;
   }
 }

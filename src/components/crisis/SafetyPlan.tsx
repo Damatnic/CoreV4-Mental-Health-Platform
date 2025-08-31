@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, AlertCircle, Heart, Users, Activity, MapPin, Save, Download, Share2, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface SafetyPlanData {
   warningSignals: string[];
@@ -87,7 +88,7 @@ export function SafetyPlan() {
       // Fallback: Copy to clipboard
       const planText = generatePlainTextPlan();
       navigator.clipboard.writeText(planText);
-      alert('Safety plan copied to clipboard!');
+      toast.success('Safety plan copied to clipboard!');
     }
   };
 

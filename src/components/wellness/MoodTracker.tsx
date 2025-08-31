@@ -5,6 +5,7 @@ import {
   Activity, Coffee, Users, Home, Briefcase, BookOpen
 } from 'lucide-react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import toast from 'react-hot-toast';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -143,7 +144,7 @@ export function MoodTracker() {
     setSocialScore(3);
 
     // Show success feedback
-    alert('Mood entry saved successfully!');
+    toast.success('Mood entry saved successfully!');
   };
 
   // Analyze mood patterns using simple algorithms

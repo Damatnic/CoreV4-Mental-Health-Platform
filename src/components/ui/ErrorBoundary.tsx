@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { logError } from '../../utils/logger';
 
 interface Props {
   children: ReactNode;
@@ -20,11 +21,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    logError('Uncaught error in React component', 'ErrorBoundary', { error, errorInfo });
     
     // Send error to monitoring service in production
     if (import.meta.env.PROD) {
       // TODO: Implement error reporting to Sentry or similar service
+      // The logger already handles storing critical errors in localStorage
     }
   }
 

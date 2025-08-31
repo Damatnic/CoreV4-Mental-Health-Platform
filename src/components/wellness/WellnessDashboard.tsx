@@ -27,9 +27,11 @@ import {
   Bell,
   CheckCircle,
   Circle,
-  AlertCircle
+  AlertCircle,
+  TrendingDown
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
+import { useWellnessStore } from '../../stores/wellnessStore';
 
 // Wellness metrics categories
 const WELLNESS_CATEGORIES = {
@@ -128,13 +130,30 @@ interface WellnessGoal {
   id: string;
   category: keyof typeof WELLNESS_CATEGORIES;
   title: string;
+  description?: string;
   target: number;
   current: number;
   unit: string;
+  frequency?: 'daily' | 'weekly' | 'monthly';
   deadline?: Date;
 }
 
 export const WellnessDashboard: React.FC = () => {
+  // Use Zustand store for state management
+  const {
+    moodEntries,
+    wellnessMetrics,
+    wellnessGoals,
+    wellnessInsights,
+    weeklyScore,
+    monthlyScore,
+    addWellnessGoal,
+    updateGoalProgress,
+    calculateWellnessScores,
+    generateInsights,
+    exportData
+  } = useWellnessStore();
+
   const [wellnessData, setWellnessData] = useState<WellnessData[]>([]);
   const [todayData, setTodayData] = useState<WellnessData>({
     date: new Date(),
@@ -142,17 +161,19 @@ export const WellnessDashboard: React.FC = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof WELLNESS_CATEGORIES | 'all'>('all');
   const [habitStreaks, setHabitStreaks] = useState<HabitStreak[]>([]);
-  const [goals, setGoals] = useState<WellnessGoal[]>([]);
   const [showAddGoal, setShowAddGoal] = useState(false);
-  const [newGoal, setNewGoal] = useState<Partial<WellnessGoal>>({});
+  const [newGoal, setNewGoal] = useState<Partial<WellnessGoal & { description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }>>({});
   const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
   const [showExportOptions, setShowExportOptions] = useState(false);
 
-  // Load saved data
+  // Load saved data and calculate scores on mount
   useEffect(() => {
+    calculateWellnessScores();
+    generateInsights();
+    
+    // Load legacy localStorage data if exists
     const savedData = localStorage.getItem('wellnessData');
     const savedStreaks = localStorage.getItem('habitStreaks');
-    const savedGoals = localStorage.getItem('wellnessGoals');
     const savedToday = localStorage.getItem('wellnessTodayData');
     
     if (savedData) {
@@ -166,13 +187,6 @@ export const WellnessDashboard: React.FC = () => {
       setHabitStreaks(JSON.parse(savedStreaks));
     }
     
-    if (savedGoals) {
-      setGoals(JSON.parse(savedGoals).map((g: any) => ({
-        ...g,
-        deadline: g.deadline ? new Date(g.deadline) : undefined
-      })));
-    }
-    
     if (savedToday) {
       const today = JSON.parse(savedToday);
       if (new Date(today.date).toDateString() === new Date().toDateString()) {
@@ -182,7 +196,7 @@ export const WellnessDashboard: React.FC = () => {
         });
       }
     }
-  }, []);
+  }, [calculateWellnessScores, generateInsights]);
 
   // Save today's data
   useEffect(() => {
@@ -291,37 +305,59 @@ export const WellnessDashboard: React.FC = () => {
     localStorage.removeItem('wellnessTodayData');
   };
 
-  // Add new goal
+  // Add new goal using store
   const addGoal = () => {
     if (!newGoal.title || !newGoal.target || !newGoal.category) return;
     
-    const goal: WellnessGoal = {
-      id: Date.now().toString(),
-      category: newGoal.category as keyof typeof WELLNESS_CATEGORIES,
+    // Use the store's addWellnessGoal method
+    addWellnessGoal({
+      category: newGoal.category as 'physical' | 'mental' | 'emotional' | 'social' | 'spiritual',
       title: newGoal.title,
-      target: newGoal.target,
-      current: 0,
+      description: newGoal.description || '',
+      targetValue: newGoal.target,
+      currentValue: 0,
       unit: newGoal.unit || '',
-      deadline: newGoal.deadline
-    };
-    
-    const updatedGoals = [...goals, goal];
-    setGoals(updatedGoals);
-    localStorage.setItem('wellnessGoals', JSON.stringify(updatedGoals));
+      frequency: newGoal.frequency || 'daily',
+      startDate: new Date(),
+      endDate: newGoal.deadline,
+      milestones: [],
+      reminders: [],
+      insights: []
+    });
     
     setNewGoal({});
     setShowAddGoal(false);
+    generateInsights(); // Regenerate insights after adding goal
   };
 
-  // Calculate wellness score
+  // Calculate wellness score using real data from store
   const calculateWellnessScore = () => {
+    // If we have a weekly score from the store, use it
+    if (weeklyScore > 0) {
+      return weeklyScore;
+    }
+    
+    // Otherwise calculate based on current day data
     let score = 0;
     let factors = 0;
     
-    // Habits score (40%)
+    // Habits score (30%)
     const completedHabits = (todayData.habits?.length || 0) / DAILY_HABITS.length;
-    score += completedHabits * 40;
+    score += completedHabits * 30;
     factors++;
+    
+    // Mood score from recent entries (30%)
+    const recentMoodEntries = moodEntries.filter(entry => {
+      const entryDate = new Date(entry.timestamp);
+      const today = new Date();
+      return entryDate.toDateString() === today.toDateString();
+    });
+    
+    if (recentMoodEntries.length > 0) {
+      const avgMood = recentMoodEntries.reduce((sum, e) => sum + e.moodScore, 0) / recentMoodEntries.length;
+      score += (avgMood / 10) * 30;
+      factors++;
+    }
     
     // Sleep score (20%)
     if (todayData.sleep) {
@@ -331,25 +367,17 @@ export const WellnessDashboard: React.FC = () => {
       factors++;
     }
     
-    // Exercise score (20%)
+    // Exercise score (10%)
     if (todayData.exercise) {
       const exerciseMinutes = todayData.exercise.reduce((sum, e) => sum + e.duration, 0);
       const exerciseScore = Math.min(exerciseMinutes / 30, 1);
-      score += exerciseScore * 20;
+      score += exerciseScore * 10;
       factors++;
     }
     
     // Hydration score (10%)
     const waterScore = Math.min((todayData.water || 0) / 8, 1);
     score += waterScore * 10;
-    
-    // Mood/stress score (10%)
-    if (todayData.mood && todayData.stress) {
-      const moodScore = todayData.mood / 10;
-      const stressScore = (10 - todayData.stress) / 10;
-      score += ((moodScore + stressScore) / 2) * 10;
-      factors++;
-    }
     
     return Math.round(score);
   };
@@ -419,14 +447,11 @@ export const WellnessDashboard: React.FC = () => {
     return achievements;
   };
 
-  // Export data
-  const exportData = (format: 'json' | 'csv') => {
+  // Export data using store's export function
+  const handleExportData = (format: 'json' | 'csv') => {
     if (format === 'json') {
-      const dataStr = JSON.stringify({
-        wellnessData,
-        habitStreaks,
-        goals
-      }, null, 2);
+      // Use the store's export function
+      const dataStr = exportData();
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
       const exportFileDefaultName = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
@@ -435,18 +460,33 @@ export const WellnessDashboard: React.FC = () => {
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
     } else if (format === 'csv') {
-      // Create CSV content
-      let csvContent = 'Date,Habits Completed,Exercise Minutes,Water Glasses,Sleep Hours,Sleep Quality,Wellness Score\n';
+      // Create CSV content from store data
+      let csvContent = 'Date,Mood Score,Stress Level,Sleep Hours,Exercise Minutes,Water Glasses,Wellness Score\n';
       
-      wellnessData.forEach(data => {
-        const habits = data.habits?.length || 0;
-        const exercise = data.exercise?.reduce((sum, e) => sum + e.duration, 0) || 0;
-        const water = data.water || 0;
-        const sleepHours = data.sleep?.hours || 0;
-        const sleepQuality = data.sleep?.quality || '';
-        const score = calculateWellnessScore();
+      // Combine mood entries and wellness metrics for CSV
+      const today = new Date();
+      const last30Days = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        return date;
+      });
+      
+      last30Days.forEach(date => {
+        const dayMoodEntries = moodEntries.filter(e => 
+          new Date(e.timestamp).toDateString() === date.toDateString()
+        );
+        const dayMetrics = wellnessMetrics.find(m => 
+          new Date(m.date).toDateString() === date.toDateString()
+        );
         
-        csvContent += `${formatDate(data.date, 'yyyy-MM-dd')},${habits},${exercise},${water},${sleepHours},${sleepQuality},${score}\n`;
+        const avgMood = dayMoodEntries.length > 0 
+          ? dayMoodEntries.reduce((sum, e) => sum + e.moodScore, 0) / dayMoodEntries.length 
+          : 0;
+        const avgStress = dayMoodEntries.length > 0 
+          ? dayMoodEntries.reduce((sum, e) => sum + (e.stressLevel || 0), 0) / dayMoodEntries.length 
+          : 0;
+        
+        csvContent += `${formatDate(date, 'yyyy-MM-dd')},${avgMood.toFixed(1)},${avgStress.toFixed(1)},${dayMetrics?.sleepHours || 0},${dayMetrics?.exerciseMinutes || 0},${dayMetrics?.waterIntake || 0},${calculateWellnessScore()}\n`;
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -483,13 +523,13 @@ export const WellnessDashboard: React.FC = () => {
               {showExportOptions && (
                 <div className="absolute right-0 top-12 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 z-10">
                   <button
-                    onClick={() => exportData('json')}
+                    onClick={() => handleExportData('json')}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   >
                     Export as JSON
                   </button>
                   <button
-                    onClick={() => exportData('csv')}
+                    onClick={() => handleExportData('csv')}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   >
                     Export as CSV
@@ -767,9 +807,17 @@ export const WellnessDashboard: React.FC = () => {
             </div>
             
             <div className="space-y-3">
-              {goals.map(goal => {
-                const progress = (goal.current / goal.target) * 100;
-                const Icon = WELLNESS_CATEGORIES[goal.category].icon;
+              {wellnessGoals.filter(g => g.status === 'active').slice(0, 5).map(goal => {
+                const progress = goal.progress || 0;
+                const categoryMap: Record<string, keyof typeof WELLNESS_CATEGORIES> = {
+                  physical: 'physical',
+                  mental: 'mental',
+                  emotional: 'emotional',
+                  social: 'habits',
+                  spiritual: 'habits'
+                };
+                const category = categoryMap[goal.category] || 'habits';
+                const Icon = WELLNESS_CATEGORIES[category].icon;
                 
                 return (
                   <div key={goal.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -780,7 +828,7 @@ export const WellnessDashboard: React.FC = () => {
                           {goal.title}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {goal.current} / {goal.target} {goal.unit}
+                          {goal.currentValue} / {goal.targetValue} {goal.unit}
                         </p>
                       </div>
                     </div>
@@ -790,18 +838,18 @@ export const WellnessDashboard: React.FC = () => {
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       />
                     </div>
-                    {goal.deadline && (
+                    {goal.endDate && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Due: {formatDate(goal.deadline, 'MMM d')}
+                        Due: {formatDate(new Date(goal.endDate), 'MMM d')}
                       </p>
                     )}
                   </div>
                 );
               })}
               
-              {goals.length === 0 && (
+              {wellnessGoals.filter(g => g.status === 'active').length === 0 && (
                 <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  No goals set yet
+                  No active goals. Set your first wellness goal!
                 </p>
               )}
             </div>
@@ -832,34 +880,53 @@ export const WellnessDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Insights */}
+          {/* AI-Powered Insights */}
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Insights
+              AI Insights
             </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Most consistent: {
-                    habitStreaks.length > 0
-                      ? DAILY_HABITS.find(h => h.id === habitStreaks.sort((a, b) => b.current - a.current)[0]?.habitId)?.name || 'Unknown habit'
-                      : 'Start tracking habits'
-                  }
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-yellow-500" />
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Focus area: {
-                    todayData.habits?.length === 0
-                      ? 'Start your daily habits'
-                      : todayData.water && todayData.water < 8
-                      ? 'Increase water intake'
-                      : 'Keep up the great work!'
-                  }
-                </p>
-              </div>
+            <div className="space-y-3">
+              {wellnessInsights.slice(0, 3).map((insight) => {
+                const IconComponent = insight.type === 'trend' && insight.title.includes('Improvement') ? TrendingUp :
+                                     insight.type === 'trend' && insight.title.includes('Decline') ? TrendingDown :
+                                     insight.type === 'warning' ? AlertCircle :
+                                     insight.type === 'achievement' ? Award :
+                                     TrendingUp;
+                const iconColor = insight.priority === 'high' ? 'text-red-500' :
+                                 insight.priority === 'medium' ? 'text-yellow-500' :
+                                 'text-green-500';
+                
+                return (
+                  <div key={insight.id} className="flex items-start gap-2">
+                    <IconComponent className={`w-4 h-4 ${iconColor} mt-0.5`} />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {insight.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                        {insight.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {wellnessInsights.length === 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Track your mood and habits to get personalized insights
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-yellow-500" />
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Start by logging today's mood and completing daily habits
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
