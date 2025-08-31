@@ -64,7 +64,7 @@ window.scrollTo = vi.fn();
 // Mock navigator.vibrate for mobile interactions
 navigator.vibrate = vi.fn();
 
-// Mock crypto for security testing
+// Mock crypto for security testing with full WebCrypto API
 Object.defineProperty(window, 'crypto', {
   value: {
     getRandomValues: (arr: any) => {
@@ -80,7 +80,56 @@ Object.defineProperty(window, 'crypto', {
         return v.toString(16);
       });
     },
+    subtle: {
+      generateKey: vi.fn().mockResolvedValue({
+        privateKey: {},
+        publicKey: {}
+      }),
+      encrypt: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+      decrypt: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+      digest: vi.fn().mockResolvedValue(new ArrayBuffer(32)),
+      sign: vi.fn().mockResolvedValue(new ArrayBuffer(64)),
+      verify: vi.fn().mockResolvedValue(true),
+      deriveBits: vi.fn().mockResolvedValue(new ArrayBuffer(32)),
+      deriveKey: vi.fn().mockResolvedValue({}),
+      importKey: vi.fn().mockResolvedValue({}),
+      exportKey: vi.fn().mockResolvedValue({}),
+      wrapKey: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+      unwrapKey: vi.fn().mockResolvedValue({})
+    }
   },
+});
+
+// Mock IndexedDB for storage testing
+const indexedDBMock = {
+  databases: new Map(),
+  open: vi.fn((name: string) => {
+    return {
+      result: {
+        objectStoreNames: [],
+        createObjectStore: vi.fn(),
+        transaction: vi.fn(() => ({
+          objectStore: vi.fn(() => ({
+            add: vi.fn(),
+            put: vi.fn(),
+            get: vi.fn(() => ({ result: null })),
+            delete: vi.fn(),
+            clear: vi.fn(),
+            getAll: vi.fn(() => ({ result: [] }))
+          }))
+        }))
+      },
+      onsuccess: null,
+      onerror: null,
+      onupgradeneeded: null
+    };
+  }),
+  deleteDatabase: vi.fn()
+};
+
+Object.defineProperty(window, 'indexedDB', {
+  value: indexedDBMock,
+  writable: true
 });
 
 // Performance monitoring for tests
@@ -237,5 +286,3 @@ process.env.NODE_ENV = 'test';
 process.env.VITE_API_URL = 'http://localhost:3000';
 process.env.VITE_CRISIS_HOTLINE = '988';
 process.env.VITE_ENABLE_ANALYTICS = 'false';
-
-export { testUtils };

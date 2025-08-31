@@ -7,7 +7,7 @@
 
 import { orchestrator } from './orchestrator';
 import { coordinator } from './agent-coordinator';
-import { systemLogger } from './logger';
+import { systemLogger as _systemLogger } from './logger';
 import chalk from 'chalk';
 import ora from 'ora';
 import figlet from 'figlet';

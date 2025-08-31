@@ -53,7 +53,7 @@
       "@styles/*": ["./src/styles/*"]
     }
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "src/types/globals.d.ts"],
   "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.test.tsx", "src/test/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

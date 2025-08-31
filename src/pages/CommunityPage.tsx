@@ -283,3 +283,5 @@ export function CommunityPage() {
     </div>
   );
 }
+// Default export for lazy loading
+export default CommunityPage;

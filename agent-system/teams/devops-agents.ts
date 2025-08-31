@@ -10,7 +10,7 @@ export class BuildOptimizerAgent {
   private role = AgentRole.BUILD_OPTIMIZER;
   
   async execute() {
-    console.log('[Agent Q] Optimizing Build System & CI/CD');
+    console.warn('[Agent Q] Optimizing Build System & CI/CD');
     
     return {
       build: await this.optimizeBuildSystem(),
@@ -296,7 +296,7 @@ export class CloudInfrastructureAgent {
   private role = AgentRole.CLOUD_INFRASTRUCTURE;
   
   async execute() {
-    console.log('[Agent R] Architecting Scalable Cloud Infrastructure');
+    console.warn('[Agent R] Architecting Scalable Cloud Infrastructure');
     
     return {
       architecture: await this.designArchitecture(),
@@ -544,7 +544,7 @@ export class MonitoringAnalyticsAgent {
   private role = AgentRole.MONITORING_ANALYTICS;
   
   async execute() {
-    console.log('[Agent S] Implementing Comprehensive Monitoring & Analytics');
+    console.warn('[Agent S] Implementing Comprehensive Monitoring & Analytics');
     
     return {
       monitoring: await this.setupMonitoring(),
@@ -811,13 +811,13 @@ export class DevOpsTeamCoordinator {
   ];
   
   async executeTeam() {
-    console.log('🚀 DevOps Team Starting Parallel Development');
+    console.warn('🚀 DevOps Team Starting Parallel Development');
     
     const results = await Promise.all(
       this.agents.map(agent => agent.execute())
     );
     
-    console.log('✅ DevOps Team Completed All Tasks');
+    console.warn('✅ DevOps Team Completed All Tasks');
     return results;
   }
 }

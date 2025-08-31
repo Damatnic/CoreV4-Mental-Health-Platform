@@ -1,16 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run lint)",
-      "mcp__ide__getDiagnostics",
-      "Bash(npm run build:*)",
-      "Bash(find:*)",
-      "Bash(npm audit:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run typecheck:*)",
-      "Bash(node:*)",
-      "Bash(git add:*)"
+      "Bash(sed:*)",
+      "Bash(npx vite build:*)"
     ],
     "deny": [],
     "ask": []

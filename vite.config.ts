@@ -108,6 +108,14 @@ export default defineConfig({
       overlay: true
     }
   },
+  worker: {
+    format: 'es',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/workers/[name]-[hash].js'
+      }
+    }
+  },
   build: {
     target: 'es2020',
     minify: 'terser',

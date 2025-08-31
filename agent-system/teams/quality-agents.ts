@@ -10,7 +10,7 @@ export class TestingFrameworkAgent {
   private role = AgentRole.TESTING_FRAMEWORK;
   
   async execute() {
-    console.log('[Agent N] Implementing Comprehensive Testing Framework');
+    console.warn('[Agent N] Implementing Comprehensive Testing Framework');
     
     return {
       unit: await this.setupUnitTesting(),
@@ -194,7 +194,7 @@ export class AccessibilityComplianceAgent {
   private role = AgentRole.ACCESSIBILITY_COMPLIANCE;
   
   async execute() {
-    console.log('[Agent O] Ensuring WCAG AAA Accessibility Compliance');
+    console.warn('[Agent O] Ensuring WCAG AAA Accessibility Compliance');
     
     return {
       standards: await this.implementWCAGStandards(),
@@ -380,7 +380,7 @@ export class PerformanceTestingAgent {
   private role = AgentRole.PERFORMANCE_TESTING;
   
   async execute() {
-    console.log('[Agent P] Implementing Performance Testing & Optimization');
+    console.warn('[Agent P] Implementing Performance Testing & Optimization');
     
     return {
       load: await this.setupLoadTesting(),
@@ -583,13 +583,13 @@ export class QualityTeamCoordinator {
   ];
   
   async executeTeam() {
-    console.log('🚀 Quality Team Starting Parallel Development');
+    console.warn('🚀 Quality Team Starting Parallel Development');
     
     const results = await Promise.all(
       this.agents.map(agent => agent.execute())
     );
     
-    console.log('✅ Quality Team Completed All Tasks');
+    console.warn('✅ Quality Team Completed All Tasks');
     return results;
   }
 }

@@ -1,12 +1,6 @@
 // CrisisButton Component Tests
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
-// @ts-ignore - testing library compatibility
-const screen = (global as any).screen || {};
-// @ts-ignore - testing library compatibility
-const fireEvent = (global as any).fireEvent || {};
-// @ts-ignore - testing library compatibility
-const waitFor = (global as any).waitFor || (() => Promise.resolve());
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CrisisButton from './CrisisButton';
 import { server } from '../../test/mocks/server';

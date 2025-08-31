@@ -4,7 +4,6 @@ import {
   Wind,
   BookOpen,
   Timer,
-  BarChart3,
   Home,
   Settings,
   HelpCircle,
@@ -22,7 +21,7 @@ import { BreathingExercises } from './BreathingExercises';
 import { TherapeuticJournal } from './TherapeuticJournal';
 import { MeditationTimer } from './MeditationTimer';
 import { WellnessDashboard } from './WellnessDashboard';
-import { MoodTracker } from './MoodTracker';
+import MoodTracker from './MoodTracker';
 
 // Navigation items
 const WELLNESS_TOOLS = [
@@ -324,4 +323,4 @@ export { BreathingExercises } from './BreathingExercises';
 export { TherapeuticJournal } from './TherapeuticJournal';
 export { MeditationTimer } from './MeditationTimer';
 export { WellnessDashboard } from './WellnessDashboard';
-export { MoodTracker } from './MoodTracker';
+export { default as MoodTracker } from './MoodTracker';

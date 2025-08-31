@@ -10,7 +10,7 @@ export class MentalHealthUIAgent {
   private role = AgentRole.MENTAL_HEALTH_UI_UX;
   
   async execute() {
-    console.log('[Agent A] Starting Mental Health UI/UX Development');
+    console.warn('[Agent A] Starting Mental Health UI/UX Development');
     
     const tasks = [
       this.designCrisisInterface(),
@@ -107,7 +107,7 @@ export class ComponentArchitectureAgent {
   private role = AgentRole.COMPONENT_ARCHITECTURE;
   
   async execute() {
-    console.log('[Agent B] Building Reusable Component Architecture');
+    console.warn('[Agent B] Building Reusable Component Architecture');
     
     const components = await this.createComponentLibrary();
     const patterns = await this.implementDesignPatterns();
@@ -172,7 +172,7 @@ export class AnimationDesignerAgent {
   private role = AgentRole.ANIMATION_DESIGNER;
   
   async execute() {
-    console.log('[Agent C] Creating Calming Animations & Micro-interactions');
+    console.warn('[Agent C] Creating Calming Animations & Micro-interactions');
     
     return {
       transitions: await this.createSmoothTransitions(),
@@ -237,7 +237,7 @@ export class MobileOptimizationAgent {
   private role = AgentRole.MOBILE_OPTIMIZATION;
   
   async execute() {
-    console.log('[Agent D] Optimizing for Mobile-First Experience');
+    console.warn('[Agent D] Optimizing for Mobile-First Experience');
     
     return {
       touch: await this.optimizeTouchInteractions(),
@@ -297,7 +297,7 @@ export class PerformanceFrontendAgent {
   private role = AgentRole.PERFORMANCE_FRONTEND;
   
   async execute() {
-    console.log('[Agent E] Optimizing Frontend Performance');
+    console.warn('[Agent E] Optimizing Frontend Performance');
     
     return {
       bundling: await this.optimizeBundling(),
@@ -367,13 +367,13 @@ export class FrontendTeamCoordinator {
   ];
   
   async executeTeam() {
-    console.log('🚀 Frontend Team Starting Parallel Development');
+    console.warn('🚀 Frontend Team Starting Parallel Development');
     
     const results = await Promise.all(
       this.agents.map(agent => agent.execute())
     );
     
-    console.log('✅ Frontend Team Completed All Tasks');
+    console.warn('✅ Frontend Team Completed All Tasks');
     return results;
   }
 }

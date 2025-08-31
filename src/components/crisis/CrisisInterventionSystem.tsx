@@ -4,6 +4,7 @@ import { EmergencyContacts } from './EmergencyContacts';
 import { SafetyPlan } from './SafetyPlan';
 import { CrisisResources } from './CrisisResources';
 import { CrisisChat } from './CrisisChat';
+import { logger, LogCategory } from '../../services/logging/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';
@@ -48,7 +49,6 @@ export function CrisisInterventionSystem() {
   const [currentCrisisLevel, setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
   const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
   const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
-  const [nearbyResources, setNearbyResources] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'assessment' | 'resources' | 'safety' | 'chat'>('assessment');
   const [responseTime, setResponseTime] = useState(0);
 
@@ -63,24 +63,38 @@ export function CrisisInterventionSystem() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => setUserLocation(position),
-        (error) => console.error('Location access denied:', error),
+        (error) => logger.error('Location access denied', new Error(error.message), { category: LogCategory.CRISIS }),
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
   }, []);
 
+  // Track crisis interactions for improvement
+  const trackCrisisInteraction = useCallback((action: string, data: Record<string, unknown>) => {
+    // In production, this would send to analytics service
+    logger.logCrisisIntervention(action, undefined, {
+      ...data,
+      responseTime,
+      timestamp: new Date().toISOString()
+    });
+  }, [responseTime]);
+
   // Emergency hotline handlers with immediate response
   const handleEmergencyCall = useCallback((number: string, service: string) => {
     // Log the emergency call attempt for safety tracking
     const timestamp = new Date().toISOString();
-    console.log(`Emergency call initiated: ${service} at ${timestamp}`);
+    logger.logCrisisIntervention('emergency_call_initiated', undefined, {
+      service,
+      timestamp,
+      responseTime
+    });
     
     // Immediate tel: link for mobile devices
     window.location.href = `tel:${number}`;
     
     // Track interaction for crisis analytics
     trackCrisisInteraction('emergency_call', { service, number, timestamp });
-  }, []);
+  }, [responseTime, trackCrisisInteraction]);
 
   // Crisis text line handler
   const handleCrisisText = useCallback((number: string, keyword: string) => {
@@ -89,13 +103,7 @@ export function CrisisInterventionSystem() {
     window.location.href = smsUrl;
     
     trackCrisisInteraction('crisis_text', { number, keyword });
-  }, []);
-
-  // Track crisis interactions for improvement
-  const trackCrisisInteraction = (action: string, data: any) => {
-    // In production, this would send to analytics service
-    console.log('Crisis interaction tracked:', { action, data, responseTime });
-  };
+  }, [trackCrisisInteraction]);
 
   // Crisis level assessment
   const assessCrisisLevel = (responses: Record<string, number>) => {
@@ -333,7 +341,14 @@ function EmergencyDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="fixed inset-0 bg-black opacity-75" onClick={onClose}></div>
+        <div 
+          className="fixed inset-0 bg-black opacity-75" 
+          onClick={onClose}
+          onKeyDown={(e) => e.key === 'Escape' && onClose()}
+          role="button"
+          tabIndex={0}
+          aria-label="Close dialog"
+        ></div>
         <div className="relative bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
           <div className="text-center">
             <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />

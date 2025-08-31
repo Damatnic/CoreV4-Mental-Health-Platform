@@ -3,3 +3,5 @@ import { CrisisInterventionSystem } from '../components/crisis/CrisisInterventio
 export function CrisisPage() {
   return <CrisisInterventionSystem />;
 }
+// Default export for lazy loading
+export default CrisisPage;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, Clock, MapPin, Video, Users, ChevronRight, Plus, Filter, Search } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video, Users, Plus } from 'lucide-react';
 import { format, isToday, isTomorrow, isThisWeek, addDays } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { communityService, Event, CreateEventDto } from '../../services/community/communityService';
@@ -173,7 +173,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
   const [formData, setFormData] = useState<CreateEventDto>({
     title: '',
     description: '',
-    type: 'workshop' as any,
+    type: 'workshop' as Event['type'],
     startTime: new Date(),
     endTime: addDays(new Date(), 1),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -181,7 +181,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
     location: '',
     meetingLink: '',
     maxAttendees: undefined,
-    groupId: groupId,
+    groupId,
     tags: [],
   });
   const [tagInput, setTagInput] = useState('');
@@ -193,7 +193,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to create event');
     },
   });
@@ -238,10 +238,11 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 mb-1">
                 Event Title <span className="text-red-500">*</span>
               </label>
               <input
+                id="event-title"
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -249,15 +250,17 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 placeholder="e.g., Weekly Mindfulness Meditation"
                 required
                 maxLength={200}
+                aria-required="true"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 mb-1">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
+                id="event-description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -265,19 +268,22 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 rows={4}
                 required
                 maxLength={2000}
+                aria-required="true"
               />
             </div>
 
             {/* Event Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="event-type" className="block text-sm font-medium text-gray-700 mb-1">
                 Event Type <span className="text-red-500">*</span>
               </label>
               <select
+                id="event-type"
                 value={formData.type}
-                onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as Event['type'] }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
+                aria-required="true"
               >
                 <option value="workshop">Workshop</option>
                 <option value="support-session">Support Session</option>
@@ -291,93 +297,108 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
             {/* Date and Time */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="event-start-time" className="block text-sm font-medium text-gray-700 mb-1">
                   Start Date & Time <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="event-start-time"
                   type="datetime-local"
                   value={format(formData.startTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
+                  aria-required="true"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="event-end-time" className="block text-sm font-medium text-gray-700 mb-1">
                   End Date & Time <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="event-end-time"
                   type="datetime-local"
                   value={format(formData.endTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e) => setFormData(prev => ({ ...prev, endTime: new Date(e.target.value) }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
 
             {/* Location Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location Type
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={formData.isOnline}
-                    onChange={() => setFormData(prev => ({ ...prev, isOnline: true }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Online</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={!formData.isOnline}
-                    onChange={() => setFormData(prev => ({ ...prev, isOnline: false }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">In-Person</span>
-                </label>
-              </div>
+              <fieldset>
+                <legend className="block text-sm font-medium text-gray-700 mb-2">
+                  Location Type
+                </legend>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="location-type"
+                      id="location-online"
+                      checked={formData.isOnline}
+                      onChange={() => setFormData(prev => ({ ...prev, isOnline: true }))}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Online</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="location-type"
+                      id="location-in-person"
+                      checked={!formData.isOnline}
+                      onChange={() => setFormData(prev => ({ ...prev, isOnline: false }))}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">In-Person</span>
+                  </label>
+                </div>
+              </fieldset>
             </div>
 
             {/* Meeting Link or Location */}
             {formData.isOnline ? (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="meeting-link" className="block text-sm font-medium text-gray-700 mb-1">
                   Meeting Link
                 </label>
                 <input
+                  id="meeting-link"
                   type="url"
                   value={formData.meetingLink}
                   onChange={(e) => setFormData(prev => ({ ...prev, meetingLink: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="https://zoom.us/j/..."
+                  aria-describedby="meeting-link-hint"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="event-location" className="block text-sm font-medium text-gray-700 mb-1">
                   Location
                 </label>
                 <input
+                  id="event-location"
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Community Center, 123 Main St"
+                  aria-describedby="location-hint"
                 />
               </div>
             )}
 
             {/* Max Attendees */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="max-attendees" className="block text-sm font-medium text-gray-700 mb-1">
                 Maximum Attendees (optional)
               </label>
               <input
+                id="max-attendees"
                 type="number"
                 value={formData.maxAttendees || ''}
                 onChange={(e) => setFormData(prev => ({ 
@@ -387,22 +408,25 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Leave empty for unlimited"
                 min="1"
+                aria-describedby="max-attendees-hint"
               />
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="event-tags" className="block text-sm font-medium text-gray-700 mb-1">
                 Tags
               </label>
               <div className="flex items-center space-x-2">
                 <input
+                  id="event-tags"
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Add tags..."
+                  aria-label="Add a tag"
                 />
                 <button
                   type="button"

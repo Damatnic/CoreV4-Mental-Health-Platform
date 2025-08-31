@@ -175,3 +175,5 @@ export function WellnessPage() {
     </div>
   );
 }
+// Default export for lazy loading
+export default WellnessPage;

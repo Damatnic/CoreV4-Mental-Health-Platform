@@ -167,3 +167,6 @@ const stats = [
   { value: '98%', label: 'Satisfaction' },
   { value: '24/7', label: 'Support' },
 ];
+
+// Default export for lazy loading
+export default HomePage;

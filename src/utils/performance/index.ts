@@ -1,0 +1,261 @@
+/**
+ * Performance Optimization Integration
+ * Central export point for all performance utilities and components
+ */
+
+// Import for internal use
+import {
+  performanceMonitor,
+  memoryMonitor,
+  frameRateMonitor,
+} from './performanceMonitor';
+
+import {
+  UpdatePriority,
+} from './concurrentFeatures';
+
+import {
+  resourceManager,
+  imageLoader,
+  memoryLeakDetector,
+} from './memoryManagement';
+
+// Performance monitoring
+export {
+  performanceMonitor,
+  memoryMonitor,
+  frameRateMonitor,
+  usePerformanceMonitor,
+  MemoryMonitor,
+  FrameRateMonitor,
+  PERFORMANCE_THRESHOLDS,
+} from './performanceMonitor';
+
+// React 18/19 concurrent features
+export {
+  UpdatePriority,
+  usePrioritizedTransition,
+  usePrioritizedDeferredValue,
+  LoadingFallbacks,
+  SuspenseWrapper,
+  lazyWithPreload,
+  ProgressiveEnhancement,
+  optimizedMemo,
+  batchedUpdates,
+  useHeavyComputation,
+  LazyLoad,
+  timeSlice,
+} from './concurrentFeatures';
+
+// Memory management
+export {
+  resourceManager,
+  useResourceCleanup,
+  useEventListenerCleanup,
+  useTimerCleanup,
+  useIntervalCleanup,
+  imageLoader,
+  ImageLoader,
+  debounceWithCleanup,
+  throttleWithCleanup,
+  memoryLeakDetector,
+  MemoryLeakDetector,
+  WeakCache,
+} from './memoryManagement';
+
+// Performance components
+export { VirtualizedList, VirtualizedPostItem, VirtualizedTextArea } from '../../components/performance/VirtualizedList';
+export { OptimizedChart, MoodChart } from '../../components/performance/OptimizedChart';
+export { OptimizedCrisisIntervention } from '../../components/performance/OptimizedCrisisIntervention';
+
+/**
+ * Initialize all performance optimizations
+ */
+export function initializePerformanceOptimizations() {
+  // Start monitoring in production
+  if (import.meta.env.PROD) {
+    // Start memory monitoring
+    memoryMonitor.start(30000); // Check every 30 seconds
+    
+    // Start frame rate monitoring for smooth UX
+    frameRateMonitor.start((fps) => {
+      if (fps < 30) {
+        console.warn(`Low frame rate detected: ${fps} FPS`);
+      }
+    });
+    
+    // Start memory leak detection
+    setInterval(() => {
+      memoryLeakDetector.takeSnapshot();
+      if (memoryLeakDetector.detectLeak()) {
+        console.error('Memory leak detected!', memoryLeakDetector.getReport());
+      }
+    }, 60000); // Check every minute
+  }
+  
+  // Preload critical resources
+  preloadCriticalResources();
+  
+  // Set up performance budget monitoring
+  setupPerformanceBudget();
+  
+  // Initialize service worker for offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.error('Service Worker registration failed:', error);
+    });
+  }
+}
+
+/**
+ * Preload critical resources for mental health app
+ */
+function preloadCriticalResources() {
+  // Preload crisis resources
+  const crisisResources = [
+    '/crisis-support.svg',
+    '/emergency.svg',
+    '/breathing-exercise.mp3',
+  ];
+  
+  crisisResources.forEach(src => {
+    if (src.endsWith('.svg') || src.endsWith('.png') || src.endsWith('.jpg')) {
+      imageLoader.preload([src]);
+    } else if (src.endsWith('.mp3')) {
+      const audio = new Audio();
+      audio.preload = 'auto';
+      audio.src = src;
+    }
+  });
+  
+  // Preconnect to critical domains
+  const domains = [
+    'https://988lifeline.org',
+    import.meta.env.VITE_API_URL,
+  ];
+  
+  domains.forEach(url => {
+    if (url) {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = new URL(url).origin;
+      document.head.appendChild(link);
+    }
+  });
+}
+
+/**
+ * Set up performance budget monitoring
+ */
+function setupPerformanceBudget() {
+  const budgets = {
+    js: 500 * 1024, // 500KB JavaScript
+    css: 100 * 1024, // 100KB CSS
+    images: 2 * 1024 * 1024, // 2MB images
+    total: 3 * 1024 * 1024, // 3MB total
+  };
+  
+  // Monitor resource sizes
+  if ('PerformanceObserver' in window) {
+    try {
+      const resourceObserver = new PerformanceObserver((list) => {
+        let jsSize = 0;
+        let cssSize = 0;
+        let imageSize = 0;
+        
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'resource') {
+            const resource = entry as PerformanceResourceTiming;
+            const size = resource.transferSize || 0;
+            
+            if (resource.name.includes('.js')) {
+              jsSize += size;
+            } else if (resource.name.includes('.css')) {
+              cssSize += size;
+            } else if (resource.name.match(/\.(jpg|jpeg|png|gif|svg|webp)/i)) {
+              imageSize += size;
+            }
+          }
+        }
+        
+        // Check against budgets
+        if (jsSize > budgets.js) {
+          console.warn(`JavaScript budget exceeded: ${(jsSize / 1024).toFixed(2)}KB > ${(budgets.js / 1024).toFixed(2)}KB`);
+        }
+        if (cssSize > budgets.css) {
+          console.warn(`CSS budget exceeded: ${(cssSize / 1024).toFixed(2)}KB > ${(budgets.css / 1024).toFixed(2)}KB`);
+        }
+        if (imageSize > budgets.images) {
+          console.warn(`Image budget exceeded: ${(imageSize / 1024 / 1024).toFixed(2)}MB > ${(budgets.images / 1024 / 1024).toFixed(2)}MB`);
+        }
+      });
+      
+      resourceObserver.observe({ entryTypes: ['resource'] });
+    } catch (e) {
+      console.warn('Resource timing not supported');
+    }
+  }
+}
+
+/**
+ * Performance optimization presets for different scenarios
+ */
+export const PerformancePresets = {
+  // For crisis intervention - maximum performance
+  crisis: {
+    priority: UpdatePriority.CRISIS,
+    animations: false,
+    transitions: false,
+    virtualization: false,
+    webWorkers: false,
+  },
+  
+  // For data visualization - balanced
+  charts: {
+    priority: UpdatePriority.MEDIUM,
+    animations: true,
+    transitions: true,
+    virtualization: false,
+    webWorkers: true,
+  },
+  
+  // For community lists - optimized for large datasets
+  lists: {
+    priority: UpdatePriority.LOW,
+    animations: true,
+    transitions: true,
+    virtualization: true,
+    webWorkers: false,
+  },
+  
+  // For wellness tracking - smooth experience
+  wellness: {
+    priority: UpdatePriority.HIGH,
+    animations: true,
+    transitions: true,
+    virtualization: false,
+    webWorkers: true,
+  },
+};
+
+/**
+ * Get performance report
+ */
+export function getPerformanceReport() {
+  const metrics = performanceMonitor.getMetrics();
+  const resources = resourceManager.getStats();
+  const images = imageLoader.getStats();
+  const memory = memoryLeakDetector.getReport();
+  const fps = frameRateMonitor.getFPS();
+  
+  return {
+    webVitals: metrics,
+    resources,
+    images,
+    memory,
+    fps,
+    timestamp: Date.now(),
+  };
+}
+
+// Type exports removed - types not available from these modules

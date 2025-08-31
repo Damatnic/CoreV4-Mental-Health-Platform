@@ -10,7 +10,7 @@ export class CrisisInterventionAgent {
   private role = AgentRole.CRISIS_INTERVENTION;
   
   async execute() {
-    console.log('[Agent J] Implementing Crisis Intervention Systems');
+    console.warn('[Agent J] Implementing Crisis Intervention Systems');
     
     return {
       detection: await this.implementCrisisDetection(),
@@ -161,7 +161,7 @@ export class WellnessTrackingAgent {
   private role = AgentRole.WELLNESS_TRACKING;
   
   async execute() {
-    console.log('[Agent K] Building Comprehensive Wellness Tracking');
+    console.warn('[Agent K] Building Comprehensive Wellness Tracking');
     
     return {
       moodTracking: await this.implementMoodTracking(),
@@ -326,7 +326,7 @@ export class CommunityPlatformAgent {
   private role = AgentRole.COMMUNITY_PLATFORM;
   
   async execute() {
-    console.log('[Agent L] Creating Safe Community Platform');
+    console.warn('[Agent L] Creating Safe Community Platform');
     
     return {
       forums: await this.buildForums(),
@@ -485,7 +485,7 @@ export class ProfessionalServicesAgent {
   private role = AgentRole.PROFESSIONAL_SERVICES;
   
   async execute() {
-    console.log('[Agent M] Architecting Professional Services Platform');
+    console.warn('[Agent M] Architecting Professional Services Platform');
     
     return {
       directory: await this.buildProviderDirectory(),
@@ -668,13 +668,13 @@ export class DomainTeamCoordinator {
   ];
   
   async executeTeam() {
-    console.log('🚀 Domain Expert Team Starting Parallel Development');
+    console.warn('🚀 Domain Expert Team Starting Parallel Development');
     
     const results = await Promise.all(
       this.agents.map(agent => agent.execute())
     );
     
-    console.log('✅ Domain Expert Team Completed All Tasks');
+    console.warn('✅ Domain Expert Team Completed All Tasks');
     return results;
   }
 }

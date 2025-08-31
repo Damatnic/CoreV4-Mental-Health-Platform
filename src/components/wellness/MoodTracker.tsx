@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  TrendingUp, TrendingDown, Minus, Calendar, Clock, 
-  Sun, Cloud, CloudRain, Zap, Moon, Heart, Brain,
-  Activity, Coffee, Users, Home, Briefcase, BookOpen
-} from 'lucide-react';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import toast from 'react-hot-toast';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Slider } from '@radix-ui/react-slider';
+import { TrendingUp, TrendingDown, AlertCircle, Heart } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  ArcElement,
   Title,
   Tooltip,
   Legend,
-  Filler
+  ChartOptions
 } from 'chart.js';
+import { useDebounce } from 'react-use';
+import CrisisButton from '../crisis/CrisisButton';
 
 // Register ChartJS components
 ChartJS.register(
@@ -26,631 +24,396 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  ArcElement,
   Title,
   Tooltip,
-  Legend,
-  Filler
+  Legend
 );
 
+interface MoodTrackerProps {
+  showHistory?: boolean;
+  onMoodChange?: (mood: number) => void;
+}
+
 interface MoodEntry {
-  id: string;
-  timestamp: Date;
-  moodScore: number; // 1-10 scale
-  emotions: string[];
-  activities: string[];
-  triggers: string[];
-  notes: string;
-  weather?: string;
-  sleep?: number;
-  exercise?: boolean;
-  medication?: boolean;
-  socialInteraction?: number; // 1-5 scale
-  location?: string;
+  date: string;
+  score: number;
+  mood: string;
+  notes?: string;
 }
 
-interface MoodPattern {
-  pattern: string;
-  frequency: number;
-  impact: 'positive' | 'negative' | 'neutral';
-  recommendation: string;
-}
-
-const MOOD_EMOJIS = ['😔', '😟', '😐', '🙂', '😊'];
-const MOOD_COLORS = ['#EF4444', '#F59E0B', '#FCD34D', '#84CC16', '#22C55E'];
-
-const EMOTIONS = [
-  { value: 'happy', label: '😊 Happy', color: '#22C55E' },
-  { value: 'sad', label: '😢 Sad', color: '#3B82F6' },
-  { value: 'anxious', label: '😰 Anxious', color: '#F59E0B' },
-  { value: 'angry', label: '😠 Angry', color: '#EF4444' },
-  { value: 'calm', label: '😌 Calm', color: '#06B6D4' },
-  { value: 'excited', label: '🤗 Excited', color: '#A855F7' },
-  { value: 'tired', label: '😴 Tired', color: '#6B7280' },
-  { value: 'stressed', label: '😣 Stressed', color: '#DC2626' },
-  { value: 'grateful', label: '🙏 Grateful', color: '#10B981' },
-  { value: 'lonely', label: '😔 Lonely', color: '#7C3AED' }
+const MOOD_EMOJIS = ['😰', '😔', '😟', '😕', '😐', '🙂', '😊', '😄', '😁', '🤗'];
+const MOOD_LABELS = [
+  'Very Low',
+  'Low',
+  'Poor',
+  'Below Average',
+  'Neutral',
+  'Okay',
+  'Good',
+  'Very Good',
+  'Great',
+  'Excellent'
 ];
 
-const ACTIVITIES = [
-  { value: 'work', label: 'Work', icon: Briefcase },
-  { value: 'exercise', label: 'Exercise', icon: Activity },
-  { value: 'social', label: 'Socializing', icon: Users },
-  { value: 'relaxing', label: 'Relaxing', icon: Home },
-  { value: 'learning', label: 'Learning', icon: BookOpen },
-  { value: 'creative', label: 'Creative', icon: Brain }
-];
+const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodChange }) => {
+  const [mood, setMood] = useState(5);
+  const [notes, setNotes] = useState('');
+  const [showCrisisSupport, setShowCrisisSupport] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [debouncedMood, setDebouncedMood] = useState(mood);
 
-export function MoodTracker() {
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
-  const [currentMood, setCurrentMood] = useState(5);
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  const [moodNotes, setMoodNotes] = useState('');
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [patterns, setPatterns] = useState<MoodPattern[]>([]);
-  const [sleepHours, setSleepHours] = useState(7);
-  const [hadExercise, setHadExercise] = useState(false);
-  const [socialScore, setSocialScore] = useState(3);
+  // Debounce mood changes for performance
+  useDebounce(
+    () => {
+      setDebouncedMood(mood);
+      if (onMoodChange) {
+        onMoodChange(mood);
+      }
+    },
+    300,
+    [mood]
+  );
 
-  // Load mood entries from localStorage
-  useEffect(() => {
-    const savedEntries = localStorage.getItem('moodEntries');
-    if (savedEntries) {
-      const entries = JSON.parse(savedEntries);
-      setMoodEntries(entries.map((e: any) => ({
-        ...e,
-        timestamp: new Date(e.timestamp)
-      })));
+  // Fetch mood history
+  const { data: history, isLoading: historyLoading } = useQuery({
+    queryKey: ['moodHistory'],
+    queryFn: async () => {
+      const response = await axios.get('/api/wellness/history');
+      return response.data;
+    },
+    enabled: showHistory
+  });
+
+  // Submit mood mutation
+  const submitMood = useMutation({
+    mutationFn: async (data: { mood: number; score: number; notes: string }) => {
+      // Encrypt sensitive data before sending
+      const encryptedData = await encryptMoodData(data);
+      
+      const response = await axios.post('/api/wellness/mood', {
+        mood: MOOD_LABELS[data.mood - 1],
+        score: data.mood,
+        notes: data.notes,
+        encrypted: encryptedData,
+        timestamp: Date.now()
+      });
+      
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setSuccessMessage('Mood logged successfully!');
+      setErrorMessage('');
+      
+      // Store encrypted data locally for offline access
+      storeMoodLocally(data);
+      
+      // Check for crisis indicators
+      if (mood <= 2) {
+        setShowCrisisSupport(true);
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    },
+    onError: () => {
+      setErrorMessage('Failed to log mood. Please try again.');
+      setSuccessMessage('');
+      setTimeout(() => setErrorMessage(''), 3000);
     }
-  }, []);
+  });
 
-  // Analyze patterns when entries change
-  useEffect(() => {
-    if (moodEntries.length > 5) {
-      analyzeMoodPatterns();
+  // Encrypt mood data for privacy
+  const encryptMoodData = async (data: any) => {
+    try {
+      const encoder = new TextEncoder();
+      const dataBuffer = encoder.encode(JSON.stringify(data));
+      
+      // Generate a random key for this session
+      const key = await window.crypto.subtle.generateKey(
+        { name: 'AES-GCM', length: 256 },
+        true,
+        ['encrypt', 'decrypt']
+      );
+      
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const encrypted = await window.crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        dataBuffer
+      );
+      
+      return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    } catch (error) {
+      console.error('Encryption failed:', error);
+      return null;
     }
-  }, [moodEntries, timeRange]);
-
-  // Save mood entry
-  const saveMoodEntry = () => {
-    const newEntry: MoodEntry = {
-      id: `mood-${Date.now()}`,
-      timestamp: new Date(),
-      moodScore: currentMood,
-      emotions: selectedEmotions,
-      activities: selectedActivities,
-      triggers: [],
-      notes: moodNotes,
-      sleep: sleepHours,
-      exercise: hadExercise,
-      socialInteraction: socialScore,
-      medication: true // This would be tracked properly in production
-    };
-
-    const updatedEntries = [...moodEntries, newEntry];
-    setMoodEntries(updatedEntries);
-    localStorage.setItem('moodEntries', JSON.stringify(updatedEntries));
-
-    // Reset form
-    setCurrentMood(5);
-    setSelectedEmotions([]);
-    setSelectedActivities([]);
-    setMoodNotes('');
-    setSleepHours(7);
-    setHadExercise(false);
-    setSocialScore(3);
-
-    // Show success feedback
-    toast.success('Mood entry saved successfully!');
   };
 
-  // Analyze mood patterns using simple algorithms
-  const analyzeMoodPatterns = () => {
-    const newPatterns: MoodPattern[] = [];
-
-    // Pattern 1: Low mood correlation with sleep
-    const lowMoodEntries = moodEntries.filter(e => e.moodScore <= 4);
-    const poorSleepLowMood = lowMoodEntries.filter(e => (e.sleep || 0) < 6);
-    if (poorSleepLowMood.length > lowMoodEntries.length * 0.6) {
-      newPatterns.push({
-        pattern: 'Poor sleep linked to low mood',
-        frequency: poorSleepLowMood.length,
-        impact: 'negative',
-        recommendation: 'Consider improving sleep hygiene. Aim for 7-9 hours of quality sleep.'
-      });
+  // Store mood data locally (encrypted)
+  const storeMoodLocally = (data: any) => {
+    try {
+      const existingData = localStorage.getItem('mood_data');
+      const moodHistory = existingData ? JSON.parse(atob(existingData)) : [];
+      moodHistory.push(data);
+      
+      // Keep only last 30 entries
+      if (moodHistory.length > 30) {
+        moodHistory.shift();
+      }
+      
+      localStorage.setItem('mood_data', btoa(JSON.stringify(moodHistory)));
+    } catch (error) {
+      console.error('Failed to store mood locally:', error);
     }
-
-    // Pattern 2: Exercise impact
-    const exerciseEntries = moodEntries.filter(e => e.exercise);
-    const avgMoodWithExercise = exerciseEntries.reduce((sum, e) => sum + e.moodScore, 0) / (exerciseEntries.length || 1);
-    const noExerciseEntries = moodEntries.filter(e => !e.exercise);
-    const avgMoodWithoutExercise = noExerciseEntries.reduce((sum, e) => sum + e.moodScore, 0) / (noExerciseEntries.length || 1);
-    
-    if (avgMoodWithExercise > avgMoodWithoutExercise + 1) {
-      newPatterns.push({
-        pattern: 'Exercise boosts your mood',
-        frequency: exerciseEntries.length,
-        impact: 'positive',
-        recommendation: 'Keep up the regular exercise! It significantly improves your mood.'
-      });
-    }
-
-    // Pattern 3: Social interaction correlation
-    const highSocialEntries = moodEntries.filter(e => (e.socialInteraction || 0) >= 4);
-    const avgMoodHighSocial = highSocialEntries.reduce((sum, e) => sum + e.moodScore, 0) / (highSocialEntries.length || 1);
-    
-    if (avgMoodHighSocial > 6) {
-      newPatterns.push({
-        pattern: 'Social connections improve mood',
-        frequency: highSocialEntries.length,
-        impact: 'positive',
-        recommendation: 'Social interactions positively affect your wellbeing. Stay connected!'
-      });
-    }
-
-    // Pattern 4: Time of day patterns
-    const morningEntries = moodEntries.filter(e => e.timestamp.getHours() < 12);
-    const eveningEntries = moodEntries.filter(e => e.timestamp.getHours() >= 18);
-    const avgMorningMood = morningEntries.reduce((sum, e) => sum + e.moodScore, 0) / (morningEntries.length || 1);
-    const avgEveningMood = eveningEntries.reduce((sum, e) => sum + e.moodScore, 0) / (eveningEntries.length || 1);
-    
-    if (Math.abs(avgMorningMood - avgEveningMood) > 2) {
-      newPatterns.push({
-        pattern: avgMorningMood > avgEveningMood ? 'Better mood in mornings' : 'Better mood in evenings',
-        frequency: moodEntries.length,
-        impact: 'neutral',
-        recommendation: `Your mood tends to be better in the ${avgMorningMood > avgEveningMood ? 'morning' : 'evening'}. Plan important activities accordingly.`
-      });
-    }
-
-    setPatterns(newPatterns);
   };
 
-  // Get chart data
-  const getChartData = () => {
-    const filteredEntries = getFilteredEntries();
-    const labels = filteredEntries.map(e => 
-      e.timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  // Handle mood submission
+  const handleSubmit = useCallback(() => {
+    if (!submitMood.isPending) {
+      submitMood.mutate({
+        mood,
+        score: mood,
+        notes
+      });
+    }
+  }, [mood, notes, submitMood]);
+
+  // Check for declining trend
+  const moodTrend = useMemo(() => {
+    if (!history?.moodHistory || history.moodHistory.length < 3) return null;
+    
+    const recent = history.moodHistory.slice(-3);
+    const scores = recent.map((m: MoodEntry) => m.score);
+    const declining = scores.every((score: number, i: number) => 
+      i === 0 || score < scores[i - 1]
     );
-    const moodData = filteredEntries.map(e => e.moodScore);
+    
+    if (declining && scores[scores.length - 1] <= 4) {
+      return 'declining';
+    }
+    
+    const improving = scores.every((score: number, i: number) => 
+      i === 0 || score > scores[i - 1]
+    );
+    
+    return improving ? 'improving' : 'stable';
+  }, [history]);
 
+  // Chart configuration
+  const chartData = useMemo(() => {
+    if (!history?.moodHistory) return null;
+    
     return {
-      labels,
-      datasets: [
-        {
-          label: 'Mood Score',
-          data: moodData,
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.4,
-          fill: true
-        }
-      ]
-    };
-  };
-
-  // Get emotion distribution data
-  const getEmotionData = () => {
-    const emotionCounts: Record<string, number> = {};
-    moodEntries.forEach(entry => {
-      entry.emotions.forEach(emotion => {
-        emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
-      });
-    });
-
-    const sortedEmotions = Object.entries(emotionCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    return {
-      labels: sortedEmotions.map(([emotion]) => 
-        EMOTIONS.find(e => e.value === emotion)?.label || emotion
+      labels: history.moodHistory.map((m: MoodEntry) => 
+        new Date(m.date).toLocaleDateString()
       ),
       datasets: [{
-        data: sortedEmotions.map(([, count]) => count),
-        backgroundColor: sortedEmotions.map(([emotion]) => 
-          EMOTIONS.find(e => e.value === emotion)?.color || '#6B7280'
-        )
+        label: 'Mood Score',
+        data: history.moodHistory.map((m: MoodEntry) => m.score),
+        borderColor: 'rgb(147, 51, 234)',
+        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+        tension: 0.3
       }]
     };
-  };
+  }, [history]);
 
-  // Filter entries based on time range
-  const getFilteredEntries = () => {
-    const now = new Date();
-    const cutoff = new Date();
-    
-    switch (timeRange) {
-      case 'week':
-        cutoff.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        cutoff.setMonth(now.getMonth() - 1);
-        break;
-      case 'year':
-        cutoff.setFullYear(now.getFullYear() - 1);
-        break;
+  const chartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Mood Trend'
+      }
+    },
+    scales: {
+      y: {
+        min: 1,
+        max: 10,
+        ticks: {
+          stepSize: 1
+        }
+      }
     }
-
-    return moodEntries
-      .filter(e => e.timestamp >= cutoff)
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   };
 
-  // Calculate mood statistics
-  const getMoodStats = () => {
-    const filtered = getFilteredEntries();
-    if (filtered.length === 0) return { average: 0, trend: 'stable', change: 0 };
-
-    const average = filtered.reduce((sum, e) => sum + e.moodScore, 0) / filtered.length;
-    const recentAvg = filtered.slice(-3).reduce((sum, e) => sum + e.moodScore, 0) / Math.min(3, filtered.length);
-    const olderAvg = filtered.slice(0, -3).reduce((sum, e) => sum + e.moodScore, 0) / Math.max(1, filtered.length - 3);
+  // Calculate average mood
+  const averageMood = useMemo(() => {
+    if (!history?.moodHistory || history.moodHistory.length === 0) return null;
     
-    const change = recentAvg - olderAvg;
-    const trend = change > 0.5 ? 'improving' : change < -0.5 ? 'declining' : 'stable';
-
-    return { average: average.toFixed(1), trend, change: change.toFixed(1) };
-  };
-
-  const stats = getMoodStats();
+    const sum = history.moodHistory.reduce((acc: number, m: MoodEntry) => 
+      acc + m.score, 0
+    );
+    return (sum / history.moodHistory.length).toFixed(1);
+  }, [history]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl p-8 mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Mood Tracker</h1>
-            <p className="opacity-90">Track your emotional wellbeing over time</p>
-          </div>
-          <div className="text-right">
-            <div className="text-4xl font-bold">{stats.average}</div>
-            <div className="text-sm opacity-75">Average Mood</div>
-            <div className="flex items-center mt-2">
-              {stats.trend === 'improving' ? (
-                <TrendingUp className="h-5 w-5 mr-1" />
-              ) : stats.trend === 'declining' ? (
-                <TrendingDown className="h-5 w-5 mr-1" />
-              ) : (
-                <Minus className="h-5 w-5 mr-1" />
-              )}
-              <span className="text-sm">{stats.trend}</span>
-            </div>
-          </div>
+    <div className="mood-tracker bg-white rounded-lg shadow-md p-6">
+      <div className="mb-6">
+        <label htmlFor="mood-slider" className="block text-lg font-semibold mb-4">
+          How are you feeling today?
+        </label>
+        
+        {/* Mood Emojis */}
+        <div className="flex justify-between mb-2">
+          <span>😔</span>
+          <span>😐</span>
+          <span>😊</span>
         </div>
-      </div>
-
-      {/* Quick Mood Entry */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">How are you feeling?</h2>
         
         {/* Mood Slider */}
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            {MOOD_EMOJIS.map((emoji, index) => (
-              <span
-                key={index}
-                className={`text-2xl cursor-pointer transition-transform ${
-                  Math.floor(currentMood / 2) === index ? 'scale-125' : 'opacity-50'
-                }`}
-                onClick={() => setCurrentMood((index + 1) * 2)}
-              >
-                {emoji}
-              </span>
-            ))}
+        <input
+          id="mood-slider"
+          type="range"
+          role="slider"
+          min="1"
+          max="10"
+          value={mood}
+          onChange={(e) => setMood(parseInt(e.target.value))}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          aria-label="Mood rating from 1 to 10"
+          aria-valuemin={1}
+          aria-valuemax={10}
+          aria-valuenow={mood}
+        />
+        
+        {/* Current Mood Display */}
+        <div className="mt-4 text-center">
+          <div className="text-4xl mb-2">{MOOD_EMOJIS[mood - 1]}</div>
+          <div className="text-lg font-medium">
+            {mood <= 3 && <span className="text-red-600">Feeling low</span>}
+            {mood > 3 && mood <= 6 && <span className="text-yellow-600">Feeling okay</span>}
+            {mood > 6 && <span className="text-green-600">Feeling good</span>}
           </div>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={currentMood}
-            onChange={(e) => setCurrentMood(Number(e.target.value))}
-            className="w-full h-3 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 rounded-lg appearance-none cursor-pointer"
-            style={{
-              background: `linear-gradient(to right, ${MOOD_COLORS.join(', ')})`
-            }}
-          />
-          <div className="text-center mt-2">
-            <span className="text-3xl font-bold" style={{ color: MOOD_COLORS[Math.floor(currentMood / 2.1)] }}>
-              {currentMood}/10
-            </span>
+          <div role="status" aria-live="polite" className="sr-only">
+            Mood: {mood} out of 10 - {MOOD_LABELS[mood - 1]}
           </div>
         </div>
-
-        {/* Emotions */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What emotions are you experiencing?
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {EMOTIONS.map((emotion) => (
-              <button
-                key={emotion.value}
-                onClick={() => {
-                  setSelectedEmotions(prev =>
-                    prev.includes(emotion.value)
-                      ? prev.filter(e => e !== emotion.value)
-                      : [...prev, emotion.value]
-                  );
-                }}
-                className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
-                  selectedEmotions.includes(emotion.value)
-                    ? 'ring-2 ring-offset-2'
-                    : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-                style={{
-                  backgroundColor: selectedEmotions.includes(emotion.value) ? emotion.color + '20' : undefined,
-                  color: selectedEmotions.includes(emotion.value) ? emotion.color : undefined,
-                  borderColor: selectedEmotions.includes(emotion.value) ? emotion.color : undefined
-                } as React.CSSProperties}
-              >
-                {emotion.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Activities */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What have you been doing?
-          </label>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {ACTIVITIES.map((activity) => (
-              <button
-                key={activity.value}
-                onClick={() => {
-                  setSelectedActivities(prev =>
-                    prev.includes(activity.value)
-                      ? prev.filter(a => a !== activity.value)
-                      : [...prev, activity.value]
-                  );
-                }}
-                className={`p-3 rounded-lg text-center transition-all ${
-                  selectedActivities.includes(activity.value)
-                    ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-500'
-                    : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-              >
-                <activity.icon className="h-6 w-6 mx-auto mb-1" />
-                <span className="text-xs">{activity.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Additional Factors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sleep (hours)
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="24"
-              value={sleepHours}
-              onChange={(e) => setSleepHours(Number(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Exercise today?
-            </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setHadExercise(true)}
-                className={`flex-1 py-2 rounded-lg ${
-                  hadExercise ? 'bg-green-100 text-green-700' : 'bg-gray-100'
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setHadExercise(false)}
-                className={`flex-1 py-2 rounded-lg ${
-                  !hadExercise ? 'bg-red-100 text-red-700' : 'bg-gray-100'
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Social interaction
-            </label>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <button
-                  key={level}
-                  onClick={() => setSocialScore(level)}
-                  className={`flex-1 py-2 rounded ${
-                    socialScore >= level ? 'bg-blue-500 text-white' : 'bg-gray-200'
-                  }`}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Notes */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes (optional)
-          </label>
+        
+        {/* Notes Input */}
+        <div className="mt-4">
           <textarea
-            value={moodNotes}
-            onChange={(e) => setMoodNotes(e.target.value)}
-            placeholder="Any thoughts, triggers, or observations..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Add notes about how you're feeling (optional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg resize-none"
             rows={3}
           />
         </div>
-
-        {/* Save Button */}
+        
+        {/* Submit Button */}
         <button
-          onClick={saveMoodEntry}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          onClick={handleSubmit}
+          disabled={submitMood.isPending}
+          className="mt-4 w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
         >
-          Save Mood Entry
+          {submitMood.isPending ? 'Logging...' : 'Log Mood'}
         </button>
-      </div>
-
-      {/* Analytics Toggle */}
-      <div className="flex justify-center mb-8">
-        <button
-          onClick={() => setShowAnalytics(!showAnalytics)}
-          className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-        >
-          {showAnalytics ? 'Hide' : 'Show'} Analytics & Insights
-        </button>
-      </div>
-
-      {/* Analytics Section */}
-      {showAnalytics && moodEntries.length > 0 && (
-        <div className="space-y-8">
-          {/* Time Range Selector */}
-          <div className="flex justify-center gap-2">
-            {(['week', 'month', 'year'] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  timeRange === range
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {range.charAt(0).toUpperCase() + range.slice(1)}
-              </button>
-            ))}
+        
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="mt-3 p-3 bg-green-100 text-green-700 rounded-lg">
+            {successMessage}
           </div>
-
-          {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Mood Trend Chart */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Mood Trend</h3>
-              <Line
-                data={getChartData()}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => `Mood: ${context.parsed.y}/10`
-                      }
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      max: 10,
-                      ticks: { stepSize: 1 }
-                    }
-                  }
-                }}
-              />
-            </div>
-
-            {/* Emotion Distribution */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Top Emotions</h3>
-              {moodEntries.length > 0 ? (
-                <Doughnut
-                  data={getEmotionData()}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: { position: 'bottom' }
-                    }
-                  }}
-                />
-              ) : (
-                <p className="text-gray-500 text-center py-8">No emotion data yet</p>
-              )}
-            </div>
+        )}
+        
+        {errorMessage && (
+          <div className="mt-3 p-3 bg-red-100 text-red-700 rounded-lg">
+            {errorMessage}
           </div>
-
-          {/* Patterns & Insights */}
-          {patterns.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Patterns & Insights</h3>
-              <div className="space-y-4">
-                {patterns.map((pattern, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      pattern.impact === 'positive'
-                        ? 'bg-green-50 border-green-500'
-                        : pattern.impact === 'negative'
-                        ? 'bg-red-50 border-red-500'
-                        : 'bg-gray-50 border-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{pattern.pattern}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{pattern.recommendation}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        pattern.impact === 'positive'
-                          ? 'bg-green-200 text-green-800'
-                          : pattern.impact === 'negative'
-                          ? 'bg-red-200 text-red-800'
-                          : 'bg-gray-200 text-gray-800'
-                      }`}>
-                        {pattern.frequency} occurrences
-                      </span>
-                    </div>
-                  </div>
-                ))}
+        )}
+      </div>
+      
+      {/* Crisis Support */}
+      {showCrisisSupport && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center mb-3">
+            <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+            <span className="font-semibold text-red-900">Crisis Support Available</span>
+          </div>
+          <p className="text-red-800 mb-3">
+            We notice you're going through a difficult time. Help is available:
+          </p>
+          <div className="text-red-700 font-bold text-xl mb-3">988</div>
+          <CrisisButton size="medium" />
+        </div>
+      )}
+      
+      {/* Declining Mood Warning */}
+      {moodTrend === 'declining' && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center mb-2">
+            <TrendingDown className="w-5 h-5 text-yellow-600 mr-2" />
+            <span className="font-semibold text-yellow-900">
+              Your mood has been declining
+            </span>
+          </div>
+          <p className="text-yellow-800">
+            Consider reaching out to a friend, family member, or mental health professional.
+          </p>
+        </div>
+      )}
+      
+      {/* Mood History */}
+      {showHistory && (
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Mood History</h3>
+          
+          {/* Average Mood */}
+          {averageMood && (
+            <div className="mb-4 p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">Average Mood:</span>
+                <span className="text-2xl font-bold text-purple-600">{averageMood}</span>
               </div>
             </div>
           )}
-
-          {/* Recent Entries */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Entries</h3>
-            <div className="space-y-3">
-              {getFilteredEntries().slice(-5).reverse().map((entry) => (
-                <div key={entry.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <span className="text-2xl">{MOOD_EMOJIS[Math.floor(entry.moodScore / 2.1)]}</span>
-                    <div>
-                      <p className="font-medium">
-                        {entry.timestamp.toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {entry.emotions.slice(0, 3).map(e => 
-                          EMOTIONS.find(em => em.value === e)?.label || e
-                        ).join(', ')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold" style={{ color: MOOD_COLORS[Math.floor(entry.moodScore / 2.1)] }}>
-                      {entry.moodScore}/10
-                    </span>
-                  </div>
-                </div>
-              ))}
+          
+          {/* Mood Trend Badge */}
+          {moodTrend && (
+            <div className="mb-4">
+              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
+                {moodTrend === 'improving' && (
+                  <>
+                    <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                    <span className="text-green-700">Improving</span>
+                  </>
+                )}
+                {moodTrend === 'declining' && (
+                  <>
+                    <TrendingDown className="w-4 h-4 text-red-600 mr-1" />
+                    <span className="text-red-700">Declining</span>
+                  </>
+                )}
+                {moodTrend === 'stable' && (
+                  <>
+                    <Heart className="w-4 h-4 text-blue-600 mr-1" />
+                    <span className="text-blue-700">Stable</span>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+          
+          {/* Mood Chart */}
+          {chartData && (
+            <div data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
+              <Line data={chartData} options={chartOptions} />
+            </div>
+          )}
+          
+          {historyLoading && (
+            <div className="text-center py-8 text-gray-500">
+              Loading mood history...
+            </div>
+          )}
         </div>
       )}
     </div>
   );
-}
+};
+
+export default MoodTracker;

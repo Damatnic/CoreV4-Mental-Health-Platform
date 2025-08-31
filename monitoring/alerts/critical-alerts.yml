@@ -1,0 +1,199 @@
+# Critical Alerts for Mental Health Platform
+# These alerts require immediate attention
+
+groups:
+  - name: crisis_alerts
+    interval: 10s
+    rules:
+      # Crisis response time alert
+      - alert: CrisisResponseTimeHigh
+        expr: histogram_quantile(0.95, rate(crisis_response_duration_seconds_bucket[5m])) > 30
+        for: 2m
+        labels:
+          severity: critical
+          team: crisis-response
+        annotations:
+          summary: "Crisis response time exceeding 30 seconds"
+          description: "95th percentile crisis response time is {{ $value }}s (threshold: 30s)"
+          runbook_url: "https://docs.mentalhealth.app/runbooks/crisis-response"
+
+      # Crisis queue buildup
+      - alert: CrisisQueueBacklog
+        expr: crisis_sessions_waiting > 5
+        for: 1m
+        labels:
+          severity: critical
+          team: crisis-response
+        annotations:
+          summary: "Crisis queue has {{ $value }} users waiting"
+          description: "More than 5 users waiting for crisis support. Immediate counselor availability needed."
+
+      # Crisis escalation rate
+      - alert: CrisisEscalationRateHigh
+        expr: rate(crisis_escalations_total[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          team: crisis-response
+        annotations:
+          summary: "High crisis escalation rate detected"
+          description: "Crisis escalation rate is {{ $value }} per second. Review protocols immediately."
+
+  - name: availability_alerts
+    interval: 30s
+    rules:
+      # Service down alert
+      - alert: ServiceDown
+        expr: up{job=~"backend-api|websocket|frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+
+      # Database connection pool exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_connection_pool_available == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: database
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: "No available database connections. Application may be unable to serve requests."
+
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }}. More than 5% of requests are failing."
+
+  - name: security_alerts
+    interval: 30s
+    rules:
+      # Multiple failed login attempts
+      - alert: BruteForceAttempt
+        expr: rate(auth_failed_login_attempts_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: "Potential brute force attack detected"
+          description: "{{ $value }} failed login attempts per second from {{ $labels.ip_address }}"
+
+      # Unauthorized data access attempt
+      - alert: UnauthorizedDataAccess
+        expr: unauthorized_access_attempts_total > 0
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: "Unauthorized data access attempt detected"
+          description: "User {{ $labels.user_id }} attempted to access protected resource {{ $labels.resource }}"
+
+      # SSL certificate expiry
+      - alert: SSLCertificateExpiringSoon
+        expr: ssl_cert_expiry_days < 7
+        for: 1h
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "SSL certificate expiring in {{ $value }} days"
+          description: "SSL certificate for {{ $labels.domain }} will expire in {{ $value }} days"
+
+  - name: compliance_alerts
+    interval: 60s
+    rules:
+      # HIPAA audit log failure
+      - alert: AuditLogFailure
+        expr: audit_log_write_failures_total > 0
+        for: 1m
+        labels:
+          severity: critical
+          team: compliance
+          compliance: hipaa
+        annotations:
+          summary: "Audit log write failure detected"
+          description: "Failed to write {{ $value }} audit log entries. HIPAA compliance at risk."
+
+      # Encryption failure
+      - alert: EncryptionFailure
+        expr: encryption_failures_total > 0
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+          compliance: hipaa
+        annotations:
+          summary: "Data encryption failure"
+          description: "Failed to encrypt sensitive data. {{ $value }} encryption failures detected."
+
+      # Data retention violation
+      - alert: DataRetentionViolation
+        expr: data_retention_violations_total > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: compliance
+        annotations:
+          summary: "Data retention policy violation"
+          description: "{{ $value }} records violating data retention policy"
+
+  - name: performance_alerts
+    interval: 30s
+    rules:
+      # High latency
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 3
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High request latency"
+          description: "99th percentile latency is {{ $value }}s (threshold: 3s)"
+
+      # Memory usage critical
+      - alert: MemoryUsageCritical
+        expr: |
+          (
+            container_memory_usage_bytes{pod=~"backend-.*|frontend-.*"} /
+            container_spec_memory_limit_bytes
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Memory usage critical for {{ $labels.pod }}"
+          description: "Memory usage is {{ $value | humanizePercentage }} of limit"
+
+      # Disk space low
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"} /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"

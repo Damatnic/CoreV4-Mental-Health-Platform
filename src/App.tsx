@@ -11,6 +11,7 @@ import { WellnessPage } from './pages/WellnessPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { ProfessionalPage } from './pages/ProfessionalPage';
 import { AuthProvider } from './contexts/AuthContext';
+import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,24 +25,32 @@ const queryClient = new QueryClient({
   },
 });
 
+// Wrap sensitive pages with security
+const SecureDashboard = withSecurity(DashboardPage, 'basic');
+const SecureWellness = withSecurity(WellnessPage, 'elevated');
+const SecureProfessional = withSecurity(ProfessionalPage, 'maximum');
+const SecureCommunity = withSecurity(CommunityPage, 'basic');
+
 function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Router>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/crisis" element={<CrisisPage />} />
-                <Route path="/wellness/*" element={<WellnessPage />} />
-                <Route path="/community/*" element={<CommunityPage />} />
-                <Route path="/professional/*" element={<ProfessionalPage />} />
-              </Routes>
-            </Layout>
-          </Router>
-        </AuthProvider>
+        <SecurityProvider>
+          <AuthProvider>
+            <Router>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/dashboard" element={<SecureDashboard />} />
+                  <Route path="/crisis" element={<CrisisPage />} />
+                  <Route path="/wellness/*" element={<SecureWellness />} />
+                  <Route path="/community/*" element={<SecureCommunity />} />
+                  <Route path="/professional/*" element={<SecureProfessional />} />
+                </Routes>
+              </Layout>
+            </Router>
+          </AuthProvider>
+        </SecurityProvider>
         <Toaster
           position="top-right"
           toastOptions={{

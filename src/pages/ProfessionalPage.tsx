@@ -3,3 +3,5 @@ import { ProfessionalSupport } from '../components/professional/ProfessionalSupp
 export function ProfessionalPage() {
   return <ProfessionalSupport />;
 }
+// Default export for lazy loading
+export default ProfessionalPage;
