@@ -3,7 +3,8 @@
     "allow": [
       "Bash(sed:*)",
       "Bash(npx vite build:*)",
-      "Bash(npm:*)"
+      "Bash(npm:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []
