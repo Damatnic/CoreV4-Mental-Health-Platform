@@ -22,7 +22,8 @@
       "Bash(find:*)",
       "Bash(wc:*)",
       "Bash(git restore:*)",
-      "Bash(npx depcheck:*)"
+      "Bash(npx depcheck:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

@@ -99,13 +99,13 @@ class SecureLocalStorage {
       if (this.isSensitiveData(key)) {
         // Encrypt sensitive data
         const encryptedValue = this.encrypt(value);
-        secureStorage.setItem(`encrypted_${key}`, encryptedValue);
+        localStorage.setItem(`encrypted_${key}`, encryptedValue);
         
         // Log security action (but not the data)
         console.info('🔒 Stored encrypted data for key:', key);
       } else {
         // Store non-sensitive data normally
-        secureStorage.setItem(key, value);
+        localStorage.setItem(key, value);
       }
     } catch (error) {
       console.error('🔒 SecureLocalStorage.setItem failed:', error);
@@ -120,17 +120,17 @@ class SecureLocalStorage {
     try {
       if (this.isSensitiveData(key)) {
         // Try to get encrypted version first
-        const encryptedValue = secureStorage.getItem(`encrypted_${key}`);
+        const encryptedValue = localStorage.getItem(`encrypted_${key}`);
         if (encryptedValue) {
           return this.decrypt(encryptedValue);
         }
         
         // Fall back to plain text (for migration)
-        const plainValue = secureStorage.getItem(key);
+        const plainValue = localStorage.getItem(key);
         if (plainValue) {
           // Migrate to encrypted storage
           this.setItem(key, plainValue);
-          secureStorage.removeItem(key); // Remove plain text version
+          localStorage.removeItem(key); // Remove plain text version
           console.info('🔒 Migrated plain text data to encrypted storage:', key);
           return plainValue;
         }
@@ -138,7 +138,7 @@ class SecureLocalStorage {
         return null;
       } else {
         // Get non-sensitive data normally
-        return secureStorage.getItem(key);
+        return localStorage.getItem(key);
       }
     } catch (error) {
       console.error('🔒 SecureLocalStorage.getItem failed:', error);
@@ -152,11 +152,11 @@ class SecureLocalStorage {
   removeItem(key: string): void {
     try {
       if (this.isSensitiveData(key)) {
-        secureStorage.removeItem(`encrypted_${key}`);
-        secureStorage.removeItem(key); // Also remove any plain text version
+        localStorage.removeItem(`encrypted_${key}`);
+        localStorage.removeItem(key); // Also remove any plain text version
         console.info('🔒 Removed encrypted data for key:', key);
       } else {
-        secureStorage.removeItem(key);
+        localStorage.removeItem(key);
       }
     } catch (error) {
       console.error('🔒 SecureLocalStorage.removeItem failed:', error);
@@ -186,7 +186,7 @@ class SecureLocalStorage {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key) {
-          used += (secureStorage.getItem(key) || '').length;
+          used += (localStorage.getItem(key) || '').length;
         }
       }
       
@@ -240,7 +240,7 @@ class SecureLocalStorage {
 
     // Migrate sensitive plain text data
     audit.sensitive.forEach(key => {
-      const value = secureStorage.getItem(key);
+      const value = localStorage.getItem(key);
       if (value) {
         try {
           this.setItem(key, value); // This will encrypt it

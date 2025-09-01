@@ -168,16 +168,68 @@ if ('serviceWorker' in navigator) {
   }
 }
 
-// Initialize React 19 with concurrent features
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Failed to find the root element');
+// Initialize React with DOM ready check
+function initializeReact() {
+  console.log('🔍 Looking for root element...');
+  const rootElement = document.getElementById('root');
+  
+  if (!rootElement) {
+    console.error('❌ Root element #root not found! DOM ready state:', document.readyState);
+    
+    // If DOM isn't ready, wait and retry
+    if (document.readyState !== 'complete') {
+      console.log('🔄 DOM not ready, retrying in 100ms...');
+      setTimeout(() => {
+        initializeReact();
+      }, 100);
+      return;
+    }
+    
+    // If DOM is ready but no root element, create it
+    console.log('🏠 Creating missing root element...');
+    const newRoot = document.createElement('div');
+    newRoot.id = 'root';
+    document.body.appendChild(newRoot);
+    
+    // Retry initialization
+    setTimeout(() => {
+      initializeReact();
+    }, 50);
+    return;
+  }
 
-const root = ReactDOM.createRoot(rootElement);
+  console.log('✅ Found root element, initializing React...');
+  
+  try {
+    const root = ReactDOM.createRoot(rootElement);
 
-root.render(
-  <React.StrictMode>
-    <EmergencyErrorBoundary>
-      <App />
-    </EmergencyErrorBoundary>
-  </React.StrictMode>
-);
+    root.render(
+      <React.StrictMode>
+        <EmergencyErrorBoundary>
+          <App />
+        </EmergencyErrorBoundary>
+      </React.StrictMode>
+    );
+    
+    console.log('✅ React successfully initialized!');
+  } catch (error) {
+    console.error('🚨 React initialization failed:', error);
+    // Show emergency fallback
+    rootElement.innerHTML = `
+      <div style="padding: 2rem; text-align: center; font-family: system-ui; color: #dc2626;">
+        <h1>🏥 CoreV4 Emergency Mode</h1>
+        <p>React failed to initialize. Crisis resources available:</p>
+        <a href="tel:988" style="display: block; margin: 1rem 0; padding: 1rem; background: #dc2626; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Call Crisis Lifeline: 988</a>
+        <button onclick="window.location.reload()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry Loading</button>
+      </div>
+    `;
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeReact);
+} else {
+  // DOM is already ready
+  initializeReact();
+}
