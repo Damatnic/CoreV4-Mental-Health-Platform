@@ -400,17 +400,22 @@ class CryptographyService {
   }
 
   private getStoredMasterKey(): string | null {
-    // In production, retrieve from secure key storage or HSM
-    // For development, using sessionStorage (NOT SECURE FOR PRODUCTION)
-    return sessionStorage.getItem('__temp_master_key__');
+    // SECURITY: Key storage disabled to prevent insecure key exposure
+    // In production, implement secure key storage (HSM, KMS, or server-side)
+    // For development, keys are generated per session (more secure than browser storage)
+    console.warn('🔐 SECURITY: Using session-only keys (no persistent storage)');
+    return null; // Force key regeneration each session for security
   }
 
   private async storeMasterKey(key: CryptoKey): Promise<void> {
-    // In production, store in secure key storage or HSM
-    // For development, using sessionStorage (NOT SECURE FOR PRODUCTION)
-    const exportedKey = await crypto.subtle.exportKey('raw', key);
-    const keyString = this.arrayBufferToBase64(exportedKey);
-    sessionStorage.setItem('__temp_master_key__', keyString);
+    // SECURITY: Key storage disabled to prevent insecure key exposure
+    // In production, implement secure key storage:
+    // - AWS KMS, Azure Key Vault, Google Cloud KMS
+    // - Hardware Security Module (HSM)
+    // - Server-side secure key management
+    // For now, keys are kept in memory only (more secure than browser storage)
+    console.log('🔐 SECURITY: Master key kept in memory only (no persistent storage)');
+    // No storage operation - key lives only in this.masterKey
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer): string {

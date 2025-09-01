@@ -19,6 +19,24 @@ const db = new DatabaseService();
 const audit = new AuditService();
 const encryption = new EncryptionService();
 
+// CRITICAL SECURITY: Ensure JWT secret is properly configured
+const getJWTSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret === 'fallback-secret' || secret.length < 32) {
+    throw new Error('🚨 CRITICAL SECURITY ERROR: JWT_SECRET must be set to a secure value (minimum 32 characters)');
+  }
+  return secret;
+};
+
+// CRITICAL SECURITY: Validate JWT secret on startup
+try {
+  getJWTSecret();
+  console.log('✅ JWT Secret validation passed');
+} catch (error) {
+  console.error('❌ JWT Secret validation failed:', error);
+  process.exit(1); // Prevent insecure startup
+}
+
 // Validation rules
 const registerValidation = [
   body('email').optional().isEmail().normalizeEmail(),
@@ -72,7 +90,7 @@ router.post('/register', registerValidation, async (req: Request, res: Response,
       // Generate JWT token
       const token = jwt.sign(
         { userId, isAnonymous: true },
-        process.env.JWT_SECRET || 'fallback-secret',
+        getJWTSecret(),
         { expiresIn: '30d' }
       );
 
@@ -140,7 +158,7 @@ router.post('/register', registerValidation, async (req: Request, res: Response,
       // Generate JWT token
       const token = jwt.sign(
         { userId, isAnonymous: false, email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        getJWTSecret(),
         { expiresIn: '7d' }
       );
 
@@ -218,7 +236,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response, next:
       // Generate new token
       const token = jwt.sign(
         { userId: anonymousId, isAnonymous: true },
-        process.env.JWT_SECRET || 'fallback-secret',
+        getJWTSecret(),
         { expiresIn: '30d' }
       );
 
@@ -278,7 +296,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response, next:
       // Generate JWT token
       const token = jwt.sign(
         { userId: user.id, isAnonymous: false, email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        getJWTSecret(),
         { expiresIn: '7d' }
       );
 
@@ -325,12 +343,12 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
 
     // Verify existing token (even if expired)
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret', { ignoreExpiration: true }) as any;
+      const decoded = jwt.verify(token, getJWTSecret(), { ignoreExpiration: true }) as any;
       
       // Generate new token
       const newToken = jwt.sign(
         { userId: decoded.userId, isAnonymous: decoded.isAnonymous, email: decoded.email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        getJWTSecret(),
         { expiresIn: decoded.isAnonymous ? '30d' : '7d' }
       );
 
@@ -398,7 +416,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    const decoded = jwt.verify(token, getJWTSecret()) as any;
 
     const user = await db.getUserById(decoded.userId);
     if (!user) {

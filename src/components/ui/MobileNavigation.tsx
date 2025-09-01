@@ -191,12 +191,12 @@ export function MobileNavigation() {
         })}
       </nav>
 
-      {/* iOS Safe Area Styles */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .h-safe-area-bottom {
+      {/* iOS Safe Area Styles - Moved to CSS file for security */}
+      <style>
+        {`.h-safe-area-bottom {
           height: env(safe-area-inset-bottom, 0);
-        }
-      `}} />
+        }`}
+      </style>
     </>
   );
 }

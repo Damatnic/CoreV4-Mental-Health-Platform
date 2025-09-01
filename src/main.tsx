@@ -4,6 +4,8 @@ import App from './App';
 import './styles/index.css';
 import { EmergencyErrorBoundary, setupGlobalErrorHandling } from './components/ErrorBoundary';
 import { setupRuntimeGuards } from './utils/runtimeGuards';
+// CRITICAL SECURITY: Validate environment configuration before app startup
+import './config/securityValidation';
 
 // Initialize global error handling and runtime guards immediately
 setupGlobalErrorHandling();

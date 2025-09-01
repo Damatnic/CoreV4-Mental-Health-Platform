@@ -17,7 +17,8 @@
       "Bash(node:*)",
       "Bash(rg:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(npx madge:*)"
+      "Bash(npx madge:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
