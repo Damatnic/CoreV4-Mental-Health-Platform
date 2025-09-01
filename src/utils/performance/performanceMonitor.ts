@@ -3,7 +3,7 @@
  * Tracks critical metrics including crisis response times, Core Web Vitals, and custom metrics
  */
 
-import { getCLS, getFCP, getFID, getLCP, getTTFB, Metric } from 'web-vitals';
+import { onCLS, onFCP, onFID, onLCP, onTTFB, type Metric } from 'web-vitals';
 
 // Performance thresholds for mental health app
 const PERFORMANCE_THRESHOLDS = {
@@ -72,19 +72,19 @@ class PerformanceMonitor {
    */
   private initializeWebVitals(): void {
     // Largest Contentful Paint
-    getLCP((metric) => this.handleWebVital('LCP', metric));
+    onLCP((metric: Metric) => this.handleWebVital('LCP', metric));
     
     // First Input Delay
-    getFID((metric) => this.handleWebVital('FID', metric));
+    onFID((metric: Metric) => this.handleWebVital('FID', metric));
     
     // Cumulative Layout Shift
-    getCLS((metric) => this.handleWebVital('CLS', metric));
+    onCLS((metric: Metric) => this.handleWebVital('CLS', metric));
     
     // First Contentful Paint
-    getFCP((metric) => this.handleWebVital('FCP', metric));
+    onFCP((metric: Metric) => this.handleWebVital('FCP', metric));
     
     // Time to First Byte
-    getTTFB((metric) => this.handleWebVital('TTFB', metric));
+    onTTFB((metric: Metric) => this.handleWebVital('TTFB', metric));
   }
   
   /**
@@ -116,7 +116,7 @@ class PerformanceMonitor {
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
       const longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const longTask = entry as PerformanceLongTaskTiming;
+          const longTask = entry as any; // PerformanceLongTaskTiming not in all TypeScript versions
           this.recordMetric('long_task', longTask.duration, {
             name: longTask.name,
             startTime: longTask.startTime,
@@ -748,10 +748,61 @@ class PerformanceMonitor {
     // Send remaining metrics
     this.sendMetrics(this.reportQueue);
   }
+
+  /**
+   * Get performance metrics for analysis
+   */
+  public getMetrics(): Map<string, PerformanceMetric[]> {
+    return new Map(this.metrics);
+  }
+
+  /**
+   * Start performance measurement
+   */
+  public measureStart(label: string): void {
+    performance.mark(`${label}-start`);
+  }
+
+  /**
+   * End performance measurement
+   */
+  public measureEnd(label: string): number | undefined {
+    const endMark = `${label}-end`;
+    const startMark = `${label}-start`;
+    
+    try {
+      performance.mark(endMark);
+      performance.measure(label, startMark, endMark);
+      
+      const measure = performance.getEntriesByName(label, 'measure')[0];
+      if (measure) {
+        this.recordMetric(label, measure.duration);
+        return measure.duration;
+      }
+    } catch (error) {
+      console.warn(`Failed to measure ${label}:`, error);
+    }
+    
+    return undefined;
+  }
+
+  /**
+   * Cleanup method for compatibility
+   */
+  public cleanup(): void {
+    this.destroy();
+  }
 }
 
 // Export singleton instance
 export const performanceMonitor = new PerformanceMonitor();
+
+// Export additional instances for compatibility
+export const memoryMonitor = performanceMonitor;
+export const frameRateMonitor = performanceMonitor;
+
+// Export class for direct instantiation if needed
+export { PerformanceMonitor };
 
 // Export types
 export type { PerformanceMetric };
