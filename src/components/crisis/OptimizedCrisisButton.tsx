@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { AlertCircle, Phone, MessageCircle, MapPin, Heart, Loader2 } from 'lucide-react';
-import { performanceMonitor } from '../../utils/performance/PerformanceMonitor';
+import { performanceMonitor } from '../../utils/performance/performanceMonitor';
 
 // Pre-cached crisis resources for instant access
 const CRISIS_RESOURCES_CACHE = {

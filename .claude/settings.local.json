@@ -23,7 +23,8 @@
       "Bash(wc:*)",
       "Bash(git restore:*)",
       "Bash(npx depcheck:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []

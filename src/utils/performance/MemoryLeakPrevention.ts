@@ -4,7 +4,7 @@
  */
 
 import { useRef, useEffect } from 'react';
-import { performanceMonitor } from './PerformanceMonitor';
+import { performanceMonitor } from './performanceMonitor';
 
 /**
  * WeakMap-based cache for preventing memory leaks

@@ -71,16 +71,19 @@ const SecureCommunity = withSecurity(CommunityPage, 'basic');
 // Performance monitoring component
 function PerformanceMonitoring() {
   useEffect(() => {
-    // Start monitoring in production
+    // Start performance monitoring
+    performanceMonitor.recordMetric('app_initialized', performance.now());
+    
+    // Monitor crisis page performance in production
     if (import.meta.env.PROD) {
-      memoryMonitor.start();
-      frameRateMonitor.start();
+      performanceMonitor.measureStart('app_lifecycle');
     }
 
     // Cleanup on unmount
     return () => {
-      memoryMonitor.stop();
-      frameRateMonitor.stop();
+      if (import.meta.env.PROD) {
+        performanceMonitor.measureEnd('app_lifecycle');
+      }
       performanceMonitor.cleanup();
     };
   }, []);

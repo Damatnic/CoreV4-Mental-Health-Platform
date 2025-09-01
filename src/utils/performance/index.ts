@@ -25,9 +25,6 @@ export {
   performanceMonitor,
   memoryMonitor,
   frameRateMonitor,
-  usePerformanceMonitor,
-  MemoryMonitor,
-  FrameRateMonitor,
   PERFORMANCE_THRESHOLDS,
 } from './performanceMonitor';
 

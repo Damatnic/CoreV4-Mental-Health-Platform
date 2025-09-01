@@ -20,6 +20,8 @@ interface AccessibilitySettings {
   voicePitch: number;
   soundEffects: boolean;
   voiceCommands: boolean;
+  voiceNavigation: boolean;
+  voiceFeedback: boolean;
   captions: boolean;
   audioDescriptions?: boolean;
   
@@ -71,6 +73,9 @@ interface AccessibilityStore {
   removePreset: (presetId: string) => void;
   testAccessibility: () => void;
   announceToScreenReader: (message: string) => void;
+  toggleHighContrast: () => void;
+  increaseFontSize: () => void;
+  decreaseFontSize: () => void;
 }
 
 const defaultSettings: AccessibilitySettings = {
@@ -90,6 +95,8 @@ const defaultSettings: AccessibilitySettings = {
   voicePitch: 1,
   soundEffects: true,
   voiceCommands: false,
+  voiceNavigation: false,
+  voiceFeedback: false,
   captions: false,
   audioDescriptions: false,
   
@@ -302,6 +309,23 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           utterance.pitch = get().settings.voicePitch;
           window.speechSynthesis.speak(utterance);
         }
+      },
+
+      toggleHighContrast: () => {
+        const currentValue = get().settings.highContrast;
+        get().updateSetting('highContrast', !currentValue);
+      },
+
+      increaseFontSize: () => {
+        const currentSize = get().settings.fontSize;
+        const newSize = Math.min(currentSize + 10, 200); // Max 200%
+        get().updateSetting('fontSize', newSize);
+      },
+
+      decreaseFontSize: () => {
+        const currentSize = get().settings.fontSize;
+        const newSize = Math.max(currentSize - 10, 50); // Min 50%
+        get().updateSetting('fontSize', newSize);
       }
     }),
     {
