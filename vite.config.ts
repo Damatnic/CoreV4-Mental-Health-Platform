@@ -10,8 +10,8 @@ export default defineConfig(({ command, mode }) => {
   return {
   plugins: [
     react({
-      // Disable React DevTools in production
-      jsxRuntime: isProduction ? 'classic' : 'automatic',
+      // Keep automatic JSX runtime for React 18+ compatibility
+      jsxRuntime: 'automatic',
       babel: isProduction ? {
         plugins: [
           ['babel-plugin-react-remove-properties', { properties: ['data-testid'] }]
@@ -148,10 +148,14 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     rollupOptions: {
+      external: (id) => {
+        // Don't externalize scheduler - keep it bundled with React
+        return false;
+      },
       output: {
         manualChunks: (id) => {
-          // Core React dependencies
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+          // Core React dependencies - keep scheduler with React
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
             return 'react-core';
           }
           
@@ -210,6 +214,17 @@ export default defineConfig(({ command, mode }) => {
     assetsInlineLimit: 4096, // Inline assets smaller than 4kb
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      'scheduler' // Ensure scheduler is properly bundled
+    ],
+    exclude: ['@vite/client']
+  },
+  define: {
+    // Ensure proper React 18 compatibility
+    __DEV__: isProduction ? 'false' : 'true',
+    'process.env.NODE_ENV': JSON.stringify(mode)
   }
 }});  // Close both the return object and the defineConfig function
