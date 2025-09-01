@@ -4,6 +4,9 @@ import { logError } from '../../utils/logger';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  FallbackComponent?: React.ComponentType<any>;
+  fallbackRender?: (props: { error: Error; resetErrorBoundary: () => void }) => ReactNode;
+  onReset?: () => void;
 }
 
 interface State {
@@ -31,11 +34,29 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReset = () => {
-    this.setState({ hasError: false });
+    this.setState({ hasError: false, error: undefined });
+    if (this.props.onReset) {
+      this.props.onReset();
+    }
   };
 
   public override render() {
     if (this.state.hasError) {
+      // Support react-error-boundary fallbackRender prop
+      if (this.props.fallbackRender && this.state.error) {
+        return this.props.fallbackRender({
+          error: this.state.error,
+          resetErrorBoundary: this.handleReset
+        });
+      }
+
+      // Support react-error-boundary FallbackComponent prop
+      if (this.props.FallbackComponent && this.state.error) {
+        const FallbackComponent = this.props.FallbackComponent;
+        return <FallbackComponent error={this.state.error} resetErrorBoundary={this.handleReset} />;
+      }
+
+      // Support our own fallback prop
       if (this.props.fallback) {
         return this.props.fallback;
       }

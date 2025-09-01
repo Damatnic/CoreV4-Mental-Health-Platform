@@ -1,6 +1,6 @@
 import { useState, useEffect, Suspense, lazy, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary } from '../ui/ErrorBoundary';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Settings, RefreshCw, Grid3x3, Sparkles, AlertTriangle, Shield, Brain, Users, Target, Activity, Trophy, BarChart3, Flame, WifiOff, AlertCircle } from 'lucide-react';
 import { DashboardWidget, WidgetSkeleton } from './DashboardWidget';
