@@ -3,7 +3,6 @@
 
 import { io, Socket } from 'socket.io-client';
 import {
-import { secureStorage } from '../security/SecureLocalStorage';
   WebSocketEvent,
   CrisisWebSocketEvent,
   CommunityWebSocketEvent,
@@ -11,6 +10,7 @@ import { secureStorage } from '../security/SecureLocalStorage';
   Message,
   User
 } from '../api/types';
+import { secureStorage } from '../security/SecureLocalStorage';
 
 // WebSocket Configuration
 const WS_CONFIG = {

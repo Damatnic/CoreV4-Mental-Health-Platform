@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-import { secureStorage } from '../../services/security/SecureLocalStorage';
   Wind, 
   Heart, 
   Circle, 
@@ -14,6 +13,7 @@ import { secureStorage } from '../../services/security/SecureLocalStorage';
   VolumeX,
   Settings
 } from 'lucide-react';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Breathing patterns with therapeutic benefits
 const BREATHING_PATTERNS = {

@@ -5,7 +5,7 @@
  */
 
 import { cryptoService } from './cryptoService';
-import { secureStorage } from 'SecureLocalStorage';
+import { secureStorage } from './SecureLocalStorage';
 
 interface StorageOptions {
   persistent?: boolean;

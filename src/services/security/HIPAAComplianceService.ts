@@ -2,7 +2,7 @@
 // Ensures all PHI (Protected Health Information) is handled according to HIPAA standards
 
 import CryptoJS from 'crypto-js';
-import { secureStorage } from 'SecureLocalStorage';
+import { secureStorage } from './SecureLocalStorage';
 
 // HIPAA compliance requirements
 export enum ComplianceRequirement {

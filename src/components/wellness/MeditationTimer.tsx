@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-import { secureStorage } from '../../services/security/SecureLocalStorage';
   Play,
   Pause,
   RotateCcw,
@@ -23,6 +22,7 @@ import { secureStorage } from '../../services/security/SecureLocalStorage';
   Wind,
   Star
 } from 'lucide-react';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Meditation types and their benefits
 const MEDITATION_TYPES = {

@@ -6,7 +6,7 @@
 
 import { auditLogger } from './auditLogger';
 import { cryptoService } from './cryptoService';
-import { secureStorage } from 'SecureLocalStorage';
+import { secureStorage } from './SecureLocalStorage';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
