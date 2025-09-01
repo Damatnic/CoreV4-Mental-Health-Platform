@@ -35,7 +35,7 @@
   const moduleScripts = Array.from(document.querySelectorAll('script[type="module"]'));
   console.log('📦 Module scripts:', moduleScripts.length);
   
-  // Try to manually trigger React if possible
+  // Try to manually trigger React if possible OR trigger emergency app
   setTimeout(() => {
     console.log('🔄 Checking React state after 3 seconds...');
     console.log('⚛️ React still available:', typeof window.React);
@@ -70,6 +70,15 @@
         }
       } catch (error) {
         console.error('❌ Manual React render failed:', error);
+        console.log('🚨 Triggering emergency app as fallback...');
+        if (window.createEmergencyApp) {
+          window.createEmergencyApp();
+        }
+      }
+    } else if (!rootElement || rootElement.innerHTML.trim() === '') {
+      console.log('🚨 No React or empty root - triggering emergency app...');
+      if (window.createEmergencyApp) {
+        window.createEmergencyApp();
       }
     }
   }, 3000);
