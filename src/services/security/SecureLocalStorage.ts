@@ -265,11 +265,12 @@ export { SecureLocalStorage };
  * Drop-in replacement for localStorage that automatically encrypts sensitive data
  * Use this instead of localStorage throughout the application
  */
+const secureStorageInstance = secureLocalStorage;
 export const secureStorage = {
-  setItem: (key: string, value: string) => secureLocalStorage.setItem(key, value),
-  getItem: (key: string) => secureLocalStorage.getItem(key),
-  removeItem: (key: string) => secureLocalStorage.removeItem(key),
-  clear: () => secureLocalStorage.clear(),
+  setItem: (key: string, value: string) => secureStorageInstance.setItem(key, value),
+  getItem: (key: string) => secureStorageInstance.getItem(key),
+  removeItem: (key: string) => secureStorageInstance.removeItem(key),
+  clear: () => secureStorageInstance.clear(),
   get length() { return localStorage.length; },
   key: (index: number) => localStorage.key(index)
 };

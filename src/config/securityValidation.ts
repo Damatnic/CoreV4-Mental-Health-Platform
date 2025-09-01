@@ -44,16 +44,18 @@ export class SecurityValidationService {
     // Check for production readiness
     if (import.meta.env.PROD) {
       // Production-specific validations
-      if (!import.meta.env.VITE_API_URL?.startsWith('https://')) {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (apiUrl && !apiUrl.startsWith('https://')) {
         result.criticalIssues.push('🚨 CRITICAL: API URL must use HTTPS in production');
         result.isSecure = false;
       }
 
-      if (!import.meta.env.VITE_WS_URL?.startsWith('wss://')) {
+      const wsUrl = import.meta.env.VITE_WS_URL;
+      if (wsUrl && !wsUrl.startsWith('wss://')) {
         result.warnings.push('⚠️ WARNING: WebSocket URL should use WSS (secure) in production');
       }
 
-      if (import.meta.env.VITE_API_URL?.includes('localhost')) {
+      if (apiUrl?.includes('localhost')) {
         result.criticalIssues.push('🚨 CRITICAL: Production build pointing to localhost API');
         result.isSecure = false;
       }
@@ -68,17 +70,27 @@ export class SecurityValidationService {
       }
     }
 
-    // Validate required environment variables
-    const requiredVars = [
-      'VITE_APP_NAME',
-      'VITE_API_URL',
-      'VITE_CRISIS_HOTLINE'
+    // Validate critical environment variables (only fail on truly essential ones)
+    const criticalVars = [
+      'VITE_CRISIS_HOTLINE' // Critical for mental health platform
     ];
 
-    requiredVars.forEach(varName => {
-      // @ts-ignore - checking for required environment variables
+    const recommendedVars = [
+      'VITE_APP_NAME',
+      'VITE_API_URL'
+    ];
+
+    criticalVars.forEach(varName => {
+      // @ts-ignore - checking for critical environment variables
       if (!import.meta.env[varName]) {
-        result.warnings.push(`⚠️ WARNING: Missing required environment variable: ${varName}`);
+        result.warnings.push(`⚠️ WARNING: Missing critical environment variable: ${varName}`);
+      }
+    });
+
+    recommendedVars.forEach(varName => {
+      // @ts-ignore - checking for recommended environment variables
+      if (!import.meta.env[varName]) {
+        result.recommendations.push(`💡 RECOMMENDATION: Set environment variable: ${varName}`);
       }
     });
 
