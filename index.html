@@ -42,42 +42,8 @@
     
     <!-- Service Worker Registration -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('Service Worker registered:', registration);
-              
-              // Check for updates periodically
-              setInterval(() => {
-                registration.update();
-              }, 60000); // Check every minute
-              
-              // Handle updates
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New content available, show update prompt
-                    if (confirm('New version available! Reload to update?')) {
-                      // Use MessageChannel for proper async communication
-                      const messageChannel = new MessageChannel();
-                      messageChannel.port1.onmessage = (event) => {
-                        if (event.data.success) {
-                          window.location.reload();
-                        }
-                      };
-                      newWorker.postMessage({ type: 'SKIP_WAITING' }, [messageChannel.port2]);
-                    }
-                  }
-                });
-              });
-            })
-            .catch(error => {
-              console.error('Service Worker registration failed:', error);
-            });
-        });
-      }
+      // Service Worker registration is handled in main.tsx to avoid duplicate registrations
+      console.log('Service Worker registration delegated to main.tsx');
     </script>
   </body>
 </html>
