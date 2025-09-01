@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AnonymousAuthContext';
 import { AlertTriangle, RefreshCw, Home, Wifi, WifiOff } from 'lucide-react';
 import { useNavigatorOnLine } from '../hooks/useNavigatorOnLine';
 import { usePerformanceMonitor } from '../hooks/usePerformanceMonitor';

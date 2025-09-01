@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CrisisPanelData } from '../../../types/dashboard';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '../../../contexts/AnonymousAuthContext';
 import { useCrisisAssessment } from '../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../hooks/useGeolocation';
 import { logger, LogCategory } from '../../../services/logging/logger';
