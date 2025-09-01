@@ -60,8 +60,14 @@
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                     // New content available, show update prompt
                     if (confirm('New version available! Reload to update?')) {
-                      newWorker.postMessage({ type: 'SKIP_WAITING' });
-                      window.location.reload();
+                      // Use MessageChannel for proper async communication
+                      const messageChannel = new MessageChannel();
+                      messageChannel.port1.onmessage = (event) => {
+                        if (event.data.success) {
+                          window.location.reload();
+                        }
+                      };
+                      newWorker.postMessage({ type: 'SKIP_WAITING' }, [messageChannel.port2]);
                     }
                   }
                 });

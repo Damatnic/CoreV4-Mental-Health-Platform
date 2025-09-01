@@ -4,7 +4,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { HomePage } from './pages/HomePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { CrisisPage } from './pages/CrisisPage';
 import { WellnessPage } from './pages/WellnessPage';
@@ -25,8 +24,8 @@ const queryClient = new QueryClient({
   },
 });
 
-// Wrap sensitive pages with security
-const SecureDashboard = withSecurity(DashboardPage, 'basic');
+// Temporarily remove security wrappers for dashboard, keep for others
+// const SecureDashboard = withSecurity(DashboardPage, 'basic'); // Removed for now
 const SecureWellness = withSecurity(WellnessPage, 'elevated');
 const SecureProfessional = withSecurity(ProfessionalPage, 'maximum');
 const SecureCommunity = withSecurity(CommunityPage, 'basic');
@@ -40,8 +39,9 @@ function App() {
             <Router>
               <EnhancedLayout>
                 <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/dashboard" element={<SecureDashboard />} />
+                  {/* Dashboard is now the default home route without auth */}
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/crisis" element={<CrisisPage />} />
                   <Route path="/wellness/*" element={<SecureWellness />} />
                   <Route path="/community/*" element={<SecureCommunity />} />

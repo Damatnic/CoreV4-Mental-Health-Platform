@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Home, 
   BarChart3, 
   Heart, 
   Users, 
@@ -22,13 +21,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     path: '/',
-    label: 'Home',
-    icon: Home,
-    color: 'text-gray-600',
-  },
-  {
-    path: '/dashboard',
-    label: 'Track',
+    label: 'Dashboard',
     icon: BarChart3,
     color: 'text-blue-600',
   },

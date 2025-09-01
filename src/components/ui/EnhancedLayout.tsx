@@ -99,7 +99,7 @@ function UserMenu() {
                       className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                     >
                       <Star className="h-3 w-3 mr-2 text-yellow-500" />
-                      {route.split('/').pop() || 'Home'}
+                      {route.split('/').pop() || 'Dashboard'}
                     </Link>
                   ))}
                 </div>
@@ -226,7 +226,7 @@ function QuickAccessPanel() {
                         className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                       >
                         <Clock className="h-3 w-3 mr-2 text-gray-400" />
-                        {route.split('/').pop() || 'Home'}
+                        {route.split('/').pop() || 'Dashboard'}
                       </Link>
                     ))}
                   </div>
@@ -270,10 +270,9 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       ];
     }
     
-    // Normal navigation
+    // Normal navigation - Dashboard is now the home page
     return [
-      { name: 'Home', href: '/', icon: <Home className="h-4 w-4" /> },
-      { name: 'Dashboard', href: '/dashboard', icon: <BarChart3 className="h-4 w-4" /> },
+      { name: 'Dashboard', href: '/', icon: <BarChart3 className="h-4 w-4" /> },
       { name: 'Wellness', href: '/wellness', icon: <Heart className="h-4 w-4" /> },
       { name: 'Community', href: '/community', icon: <Users className="h-4 w-4" /> },
       { name: 'Professional', href: '/professional', icon: <Stethoscope className="h-4 w-4" /> },

@@ -164,7 +164,7 @@ class SecurityHeadersService {
   /**
    * Build Content Security Policy header
    */
-  buildCSP(): string {
+  buildCSP(forMetaTag: boolean = false): string {
     const { csp } = this.config;
     const directives: string[] = [];
 
@@ -213,9 +213,21 @@ class SecurityHeadersService {
     if (csp.formAction.length > 0) {
       directives.push(processDirective('form-action', csp.formAction));
     }
-    if (csp.frameAncestors.length > 0) {
-      directives.push(processDirective('frame-ancestors', csp.frameAncestors));
+    
+    // Only include frame-ancestors and report-uri in HTTP headers, not meta tags
+    if (!forMetaTag) {
+      if (csp.frameAncestors.length > 0) {
+        directives.push(processDirective('frame-ancestors', csp.frameAncestors));
+      }
+      // Add reporting only for HTTP headers
+      if (csp.reportUri) {
+        directives.push(`report-uri ${csp.reportUri}`);
+      }
+      if (csp.reportTo) {
+        directives.push(`report-to ${csp.reportTo}`);
+      }
     }
+    
     if (csp.baseUri.length > 0) {
       directives.push(processDirective('base-uri', csp.baseUri));
     }
@@ -229,14 +241,6 @@ class SecurityHeadersService {
     }
     if (csp.blockAllMixedContent) {
       directives.push('block-all-mixed-content');
-    }
-
-    // Add reporting
-    if (csp.reportUri) {
-      directives.push(`report-uri ${csp.reportUri}`);
-    }
-    if (csp.reportTo) {
-      directives.push(`report-to ${csp.reportTo}`);
     }
 
     return directives.join('; ');
@@ -320,10 +324,10 @@ class SecurityHeadersService {
       existingCSP.remove();
     }
 
-    // Create new CSP meta tag
+    // Create new CSP meta tag with filtered directives (no frame-ancestors or report-uri)
     const meta = document.createElement('meta');
     meta.httpEquiv = 'Content-Security-Policy';
-    meta.content = this.buildCSP();
+    meta.content = this.buildCSP(true); // Pass true to filter out meta-incompatible directives
     document.head.appendChild(meta);
   }
 

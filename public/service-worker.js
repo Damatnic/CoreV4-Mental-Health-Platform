@@ -303,12 +303,30 @@ async function clearPendingData() {
 self.addEventListener('message', (event) => {
   if (event.data.type === 'CACHE_URLS') {
     const urlsToCache = event.data.payload;
-    caches.open(DYNAMIC_CACHE)
-      .then((cache) => cache.addAll(urlsToCache));
+    event.waitUntil(
+      caches.open(DYNAMIC_CACHE)
+        .then((cache) => cache.addAll(urlsToCache))
+        .then(() => {
+          // Send response back if ports are available
+          if (event.ports && event.ports[0]) {
+            event.ports[0].postMessage({ success: true });
+          }
+        })
+        .catch((error) => {
+          console.error('[Service Worker] Cache URLs failed:', error);
+          if (event.ports && event.ports[0]) {
+            event.ports[0].postMessage({ success: false, error: error.message });
+          }
+        })
+    );
   }
   
   if (event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+    event.waitUntil(self.skipWaiting());
+    // Send acknowledgment if ports are available
+    if (event.ports && event.ports[0]) {
+      event.ports[0].postMessage({ success: true });
+    }
   }
 });
 
