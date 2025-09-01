@@ -24,11 +24,11 @@ const queryClient = new QueryClient({
   },
 });
 
-// Temporarily remove security wrappers for dashboard, keep for others
-// const SecureDashboard = withSecurity(DashboardPage, 'basic'); // Removed for now
-const SecureWellness = withSecurity(WellnessPage, 'elevated');
-const SecureProfessional = withSecurity(ProfessionalPage, 'maximum');
-const SecureCommunity = withSecurity(CommunityPage, 'basic');
+// Adjusted security levels for development/demo - production should use higher levels
+// const SecureDashboard = withSecurity(DashboardPage, 'basic'); // Dashboard doesn't need security wrapper
+const SecureWellness = withSecurity(WellnessPage, 'basic'); // Reduced from 'elevated' for demo
+const SecureProfessional = withSecurity(ProfessionalPage, 'basic'); // Reduced from 'maximum' for demo
+const SecureCommunity = withSecurity(CommunityPage, 'basic'); // Already at basic level
 
 function App() {
   return (
