@@ -100,7 +100,7 @@ export function QuickActions({ actions, onActionClick }: QuickActionsProps) {
     if (!acc[action.category]) {
       acc[action.category] = [];
     }
-    acc[action.category].push(action);
+    acc[action.category]!.push(action);
     return acc;
   }, {} as Record<string, QuickAction[]>);
 
@@ -128,7 +128,7 @@ export function QuickActions({ actions, onActionClick }: QuickActionsProps) {
           )}
           
           <div className={`grid ${category === 'crisis' ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-            {groupedActions[category].map((action, index) => {
+            {groupedActions[category]?.map((action, index) => {
               const Icon = getIconComponent(action.icon);
               
               return (

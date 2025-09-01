@@ -99,6 +99,16 @@ export function AIInsightsDashboard() {
     }
   };
 
+  // Convert trend values to expected format
+  const convertTrend = (trend: string): 'up' | 'down' | 'stable' => {
+    switch (trend) {
+      case 'improving': return 'up';
+      case 'declining': return 'down';
+      case 'stable': return 'stable';
+      default: return 'stable';
+    }
+  };
+
   // Trend indicator
   const TrendIndicator = ({ trend, value }: { trend: 'up' | 'down' | 'stable'; value?: number }) => {
     const config = {
@@ -799,7 +809,7 @@ export function AIInsightsDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Overall Wellness Score</h3>
                   <TrendIndicator 
-                    trend={insightsDashboard.progressMetrics.overallWellness.trend}
+                    trend={convertTrend(insightsDashboard.progressMetrics.overallWellness.trend)}
                     value={insightsDashboard.progressMetrics.overallWellness.changeRate}
                   />
                 </div>
@@ -824,7 +834,7 @@ export function AIInsightsDashboard() {
                     <div key={component.name} className="bg-white/80 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-medium text-gray-600">{component.name}</span>
-                        <TrendIndicator trend={component.trend} />
+                        <TrendIndicator trend={convertTrend(component.trend)} />
                       </div>
                       <div className="text-2xl font-bold text-gray-900">{component.score}</div>
                       <ProgressBar value={component.score} color="bg-gray-400" />

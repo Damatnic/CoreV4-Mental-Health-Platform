@@ -458,8 +458,8 @@ class SecureAPIService {
       
       for (const [key, value] of Object.entries(data)) {
         if (typeof value === 'object' && value !== null && 'ciphertext' in value) {
-          // This field is encrypted
-          decrypted[key] = await fieldEncryption.decryptField(key, value);
+          // This field is encrypted - cast to proper type
+          decrypted[key] = await fieldEncryption.decryptField(key, value as any);
         } else {
           decrypted[key] = value;
         }

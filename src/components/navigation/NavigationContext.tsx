@@ -27,6 +27,8 @@ interface NavigationContextState {
   quickActions: Array<{ label: string; action: () => void; icon?: string }>;
   crisisDetected: boolean;
   userRole: 'patient' | 'caregiver' | 'professional' | 'guest';
+  favoriteRoutes: string[]; // Access via preferences.favoriteRoutes for compatibility
+  recentRoutes: string[]; // Access via preferences.recentRoutes for compatibility
   setMode: (mode: NavigationMode) => void;
   updatePreferences: (prefs: Partial<NavigationPreferences>) => void;
   setSearchOpen: (open: boolean) => void;
@@ -192,6 +194,8 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     quickActions,
     crisisDetected,
     userRole,
+    favoriteRoutes: preferences.favoriteRoutes, // Expose as direct property for easier access
+    recentRoutes: preferences.recentRoutes, // Expose as direct property for easier access
     setMode,
     updatePreferences,
     setSearchOpen,

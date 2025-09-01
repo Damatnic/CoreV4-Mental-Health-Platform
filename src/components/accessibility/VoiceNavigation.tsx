@@ -4,9 +4,9 @@
  * Especially critical for users in crisis situations or with motor impairments
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAccessibilityStore } from '@stores/accessibilityStore';
+import { useAccessibilityStore } from '../../stores/accessibilityStore';
 
 interface VoiceCommand {
   phrase: string;
@@ -19,7 +19,7 @@ export const VoiceNavigation: React.FC = () => {
   const navigate = useNavigate();
   const { settings } = useAccessibilityStore();
   const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+  const [recognition, setRecognition] = useState<any>(null);
   const [confidence, setConfidence] = useState(0);
   
   // Voice commands with crisis-focused priority
@@ -115,7 +115,7 @@ export const VoiceNavigation: React.FC = () => {
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognitionInstance = new SpeechRecognition();
     
     recognitionInstance.continuous = true;
@@ -123,7 +123,7 @@ export const VoiceNavigation: React.FC = () => {
     recognitionInstance.lang = 'en-US';
     recognitionInstance.maxAlternatives = 3;
 
-    recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
+    recognitionInstance.onresult = (event: any) => {
       const lastResult = event.results[event.results.length - 1];
       if (lastResult.isFinal) {
         const transcript = lastResult[0].transcript.toLowerCase().trim();
@@ -171,7 +171,7 @@ export const VoiceNavigation: React.FC = () => {
       }
     };
 
-    recognitionInstance.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognitionInstance.onerror = (event: any) => {
       console.warn('Voice recognition error:', event.error);
       if (event.error === 'no-speech' || event.error === 'audio-capture') {
         // These are expected errors, don't show to user
@@ -279,17 +279,34 @@ export const VoiceNavigation: React.FC = () => {
 // Type declarations for Speech Recognition API
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
+// Speech Recognition interfaces
+interface SpeechRecognitionResult {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
 }
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
 }

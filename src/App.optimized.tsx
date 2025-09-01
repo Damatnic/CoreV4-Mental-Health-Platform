@@ -213,18 +213,6 @@ function OptimizedApp() {
               color: '#f3f4f6',
               borderRadius: '0.5rem',
             },
-            success: {
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#f3f4f6',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#f3f4f6',
-              },
-            },
           }}
         />
         

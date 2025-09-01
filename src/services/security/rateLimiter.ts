@@ -442,7 +442,7 @@ class RateLimiterService {
     }
     
     // Default fallback
-    return this.defaultLimits['/api/*'];
+    return this.defaultLimits['/api/*'] || { requests: 100, windowMs: 60000 };
   }
 
   private generateKey(ip: string, userId?: string, endpoint?: string): string {

@@ -137,6 +137,7 @@ interface WellnessState {
   // Analytics
   moodPatterns: MoodPattern[];
   wellnessInsights: WellnessInsight[];
+  insights: WellnessInsight[]; // Alias for wellnessInsights (used by dashboard components)
   weeklyScore: number;
   monthlyScore: number;
   yearlyScore: number;

@@ -13,6 +13,10 @@ export interface AIInsightsDashboard {
   environmentalCorrelations: EnvironmentalInsight[];
   progressMetrics: ProgressMetrics;
   aiConfidence: number; // 0-1 confidence in insights
+  crisisRiskPrediction?: any; // Optional crisis risk prediction data
+  moodAnalysis?: any; // Optional mood analysis data  
+  personalizedInterventions?: any; // Optional personalized interventions
+  therapeuticContent?: any; // Optional therapeutic content
 }
 
 // Core AI Insight Types
@@ -84,7 +88,9 @@ export type PatternType =
   | 'seasonal_pattern'
   | 'crisis_precursor'
   | 'recovery_pattern'
-  | 'behavioral_loop';
+  | 'behavioral_loop'
+  | 'circadian_rhythm'
+  | 'environmental_correlation';
 
 export interface PatternFrequency {
   type: 'daily' | 'weekly' | 'monthly' | 'seasonal' | 'irregular';
@@ -296,6 +302,16 @@ export interface CBTAnalysis {
   progressIndicators: string[];
 }
 
+export interface InterventionEffectiveness {
+  intervention: string;
+  effectiveness: number; // 0-100
+  completionRate: number; // 0-1
+  userFeedback: number; // 1-5
+  timeToEffect: number; // hours
+  sideEffects: string[];
+  recommendedFrequency: string;
+}
+
 export interface ThoughtPattern {
   pattern: string;
   frequency: number;
@@ -403,7 +419,7 @@ export interface MindfulnessRecommendation {
 export interface BehavioralActivationAnalysis {
   activityLevels: ActivityLevel[];
   moodActivityCorrelation: number; // -1 to 1
-  pleasurablActivities: PleasurableActivity[];
+  pleasurableActivities: PleasurableActivity[];
   masteryActivities: MasteryActivity[];
   schedulingAdherence: number; // 0-1
   barriers: string[];
@@ -601,7 +617,7 @@ export interface Evidence {
   type: 'data_point' | 'pattern' | 'correlation' | 'research' | 'clinical';
   source: string;
   description: string;
-  strength: 'weak' | 'moderate' | 'strong';
+  strength: 'weak' | 'moderate' | 'strong' | 'very_strong';
   relevance: number; // 0-1
   dataPoints?: DataPoint[];
   reference?: string;

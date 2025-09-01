@@ -195,7 +195,7 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
                   ) : (
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-primary-600">
-                        {post.author[0].toUpperCase()}
+                        {post.author?.[0]?.toUpperCase() || '?'}
                       </span>
                     </div>
                   )}

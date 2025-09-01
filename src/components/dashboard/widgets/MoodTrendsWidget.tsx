@@ -127,9 +127,11 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
     
     const emotionCounts: Record<string, number> = {};
     moodData.slice(-7).forEach(entry => {
-      entry.emotions.forEach(emotion => {
-        emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
-      });
+      if (entry.emotions && Array.isArray(entry.emotions)) {
+        entry.emotions.forEach(emotion => {
+          emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+        });
+      }
     });
     
     return Object.entries(emotionCounts)
@@ -163,7 +165,7 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
 
   const trend = calculateTrend();
   const commonEmotions = getCommonEmotions();
-  const latestMood = moodData[moodData.length - 1];
+  const latestMood = moodData && moodData.length > 0 ? moodData[moodData.length - 1] : null;
 
   return (
     <div className="space-y-3">
@@ -193,34 +195,36 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       )}
 
       {/* Latest Entry */}
-      <div className="bg-gray-50 rounded-lg p-3">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-gray-600">Latest Entry</span>
-          <span className="text-xs text-gray-500">
-            {new Date(latestMood.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </span>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((level) => (
-              <div
-                key={level}
-                className={`w-1.5 h-6 mx-0.5 rounded-full transition-colors ${
-                  level <= latestMood.moodScore
-                    ? 'bg-primary-500'
-                    : 'bg-gray-200'
-                }`}
-              />
-            ))}
+      {latestMood && (
+        <div className="bg-gray-50 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-gray-600">Latest Entry</span>
+            <span className="text-xs text-gray-500">
+              {new Date(latestMood.timestamp).toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </span>
           </div>
-          <span className="text-sm text-gray-700">
-            Score: {latestMood.moodScore}/5
-          </span>
+          <div className="flex items-center space-x-3">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((level) => (
+                <div
+                  key={level}
+                  className={`w-1.5 h-6 mx-0.5 rounded-full transition-colors ${
+                    level <= latestMood.moodScore
+                      ? 'bg-primary-500'
+                      : 'bg-gray-200'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-sm text-gray-700">
+              Score: {latestMood.moodScore}/5
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Common Emotions */}
       {commonEmotions.length > 0 && (

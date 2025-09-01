@@ -236,6 +236,8 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
 
   const handleNext = () => {
     const step = steps[currentStep];
+    if (!step) return;
+    
     setCompletedSteps(prev => new Set(prev).add(step.id));
     
     trackEvent('onboarding_step_completed', {
@@ -279,6 +281,11 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
+
+  // Early return if no current step data
+  if (!currentStepData) {
+    return null;
+  }
 
   return (
     <AnimatePresence>

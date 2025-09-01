@@ -159,6 +159,13 @@ declare global {
     unregister(): Promise<boolean>;
     onupdatefound: ((this: ServiceWorkerRegistration, ev: Event) => any) | null;
     pushManager: PushManager;
+    sync?: SyncManager; // Background Sync API
+  }
+
+  // Background Sync API for offline data synchronization
+  interface SyncManager {
+    register(tag: string): Promise<void>;
+    getTags(): Promise<string[]>;
   }
 
   interface GetNotificationOptions {
@@ -511,6 +518,11 @@ declare global {
 
   // Window globals
   const prompt: (message?: string, defaultValue?: string) => string | null;
+  
+  // Google Analytics gtag
+  interface Window {
+    gtag?: (command: 'event' | 'config' | 'set', targetId: string, parameters?: Record<string, any>) => void;
+  }
 }
 
 export {};

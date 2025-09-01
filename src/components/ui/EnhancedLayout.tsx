@@ -14,7 +14,7 @@ import { MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../contexts/AnonymousAuthContext';
 import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 interface EnhancedLayoutProps {
   children: ReactNode;

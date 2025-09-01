@@ -424,6 +424,7 @@ class FieldEncryptionService {
         algorithm: newMetadata.algorithm,
         metadata: {
           ...data.metadata,
+          fieldType: data.metadata?.fieldType || 'string',
           encrypted: new Date(),
         },
       };

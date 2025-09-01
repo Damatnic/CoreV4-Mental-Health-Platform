@@ -411,8 +411,8 @@ export function OptimizedCommunityPosts({ groupId }: { groupId?: string }) {
                   post={post}
                   style={style}
                   onLike={handleLike}
-                  onComment={() => toast.info('Comments coming soon')}
-                  onShare={() => toast.info('Sharing coming soon')}
+                  onComment={() => toast('Comments coming soon', { icon: 'ℹ️' })}
+                  onShare={() => toast('Sharing coming soon', { icon: 'ℹ️' })}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onReport={handleReport}

@@ -41,7 +41,7 @@ export function useQuickActionsContext(): QuickActionsContext {
       color: 'bg-blue-500',
       category: 'wellness',
       keyboard: 'alt+d',
-      voiceAlias: 'meditation',
+      voiceAlias: ['meditation', 'meditate'],
       tags: ['meditation', 'mindfulness', 'relaxation']
     },
     {

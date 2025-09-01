@@ -85,6 +85,7 @@ export function MobileBreadcrumbs() {
     >
       <ol className="flex items-center space-x-1 text-xs">
         {visibleCrumbs.map((crumb, index) => {
+          if (!crumb) return null;
           const isLast = index === visibleCrumbs.length - 1;
           
           return (

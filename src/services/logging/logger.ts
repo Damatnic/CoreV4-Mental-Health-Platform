@@ -38,6 +38,11 @@ interface LogContext {
   action?: string;
   userId?: string;
   sessionId?: string;
+  signId?: string;
+  contactId?: string;
+  buddyId?: string;
+  newStatus?: boolean;
+  relationship?: string;
   metadata?: Record<string, any>;
   performanceMetrics?: {
     duration?: number;

@@ -7,6 +7,13 @@ import { setupRuntimeGuards } from './utils/runtimeGuards';
 // CRITICAL SECURITY: Validate environment configuration before app startup
 import './config/securityValidation';
 
+// Extend Window interface for temporary update function
+declare global {
+  interface Window {
+    updateApp?: () => void;
+  }
+}
+
 // Initialize global error handling and runtime guards immediately
 setupGlobalErrorHandling();
 setupRuntimeGuards();
@@ -107,7 +114,7 @@ if ('serviceWorker' in navigator) {
   });
 
   // Show a non-intrusive update notification
-  function showUpdateNotification(onUpdate) {
+  function showUpdateNotification(onUpdate: () => void) {
     const notification = document.createElement('div');
     notification.style.cssText = `
       position: fixed;

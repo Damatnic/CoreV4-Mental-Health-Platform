@@ -38,6 +38,8 @@ export function GestureHandler({
   // Handle touch start
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
+    if (!touch) return;
+    
     touchStartRef.current = {
       x: touch.clientX,
       y: touch.clientY,
@@ -45,7 +47,7 @@ export function GestureHandler({
     };
 
     // Handle multi-touch gestures
-    if (e.touches.length === 2) {
+    if (e.touches.length === 2 && e.touches[0] && e.touches[1]) {
       // Calculate initial pinch distance
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -75,7 +77,7 @@ export function GestureHandler({
       const touch = e.touches[0];
       const startPos = touchStartRef.current;
       
-      if (startPos) {
+      if (startPos && touch) {
         const dx = Math.abs(touch.clientX - startPos.x);
         const dy = Math.abs(touch.clientY - startPos.y);
         
@@ -87,7 +89,7 @@ export function GestureHandler({
     }
 
     // Handle pinch gesture
-    if (e.touches.length === 2 && pinchStartRef.current !== null && onPinch) {
+    if (e.touches.length === 2 && e.touches[0] && e.touches[1] && pinchStartRef.current !== null && onPinch) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -96,7 +98,7 @@ export function GestureHandler({
     }
 
     // Handle rotate gesture
-    if (e.touches.length === 2 && rotateStartRef.current !== null && onRotate) {
+    if (e.touches.length === 2 && e.touches[0] && e.touches[1] && rotateStartRef.current !== null && onRotate) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -120,6 +122,8 @@ export function GestureHandler({
     }
 
     const touch = e.changedTouches[0];
+    if (!touch) return;
+    
     const endTime = Date.now();
     
     touchEndRef.current = {

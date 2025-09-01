@@ -72,8 +72,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         onMoodChange(mood);
       }
     },
-    300,
-    [mood]
+    300
   );
 
   // Fetch mood history
@@ -219,7 +218,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
     };
   }, [history]);
 
-  const chartOptions: ChartOptions<'line'> = {
+  const chartOptions: ChartOptions = {
     responsive: true,
     plugins: {
       legend: {

@@ -54,9 +54,11 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
       // Log location acquisition for crisis services
       logger.info('Location acquired for crisis services', {
         category: LogCategory.CRISIS,
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        accuracy: position.coords.accuracy
+        metadata: {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        }
       });
     };
 
@@ -70,7 +72,7 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
       // Log error for debugging
       logger.error('Failed to get location', new Error(error.message), {
         category: LogCategory.CRISIS,
-        errorCode: error.code
+        metadata: { errorCode: error.code }
       });
     };
 

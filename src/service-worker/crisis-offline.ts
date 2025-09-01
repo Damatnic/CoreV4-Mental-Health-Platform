@@ -1,7 +1,7 @@
 // Crisis offline resources and caching strategies
-import { openDB, DBSchema } from 'idb';
+import { openDB } from 'idb';
 
-interface CrisisDB extends DBSchema {
+interface CrisisDB {
   safetyPlans: {
     key: string;
     value: {
@@ -434,8 +434,9 @@ export async function syncOfflineData() {
       if (response.ok) {
         // Mark as synced
         const tx = db.transaction('crisisLogs', 'readwrite');
+        const store = tx.objectStore('crisisLogs');
         for (const log of unsyncedLogs) {
-          await tx.store.put({ ...log, synced: true });
+          await store.put({ ...log, synced: true });
         }
         await tx.done;
       }

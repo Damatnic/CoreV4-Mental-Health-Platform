@@ -283,7 +283,12 @@ class SecurityMonitorService {
    * Execute automated incident response
    */
   private async executeIncidentPlaybook(incident: IncidentResponse): Promise<void> {
-    const playbook = this.getPlaybook(incident.severity, incident.triggeredBy[0].type);
+    const firstTrigger = incident.triggeredBy[0];
+    if (!firstTrigger) {
+      console.warn('No trigger found for incident, skipping playbook execution');
+      return;
+    }
+    const playbook = this.getPlaybook(incident.severity, firstTrigger.type);
     
     for (const action of playbook) {
       const responseAction: ResponseAction = {
@@ -368,7 +373,9 @@ class SecurityMonitorService {
     
     incidents.forEach(incident => {
       if (incident.triggeredBy.length > 0) {
-        const detectTime = incident.startTime.getTime() - incident.triggeredBy[0].timestamp.getTime();
+        const firstTrigger = incident.triggeredBy[0];
+        if (!firstTrigger) return;
+        const detectTime = incident.startTime.getTime() - firstTrigger.timestamp.getTime();
         totalDetectTime += detectTime;
         detectionCount++;
       }

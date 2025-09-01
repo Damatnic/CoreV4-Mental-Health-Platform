@@ -18,6 +18,7 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
+  Info,
   Sparkles,
   Flame
 } from 'lucide-react';
@@ -48,6 +49,15 @@ interface MetricCard {
   trend: number; // percentage change
   streak?: number;
   lastUpdated?: Date;
+}
+
+type Priority = 'critical' | 'high' | 'medium' | 'low';
+
+interface Recommendation {
+  metric: string;
+  message: string;
+  priority: Priority;
+  action: () => void;
 }
 
 export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
@@ -270,8 +280,8 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
   }, [wellnessGoals]);
 
   // Get recommendations based on current metrics
-  const recommendations = useMemo(() => {
-    const recs = [];
+  const recommendations = useMemo((): Recommendation[] => {
+    const recs: Recommendation[] = [];
     
     todayMetrics.forEach(metric => {
       const percentage = (metric.value / metric.target) * 100;
@@ -280,14 +290,14 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
         recs.push({
           metric: metric.title,
           message: `Your ${metric.title.toLowerCase()} is below 50% of target. Consider focusing on this today.`,
-          priority: 'high' as const,
+          priority: 'high' as Priority,
           action: () => onSetGoal?.(metric.id)
         });
       } else if (percentage >= 100 && metric.streak && metric.streak >= 7) {
         recs.push({
           metric: metric.title,
           message: `Great job! You're on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
-          priority: 'low' as const,
+          priority: 'low' as Priority,
           action: () => onViewDetails?.(metric.id)
         });
       }
@@ -298,14 +308,14 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
       recs.unshift({
         metric: 'Overall',
         message: 'Your wellness score is low. Consider taking a break and focusing on self-care.',
-        priority: 'critical' as const,
+        priority: 'critical' as Priority,
         action: () => {}
       });
     } else if (wellnessScore > 80) {
       recs.unshift({
         metric: 'Overall',
         message: 'Excellent wellness score! Keep up the great work!',
-        priority: 'low' as const,
+        priority: 'low' as Priority,
         action: () => {}
       });
     }
@@ -561,7 +571,9 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
                   ? 'bg-red-50 border border-red-200'
                   : rec.priority === 'high'
                   ? 'bg-orange-50 border border-orange-200'
-                  : 'bg-green-50 border border-green-200'
+                  : rec.priority === 'low'
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-gray-50 border border-gray-200'
               }`}
               onClick={rec.action}
             >
@@ -569,8 +581,10 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
                 <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
               ) : rec.priority === 'high' ? (
                 <AlertTriangle className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
-              ) : (
+              ) : rec.priority === 'low' ? (
                 <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              ) : (
+                <Info className="h-5 w-5 text-gray-500 flex-shrink-0 mt-0.5" />
               )}
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">{rec.metric}</p>

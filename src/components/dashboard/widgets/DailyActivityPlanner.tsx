@@ -127,8 +127,8 @@ export const DailyActivityPlanner: React.FC = () => {
       if (activity.scheduledTime) {
         const time = format(new Date(activity.scheduledTime), 'HH:mm');
         const slotIndex = slots.findIndex(slot => slot.time === time);
-        if (slotIndex !== -1) {
-          slots[slotIndex].activity = {
+        if (slotIndex !== -1 && slots[slotIndex]) {
+          slots[slotIndex]!.activity = {
             id: activity.id,
             title: activity.title,
             category: activity.category,
@@ -161,7 +161,9 @@ export const DailyActivityPlanner: React.FC = () => {
   
   // Quick add activity
   const quickAddActivity = (slot: TimeSlot) => {
-    const [hours, minutes] = slot.time.split(':').map(Number);
+    const timeParts = slot.time.split(':').map(Number);
+    const hours = timeParts[0] ?? 9;
+    const minutes = timeParts[1] ?? 0;
     const scheduledTime = new Date(selectedDate);
     scheduledTime.setHours(hours, minutes, 0, 0);
     
@@ -193,7 +195,9 @@ export const DailyActivityPlanner: React.FC = () => {
   
   // Reschedule activity
   const handleReschedule = (activityId: string, newTime: string) => {
-    const [hours, minutes] = newTime.split(':').map(Number);
+    const timeParts = newTime.split(':').map(Number);
+    const hours = timeParts[0] ?? 9;
+    const minutes = timeParts[1] ?? 0;
     const newScheduledTime = new Date(selectedDate);
     newScheduledTime.setHours(hours, minutes, 0, 0);
     
@@ -203,7 +207,8 @@ export const DailyActivityPlanner: React.FC = () => {
   
   // Get time period of day
   const getTimePeriod = (time: string) => {
-    const hour = parseInt(time.split(':')[0]);
+    const hourStr = time.split(':')[0];
+    const hour = hourStr ? parseInt(hourStr) : 9;
     if (hour < 6) return { name: 'Early Morning', icon: Moon, color: 'from-indigo-500 to-purple-500' };
     if (hour < 12) return { name: 'Morning', icon: Sun, color: 'from-yellow-400 to-orange-400' };
     if (hour < 14) return { name: 'Noon', icon: Sun, color: 'from-orange-400 to-red-400' };
@@ -317,7 +322,7 @@ export const DailyActivityPlanner: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-medium">{activity.title}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${CATEGORY_COLORS[activity.category]}`}>
+                    <span className={`text-xs px-2 py-1 rounded ${CATEGORY_COLORS[activity.category as keyof typeof CATEGORY_COLORS] || 'bg-gray-100 text-gray-700'}`}>
                       {activity.category}
                     </span>
                   </div>
@@ -367,7 +372,7 @@ export const DailyActivityPlanner: React.FC = () => {
       <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
         {timeSlots.map((slot, index) => {
           const period = getTimePeriod(slot.time);
-          const showPeriodHeader = index === 0 || getTimePeriod(timeSlots[index - 1].time).name !== period.name;
+          const showPeriodHeader = index === 0 || getTimePeriod(timeSlots[index - 1]?.time || '09:00').name !== period.name;
           
           return (
             <React.Fragment key={slot.time}>
@@ -412,7 +417,7 @@ export const DailyActivityPlanner: React.FC = () => {
                             <span className="font-medium text-gray-900 dark:text-white">
                               {slot.activity.title}
                             </span>
-                            <span className={`text-xs px-2 py-1 rounded ${CATEGORY_COLORS[slot.activity.category]}`}>
+                            <span className={`text-xs px-2 py-1 rounded ${CATEGORY_COLORS[slot.activity.category as keyof typeof CATEGORY_COLORS] || 'bg-gray-100 text-gray-700'}`}>
                               {slot.activity.category}
                             </span>
                             {slot.activity.flexibility === 'fixed' && (

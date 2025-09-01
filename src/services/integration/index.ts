@@ -3,6 +3,11 @@
  * Central export point for all integration services
  */
 
+// Import services
+import { dataIntegrationService, IntegrationEvent } from './DataIntegrationService';
+import { realtimeSyncService, RealtimeEvent } from './RealtimeSyncService';
+import { crisisIntegrationService, CrisisEventType, CrisisSeverity } from './CrisisIntegrationService';
+
 // Core integration services
 export { 
   dataIntegrationService,

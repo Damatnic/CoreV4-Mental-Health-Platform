@@ -159,6 +159,9 @@ class SessionManagerService {
       
       // Get configuration
       const config = SESSION_CONFIGS[securityLevel];
+      if (!config) {
+        throw new Error(`Invalid security level: ${securityLevel}`);
+      }
       
       // Create session
       const session: Session = {
@@ -256,6 +259,9 @@ class SessionManagerService {
       }
 
       const config = SESSION_CONFIGS[session.securityLevel];
+      if (!config) {
+        throw new Error(`Invalid security level: ${session.securityLevel}`);
+      }
       const now = new Date();
 
       // Check absolute timeout
@@ -372,6 +378,9 @@ class SessionManagerService {
     if (!session) return null;
 
     const config = SESSION_CONFIGS[session.securityLevel];
+    if (!config) {
+      throw new Error(`Invalid security level: ${session.securityLevel}`);
+    }
     
     // Extend expiration
     session.expiresAt = new Date(Date.now() + config.absoluteTimeout);
@@ -469,7 +478,7 @@ class SessionManagerService {
     if (!session) return false;
     
     // Verify MFA if required
-    if (SESSION_CONFIGS[newLevel].requireMFA && !mfaToken) {
+    if (SESSION_CONFIGS[newLevel]?.requireMFA && !mfaToken) {
       return false;
     }
     
@@ -479,6 +488,9 @@ class SessionManagerService {
     
     // Apply new configuration
     const config = SESSION_CONFIGS[newLevel];
+    if (!config) {
+      throw new Error(`Invalid security level: ${newLevel}`);
+    }
     session.expiresAt = new Date(
       Math.min(
         session.createdAt.getTime() + config.absoluteTimeout,
@@ -548,7 +560,9 @@ class SessionManagerService {
     let suspiciousCount = 0;
     
     sessions.forEach(session => {
-      sessionsByLevel[session.securityLevel]++;
+      if (sessionsByLevel[session.securityLevel] !== undefined) {
+        sessionsByLevel[session.securityLevel]!++;
+      }
       totalDuration += now - session.createdAt.getTime();
       if (session.flags.suspicious) suspiciousCount++;
     });
@@ -760,6 +774,7 @@ class SessionManagerService {
     
     for (const [sessionId, session] of this.sessions) {
       const config = SESSION_CONFIGS[session.securityLevel];
+      if (!config) continue; // Skip invalid sessions
       const idleTime = now - session.lastActivity.getTime();
       
       if (now > session.expiresAt.getTime() || idleTime > config.maxIdleTime) {
@@ -780,7 +795,7 @@ class SessionManagerService {
     setInterval(async () => {
       for (const [sessionId, session] of this.sessions) {
         const config = SESSION_CONFIGS[session.securityLevel];
-        if (config.rotateTokens) {
+        if (config?.rotateTokens) {
           await this.renewSession(sessionId);
         }
       }

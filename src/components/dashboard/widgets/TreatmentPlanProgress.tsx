@@ -121,7 +121,7 @@ export function TreatmentPlanProgress({
     if (!acc[skill.type]) {
       acc[skill.type] = [];
     }
-    acc[skill.type].push(skill);
+    acc[skill.type]!.push(skill);
     return acc;
   }, {} as Record<string, SkillPractice[]>);
 

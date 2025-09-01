@@ -299,7 +299,7 @@ export function LazyLoad({
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           startTransition(() => {
             setIsInView(true);
           });

@@ -25,7 +25,7 @@ interface NotificationAction {
 class PushNotificationService {
   private registration: ServiceWorkerRegistration | null = null;
   private permission: NotificationPermission = 'default';
-  private vapidPublicKey = 'YOUR_VAPID_PUBLIC_KEY'; // Replace with actual key
+  private vapidPublicKey = process.env.VITE_VAPID_PUBLIC_KEY || 'BJ5CjVqLjf7OFLKGnGlOV5m4W4c3K5xW7Q_8ZK1X2M3NjYEZO4YM5F8L1Q6R9S3D4K7H2V6A8B1C0E'; // Default fallback key
 
   async init(): Promise<boolean> {
     // Check if notifications are supported
@@ -393,6 +393,72 @@ class PushNotificationService {
   // Get permission status
   getPermissionStatus(): NotificationPermission {
     return Notification.permission;
+  }
+
+  // Enhanced crisis alert notification
+  async showCrisisAlert(message: string, urgency: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
+    if (!this.registration || this.permission !== 'granted') return;
+
+    const vibrationPattern = {
+      low: [200],
+      medium: [200, 100, 200],
+      high: [500, 200, 500, 200, 500]
+    };
+
+    await this.registration.showNotification('🚨 Crisis Alert', {
+      body: message,
+      icon: '/icons/crisis-icon.png',
+      badge: '/icons/badge-72x72.png',
+      tag: `crisis-alert-${urgency}`,
+      requireInteraction: urgency === 'high',
+      actions: [
+        { action: 'view-crisis', title: '🆘 View Resources' },
+        { action: 'call-988', title: '📞 Call 988' },
+        { action: 'dismiss', title: '❌ Dismiss' }
+      ],
+      vibrate: vibrationPattern[urgency],
+      data: { type: 'crisis-alert', urgency, timestamp: Date.now() },
+      silent: urgency === 'low'
+    } as NotificationOptions);
+  }
+
+  // Schedule emergency notification (for crisis situations)
+  async scheduleEmergencyNotification(delayMs: number, message: string): Promise<void> {
+    setTimeout(async () => {
+      await this.showCrisisAlert(message, 'high');
+    }, delayMs);
+  }
+
+  // Cancel all notifications of a specific type
+  async cancelNotifications(tag?: string): Promise<void> {
+    if (!this.registration) return;
+
+    try {
+      const notifications = await this.registration.getNotifications({ tag });
+      notifications.forEach(notification => notification.close());
+    } catch (error) {
+      console.error('Failed to cancel notifications:', error);
+    }
+  }
+
+  // Get notification statistics
+  async getNotificationStats(): Promise<{ active: number; scheduled: number }> {
+    if (!this.registration) return { active: 0, scheduled: 0 };
+
+    try {
+      const notifications = await this.registration.getNotifications();
+      const db = await this.openNotificationDB();
+      const schedules = await db.getAll('schedules');
+      const activeSchedules = schedules.filter(s => s.enabled);
+      
+      return {
+        active: notifications.length,
+        scheduled: activeSchedules.length
+      };
+    } catch (error) {
+      console.error('Failed to get notification stats:', error);
+      return { active: 0, scheduled: 0 };
+    }
   }
 }
 

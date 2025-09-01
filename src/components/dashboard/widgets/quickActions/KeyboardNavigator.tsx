@@ -99,7 +99,7 @@ export function KeyboardNavigator({
       case 'enter':
       case ' ':
         event.preventDefault();
-        if (focusedIndex >= 0 && focusedIndex < actions.length) {
+        if (focusedIndex >= 0 && focusedIndex < actions.length && actions[focusedIndex]) {
           onActionSelect(actions[focusedIndex]);
         }
         break;
@@ -248,6 +248,8 @@ export function KeyboardNavigator({
   useEffect(() => {
     if (focusedIndex >= 0 && focusedIndex < actions.length) {
       const action = actions[focusedIndex];
+      if (!action) return;
+      
       const announcement = `${action.label}. ${action.description || ''}. ${
         action.keyboard ? `Keyboard shortcut: ${action.keyboard}` : ''
       }`;

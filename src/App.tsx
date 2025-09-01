@@ -88,26 +88,6 @@ function App() {
               padding: '16px',
               fontSize: '14px',
             },
-            success: {
-              iconTheme: {
-                primary: '#66BB6A',
-                secondary: '#ffffff',
-              },
-              style: {
-                background: 'linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%)',
-                border: '1px solid #81C784',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#FF8A80',
-                secondary: '#ffffff',
-              },
-              style: {
-                background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
-                border: '1px solid #FFAB91',
-              },
-            },
           }}
         />
         {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}

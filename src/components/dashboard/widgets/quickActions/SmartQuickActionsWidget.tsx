@@ -122,7 +122,7 @@ export function SmartQuickActionsWidget({
   const handleVoiceCommand = useCallback((command: string) => {
     const matchedAction = actions.find(a => 
       a.label.toLowerCase().includes(command.toLowerCase()) ||
-      a.voiceAlias?.toLowerCase() === command.toLowerCase()
+      a.voiceAlias?.some(alias => alias.toLowerCase() === command.toLowerCase())
     );
     
     if (matchedAction) {

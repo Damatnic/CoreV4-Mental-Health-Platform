@@ -33,13 +33,13 @@ export function TodaySchedule({
       if (item.status === 'completed') {
         // Skip completed items or show them separately
       } else if (item.status === 'missed' || diffMinutes < -30) {
-        groups.overdue.push(item);
+        groups.overdue!.push(item);
       } else if (diffMinutes >= -30 && diffMinutes <= 30) {
-        groups.current.push(item);
+        groups.current!.push(item);
       } else if (diffMinutes > 30 && diffMinutes <= 180) {
-        groups.upcoming.push(item);
+        groups.upcoming!.push(item);
       } else {
-        groups.later.push(item);
+        groups.later!.push(item);
       }
     });
 
@@ -123,14 +123,14 @@ export function TodaySchedule({
   return (
     <div className="space-y-4">
       {/* Overdue Items */}
-      {groups.overdue.length > 0 && (
+      {groups.overdue!.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <AlertCircle className="h-4 w-4 text-red-500" />
             <h4 className="text-sm font-semibold text-red-700">Overdue</h4>
           </div>
           <div className="space-y-2">
-            {groups.overdue.map((item) => (
+            {groups.overdue!.map((item) => (
               <ScheduleItemCard
                 key={item.id}
                 item={item}
@@ -148,11 +148,11 @@ export function TodaySchedule({
       )}
 
       {/* Current/Ongoing Items */}
-      {groups.current.length > 0 && (
+      {groups.current!.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-green-700">Happening Now</h4>
           <div className="space-y-2">
-            {groups.current.map((item) => (
+            {groups.current!.map((item) => (
               <ScheduleItemCard
                 key={item.id}
                 item={item}
@@ -170,11 +170,11 @@ export function TodaySchedule({
       )}
 
       {/* Upcoming Items */}
-      {groups.upcoming.length > 0 && (
+      {groups.upcoming!.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-gray-700">Coming Up</h4>
           <div className="space-y-2">
-            {groups.upcoming.map((item) => (
+            {groups.upcoming!.map((item) => (
               <ScheduleItemCard
                 key={item.id}
                 item={item}
@@ -194,11 +194,11 @@ export function TodaySchedule({
       )}
 
       {/* Later Today */}
-      {groups.later.length > 0 && (
+      {groups.later!.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-gray-500">Later Today</h4>
           <div className="space-y-2">
-            {groups.later.slice(0, 3).map((item) => (
+            {groups.later!.slice(0, 3).map((item) => (
               <ScheduleItemCard
                 key={item.id}
                 item={item}
@@ -213,9 +213,9 @@ export function TodaySchedule({
               />
             ))}
           </div>
-          {groups.later.length > 3 && (
+          {groups.later!.length > 3 && (
             <button className="text-sm text-primary-600 hover:text-primary-700">
-              View {groups.later.length - 3} more items
+              View {groups.later!.length - 3} more items
             </button>
           )}
         </div>

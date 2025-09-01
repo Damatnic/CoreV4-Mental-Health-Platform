@@ -196,10 +196,6 @@ export function HomePage() {
             sessionStorage.clear();
             window.location.reload();
           }}
-          onError={(error, errorInfo) => {
-            // Log to error tracking service
-            console.error('Dashboard Error:', error, errorInfo);
-          }}
         >
           <Suspense fallback={<DashboardSkeleton />}>
             {/* Show onboarding for first-time users */}

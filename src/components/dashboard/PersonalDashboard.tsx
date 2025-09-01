@@ -38,26 +38,28 @@ function WidgetErrorBoundary({ children, widgetName }: { children: React.ReactNo
   
   return (
     <ErrorBoundary
-      fallbackRender={({ error, resetErrorBoundary }) => (
-        <div className="flex flex-col items-center justify-center h-full p-4 bg-red-50 rounded-lg">
-          <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
-          <p className="text-sm text-red-700 text-center mb-3">
-            Error loading {widgetName}
-          </p>
-          <button
-            onClick={resetErrorBoundary}
-            className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-      onError={(error) => {
+      fallbackRender={({ error, resetErrorBoundary }) => {
+        // Track the error when fallback is rendered
         trackError('widget_error', {
           widget: widgetName,
           message: error.message,
           stack: error.stack
         });
+        
+        return (
+          <div className="flex flex-col items-center justify-center h-full p-4 bg-red-50 rounded-lg">
+            <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+            <p className="text-sm text-red-700 text-center mb-3">
+              Error loading {widgetName}
+            </p>
+            <button
+              onClick={resetErrorBoundary}
+              className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        );
       }}
     >
       {children}
@@ -417,7 +419,7 @@ export function PersonalDashboard() {
               transition={{ duration: 0.3 }}
             >
               <DashboardWidget
-                widget={widgets[0]}
+                widget={widgets[0]!}
                 loading={isLoading}
                 className="h-full"
               >
@@ -469,7 +471,7 @@ export function PersonalDashboard() {
             transition={{ duration: 0.3, delay: 0.1 }}
           >
             <DashboardWidget
-              widget={widgets[1]}
+              widget={widgets[1]!}
               loading={isLoading}
               onRefresh={async () => {
                 await refetch();
@@ -498,7 +500,7 @@ export function PersonalDashboard() {
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <DashboardWidget
-              widget={widgets[2]}
+              widget={widgets[2]!}
               loading={isLoading}
               onRefresh={async () => {
                 await refetch();
@@ -528,7 +530,7 @@ export function PersonalDashboard() {
             transition={{ duration: 0.3, delay: 0.3 }}
           >
             <DashboardWidget
-              widget={widgets[3]}
+              widget={widgets[3]!}
               loading={isLoading}
               className="h-full"
             >

@@ -18,7 +18,18 @@ export type DashboardWidgetType =
   | 'environmental_factors'
   | 'mood_tracker'
   | 'medication_reminder'
-  | 'journal_prompt';
+  | 'journal_prompt'
+  // Additional widget types used by components
+  | 'mood_trends'
+  | 'therapy_progress'
+  | 'community_feed'
+  | 'goals_progress'
+  | 'medication_tracker'
+  | 'activity_tracker'
+  | 'goal_progress'
+  | 'habit_tracker'
+  | 'activity_analytics'
+  | 'behavioral_activation';
 
 export interface DashboardWidget {
   id: string;
@@ -247,6 +258,8 @@ export interface QuickAction {
   isEmergency?: boolean;
   keyboard?: string; // Keyboard shortcut
   badge?: string | number;
+  tags?: string[]; // Search tags for categorization
+  voiceAlias?: string[]; // Voice command aliases
 }
 
 // Performance and Analytics

@@ -49,7 +49,7 @@ export function WellnessStatusWidget({ data, error }: WellnessStatusWidgetProps)
         return 'text-red-600 bg-red-100';
       case 'high':
         return 'text-orange-600 bg-orange-100';
-      case 'medium':
+      case 'moderate':
         return 'text-yellow-600 bg-yellow-100';
       default:
         return 'text-green-600 bg-green-100';

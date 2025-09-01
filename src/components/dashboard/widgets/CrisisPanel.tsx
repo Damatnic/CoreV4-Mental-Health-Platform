@@ -159,38 +159,26 @@ export function CrisisPanel({ data, onEmergencyCall, onOpenSafetyPlan }: CrisisP
               className="mt-3 space-y-3 text-sm"
             >
               {/* Warning Signals */}
-              {data.safetyPlan.warningSignals.length > 0 && (
+              {data.safetyPlan.warningSignsText && (
                 <div>
                   <p className="font-semibold text-gray-700 mb-1">Warning Signals:</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    {data.safetyPlan.warningSignals.map((signal, idx) => (
-                      <li key={idx}>{signal}</li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-600">{data.safetyPlan.warningSignsText}</p>
                 </div>
               )}
               
               {/* Coping Strategies */}
-              {data.safetyPlan.copingStrategies.length > 0 && (
+              {data.safetyPlan.copingStrategiesText && (
                 <div>
                   <p className="font-semibold text-gray-700 mb-1">Coping Strategies:</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    {data.safetyPlan.copingStrategies.map((strategy, idx) => (
-                      <li key={idx}>{strategy}</li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-600">{data.safetyPlan.copingStrategiesText}</p>
                 </div>
               )}
               
               {/* Reasons to Live */}
-              {data.safetyPlan.reasons && data.safetyPlan.reasons.length > 0 && (
+              {data.safetyPlan.reasonsToLiveText && (
                 <div>
                   <p className="font-semibold text-gray-700 mb-1">My Reasons:</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    {data.safetyPlan.reasons.map((reason, idx) => (
-                      <li key={idx}>{reason}</li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-600">{data.safetyPlan.reasonsToLiveText}</p>
                 </div>
               )}
               

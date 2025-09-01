@@ -112,7 +112,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
       if (hoursSinceAssessment > 24) {
         logger.info('Crisis assessment is stale', {
           category: LogCategory.CRISIS,
-          hoursSinceAssessment
+          metadata: { hoursSinceAssessment }
         });
       }
     }

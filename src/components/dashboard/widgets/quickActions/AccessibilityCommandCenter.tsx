@@ -8,7 +8,7 @@ import {
   Upload, HelpCircle, Info, AlertCircle, Brain, Mic,
   MessageSquare, Edit3, Clock, Layout, Book
 } from 'lucide-react';
-import { useAccessibilityStore } from '../../../../stores/accessibilityStore';
+import { useAccessibilityStore, type AccessibilitySettings } from '../../../../stores/accessibilityStore';
 
 interface AccessibilityCommandCenterProps {
   onSettingChange?: (setting: string, value: any) => void;
@@ -85,7 +85,7 @@ export function AccessibilityCommandCenter({
       label: 'Text Size',
       description: 'Adjust text size for readability',
       type: 'slider',
-      value: settings.fontSize || 100,
+      value: settings.fontSize,
       min: 80,
       max: 200,
       step: 10,
@@ -97,7 +97,7 @@ export function AccessibilityCommandCenter({
       label: 'Line Spacing',
       description: 'Increase space between lines',
       type: 'slider',
-      value: settings.lineSpacing || 1.5,
+      value: settings.lineSpacing,
       min: 1,
       max: 3,
       step: 0.25,
@@ -138,7 +138,7 @@ export function AccessibilityCommandCenter({
       label: 'Voice Speed',
       description: 'Adjust screen reader speech rate',
       type: 'slider',
-      value: settings.voiceSpeed || 1,
+      value: settings.voiceSpeed,
       min: 0.5,
       max: 2,
       step: 0.1,
@@ -149,7 +149,7 @@ export function AccessibilityCommandCenter({
       label: 'Voice Pitch',
       description: 'Adjust voice pitch preference',
       type: 'slider',
-      value: settings.voicePitch || 1,
+      value: settings.voicePitch,
       min: 0.5,
       max: 2,
       step: 0.1,
@@ -212,7 +212,7 @@ export function AccessibilityCommandCenter({
       label: 'Touch Target Size',
       description: 'Increase button and link sizes',
       type: 'select',
-      value: settings.touchTargetSize || 'default',
+      value: settings.touchTargetSize,
       options: ['default', 'large', 'extra-large'],
       icon: Smartphone
     },
@@ -299,7 +299,7 @@ export function AccessibilityCommandCenter({
 
   // Handle setting change
   const handleSettingChange = useCallback((settingId: string, value: any) => {
-    updateSetting(settingId, value);
+    updateSetting(settingId as keyof AccessibilitySettings, value);
     onSettingChange?.(settingId, value);
     
     // Announce change for screen readers
@@ -471,7 +471,7 @@ export function AccessibilityCommandCenter({
             onClick={() => handleSettingChange('fontSize', settings.fontSize === 100 ? 150 : 100)}
             className="p-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50"
           >
-            Text: {settings.fontSize || 100}%
+            Text: {settings.fontSize}%
           </button>
           
           <button
@@ -530,7 +530,7 @@ export function AccessibilityCommandCenter({
               <button
                 key={preset.id}
                 onClick={() => {
-                  applyPreset(preset.settings);
+                  applyPreset(preset.settings as Partial<AccessibilitySettings>);
                   setShowPresetMenu(false);
                 }}
                 className="p-3 bg-white rounded-lg hover:shadow-md transition-all text-left"

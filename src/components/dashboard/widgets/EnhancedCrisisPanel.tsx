@@ -43,56 +43,56 @@ interface CrisisLevel {
   urgency: 'none' | 'low' | 'medium' | 'high' | 'immediate';
 }
 
-const CRISIS_LEVELS: Record<string, CrisisLevel> = {
+const CRISIS_LEVELS = {
   safe: {
-    level: 'safe',
+    level: 'safe' as const,
     score: 0,
     color: 'text-green-700',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-400',
     message: 'You\'re in a good place',
     recommendations: ['Continue your wellness routine', 'Keep using coping strategies'],
-    urgency: 'none'
+    urgency: 'none' as const
   },
   low: {
-    level: 'low',
+    level: 'low' as const,
     score: 25,
     color: 'text-yellow-700',
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-400',
     message: 'Mild stress detected',
     recommendations: ['Try breathing exercises', 'Reach out to a friend', 'Take a break'],
-    urgency: 'low'
+    urgency: 'low' as const
   },
   moderate: {
-    level: 'moderate',
+    level: 'moderate' as const,
     score: 50,
     color: 'text-orange-700',
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-400',
     message: 'Support recommended',
     recommendations: ['Contact your therapist', 'Use your safety plan', 'Call a support person'],
-    urgency: 'medium'
+    urgency: 'medium' as const
   },
   high: {
-    level: 'high',
+    level: 'high' as const,
     score: 75,
     color: 'text-red-700',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-400',
     message: 'Immediate support needed',
     recommendations: ['Call crisis hotline', 'Go to emergency room', 'Contact emergency contact'],
-    urgency: 'high'
+    urgency: 'high' as const
   },
   critical: {
-    level: 'critical',
+    level: 'critical' as const,
     score: 90,
     color: 'text-red-900',
     bgColor: 'bg-red-100',
     borderColor: 'border-red-600',
     message: 'Emergency - Get help now',
     recommendations: ['Call 988 immediately', 'Call 911 if in danger', 'Go to nearest ER'],
-    urgency: 'immediate'
+    urgency: 'immediate' as const
   }
 };
 
@@ -119,11 +119,11 @@ export function EnhancedCrisisPanel({
     thoughtPatterns: 0,
     physicalSymptoms: 0
   });
-  const [crisisLevel, setCrisisLevel] = useState<CrisisLevel>(CRISIS_LEVELS.safe);
+  const [crisisLevel, setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
   const [pulseAnimation, setPulseAnimation] = useState(false);
 
   // Calculate real-time risk assessment
-  const calculateRiskLevel = useCallback(() => {
+  const calculateRiskLevel = useCallback((): CrisisLevel => {
     const factors = Object.values(riskFactors);
     const avgScore = factors.reduce((sum, val) => sum + val, 0) / factors.length;
     
@@ -242,7 +242,7 @@ export function EnhancedCrisisPanel({
 
   // Personalized coping strategies based on risk level
   const copingStrategies = useMemo(() => {
-    const baseStrategies = data?.safetyPlan?.copingStrategies || [];
+    const baseStrategies = data?.safetyPlan?.copingStrategiesText ? [data.safetyPlan.copingStrategiesText] : [];
     const additionalStrategies = crisisLevel.recommendations;
     return [...baseStrategies, ...additionalStrategies];
   }, [data?.safetyPlan, crisisLevel]);
@@ -464,7 +464,7 @@ export function EnhancedCrisisPanel({
                     <div className="bg-yellow-50 p-3 rounded-lg">
                       <p className="font-medium text-yellow-900 mb-2">Warning Signals</p>
                       <ul className="space-y-1 text-sm text-yellow-800">
-                        {data.safetyPlan.warningSignals.slice(0, 3).map((signal, idx) => (
+                        {data.safetyPlan.warningSignsText && data.safetyPlan.warningSignsText.split(',').slice(0, 3).map((signal, idx) => (
                           <li key={idx} className="flex items-start space-x-1">
                             <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
                             <span>{signal}</span>
@@ -487,11 +487,11 @@ export function EnhancedCrisisPanel({
                     </div>
 
                     {/* Reasons to Live */}
-                    {data.safetyPlan.reasons && data.safetyPlan.reasons.length > 0 && (
+                    {data.safetyPlan.reasonsToLiveText && (
                       <div className="bg-green-50 p-3 rounded-lg">
                         <p className="font-medium text-green-900 mb-2">My Reasons</p>
                         <ul className="space-y-1 text-sm text-green-800">
-                          {data.safetyPlan.reasons.slice(0, 3).map((reason, idx) => (
+                          {data.safetyPlan.reasonsToLiveText.split(',').slice(0, 3).map((reason, idx) => (
                             <li key={idx} className="flex items-start space-x-1">
                               <Heart className="h-3 w-3 mt-0.5 flex-shrink-0" />
                               <span>{reason}</span>
@@ -574,28 +574,19 @@ export function EnhancedCrisisPanel({
                 )}
 
                 {/* Professional Contacts */}
-                {data?.safetyPlan?.professionalContacts && data.safetyPlan.professionalContacts.length > 0 && (
+                {data?.safetyPlan?.professionalContactsText && (
                   <>
                     <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mt-4">
                       Professional Support
                     </h4>
-                    <div className="space-y-2">
-                      {data.safetyPlan.professionalContacts.map((contact) => (
-                        <button
-                          key={contact.id}
-                          onClick={() => handleEmergencyCallWithLocation(contact.phone, contact.name)}
-                          className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <HelpCircle className="h-5 w-5 text-blue-600" />
-                            <div className="text-left">
-                              <p className="font-medium text-gray-900">{contact.name}</p>
-                              <p className="text-sm text-gray-600">{contact.role}</p>
-                            </div>
-                          </div>
-                          <span className="text-xs text-gray-500">{contact.availability}</span>
-                        </button>
-                      ))}
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="flex items-start space-x-3">
+                        <HelpCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div className="text-left">
+                          <p className="font-medium text-blue-900 mb-1">Professional Contacts</p>
+                          <p className="text-sm text-blue-800">{data.safetyPlan.professionalContactsText}</p>
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}

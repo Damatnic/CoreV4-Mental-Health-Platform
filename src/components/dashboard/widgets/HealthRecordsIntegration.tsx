@@ -5,7 +5,8 @@ import {
   Activity, Heart, Brain, Pill, Calendar, Clock,
   AlertCircle, CheckCircle, Info, TrendingUp, TrendingDown,
   ChevronRight, Filter, Search, Eye, EyeOff, RefreshCw,
-  User, Users, Clipboard, Award, BarChart3, Database
+  User, Users, Clipboard, Award, BarChart3, Database,
+  Minus, XCircle
 } from 'lucide-react';
 
 interface HealthRecord {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -20,16 +20,75 @@ import {
   GraduationCap,
   Building,
   Sparkles,
-  HandHeart
+  HandHeart,
+  Star,
+  DollarSign,
+  UserCheck,
+  Filter,
+  SortAsc,
+  BookOpen,
+  Briefcase,
+  Award,
+  Zap
 } from 'lucide-react';
+import { therapistService } from '../../services/professional/TherapistService';
 
 /**
- * Professional Support - 100% Free Resources
+ * Professional Support - Enhanced Therapist Matching & Free Resources
  * 
- * This component provides access to free mental health resources
- * No payments, no premium tiers, no hidden costs
- * All resources are carefully vetted and completely free
+ * This component provides:
+ * - Advanced therapist matching with filtering
+ * - Professional therapist profiles with verification
+ * - Free mental health resources
+ * - Appointment booking integration
+ * All resources are carefully vetted and HIPAA compliant
  */
+
+// Professional categories and specializations
+const PROFESSIONAL_SPECIALIZATIONS = [
+  'Anxiety Disorders',
+  'Depression',
+  'Trauma & PTSD',
+  'Bipolar Disorder',
+  'Eating Disorders',
+  'Addiction & Substance Use',
+  'Relationship Issues',
+  'Family Therapy',
+  'Child & Adolescent',
+  'Grief & Loss',
+  'LGBTQ+ Issues',
+  'Cultural & Identity',
+  'Stress Management',
+  'Life Transitions',
+  'Chronic Illness',
+  'Sleep Disorders'
+];
+
+const THERAPY_APPROACHES = [
+  'Cognitive Behavioral Therapy (CBT)',
+  'Dialectical Behavior Therapy (DBT)',
+  'Acceptance & Commitment Therapy (ACT)',
+  'Psychodynamic Therapy',
+  'Mindfulness-Based Therapy',
+  'Solution-Focused Therapy',
+  'Family Systems Therapy',
+  'Narrative Therapy',
+  'Gestalt Therapy',
+  'Somatic Therapy'
+];
+
+const INSURANCE_PROVIDERS = [
+  'Blue Cross Blue Shield',
+  'Aetna',
+  'United Healthcare',
+  'Cigna',
+  'Humana',
+  'Kaiser Permanente',
+  'Medicare',
+  'Medicaid',
+  'Self-Pay',
+  'Sliding Scale Available'
+];
 
 // Free resource categories
 const RESOURCE_CATEGORIES = [
@@ -44,6 +103,45 @@ const RESOURCE_CATEGORIES = [
   'Support Communities',
   'Emergency Services'
 ];
+
+interface ProfessionalTherapist {
+  id: string;
+  name: string;
+  credentials: string[];
+  specializations: string[];
+  approaches: string[];
+  description: string;
+  rating: number;
+  reviewCount: number;
+  experience: number;
+  location: {
+    city: string;
+    state: string;
+    isVirtual: boolean;
+    acceptsInPerson: boolean;
+  };
+  availability: {
+    nextAvailable: Date;
+    weeklySlots: number;
+    timeZone: string;
+  };
+  insurance: {
+    accepted: string[];
+    selfPay: boolean;
+    slidingScale: boolean;
+    sessionRate?: number;
+  };
+  languages: string[];
+  demographics: {
+    age?: string;
+    gender?: string;
+    ethnicity?: string[];
+  };
+  verified: boolean;
+  acceptingNew: boolean;
+  responseTime: string;
+  badges: string[];
+}
 
 interface FreeResource {
   id: string;
@@ -65,6 +163,18 @@ interface FreeResource {
   features: string[];
   isEmergency?: boolean;
   anonymous?: boolean;
+}
+
+interface MatchingFilters {
+  specializations: string[];
+  approaches: string[];
+  insurance: string[];
+  location: 'virtual' | 'in-person' | 'both';
+  gender?: string;
+  languages: string[];
+  availability: 'immediate' | 'week' | 'month';
+  priceRange: [number, number];
+  acceptingNew: boolean;
 }
 
 // Free mental health resources

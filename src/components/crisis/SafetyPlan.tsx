@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, AlertCircle, Heart, Users, Activity, MapPin, Save, Download, Share2, CheckCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 interface SafetyPlanData {

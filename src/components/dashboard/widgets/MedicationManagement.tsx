@@ -116,7 +116,12 @@ export function MedicationManagement({
 
     medications.forEach(med => {
       med.schedule.forEach(sched => {
-        const [hours, minutes] = sched.time.split(':').map(Number);
+        if (!sched.time || !sched.time.includes(':')) return;
+        const timeParts = sched.time.split(':').map(Number);
+        if (timeParts.length !== 2 || timeParts[0] === undefined || timeParts[1] === undefined) return;
+        const hours = timeParts[0];
+        const minutes = timeParts[1];
+        if (isNaN(hours) || isNaN(minutes)) return;
         let timeCategory = 'morning';
         
         if (hours < 12) timeCategory = 'morning';
@@ -151,7 +156,10 @@ export function MedicationManagement({
 
   // Get time icon
   const getTimeIcon = (time: string) => {
-    const hour = parseInt(time.split(':')[0]);
+    if (!time || !time.includes(':')) return <Clock className="h-4 w-4" />;
+    const hourStr = time.split(':')[0];
+    if (!hourStr) return <Clock className="h-4 w-4" />;
+    const hour = parseInt(hourStr);
     if (hour < 6 || hour >= 22) return <Moon className="h-4 w-4" />;
     if (hour < 12) return <Sun className="h-4 w-4" />;
     if (hour < 17) return <Coffee className="h-4 w-4" />;

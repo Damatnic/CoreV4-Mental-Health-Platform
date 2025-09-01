@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigation } from '../components/navigation/NavigationContext';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 // Enhanced keyboard shortcut interface
 interface EnhancedKeyboardShortcut {
@@ -429,7 +429,7 @@ export function useKeyboardShortcutsHelp() {
     if (!acc[shortcut.category]) {
       acc[shortcut.category] = [];
     }
-    acc[shortcut.category].push(shortcut);
+    acc[shortcut.category]!.push(shortcut);
     return acc;
   }, {} as Record<string, EnhancedKeyboardShortcut[]>);
 

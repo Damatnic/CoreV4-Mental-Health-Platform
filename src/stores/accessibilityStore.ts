@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface AccessibilitySettings {
+export interface AccessibilitySettings {
   // Visual
   highContrast: boolean;
   darkMode: 'auto' | 'light' | 'dark';
@@ -136,8 +136,8 @@ const defaultPresets: AccessibilityPreset[] = [
       highContrast: true,
       fontSize: 150,
       lineSpacing: 2,
-      focusIndicator: 'bold',
-      cursorSize: 'large'
+      focusIndicator: 'bold' as const,
+      cursorSize: 'large' as const
     }
   },
   {
@@ -149,7 +149,7 @@ const defaultPresets: AccessibilityPreset[] = [
       lineSpacing: 2,
       fontFamily: 'OpenDyslexic',
       backgroundColor: '#FFFBF0',
-      readingLevel: 'simple'
+      readingLevel: 'simple' as const
     }
   },
   {
@@ -157,7 +157,7 @@ const defaultPresets: AccessibilityPreset[] = [
     name: 'Motor Impairment',
     description: 'Easier interaction for motor difficulties',
     settings: {
-      touchTargetSize: 'extra-large',
+      touchTargetSize: 'extra-large' as const,
       stickyKeys: true,
       dwellClicking: true,
       extendedTimeouts: true,
@@ -173,7 +173,7 @@ const defaultPresets: AccessibilityPreset[] = [
       reducedMotion: true,
       errorPrevention: true,
       autoComplete: true,
-      readingLevel: 'simple',
+      readingLevel: 'simple' as const,
       focusMode: true
     }
   },
@@ -185,7 +185,7 @@ const defaultPresets: AccessibilityPreset[] = [
       screenReader: true,
       screenReaderMode: true,
       keyboardNavigation: true,
-      focusIndicator: 'bold',
+      focusIndicator: 'bold' as const,
       captions: true
     }
   }

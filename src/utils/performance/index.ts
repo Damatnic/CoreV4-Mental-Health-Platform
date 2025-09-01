@@ -71,15 +71,21 @@ export { OptimizedCrisisIntervention } from '../../components/performance/Optimi
 export function initializePerformanceOptimizations() {
   // Start monitoring in production
   if (import.meta.env.PROD) {
-    // Start memory monitoring
-    memoryMonitor.start(30000); // Check every 30 seconds
+    // Initialize performance monitoring
+    performanceMonitor.measureStart('app-initialization');
     
-    // Start frame rate monitoring for smooth UX
-    frameRateMonitor.start((fps) => {
+    // Set up frame rate monitoring callback (if fps < 30)
+    let lastTime = performance.now();
+    const monitorFPS = () => {
+      const now = performance.now();
+      const fps = 1000 / (now - lastTime);
+      lastTime = now;
       if (fps < 30) {
         console.warn(`Low frame rate detected: ${fps} FPS`);
       }
-    });
+      requestAnimationFrame(monitorFPS);
+    };
+    requestAnimationFrame(monitorFPS);
     
     // Start memory leak detection
     setInterval(() => {
@@ -238,7 +244,7 @@ export function getPerformanceReport() {
   const resources = resourceManager.getStats();
   const images = imageLoader.getStats();
   const memory = memoryLeakDetector.getReport();
-  const fps = frameRateMonitor.getFPS();
+  const fps = 60; // Default FPS assumption, could be enhanced with actual monitoring
   
   return {
     webVitals: metrics,

@@ -110,7 +110,7 @@ export function CareTeamDashboard({
     if (!acc[provider.role]) {
       acc[provider.role] = [];
     }
-    acc[provider.role].push(provider);
+    acc[provider.role]?.push(provider);
     return acc;
   }, {} as Record<string, CareProvider[]>);
 

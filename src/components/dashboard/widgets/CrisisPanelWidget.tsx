@@ -36,7 +36,7 @@ export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
         return 'bg-red-600 text-white';
       case 'high':
         return 'bg-orange-500 text-white';
-      case 'medium':
+      case 'moderate':
         return 'bg-yellow-500 text-white';
       default:
         return 'bg-green-500 text-white';

@@ -1,0 +1,419 @@
+// Mock WebSocket Adapter - Seamlessly integrates MockCrisisServer with existing WebSocket interface
+// Provides realistic demo functionality without requiring backend services
+
+import { RealtimeMessage } from '../realtime/websocketService';
+import { mockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
+import { toast } from 'react-hot-toast';
+
+// Mock WebSocket Adapter that mimics the real WebSocketService interface
+export class MockWebSocketAdapter {
+  private static instance: MockWebSocketAdapter;
+  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private isConnected: boolean = false;
+  private currentUserId: string | null = null;
+  private activeSessions: Map<string, MockCrisisSession> = new Map();
+  private connectionSimulationTimeout: NodeJS.Timeout | null = null;
+
+  private constructor() {
+    this.setupMockCrisisServer();
+  }
+
+  public static getInstance(): MockWebSocketAdapter {
+    if (!MockWebSocketAdapter.instance) {
+      MockWebSocketAdapter.instance = new MockWebSocketAdapter();
+    }
+    return MockWebSocketAdapter.instance;
+  }
+
+  // Setup mock crisis server event handlers
+  private setupMockCrisisServer(): void {
+    mockCrisisServer.onEmergency((action: string, data: any) => {
+      this.handleEmergencyProtocol(action, data);
+    });
+  }
+
+  // Simulate WebSocket connection
+  public async connect(userId: string, token: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.isConnected) {
+        resolve();
+        return;
+      }
+
+      this.currentUserId = userId;
+
+      // Simulate connection delay
+      this.connectionSimulationTimeout = setTimeout(() => {
+        this.isConnected = true;
+        console.log('🟢 Mock WebSocket connected successfully');
+        
+        this.emit('connection:established', { userId });
+        toast.success('Connected to crisis support system');
+        
+        resolve();
+      }, 1000 + Math.random() * 2000); // 1-3 second delay
+    });
+  }
+
+  // Simulate joining a crisis room
+  public async joinRoom(roomId: string): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.isConnected) {
+        throw new Error('Not connected to server');
+      }
+
+      // Simulate join delay
+      setTimeout(() => {
+        this.emit('room:joined', roomId);
+        console.log(`Joined room: ${roomId}`);
+        resolve();
+      }, 500);
+    });
+  }
+
+  // Simulate leaving a room
+  public leaveRoom(roomId: string): void {
+    if (!this.isConnected) return;
+    
+    // End any active crisis sessions
+    const session = this.activeSessions.get(roomId);
+    if (session) {
+      session.end();
+      this.activeSessions.delete(roomId);
+    }
+
+    this.emit('room:left', roomId);
+    console.log(`Left room: ${roomId}`);
+  }
+
+  // Create and join a crisis session
+  public async createCrisisSession(priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): Promise<{
+    sessionId: string;
+    counselor: MockCounselor;
+  }> {
+    if (!this.currentUserId) {
+      throw new Error('User not authenticated');
+    }
+
+    // Create crisis session through mock server
+    const session = mockCrisisServer.createCrisisSession(this.currentUserId, priority);
+    this.activeSessions.set(session.sessionId, session);
+
+    // Setup session event handlers
+    session.onMessage((message: RealtimeMessage) => {
+      this.emit('message:new', message);
+    });
+
+    session.onTyping((isTyping: boolean) => {
+      if (isTyping) {
+        this.emit('typing:start', {
+          userId: session.counselor.id,
+          username: session.counselor.name,
+          roomId: session.sessionId
+        });
+      } else {
+        this.emit('typing:stop', {
+          userId: session.counselor.id,
+          username: session.counselor.name,
+          roomId: session.sessionId
+        });
+      }
+    });
+
+    session.onEmergency((action: string, data: any) => {
+      this.emit('crisis:escalated', { action, data, sessionId: session.sessionId });
+    });
+
+    // Join the room
+    await this.joinRoom(session.sessionId);
+
+    // Simulate counselor assignment process
+    setTimeout(() => {
+      this.emit('counselor:assigned', {
+        id: session.counselor.id,
+        name: session.counselor.name,
+        credentials: session.counselor.credentials,
+        specialties: session.counselor.specialties,
+        responseTime: session.counselor.responseTime
+      });
+    }, 2000);
+
+    // Simulate queue position updates
+    this.simulateQueueUpdates(session.sessionId);
+
+    return {
+      sessionId: session.sessionId,
+      counselor: session.counselor
+    };
+  }
+
+  // Simulate queue position updates before counselor assignment
+  private simulateQueueUpdates(sessionId: string): void {
+    let position = Math.floor(Math.random() * 5) + 1; // 1-5 position
+    let estimatedWait = position * 30; // 30 seconds per position
+
+    const updateQueue = () => {
+      if (position > 1) {
+        this.emit('queue:update', {
+          position,
+          estimatedWait
+        });
+
+        position--;
+        estimatedWait = Math.max(30, estimatedWait - 30);
+
+        setTimeout(updateQueue, 2000 + Math.random() * 3000); // 2-5 seconds between updates
+      }
+    };
+
+    // Start queue simulation only if there's a queue
+    if (position > 1) {
+      setTimeout(updateQueue, 1000);
+    }
+  }
+
+  // Send message to crisis session
+  public sendMessage(roomId: string, content: string, type: 'text' | 'system' = 'text'): void {
+    const session = this.activeSessions.get(roomId);
+    if (!session) {
+      console.warn(`No active session found for room: ${roomId}`);
+      return;
+    }
+
+    // Send message to mock crisis session
+    session.sendMessage(content);
+  }
+
+  // Send typing indicator
+  public sendTypingIndicator(roomId: string, isTyping: boolean): void {
+    // Mock typing indicators are handled automatically by the crisis session
+    // This is a no-op in the mock implementation
+  }
+
+  // Handle emergency protocols
+  private handleEmergencyProtocol(action: string, data: any): void {
+    console.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
+
+    switch (action) {
+      case 'auto_dial_988':
+        this.triggerEmergencyCall('988', 'Suicide & Crisis Lifeline', data);
+        break;
+      case 'auto_dial_911':
+        this.triggerEmergencyCall('911', 'Emergency Services', data);
+        break;
+      case 'crisis_escalation':
+        this.handleCrisisEscalation(data);
+        break;
+      default:
+        console.warn('Unknown emergency action:', action);
+    }
+
+    // Emit crisis event for UI handling
+    this.emit('crisis:emergency', { action, data });
+  }
+
+  // Trigger emergency call
+  private triggerEmergencyCall(number: string, service: string, data: any): void {
+    // Show immediate emergency modal
+    const emergencyMessage = {
+      id: `emergency-${Date.now()}`,
+      roomId: data.sessionId || 'system',
+      userId: 'system',
+      username: 'Emergency System',
+      content: `🚨 EMERGENCY PROTOCOL ACTIVATED\n\nI'm initiating an emergency call to ${service} (${number}) based on your situation. This is for your immediate safety.\n\nIf you're in immediate danger, please call ${number} directly or go to your nearest emergency room.`,
+      timestamp: new Date(),
+      type: 'crisis-alert' as const
+    };
+
+    this.emit('message:new', emergencyMessage);
+
+    // Simulate emergency call initiation after brief delay
+    setTimeout(() => {
+      // Show browser alert with emergency information
+      const alertMessage = `🚨 EMERGENCY CALL INITIATED\n\nService: ${service}\nNumber: ${number}\n\n⚠️ IMPORTANT: This is a demonstration system.\nIn a real emergency, please call ${number} immediately.\n\nPressing OK will simulate dialing ${number}.`;
+      
+      if (confirm(alertMessage)) {
+        // Actually initiate the phone call
+        if (typeof window !== 'undefined') {
+          window.location.href = `tel:${number}`;
+        }
+      }
+    }, 2000);
+
+    // Log emergency event
+    console.error(`📞 EMERGENCY CALL: ${service} (${number}) - Session: ${data.sessionId}`);
+  }
+
+  // Handle crisis escalation
+  private handleCrisisEscalation(data: any): void {
+    const escalationMessage = {
+      id: `escalation-${Date.now()}`,
+      roomId: data.sessionId || 'system',
+      userId: 'system',
+      username: 'Crisis Team',
+      content: '🆘 CRISIS ESCALATION: Your situation has been escalated to our emergency response team. A crisis specialist is being notified immediately. Please stay on the line.',
+      timestamp: new Date(),
+      type: 'crisis-alert' as const
+    };
+
+    this.emit('message:new', escalationMessage);
+
+    // Simulate crisis specialist joining
+    setTimeout(() => {
+      const specialistMessage = {
+        id: `specialist-${Date.now()}`,
+        roomId: data.sessionId || 'system',
+        userId: 'crisis-specialist',
+        username: 'Dr. Crisis Specialist',
+        content: 'Hello, I\'m Dr. Martinez, a crisis intervention specialist. I\'ve been notified of your situation and I\'m here to help. Your safety is our absolute priority. Can you tell me your current location?',
+        timestamp: new Date(),
+        type: 'text' as const
+      };
+
+      this.emit('message:new', specialistMessage);
+    }, 3000);
+  }
+
+  // Simulate connection loss and recovery
+  public simulateConnectionLoss(): void {
+    if (!this.isConnected) return;
+
+    this.isConnected = false;
+    this.emit('connection:lost', { reason: 'Network disruption' });
+    toast.error('Connection lost. Attempting to reconnect...');
+
+    // Simulate reconnection after 3-8 seconds
+    setTimeout(() => {
+      this.isConnected = true;
+      this.emit('connection:established', { userId: this.currentUserId });
+      toast.success('Connection restored');
+      
+      // Re-establish active sessions
+      this.activeSessions.forEach((session, sessionId) => {
+        this.emit('room:joined', sessionId);
+      });
+    }, 3000 + Math.random() * 5000);
+  }
+
+  // Event emitter methods
+  public on(event: string, handler: Function): void {
+    if (!this.eventHandlers.has(event)) {
+      this.eventHandlers.set(event, new Set());
+    }
+    this.eventHandlers.get(event)!.add(handler);
+  }
+
+  public off(event: string, handler: Function): void {
+    const handlers = this.eventHandlers.get(event);
+    if (handlers) {
+      handlers.delete(handler);
+    }
+  }
+
+  public emit(event: string, data: any): void {
+    const handlers = this.eventHandlers.get(event);
+    if (handlers) {
+      handlers.forEach(handler => {
+        try {
+          handler(data);
+        } catch (error) {
+          console.error(`Error in event handler for ${event}:`, error);
+        }
+      });
+    }
+  }
+
+  // Utility methods
+  public isConnectedToServer(): boolean {
+    return this.isConnected;
+  }
+
+  public getSocket(): any {
+    // Return a mock socket object with limited functionality
+    return {
+      connected: this.isConnected,
+      emit: (event: string, data: any, callback?: Function) => {
+        // Handle specific socket events
+        switch (event) {
+          case 'crisis:request-counselor':
+            this.handleCounselorRequest(data);
+            break;
+          case 'crisis:escalate':
+            this.handleCrisisEscalation(data);
+            break;
+          default:
+            console.log(`Mock socket emit: ${event}`, data);
+        }
+        
+        if (callback) {
+          setTimeout(() => callback({ success: true }), 100);
+        }
+      }
+    };
+  }
+
+  // Handle counselor request
+  private handleCounselorRequest(data: any): void {
+    console.log('Crisis counselor requested:', data);
+    
+    // This is handled automatically when creating a crisis session
+    // The MockCrisisServer manages counselor assignment
+  }
+
+  // Disconnect
+  public disconnect(): void {
+    if (this.connectionSimulationTimeout) {
+      clearTimeout(this.connectionSimulationTimeout);
+    }
+
+    // End all active sessions
+    this.activeSessions.forEach(session => session.end());
+    this.activeSessions.clear();
+
+    this.isConnected = false;
+    this.currentUserId = null;
+    this.eventHandlers.clear();
+    
+    console.log('🔴 Mock WebSocket disconnected');
+  }
+
+  // Get current session for a room
+  public getSession(roomId: string): MockCrisisSession | undefined {
+    return this.activeSessions.get(roomId);
+  }
+
+  // Get mock server statistics
+  public getServerStats(): {
+    activeSessions: number;
+    availableCounselors: number;
+    totalCounselors: number;
+  } {
+    return mockCrisisServer.getStats();
+  }
+
+  // Test emergency protocols (for demo purposes)
+  public testEmergencyProtocol(type: 'suicide_risk' | 'medical_emergency' | 'connection_loss'): void {
+    console.log(`🧪 Testing emergency protocol: ${type}`);
+    
+    switch (type) {
+      case 'suicide_risk':
+        this.handleEmergencyProtocol('auto_dial_988', {
+          reason: 'Test suicide risk protocol',
+          sessionId: 'test-session'
+        });
+        break;
+      case 'medical_emergency':
+        this.handleEmergencyProtocol('auto_dial_911', {
+          reason: 'Test medical emergency protocol',
+          sessionId: 'test-session'
+        });
+        break;
+      case 'connection_loss':
+        this.simulateConnectionLoss();
+        break;
+    }
+  }
+}
+
+// Export singleton instance
+export const mockWebSocketAdapter = MockWebSocketAdapter.getInstance();

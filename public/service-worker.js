@@ -269,58 +269,229 @@ async function syncCrisisCheckIn() {
   console.log('[Service Worker] Syncing crisis check-in...');
 }
 
-// Push notifications for medication reminders and check-ins
+// Enhanced push notifications for wellness reminders and crisis alerts
 self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data ? event.data.text() : 'Time for your wellness check-in',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
+  let notificationData = {};
+  let title = 'CoreV4 Mental Health';
+  
+  // Parse notification data
+  if (event.data) {
+    try {
+      notificationData = event.data.json();
+    } catch (e) {
+      notificationData = { body: event.data.text() };
+    }
+  }
+  
+  // Define different notification types with specific configurations
+  const notificationTypes = {
+    'medication': {
+      title: '💊 Medication Reminder',
+      icon: '/icons/medication-icon.png',
+      vibrate: [200, 100, 200],
+      requireInteraction: true,
+      actions: [
+        { action: 'taken', title: '✅ Taken' },
+        { action: 'snooze', title: '⏰ Snooze 10min' },
+        { action: 'skip', title: '❌ Skip' }
+      ]
     },
-    actions: [
-      {
-        action: 'check-in',
-        title: 'Check In',
-        icon: '/icons/checkmark.png'
-      },
-      {
-        action: 'snooze',
-        title: 'Snooze',
-        icon: '/icons/clock.png'
-      }
-    ]
+    'mood-checkin': {
+      title: '🌈 Daily Check-In',
+      icon: '/icons/mood-icon.png',
+      vibrate: [200, 100, 200],
+      actions: [
+        { action: 'log-mood', title: '📝 Log Mood' },
+        { action: 'remind-later', title: '⏰ Later' }
+      ]
+    },
+    'breathing': {
+      title: '🧘 Mindfulness Break',
+      icon: '/icons/breathing-icon.png',
+      vibrate: [200],
+      actions: [
+        { action: 'start-breathing', title: '🌬️ Start' },
+        { action: 'dismiss', title: '❌ Not now' }
+      ]
+    },
+    'crisis-alert': {
+      title: '🚨 Crisis Alert',
+      icon: '/icons/crisis-icon.png',
+      vibrate: [500, 200, 500, 200, 500],
+      requireInteraction: true,
+      actions: [
+        { action: 'view-crisis', title: '🆘 View Resources' },
+        { action: 'call-988', title: '📞 Call 988' },
+        { action: 'dismiss', title: '❌ Dismiss' }
+      ],
+      silent: false
+    },
+    'crisis-followup': {
+      title: '💙 Wellness Check',
+      icon: '/icons/heart-icon.png',
+      vibrate: [100, 50, 100],
+      requireInteraction: true,
+      actions: [
+        { action: 'feeling-better', title: '😊 Better' },
+        { action: 'need-support', title: '🤝 Need Support' },
+        { action: 'call-hotline', title: '📞 Call 988' }
+      ]
+    },
+    'therapy-reminder': {
+      title: '🗓️ Therapy Session',
+      icon: '/icons/therapy-icon.png',
+      vibrate: [500],
+      requireInteraction: true,
+      actions: [
+        { action: 'confirm', title: '✅ Confirmed' },
+        { action: 'reschedule', title: '📅 Reschedule' }
+      ]
+    }
   };
   
+  // Get notification configuration based on type
+  const type = notificationData.type || 'mood-checkin';
+  const config = notificationTypes[type] || notificationTypes['mood-checkin'];
+  
+  const options = {
+    body: notificationData.body || 'Time for your wellness check-in',
+    icon: config.icon,
+    badge: '/icons/badge-72x72.png',
+    vibrate: config.vibrate,
+    requireInteraction: config.requireInteraction || false,
+    silent: config.silent || false,
+    actions: config.actions,
+    tag: notificationData.tag || type,
+    data: {
+      ...notificationData,
+      dateOfArrival: Date.now(),
+      type: type
+    },
+    timestamp: Date.now(),
+    renotify: notificationData.urgency === 'high'
+  };
+  
+  // Use specific title or default
+  title = config.title;
+  
   event.waitUntil(
-    self.registration.showNotification('Astral Core', options)
+    self.registration.showNotification(title, options)
   );
 });
 
-// Handle notification clicks
+// Enhanced notification click handler
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
-  if (event.action === 'check-in') {
-    event.waitUntil(
-      clients.openWindow('/wellness/check-in')
-    );
-  } else if (event.action === 'snooze') {
-    // Schedule another notification in 15 minutes
-    setTimeout(() => {
-      self.registration.showNotification('Reminder', {
-        body: 'Time for your wellness check-in',
-        icon: '/icons/icon-192x192.png'
-      });
-    }, 15 * 60 * 1000);
-  } else {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
+  const action = event.action;
+  const data = event.notification.data;
+  const type = data?.type || 'default';
+  
+  // Handle different notification actions
+  const handleAction = async () => {
+    switch (action) {
+      // Medication actions
+      case 'taken':
+        await logAction('medication_taken', data);
+        return;
+      case 'snooze':
+        scheduleSnoozeNotification(type, 10); // 10 minutes
+        return;
+      case 'skip':
+        await logAction('medication_skipped', data);
+        return;
+        
+      // Mood check-in actions
+      case 'log-mood':
+        return clients.openWindow('/wellness/mood-tracker');
+      case 'remind-later':
+        scheduleSnoozeNotification('mood-checkin', 60); // 1 hour
+        return;
+        
+      // Breathing exercise actions
+      case 'start-breathing':
+        return clients.openWindow('/wellness/breathing');
+        
+      // Crisis actions
+      case 'view-crisis':
+        return clients.openWindow('/crisis');
+      case 'call-988':
+      case 'call-hotline':
+        return clients.openWindow('tel:988');
+      case 'need-support':
+        return clients.openWindow('/crisis');
+      case 'feeling-better':
+        await logAction('crisis_followup', { status: 'better' });
+        return;
+        
+      // Therapy actions
+      case 'confirm':
+        await logAction('therapy_confirmed', data);
+        return;
+      case 'reschedule':
+        return clients.openWindow('/schedule/therapy');
+        
+      // Default action
+      case 'dismiss':
+        return;
+      default:
+        // Open main app
+        return clients.openWindow('/');
+    }
+  };
+  
+  event.waitUntil(handleAction());
 });
+
+// Helper function to schedule snooze notifications
+function scheduleSnoozeNotification(type, delayMinutes) {
+  setTimeout(() => {
+    const messages = {
+      'medication': 'Don\'t forget your medication',
+      'mood-checkin': 'How are you feeling today?',
+      'breathing': 'Time for a mindful breathing break',
+      'default': 'Wellness reminder'
+    };
+    
+    self.registration.showNotification('Reminder', {
+      body: messages[type] || messages.default,
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/badge-72x72.png',
+      tag: `${type}-snooze`,
+      data: { type: type, snoozed: true }
+    });
+  }, delayMinutes * 60 * 1000);
+}
+
+// Generic action logging function
+async function logAction(action, data) {
+  try {
+    const endpoint = getEndpointForAction(action);
+    await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: action,
+        data: data,
+        timestamp: Date.now()
+      })
+    });
+  } catch (error) {
+    console.error(`Failed to log action ${action}:`, error);
+  }
+}
+
+// Get appropriate endpoint for different actions
+function getEndpointForAction(action) {
+  const endpoints = {
+    'medication_taken': '/api/wellness/medication/log',
+    'medication_skipped': '/api/wellness/medication/log',
+    'crisis_followup': '/api/crisis/followup',
+    'therapy_confirmed': '/api/schedule/therapy/confirm'
+  };
+  
+  return endpoints[action] || '/api/notifications/action';
+}
 
 // Helper functions for IndexedDB operations
 async function getPendingData() {

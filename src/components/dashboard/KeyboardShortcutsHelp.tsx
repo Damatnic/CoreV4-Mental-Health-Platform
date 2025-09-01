@@ -65,7 +65,7 @@ export function KeyboardShortcutsHelp() {
     if (!acc[shortcut.category]) {
       acc[shortcut.category] = [];
     }
-    acc[shortcut.category].push(shortcut);
+    acc[shortcut.category]?.push(shortcut);
     return acc;
   }, {} as Record<string, KeyboardShortcut[]>);
 

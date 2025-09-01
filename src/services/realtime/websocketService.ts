@@ -70,7 +70,6 @@ class WebSocketService {
         // Create socket connection with authentication
         this.socket = io(WEBSOCKET_URL, {
           auth: { token, userId },
-          transports: ['websocket', 'polling'],
           reconnection: true,
           reconnectionDelay: RECONNECT_DELAY,
           reconnectionAttempts: RECONNECT_ATTEMPTS,
@@ -86,14 +85,14 @@ class WebSocketService {
           resolve();
         });
 
-        this.socket.on('disconnect', (reason) => {
+        this.socket.on('disconnect', (reason: any) => {
           this.isConnected = false;
           console.warn('WebSocket disconnected:', reason);
           this.emit('connection:lost', { reason });
           this.handleReconnection();
         });
 
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', (error: any) => {
           console.error('WebSocket connection error:', error);
           this.emit('connection:error', { error: error.message });
           reject(error);

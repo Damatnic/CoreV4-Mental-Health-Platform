@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 import { useMobileFeatures, useTouchGestures } from '../../hooks/useMobileFeatures';
+import { initializeTouchOptimization } from '../../utils/mobile/touchOptimization';
 import { useAuth } from '../../contexts/AnonymousAuthContext';
 
 interface NavItem {
@@ -159,7 +160,46 @@ export function MobileBottomNav() {
   const navRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // Handle swipe gestures on navigation
+  // Enhanced touch optimization for navigation
+  useEffect(() => {
+    if (navRef.current) {
+      const touchManager = initializeTouchOptimization(navRef.current, {
+        enableSwipeGestures: true,
+        enableVibration: true,
+        swipeThreshold: 30,
+        longPressDelay: 600
+      });
+
+      touchManager.on('swipe', (gesture) => {
+        if (gesture.direction === 'up') {
+          vibrate([30]);
+          setIsDrawerOpen(true);
+        } else if (gesture.direction === 'down' && isDrawerOpen) {
+          vibrate([30]);
+          setIsDrawerOpen(false);
+        }
+      });
+
+      touchManager.on('longPress', () => {
+        vibrate([100, 50, 100]);
+        setShowCrisisActions(true);
+        setTimeout(() => setShowCrisisActions(false), 5000);
+        
+        // Announce to screen reader
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'assertive');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.className = 'sr-only';
+        announcement.textContent = 'Crisis actions menu opened';
+        document.body.appendChild(announcement);
+        setTimeout(() => document.body.removeChild(announcement), 1000);
+      });
+
+      return () => touchManager.destroy();
+    }
+  }, [isDrawerOpen, vibrate]);
+
+  // Legacy touch gestures for fallback
   useTouchGestures(navRef, {
     onSwipe: (direction) => {
       if (direction === 'up') {
@@ -372,9 +412,11 @@ export function MobileBottomNav() {
                 disabled={isDisabled}
                 className={`
                   flex flex-col items-center justify-center flex-1 h-full
-                  transition-all duration-200 relative
+                  transition-all duration-200 relative touch-target
                   ${isActive ? 'text-primary-600' : 'text-gray-500'}
                   ${isDisabled ? 'opacity-50' : 'active:bg-gray-50'}
+                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+                  hover:bg-gray-50 active:scale-95
                 `}
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
@@ -407,9 +449,10 @@ export function MobileBottomNav() {
             onClick={handleMenuToggle}
             className={`
               flex flex-col items-center justify-center px-4 h-full
-              transition-all duration-200
+              transition-all duration-200 touch-target
               ${isDrawerOpen ? 'text-primary-600' : 'text-gray-500'}
-              active:bg-gray-50
+              active:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500
+              hover:bg-gray-50 active:scale-95
             `}
             aria-label="More options"
             aria-expanded={isDrawerOpen}
@@ -423,7 +466,7 @@ export function MobileBottomNav() {
       </nav>
 
       {/* Add padding to page content to account for navigation */}
-      <style jsx global>{`
+      <style>{`
         .safe-area-pb {
           padding-bottom: env(safe-area-inset-bottom, 0);
         }

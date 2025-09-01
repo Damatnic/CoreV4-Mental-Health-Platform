@@ -3,7 +3,7 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, Activity, 
   Calendar, Clock, Target, Shield, Brain, Heart,
   Zap, AlertCircle, CheckCircle, Info, ChevronRight,
-  BarChart3, LineChart, PieChart, Eye, EyeOff
+  BarChart3, LineChart, PieChart, Eye, EyeOff, Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Line, Bar, Radar, Area } from 'recharts';
@@ -206,8 +206,8 @@ export function CrisisPreventionDashboard() {
       suggestions.push({
         type: 'trigger',
         priority: 'high',
-        title: `Rising trigger: ${increasingTriggers[0].name}`,
-        action: increasingTriggers[0].preventionStrategies[0],
+        title: `Rising trigger: ${increasingTriggers[0]?.name || 'Unknown'}`,
+        action: increasingTriggers[0]?.preventionStrategies?.[0] || 'No strategy available',
         icon: TrendingUp
       });
     }

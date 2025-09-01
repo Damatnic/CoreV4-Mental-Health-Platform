@@ -133,8 +133,11 @@ const dataProcessors = {
       const slice = data.slice(i, Math.min(i + step, data.length));
       const avgValue = slice.reduce((sum, p) => sum + p.value, 0) / slice.length;
       
+      const middlePoint = slice[Math.floor(slice.length / 2)];
+      if (!middlePoint) continue;
+      
       sampled.push({
-        date: slice[Math.floor(slice.length / 2)].date,
+        date: middlePoint.date,
         value: avgValue,
         metadata: { sampled: true, originalCount: slice.length },
       });
@@ -160,13 +163,13 @@ const dataProcessors = {
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
           break;
         default: // day
-          key = date.toISOString().split('T')[0];
+          key = date.toISOString().split('T')[0] || date.toISOString();
       }
       
       if (!grouped[key]) {
         grouped[key] = [];
       }
-      grouped[key].push(point);
+      grouped[key]!.push(point);
     });
     
     return grouped;
@@ -326,7 +329,7 @@ const dataProcessors = {
     }
     
     // Weekly pattern insights
-    const bestDay = patterns.weeklyPattern.reduce((best, current) => 
+    const bestDay = patterns.weeklyPattern.reduce((best: any, current: any) => 
       current.average > best.average ? current : best
     );
     insights.push(`You tend to feel best on ${this.getDayName(bestDay.day)}s.`);
@@ -336,7 +339,7 @@ const dataProcessors = {
 
   getDayName(day: number): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[day];
+    return days[day] || 'Unknown';
   },
 
   linearRegression(data: ChartDataPoint[]) {
@@ -363,8 +366,11 @@ const dataProcessors = {
       const slice = data.slice(i - period + 1, i + 1);
       const avg = slice.reduce((sum, p) => sum + p.value, 0) / period;
       
+      const dataPoint = data[i];
+      if (!dataPoint) continue;
+      
       result.push({
-        date: data[i].date,
+        date: dataPoint.date,
         value: avg,
       });
     }

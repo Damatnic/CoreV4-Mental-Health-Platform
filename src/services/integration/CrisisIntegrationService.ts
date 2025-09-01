@@ -166,22 +166,16 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private initializeMonitoring() {
     // Monitor wellness store for crisis indicators
-    useWellnessStore.subscribe(
-      (state) => state.moodEntries,
-      (moodEntries) => {
-        if (moodEntries.length > 0) {
-          this.analyzeMoodForCrisis(moodEntries[moodEntries.length - 1]);
-        }
+    useWellnessStore.subscribe((state) => {
+      if (state.moodEntries.length > 0) {
+        this.analyzeMoodForCrisis(state.moodEntries[state.moodEntries.length - 1]);
       }
-    );
+    });
     
     // Monitor activity patterns
-    useActivityStore.subscribe(
-      (state) => state.activities,
-      (activities) => {
-        this.analyzeActivityPatterns(activities);
-      }
-    );
+    useActivityStore.subscribe((state) => {
+      this.analyzeActivityPatterns(state.activities);
+    });
     
     // Setup real-time crisis alerts
     realtimeSyncService.subscribe({
@@ -432,11 +426,17 @@ class CrisisIntegrationService extends EventEmitter {
     console.log('Crisis detected:', assessment);
     
     // Update stores
-    useWellnessStore.getState().addCrisisEvent({
-      id: assessment.id,
-      timestamp: assessment.timestamp,
-      severity: assessment.severity,
-      resolved: false
+    useWellnessStore.getState().recordCrisisEvent({
+      severity: assessment.severity === CrisisSeverity.CRITICAL ? 'critical' : 
+                assessment.severity === CrisisSeverity.HIGH ? 'high' : 
+                assessment.severity === CrisisSeverity.MEDIUM ? 'medium' : 'low',
+      triggers: [],
+      copingStrategiesUsed: [],
+      supportContactsReached: [],
+      outcome: 'in_progress',
+      duration: 0,
+      followUpNeeded: true,
+      notes: `Crisis assessment detected: ${assessment.severity}`
     });
     
     // Send real-time alert
@@ -683,7 +683,7 @@ class CrisisIntegrationService extends EventEmitter {
     // Analyze patterns
     const recentMoods = wellnessStore.moodEntries.slice(-10);
     const recentActivities = activityStore.activities.filter(a => {
-      const date = new Date(a.completedAt || a.scheduledTime);
+      const date = new Date(a.completedAt || a.scheduledTime || Date.now());
       const hoursDiff = (Date.now() - date.getTime()) / (1000 * 60 * 60);
       return hoursDiff <= 24;
     });

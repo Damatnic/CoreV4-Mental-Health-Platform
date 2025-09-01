@@ -357,7 +357,7 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
       )}
       
       {/* Inline critical styles for fastest rendering */}
-      <style jsx>{`
+      <style>{`
         .crisis-button {
           display: inline-flex;
           align-items: center;

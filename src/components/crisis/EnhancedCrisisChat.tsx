@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Bot, User, Heart, AlertCircle, Clock, Phone, Shield, Wifi, WifiOff, Users } from 'lucide-react';
-import { websocketService, RealtimeMessage } from '../../services/realtime/websocketService';
+import { RealtimeMessage } from '../../services/realtime/websocketService';
+import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 
@@ -46,7 +47,7 @@ export function EnhancedCrisisChat() {
   const [isConnected, setIsConnected] = useState(false);
   const [counselorInfo, setCounselorInfo] = useState<CounselorInfo | null>(null);
   const [counselorTyping, setCounselorTyping] = useState(false);
-  const [detectedCrisisLevel, setDetectedCrisisLevel] = useState<string | null>(null);
+  const [detectedCrisisLevel, setDetectedCrisisLevel] = useState<'low' | 'medium' | 'high' | 'critical' | null>(null);
   const [showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
@@ -64,7 +65,7 @@ export function EnhancedCrisisChat() {
 
     return () => {
       if (isConnected) {
-        websocketService.leaveRoom(roomId.current);
+        mockWebSocketAdapter.leaveRoom(roomId.current);
       }
     };
   }, [user]);
@@ -72,7 +73,7 @@ export function EnhancedCrisisChat() {
   const initializeWebSocket = async () => {
     try {
       setConnectionStatus('connecting');
-      await websocketService.connect(user?.id || 'anonymous', user?.token || '');
+      await mockWebSocketAdapter.connect(user?.id || 'anonymous', user?.token || '');
       setConnectionStatus('connected');
       setupWebSocketListeners();
       
@@ -96,23 +97,23 @@ export function EnhancedCrisisChat() {
 
   const setupWebSocketListeners = () => {
     // Message events
-    websocketService.on('message:new', handleNewMessage);
-    websocketService.on('typing:start', handleCounselorTypingStart);
-    websocketService.on('typing:stop', handleCounselorTypingStop);
+    mockWebSocketAdapter.on('message:new', handleNewMessage);
+    mockWebSocketAdapter.on('typing:start', handleCounselorTypingStart);
+    mockWebSocketAdapter.on('typing:stop', handleCounselorTypingStop);
     
     // Counselor events
-    websocketService.on('counselor:assigned', handleCounselorAssigned);
-    websocketService.on('counselor:disconnected', handleCounselorDisconnected);
+    mockWebSocketAdapter.on('counselor:assigned', handleCounselorAssigned);
+    mockWebSocketAdapter.on('counselor:disconnected', handleCounselorDisconnected);
     
     // Queue events
-    websocketService.on('queue:update', handleQueueUpdate);
+    mockWebSocketAdapter.on('queue:update', handleQueueUpdate);
     
     // Crisis events
-    websocketService.on('crisis:escalated', handleCrisisEscalated);
+    mockWebSocketAdapter.on('crisis:escalated', handleCrisisEscalated);
     
     // Connection events
-    websocketService.on('connection:lost', handleConnectionLost);
-    websocketService.on('connection:established', handleConnectionRestored);
+    mockWebSocketAdapter.on('connection:lost', handleConnectionLost);
+    mockWebSocketAdapter.on('connection:established', handleConnectionRestored);
   };
 
   const handleNewMessage = useCallback((message: RealtimeMessage) => {
@@ -212,13 +213,13 @@ export function EnhancedCrisisChat() {
   }, [messages]);
 
   // Detect crisis level in messages
-  const detectCrisisLevel = (text: string): string | null => {
+  const detectCrisisLevel = (text: string): 'low' | 'medium' | 'high' | 'critical' | null => {
     const lowerText = text.toLowerCase();
     
     for (const crisis of CRISIS_KEYWORDS) {
       for (const keyword of crisis.keywords) {
         if (lowerText.includes(keyword)) {
-          return crisis.level;
+          return crisis.level as 'low' | 'medium' | 'high' | 'critical';
         }
       }
     }
@@ -235,15 +236,12 @@ export function EnhancedCrisisChat() {
     setIsConnecting(true);
     
     try {
-      // Join crisis room
-      await websocketService.joinRoom(roomId.current);
+      // Create crisis session with mock server
+      const session = await mockWebSocketAdapter.createCrisisSession(detectedCrisisLevel || 'medium');
+      roomId.current = session.sessionId;
       
-      // Request counselor
-      websocketService.getSocket()?.emit('crisis:request-counselor', {
-        roomId: roomId.current,
-        userId: user?.id || 'anonymous',
-        priority: detectedCrisisLevel || 'medium',
-      });
+      // Join crisis room
+      await mockWebSocketAdapter.joinRoom(roomId.current);
       
       // Show queue position
       const queueMessage: RealtimeMessage = {
@@ -274,7 +272,7 @@ export function EnhancedCrisisChat() {
       if (crisisLevel === 'critical') {
         setShowEmergencyPrompt(true);
         // Immediately escalate to crisis team
-        websocketService.getSocket()?.emit('crisis:escalate', {
+        mockWebSocketAdapter.getSocket()?.emit('crisis:escalate', {
           roomId: roomId.current,
           userId: user?.id,
           message: inputMessage,
@@ -283,8 +281,8 @@ export function EnhancedCrisisChat() {
       }
     }
 
-    // Send message via WebSocket
-    websocketService.sendMessage(roomId.current, inputMessage, 'text');
+    // Send message via Mock WebSocket
+    mockWebSocketAdapter.sendMessage(roomId.current, inputMessage, 'text');
     
     // Add to local messages immediately for better UX
     const userMessage: RealtimeMessage = {
@@ -310,7 +308,7 @@ export function EnhancedCrisisChat() {
   const handleUserTypingStart = () => {
     if (!isConnected) return;
     
-    websocketService.sendTypingIndicator(roomId.current, true);
+    mockWebSocketAdapter.sendTypingIndicator(roomId.current, true);
     
     // Clear existing timeout
     if (typingTimeoutRef.current) {
@@ -326,7 +324,7 @@ export function EnhancedCrisisChat() {
   const handleUserTypingStop = () => {
     if (!isConnected) return;
     
-    websocketService.sendTypingIndicator(roomId.current, false);
+    mockWebSocketAdapter.sendTypingIndicator(roomId.current, false);
     
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);

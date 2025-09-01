@@ -435,7 +435,17 @@ export function IntegratedDashboard() {
         return <MoodTrendsWidget moodData={wellnessStore.moodEntries} error={error} />;
         
       case 'therapy_progress':
-        return <TherapyProgressWidget progress={activityStore.therapyProgress} error={error} />;
+        const transformedProgress = activityStore.therapyProgress?.map(p => ({
+          id: p.id,
+          date: p.sessionDate,
+          therapistName: p.therapistName || 'Unknown Therapist',
+          type: p.sessionType,
+          topics: p.topics,
+          homework: p.homework,
+          progress: p.progressScore || 0,
+          notes: p.notes
+        }));
+        return <TherapyProgressWidget progress={transformedProgress} error={error} />;
         
       case 'community_feed':
         return <CommunityFeedWidget isConnected={isConnected} error={error} />;

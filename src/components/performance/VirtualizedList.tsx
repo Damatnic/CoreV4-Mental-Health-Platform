@@ -4,7 +4,8 @@
  */
 
 import React, { useCallback, useRef, useMemo, memo, CSSProperties } from 'react';
-import { FixedSizeList, VariableSizeList, ListChildComponentProps } from 'react-window';
+import { List as List, VList as VList } from 'react-window';
+import type { ListChildComponentProps } from 'react-window';
 import { useInView } from 'react-intersection-observer';
 import { performanceMonitor } from '../../utils/performance/performanceMonitor';
 import { LoadingFallbacks } from '../../utils/performance/concurrentFeatures';
@@ -76,7 +77,7 @@ export function VirtualizedList<T>({
 
     return (
       <div ref={ref} style={style} className="px-4">
-        {inView ? renderItem(item, index, style) : <LoadingFallbacks.Skeleton lines={3} />}
+        {inView && item ? renderItem(item, index, style) : <LoadingFallbacks.Skeleton lines={3} />}
       </div>
     );
   });
@@ -119,7 +120,7 @@ export function VirtualizedList<T>({
     if (isVariableHeight) {
       return itemHeight as (index: number) => number;
     }
-    return undefined;
+    return (index: number) => itemHeight as number;
   }, [itemHeight, isVariableHeight]);
 
   // Custom item key for better performance
@@ -137,7 +138,7 @@ export function VirtualizedList<T>({
     return <>{emptyComponent}</>;
   }
 
-  const ListComponent = isVariableHeight ? VariableSizeList : FixedSizeList;
+  const ListComponent = isVariableHeight ? VList : List;
 
   return (
     <div className={`virtualized-list-container ${className}`}>
@@ -149,7 +150,7 @@ export function VirtualizedList<T>({
           height={height}
           width={width}
           itemCount={items.length}
-          itemSize={isVariableHeight ? getItemSize! : (itemHeight as number)}
+          itemSize={isVariableHeight ? getItemSize : (typeof itemHeight === 'number' ? () => itemHeight : itemHeight)}
           overscanCount={overscan}
           onScroll={handleScroll}
           itemData={items}

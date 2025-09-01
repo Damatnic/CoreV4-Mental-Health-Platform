@@ -53,7 +53,7 @@ if (typeof Worker !== 'undefined') {
 interface OptimizedChartProps {
   type: 'line' | 'bar' | 'doughnut';
   data: any[];
-  options?: ChartOptions<any>;
+  options?: ChartOptions;
   height?: number;
   width?: number;
   priority?: UpdatePriority;
@@ -79,7 +79,7 @@ export function OptimizedChart({
 }: OptimizedChartProps) {
   const chartRef = useRef<any>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [processedData, setProcessedData] = useState<ChartData<any> | null>(null);
+  const [processedData, setProcessedData] = useState<ChartData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -148,7 +148,7 @@ export function OptimizedChart({
       }
 
       // Format for Chart.js
-      const chartData: ChartData<any> = {
+      const chartData: ChartData = {
         labels: processedPoints.map(p => p.label || p.date || p.x),
         datasets: [{
           label: 'Wellness Data',
@@ -182,16 +182,16 @@ export function OptimizedChart({
 
     const processData = async () => {
       try {
-        const result = await processDataWithWorker(deferredData);
+        const result = await processDataWithWorker(deferredData) as { processed?: Array<{ date: string, value: number }> };
         
         startPrioritizedTransition(() => {
           if (result.processed) {
             // Web worker result
-            const chartData: ChartData<any> = {
-              labels: result.processed.map((p: any) => p.date),
+            const chartData: ChartData = {
+              labels: result.processed.map(p => p.date),
               datasets: [{
                 label: 'Mood Trend',
-                data: result.processed.map((p: any) => p.value),
+                data: result.processed.map(p => p.value),
                 borderColor: 'rgb(59, 130, 246)',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
@@ -206,7 +206,7 @@ export function OptimizedChart({
             }
           } else {
             // Main thread result
-            setProcessedData(result as ChartData<any>);
+            setProcessedData(result as ChartData);
           }
           
           setIsProcessing(false);
@@ -230,7 +230,7 @@ export function OptimizedChart({
   }, [deferredData, processDataWithWorker, processDataOnMainThread, startPrioritizedTransition, type, onDataProcessed]);
 
   // Optimized chart options
-  const optimizedOptions = useMemo<ChartOptions<any>>(() => ({
+  const optimizedOptions = useMemo<ChartOptions>(() => ({
     ...options,
     responsive: true,
     maintainAspectRatio: false,

@@ -113,8 +113,8 @@ export function FloatingCrisisButton() {
 
   const handleDragMove = (e: MouseEvent | TouchEvent) => {
     if (isDragging && !isExpanded) {
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const clientX = 'touches' in e ? (e.touches[0]?.clientX || 0) : e.clientX;
+      const clientY = 'touches' in e ? (e.touches[0]?.clientY || 0) : e.clientY;
       
       const newX = Math.max(20, Math.min(window.innerWidth - 80, clientX - 30));
       const newY = Math.max(20, Math.min(window.innerHeight - 80, clientY - 30));

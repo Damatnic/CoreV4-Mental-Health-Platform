@@ -45,7 +45,7 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details for debugging
     console.error('🚨 EMERGENCY ERROR BOUNDARY CAUGHT:', {
       error: error.message,
@@ -255,7 +255,7 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
     );
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       // Render custom fallback UI or default error UI
       return this.props.fallback || this.renderErrorUI();

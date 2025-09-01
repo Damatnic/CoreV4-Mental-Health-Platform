@@ -12,6 +12,7 @@ import {
   Heart,
   Brain,
   Users,
+  X,
   Sun,
   Moon,
   Cloud,

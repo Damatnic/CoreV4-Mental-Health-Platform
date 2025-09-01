@@ -227,13 +227,14 @@ class PerformanceMonitor {
                 performance.measure('crisis_response_time', 'crisis_button_clicked', 'crisis_modal_displayed');
                 
                 const measure = performance.getEntriesByName('crisis_response_time')[0];
+                if (!measure) continue;
                 this.recordMetric('crisis_response_time', measure.duration, {
                   timestamp: Date.now(),
                   userAgent: navigator.userAgent,
                 });
                 
                 // Alert if response time exceeds threshold
-                if (measure.duration > PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD) {
+                if (measure?.duration && measure.duration > PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD) {
                   this.alertCriticalPerformanceIssue('crisis_response_slow', measure.duration);
                 }
                 
@@ -285,6 +286,7 @@ class PerformanceMonitor {
           performance.measure('safety_plan_load_time', startMark, 'safety_plan_loaded');
           
           const measure = performance.getEntriesByName('safety_plan_load_time')[0];
+          if (!measure) return;
           this.recordMetric('safety_plan_access', measure.duration, {
             withinThreshold: measure.duration < PERFORMANCE_THRESHOLDS.SAFETY_PLAN_ACCESS,
           });
@@ -318,6 +320,7 @@ class PerformanceMonitor {
           performance.measure('emergency_contacts_time', 'emergency_contacts_start', 'emergency_contacts_displayed');
           
           const measure = performance.getEntriesByName('emergency_contacts_time')[0];
+          if (!measure) return;
           this.recordMetric('emergency_contacts_display', measure.duration, {
             count: contactsElement.children.length,
             fast: measure.duration < PERFORMANCE_THRESHOLDS.EMERGENCY_CONTACT_DISPLAY,
@@ -416,14 +419,19 @@ class PerformanceMonitor {
     if (this.memoryHistory.length === 6) {
       let isGrowing = true;
       for (let i = 1; i < this.memoryHistory.length; i++) {
-        if (this.memoryHistory[i] <= this.memoryHistory[i - 1]) {
+        const current = this.memoryHistory[i];
+        const previous = this.memoryHistory[i - 1];
+        if (current != null && previous != null && current <= previous) {
           isGrowing = false;
           break;
         }
       }
       
       if (isGrowing) {
-        const growthRate = this.memoryHistory[5] - this.memoryHistory[0];
+        const recent = this.memoryHistory[5];
+        const initial = this.memoryHistory[0];
+        if (recent == null || initial == null) return;
+        const growthRate = recent - initial;
         this.alertMemoryLeak(growthRate);
       }
     }

@@ -138,8 +138,8 @@ export class ActionRecommendationEngine {
       'professional': 0.6
     };
 
-    if (action.category && categoryScores[action.category]) {
-      score = (score + categoryScores[action.category]) / 2;
+    if (action.category && categoryScores[action.category] !== undefined) {
+      score = (score + categoryScores[action.category]!) / 2;
     }
 
     return score;

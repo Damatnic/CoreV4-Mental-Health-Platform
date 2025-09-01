@@ -63,6 +63,26 @@ export interface Milestone {
   celebration?: string;
 }
 
+export interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  times: string[];
+  takenToday: boolean;
+  nextDose?: Date;
+  refillDate?: Date;
+  adherenceRate: number;
+  startDate?: Date;
+  endDate?: Date;
+  prescribedBy?: string;
+  purpose?: string;
+  sideEffects?: string[];
+  lastTaken?: Date;
+  remindersEnabled?: boolean;
+  notes?: string;
+}
+
 export interface Habit {
   id: string;
   name: string;
@@ -115,6 +135,8 @@ export interface TherapyProgress {
   };
   insights: string[];
   nextSession?: Date;
+  progressScore?: number;
+  notes?: string;
   medicationChanges?: {
     medication: string;
     change: 'started' | 'stopped' | 'increased' | 'decreased';
@@ -156,6 +178,7 @@ interface ActivityStore {
   activities: Activity[];
   goals: Goal[];
   habits: Habit[];
+  medications: Medication[];
   therapyProgress: TherapyProgress[];
   achievements: Achievement[];
   analytics: ActivityAnalytics[];

@@ -226,7 +226,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
       const dayOfWeek = date.getDay();
       
       // Simple prediction model based on day of week patterns and trend
-      const weekdayModifier = [0, -0.5, -0.3, 0, 0.2, 0.8, 0.5][dayOfWeek]; // Sunday = 0
+      const weekdayModifier = [0, -0.5, -0.3, 0, 0.2, 0.8, 0.5][dayOfWeek] || 0; // Sunday = 0
       const trendModifier = trend * 0.1 * i;
       const predictedMood = Math.max(1, Math.min(10, avgMood + weekdayModifier + trendModifier));
 
@@ -798,10 +798,10 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
                     <div className="flex-1">
                       <p className="text-sm font-medium text-amber-900">Recommended Actions</p>
                       <ul className="text-xs text-amber-700 mt-2 space-y-1">
-                        {predictions[0].predictedMood < 5 && (
+                        {predictions[0] && parseFloat(predictions[0].predictedMood) < 5 && (
                           <li>• Schedule self-care activities for tomorrow</li>
                         )}
-                        {predictions[0].predictedMood > 7 && (
+                        {predictions[0] && parseFloat(predictions[0].predictedMood) > 7 && (
                           <li>• Great outlook! Plan something special</li>
                         )}
                         <li>• Continue tracking to improve prediction accuracy</li>

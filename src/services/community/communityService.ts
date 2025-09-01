@@ -184,7 +184,9 @@ class CommunityService {
     tags?: string[];
     page?: number;
     limit?: number;
-  }): Promise<{ posts: Post[]; total: number; hasMore: boolean }> {
+    filter?: string;
+    cursor?: string;
+  }): Promise<{ posts: Post[]; total: number; hasMore: boolean; nextCursor?: string }> {
     const response = await this.apiClient.get('/community/posts', { params: filters });
     return response.data;
   }

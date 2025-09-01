@@ -25,7 +25,8 @@
       "Bash(npx depcheck:*)",
       "Bash(curl:*)",
       "Bash(npx eslint:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

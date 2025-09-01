@@ -188,6 +188,7 @@ export function useTouchGestures(
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         const touch = e.touches[0];
+        if (!touch) return;
         touchStartRef.current = {
           x: touch.clientX,
           y: touch.clientY,
@@ -198,12 +199,12 @@ export function useTouchGestures(
         if (handlers.onLongPress) {
           longPressTimerRef.current = setTimeout(() => {
             if (touchStartRef.current) {
-              handlers.onLongPress!(touch.clientX, touch.clientY);
+              handlers.onLongPress!(touch?.clientX || 0, touch?.clientY || 0);
               touchStartRef.current = null; // Prevent swipe after long press
             }
           }, 500);
         }
-      } else if (e.touches.length === 2 && handlers.onPinch) {
+      } else if (e.touches.length === 2 && handlers.onPinch && e.touches[0] && e.touches[1]) {
         // Pinch gesture
         isPinchingRef.current = true;
         const distance = getDistance(e.touches[0], e.touches[1]);
@@ -219,7 +220,7 @@ export function useTouchGestures(
       }
 
       // Handle pinch
-      if (isPinchingRef.current && e.touches.length === 2 && handlers.onPinch) {
+      if (isPinchingRef.current && e.touches.length === 2 && handlers.onPinch && e.touches[0] && e.touches[1]) {
         const distance = getDistance(e.touches[0], e.touches[1]);
         const scale = distance / initialPinchDistanceRef.current;
         handlers.onPinch(scale);
@@ -241,6 +242,7 @@ export function useTouchGestures(
       if (!touchStartRef.current) return;
 
       const touch = e.changedTouches[0];
+      if (!touch) return;
       const endTime = Date.now();
       const duration = endTime - touchStartRef.current.time;
       const deltaX = touch.clientX - touchStartRef.current.x;
@@ -251,10 +253,10 @@ export function useTouchGestures(
       if (duration < 200 && distance < 10) {
         // Double tap detection
         if (handlers.onDoubleTap && endTime - lastTapRef.current < 300) {
-          handlers.onDoubleTap(touch.clientX, touch.clientY);
+          handlers.onDoubleTap(touch?.clientX || 0, touch?.clientY || 0);
           lastTapRef.current = 0;
         } else if (handlers.onTap) {
-          handlers.onTap(touch.clientX, touch.clientY);
+          handlers.onTap(touch?.clientX || 0, touch?.clientY || 0);
           lastTapRef.current = endTime;
         }
       }
@@ -365,14 +367,18 @@ export function usePullToRefresh(
 
     const handleTouchStart = (e: TouchEvent) => {
       if (window.scrollY === 0) {
-        startYRef.current = e.touches[0].clientY;
+        const touch = e.touches[0];
+        if (!touch) return;
+        startYRef.current = touch.clientY;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (startYRef.current === 0) return;
 
-      const currentY = e.touches[0].clientY;
+      const touch = e.touches[0];
+      if (!touch) return;
+      const currentY = touch.clientY;
       const distance = currentY - startYRef.current;
 
       if (distance > 0 && window.scrollY === 0) {

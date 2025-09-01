@@ -5,7 +5,6 @@
  */
 
 import { User, ApiResponse } from '@/types';
-import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/SecureLocalStorage';
@@ -457,10 +456,7 @@ class AuthenticationService {
     const encryptedSession = await cryptoService.encrypt(JSON.stringify(session));
     
     // Store in secure storage
-    await secureStorage.setItem('session', encryptedSession, {
-      persistent,
-      expires: session.expiresAt,
-    });
+    secureStorage.setItem('session', encryptedSession);
   }
 
   private async clearSession(): Promise<void> {

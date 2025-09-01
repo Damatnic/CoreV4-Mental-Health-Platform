@@ -191,7 +191,7 @@ export function useUserPreferences(userId: string) {
     const newPreferences = {
       ...preferences,
       [category]: {
-        ...preferences[category],
+        ...(preferences[category] as object),
         [key]: value
       }
     };

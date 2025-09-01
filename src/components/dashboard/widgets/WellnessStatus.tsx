@@ -103,8 +103,8 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
             />
             <defs>
               <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" className={`${getScoreGradient().split(' ')[0].replace('from-', 'text-')}`} />
-                <stop offset="100%" className={`${getScoreGradient().split(' ')[1].replace('to-', 'text-')}`} />
+                <stop offset="0%" className={`${getScoreGradient().split(' ')[0]?.replace('from-', 'text-') || 'text-blue-500'}`} />
+                <stop offset="100%" className={`${getScoreGradient().split(' ')[1]?.replace('to-', 'text-') || 'text-blue-600'}`} />
               </linearGradient>
             </defs>
           </svg>

@@ -133,7 +133,6 @@ class RealtimeSyncService extends EventEmitter {
           reconnectionAttempts: this.config.reconnectionAttempts,
           reconnectionDelay: this.config.reconnectionDelay,
           timeout: this.config.timeout,
-          transports: ['websocket', 'polling'],
           auth: auth || {}
         });
         
@@ -154,7 +153,7 @@ class RealtimeSyncService extends EventEmitter {
           resolve();
         });
         
-        this.socket.once('connect_error', (error) => {
+        this.socket.once('connect_error', (error: any) => {
           clearTimeout(timeout);
           this.emit(RealtimeEvent.ERROR, error);
           reject(error);
@@ -245,7 +244,7 @@ class RealtimeSyncService extends EventEmitter {
     this.subscriptions.forEach((config, key) => {
       config.events.forEach(event => {
         const eventName = `${config.channel}:${event}`;
-        this.socket!.on(eventName, (data) => {
+        this.socket!.on(eventName, (data: any) => {
           if (!config.filter || config.filter(data)) {
             config.handler(data);
           }
@@ -293,7 +292,7 @@ class RealtimeSyncService extends EventEmitter {
       case 'alert':
         this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, payload);
         // Update wellness store with crisis event
-        useWellnessStore.getState().addCrisisEvent(payload);
+        useWellnessStore.getState().recordCrisisEvent(payload);
         break;
         
       case 'support_connected':
@@ -364,7 +363,6 @@ class RealtimeSyncService extends EventEmitter {
         this.emit(RealtimeEvent.APPOINTMENT_REMINDER, payload);
         // Update activity store with appointment reminder
         useActivityStore.getState().addActivity({
-          id: `appointment-${Date.now()}`,
           title: payload.title,
           type: 'appointment',
           category: 'professional',
@@ -405,8 +403,8 @@ class RealtimeSyncService extends EventEmitter {
         
       case 'insight':
         this.emit(RealtimeEvent.WELLNESS_INSIGHT, payload);
-        // Add insight to wellness store
-        useWellnessStore.getState().addInsight(payload);
+        // Regenerate insights in wellness store
+        useWellnessStore.getState().generateInsights();
         break;
     }
   }
@@ -487,7 +485,7 @@ class RealtimeSyncService extends EventEmitter {
     if (this.socket && this.isConnected) {
       config.events.forEach(event => {
         const eventName = `${config.channel}:${event}`;
-        this.socket!.on(eventName, (data) => {
+        this.socket!.on(eventName, (data: any) => {
           if (!config.filter || config.filter(data)) {
             config.handler(data);
           }

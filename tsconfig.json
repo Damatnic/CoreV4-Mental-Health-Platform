@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ES2022.Object", "ES2022.Array"],
     "module": "ESNext",
     "skipLibCheck": true,
     
@@ -12,6 +12,9 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    
+    /* Iteration and ES features */
+    "downlevelIteration": true,
     
     /* Linting */
     "strict": true,
@@ -53,7 +56,11 @@
       "@styles/*": ["./src/styles/*"]
     }
   },
-  "include": ["src", "tests", "src/types/globals.d.ts"],
+  "include": [
+    "src", 
+    "tests", 
+    "src/types/**/*.d.ts"
+  ],
   "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.test.tsx", "src/test/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

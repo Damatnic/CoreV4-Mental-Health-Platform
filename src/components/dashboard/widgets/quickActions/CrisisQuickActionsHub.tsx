@@ -4,7 +4,7 @@ import {
   Phone, MessageSquare, MapPin, Shield, Heart, Users,
   AlertCircle, Activity, Brain, Headphones, Navigation,
   Clock, CheckCircle, XCircle, ChevronRight, Volume2,
-  Zap, Send, Copy, Share2, ExternalLink, Wifi, WifiOff
+  Zap, Send, Copy, Share2, ExternalLink, Wifi, WifiOff, X
 } from 'lucide-react';
 import { useCrisisAssessment } from '../../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../../hooks/useGeolocation';
@@ -48,8 +48,8 @@ export function CrisisQuickActionsHub({
   emergencyContacts = [],
   safetyPlan
 }: CrisisQuickActionsHubProps) {
-  const { assessmentLevel, isAssessing, performAssessment } = useCrisisAssessment(userId);
-  const { location, error: locationError, requesting, requestLocation } = useGeolocation();
+  const { assessmentData, isAssessing, updateAssessment } = useCrisisAssessment();
+  const { location, error: locationError, loading } = useGeolocation();
   
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [showSafetyPlan, setShowSafetyPlan] = useState(false);
@@ -141,12 +141,8 @@ export function CrisisQuickActionsHub({
 
   // Share location for emergency
   const shareEmergencyLocation = useCallback(async () => {
-    if (!location) {
-      await requestLocation();
-    }
-    
     if (location) {
-      const googleMapsUrl = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+      const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
       const message = `Emergency: I need help. My location: ${googleMapsUrl}`;
       
       // Copy to clipboard
@@ -160,7 +156,7 @@ export function CrisisQuickActionsHub({
       
       setTimeout(() => setCopiedToClipboard(null), 3000);
     }
-  }, [location, requestLocation, onActionTaken]);
+  }, [location, onActionTaken]);
 
   // Start grounding exercise
   const startGroundingExercise = useCallback(() => {
@@ -182,14 +178,14 @@ export function CrisisQuickActionsHub({
     });
   }, [onActionTaken]);
 
-  // Get crisis level color
+  // Get crisis level color based on assessment data
   const getCrisisLevelColor = () => {
-    switch (assessmentLevel) {
-      case 'critical': return 'red';
-      case 'high': return 'orange';
-      case 'moderate': return 'yellow';
-      default: return 'green';
-    }
+    if (!assessmentData?.overallRisk) return 'blue';
+    
+    if (assessmentData.overallRisk >= 8) return 'red';      // Critical
+    if (assessmentData.overallRisk >= 6) return 'orange';   // High
+    if (assessmentData.overallRisk >= 4) return 'yellow';   // Moderate
+    return 'green';                                         // Low
   };
 
   return (
@@ -278,7 +274,7 @@ export function CrisisQuickActionsHub({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={shareEmergencyLocation}
-          disabled={requesting}
+          disabled={loading}
           className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center justify-between"
         >
           <div className="flex items-center space-x-3">
@@ -291,7 +287,7 @@ export function CrisisQuickActionsHub({
           
           {copiedToClipboard === 'location' ? (
             <CheckCircle className="h-5 w-5" />
-          ) : requesting ? (
+          ) : loading ? (
             <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
           ) : (
             <Share2 className="h-5 w-5" />
@@ -512,11 +508,15 @@ function GroundingExerciseModal({ onClose, onComplete }: { onClose: () => void; 
           </div>
           
           <div className="text-center py-8">
-            <div className="text-4xl font-bold text-green-600 mb-2">
-              {steps[step].count}
-            </div>
-            <div className="text-lg font-semibold mb-2">{steps[step].sense}</div>
-            <p className="text-gray-600">{steps[step].instruction}</p>
+            {steps[step] && (
+              <>
+                <div className="text-4xl font-bold text-green-600 mb-2">
+                  {steps[step].count}
+                </div>
+                <div className="text-lg font-semibold mb-2">{steps[step].sense}</div>
+                <p className="text-gray-600">{steps[step].instruction}</p>
+              </>
+            )}
           </div>
         </div>
         

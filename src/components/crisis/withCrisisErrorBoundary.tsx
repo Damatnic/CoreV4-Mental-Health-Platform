@@ -19,13 +19,14 @@ export function withCrisisErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   options: WithCrisisErrorBoundaryOptions = {}
 ) {
-  const WrappedComponent = React.forwardRef<any, P>((props, ref) => {
+  const WrappedComponent = React.forwardRef<any, P & React.RefAttributes<any>>((props, ref) => {
+    const { ...componentProps } = props;
     return (
       <CrisisErrorBoundary 
         showCrisisResources={options.showCrisisResources}
         fallback={options.fallback}
       >
-        <Component {...props} ref={ref} />
+        <Component {...componentProps as P} ref={ref} />
       </CrisisErrorBoundary>
     );
   });

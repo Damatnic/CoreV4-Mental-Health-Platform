@@ -9,6 +9,7 @@ import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
+import { User } from '../api/types';
 import { EventEmitter } from 'events';
 
 // Integration event types
@@ -177,33 +178,26 @@ class DataIntegrationService extends EventEmitter {
    */
   private setupStoreSubscriptions() {
     // Subscribe to wellness store changes
-    useWellnessStore.subscribe(
-      (state) => state.moodEntries,
-      (moodEntries) => {
-        this.handleDataChange('wellness.mood', moodEntries[moodEntries.length - 1]);
+    useWellnessStore.subscribe((state) => {
+      if (state.moodEntries.length > 0) {
+        this.handleDataChange('wellness.mood', state.moodEntries[state.moodEntries.length - 1]);
       }
-    );
+    });
     
     // Subscribe to activity store changes
-    useActivityStore.subscribe(
-      (state) => state.activities,
-      (activities) => {
-        const completed = activities.filter(a => a.completed && !a.synced);
-        completed.forEach(activity => {
-          this.handleDataChange('activity.completed', activity);
-        });
-      }
-    );
+    useActivityStore.subscribe((state) => {
+      const completed = state.activities.filter((a: any) => a.completed && !a.synced);
+      completed.forEach((activity: any) => {
+        this.handleDataChange('activity.completed', activity);
+      });
+    });
     
     // Subscribe to accessibility store for user preferences
-    useAccessibilityStore.subscribe(
-      (state) => state.preferences,
-      (preferences) => {
-        this.updateDataFlowConfig({
-          enableRealtime: !preferences.reducedMotion
-        });
-      }
-    );
+    useAccessibilityStore.subscribe((state) => {
+      this.updateDataFlowConfig({
+        enableRealtime: !state.settings.reducedMotion
+      });
+    });
   }
   
   /**
@@ -214,7 +208,46 @@ class DataIntegrationService extends EventEmitter {
     
     try {
       this.wsService = WebSocketService.getInstance();
-      await this.wsService.connect();
+      this.wsService.connect('', { 
+        id: 'anonymous',
+        email: 'anonymous@example.com',
+        username: 'anonymous',
+        role: 'patient',
+        profile: {
+          firstName: 'Anonymous',
+          lastName: 'User',
+          timezone: 'UTC'
+        },
+        preferences: {
+          theme: 'auto',
+          notifications: {
+            email: false,
+            push: false,
+            sms: false,
+            crisisAlerts: true,
+            appointmentReminders: false,
+            medicationReminders: false,
+            communityUpdates: false
+          },
+          privacy: {
+            profileVisibility: 'private',
+            shareDataWithTherapist: false,
+            anonymousMode: true,
+            allowResearch: false
+          },
+          accessibility: {
+            fontSize: 'medium',
+            highContrast: false,
+            screenReaderMode: false,
+            reducedMotion: false
+          }
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastActive: new Date(),
+        isVerified: false,
+        twoFactorEnabled: false
+      });
       
       // Setup WebSocket event listeners
       this.wsService.on('connect', () => {
@@ -229,17 +262,17 @@ class DataIntegrationService extends EventEmitter {
       });
       
       // Handle real-time data updates
-      this.wsService.on('data:update', (data) => {
+      this.wsService.on('data:update', (data: any) => {
         this.handleRealtimeUpdate(data);
       });
       
       // Handle crisis events
-      this.wsService.on('crisis:alert', (alert) => {
+      this.wsService.on('crisis:alert', (alert: any) => {
         this.handleCrisisAlert(alert);
       });
       
       // Handle community updates
-      this.wsService.on('community:update', (update) => {
+      this.wsService.on('community:update', (update: any) => {
         this.handleCommunityUpdate(update);
       });
       
@@ -287,6 +320,11 @@ class DataIntegrationService extends EventEmitter {
   private routeDataToTarget(target: string, data: any) {
     const [store, property] = target.split('.');
     
+    if (!property) {
+      console.warn('Invalid target format:', target);
+      return;
+    }
+    
     switch (store) {
       case 'wellness':
         this.updateWellnessStore(property, data);
@@ -316,13 +354,14 @@ class DataIntegrationService extends EventEmitter {
     
     switch (property) {
       case 'metrics':
-        store.updateMetrics(data);
+        store.addWellnessMetric(data);
         break;
-      case 'socialMetrics':
-        store.addSocialInteraction(data);
+      case 'mood':
+        store.addMoodEntry(data);
         break;
       case 'insights':
-        store.addInsight(data);
+        // Insights are generated, not directly added
+        store.generateInsights();
         break;
     }
   }
@@ -338,7 +377,11 @@ class DataIntegrationService extends EventEmitter {
         store.addActivity(data);
         break;
       case 'goals':
-        store.updateGoal(data);
+        if (data.id) {
+          store.updateGoal(data.id, data);
+        } else {
+          store.addGoal(data);
+        }
         break;
     }
   }

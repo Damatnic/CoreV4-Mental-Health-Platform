@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Plus, Edit2, Trash2, User, Star, Clock } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 interface EmergencyContact {
