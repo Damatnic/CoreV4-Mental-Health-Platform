@@ -74,6 +74,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip unsupported URL schemes (chrome-extension, etc.)
+  const supportedSchemes = ['http:', 'https:'];
+  if (!supportedSchemes.includes(url.protocol)) {
+    return;
+  }
+
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleApiRequest(request));
@@ -97,13 +103,21 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
 
+            // Additional safety check - only cache http/https requests
+            const requestUrl = new URL(request.url);
+            if (!['http:', 'https:'].includes(requestUrl.protocol)) {
+              return response;
+            }
+
             // Clone the response
             const responseToCache = response.clone();
 
             // Add to dynamic cache
             caches.open(DYNAMIC_CACHE)
               .then((cache) => {
-                cache.put(request, responseToCache);
+                cache.put(request, responseToCache).catch((error) => {
+                  console.warn('[Service Worker] Failed to cache request:', request.url, error);
+                });
               });
 
             return response;
@@ -134,10 +148,15 @@ async function handleApiRequest(request) {
     // Try network first
     const response = await fetch(request);
     
-    // Cache successful responses
+    // Cache successful responses (only for supported schemes)
     if (response.ok) {
-      const responseToCache = response.clone();
-      cache.put(request, responseToCache);
+      const requestUrl = new URL(request.url);
+      if (['http:', 'https:'].includes(requestUrl.protocol)) {
+        const responseToCache = response.clone();
+        cache.put(request, responseToCache).catch((error) => {
+          console.warn('[Service Worker] Failed to cache API request:', request.url, error);
+        });
+      }
     }
     
     return response;
