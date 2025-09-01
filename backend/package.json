@@ -4,9 +4,10 @@
   "description": "CoreV4 Mental Health Platform Backend API",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
-    "build": "tsc",
+    "start": "node dist/server-minimal.js",
+    "dev": "nodemon src/server-minimal.ts",
+    "dev-full": "nodemon src/server.ts",
+    "build": "tsc src/server-minimal.ts --outDir dist --esModuleInterop --strict",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.ts",
