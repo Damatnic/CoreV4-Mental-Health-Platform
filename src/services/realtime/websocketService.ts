@@ -45,7 +45,7 @@ export interface NotificationEvent {
 }
 
 // WebSocket service configuration
-const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'http://localhost:3001';
+const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 const RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY = 3000;
 

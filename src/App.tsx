@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
-import { Layout } from './components/ui/Layout';
+import { EnhancedLayout } from './components/ui/EnhancedLayout';
 import { HomePage } from './pages/HomePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { CrisisPage } from './pages/CrisisPage';
@@ -38,7 +38,7 @@ function App() {
         <SecurityProvider>
           <AuthProvider>
             <Router>
-              <Layout>
+              <EnhancedLayout>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/dashboard" element={<SecureDashboard />} />
@@ -47,7 +47,7 @@ function App() {
                   <Route path="/community/*" element={<SecureCommunity />} />
                   <Route path="/professional/*" element={<SecureProfessional />} />
                 </Routes>
-              </Layout>
+              </EnhancedLayout>
             </Router>
           </AuthProvider>
         </SecurityProvider>

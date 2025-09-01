@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Astral Core</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: #f3f4f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #6b7280;
+    }
+    
+    h1 {
+      color: #1f2937;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      color: #6b7280;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    
+    .offline-resources {
+      text-align: left;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .offline-resources h2 {
+      color: #374151;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .resource-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .resource-item:last-child {
+      border-bottom: none;
+    }
+    
+    .resource-icon {
+      width: 40px;
+      height: 40px;
+      background: #ddd6fe;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    
+    .resource-content h3 {
+      color: #1f2937;
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+    
+    .resource-content p {
+      color: #6b7280;
+      font-size: 14px;
+      margin: 0;
+    }
+    
+    .crisis-number {
+      color: #7c3aed;
+      font-weight: bold;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #7c3aed;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    .btn:hover {
+      background: #6d28d9;
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      margin-left: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+      }
+      
+      .btn-secondary {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+      </svg>
+    </div>
+    
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection. Don't worry, some features are still available offline.</p>
+    
+    <div class="offline-resources">
+      <h2>Available Offline Resources</h2>
+      
+      <div class="resource-item">
+        <div class="resource-icon">📞</div>
+        <div class="resource-content">
+          <h3>Crisis Hotlines</h3>
+          <p>Call <span class="crisis-number">988</span> for immediate crisis support (US)</p>
+        </div>
+      </div>
+      
+      <div class="resource-item">
+        <div class="resource-icon">🫁</div>
+        <div class="resource-content">
+          <h3>Breathing Exercises</h3>
+          <p>Practice calming breathing techniques offline</p>
+        </div>
+      </div>
+      
+      <div class="resource-item">
+        <div class="resource-icon">📝</div>
+        <div class="resource-content">
+          <h3>Safety Plan</h3>
+          <p>Access your personalized safety plan</p>
+        </div>
+      </div>
+      
+      <div class="resource-item">
+        <div class="resource-icon">💭</div>
+        <div class="resource-content">
+          <h3>Coping Strategies</h3>
+          <p>Review saved coping techniques and grounding exercises</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <a href="/" class="btn" onclick="window.location.reload()">Try Again</a>
+      <a href="tel:988" class="btn btn-secondary">Call 988</a>
+    </div>
+  </div>
+  
+  <script>
+    // Try to reconnect when online
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+    
+    // Cache key resources for offline use
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        console.log('Service Worker ready for offline support');
+      });
+    }
+  </script>
+</body>
+</html>

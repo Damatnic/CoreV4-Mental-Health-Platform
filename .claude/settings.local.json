@@ -4,7 +4,14 @@
       "Bash(sed:*)",
       "Bash(npx vite build:*)",
       "Bash(npm:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(dir:*)",
+      "Bash(npx vite:*)",
+      "Bash(if exist node_modules rmdir /s /q node_modules)",
+      "Read(H:\\Astral Core/**)",
+      "Bash(powershell:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

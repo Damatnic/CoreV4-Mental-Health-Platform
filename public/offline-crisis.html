@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ef4444">
+    <title>Crisis Support - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .offline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fbbf24;
+            color: #78350f;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .offline-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        h1 {
+            color: #991b1b;
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: #7f1d1d;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .crisis-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .crisis-card:active {
+            transform: scale(0.98);
+            border-color: #ef4444;
+        }
+
+        .crisis-card.primary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .crisis-card h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crisis-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .emergency-button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: white;
+            color: #ef4444;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emergency-button:active {
+            transform: scale(0.95);
+            background: #fef2f2;
+        }
+
+        .primary .emergency-button {
+            background: white;
+            color: #ef4444;
+        }
+
+        .breathing-exercise {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .breath-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e40af;
+            animation: breathe 8s infinite;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1.2); }
+            75% { transform: scale(1); }
+        }
+
+        .coping-strategies {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .coping-strategies h3 {
+            color: #374151;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .strategy-item {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .strategy-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .safety-reminder {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        .safety-reminder h4 {
+            color: #78350f;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .safety-reminder ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .safety-reminder li {
+            color: #92400e;
+            font-size: 14px;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .safety-reminder li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Touch-friendly sizing */
+        @media (max-width: 600px) {
+            .emergency-button {
+                padding: 20px;
+                font-size: 16px;
+            }
+            
+            .crisis-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="offline-badge">
+            <svg class="offline-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3.707 2.293a1 1 0 00-1.414 1.414l6.921 6.922c.05.062.105.118.168.167l6.91 6.911a1 1 0 001.415-1.414l-.675-.675A9.001 9.001 0 0018 10a8.982 8.982 0 00-3.304-6.968l-.713.713A7.501 7.501 0 0116.5 10c0 1.487-.433 2.873-1.179 4.036l-1.165-1.165A5.502 5.502 0 0015 10c0-.837-.187-1.63-.52-2.34l-1.226 1.226A3.504 3.504 0 0113.5 10a3.5 3.5 0 01-3.5 3.5c-.403 0-.79-.069-1.15-.195l-1.317 1.317A5.47 5.47 0 0010 15.5a5.502 5.502 0 005.131-3.51l1.172 1.173A7.482 7.482 0 0110 17.5a7.502 7.502 0 01-6.497-3.75l-.713.713A8.968 8.968 0 002 10c0-1.898.588-3.66 1.592-5.116l-.585-.586c-.053.05-.101.105-.143.167A9.97 9.97 0 002 10a9.001 9.001 0 003.304 6.968l-.713.713a10.97 10.97 0 01-1.091-1.181 10.97 10.97 0 010-13 10.968 10.968 0 011.091-1.181l.707.707zM10 4.5a5.502 5.502 0 00-5.131 3.51L3.697 6.837A7.482 7.482 0 0110 2.5c2.614 0 4.917 1.334 6.264 3.358l-.713.713A6.503 6.503 0 0010 4.5z"/>
+            </svg>
+            You're Offline - Emergency Features Still Work
+        </div>
+
+        <h1>
+            <svg width="32" height="32" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            Crisis Support
+        </h1>
+        
+        <p class="subtitle">
+            Help is available even offline. Your safety is our priority.
+        </p>
+
+        <!-- Emergency Contacts -->
+        <div class="crisis-card primary">
+            <h2>
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                </svg>
+                Emergency Hotlines
+            </h2>
+            <p>These numbers work even without internet connection</p>
+            <a href="tel:988" class="emergency-button">
+                📞 Call 988 - Crisis Lifeline
+            </a>
+            <a href="tel:911" class="emergency-button">
+                🚨 Call 911 - Emergency
+            </a>
+        </div>
+
+        <!-- Text Support -->
+        <div class="crisis-card">
+            <h2>
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                </svg>
+                Text Support
+            </h2>
+            <p>Send a text message for support</p>
+            <a href="sms:741741?body=HOME" class="emergency-button">
+                💬 Text HOME to 741741
+            </a>
+        </div>
+
+        <!-- Breathing Exercise -->
+        <div class="breathing-exercise">
+            <div class="breath-circle" id="breathCircle">Breathe</div>
+            <h3 style="color: #1e40af; margin-bottom: 10px;">4-7-8 Breathing</h3>
+            <p style="color: #3730a3; font-size: 14px;">
+                Follow the circle: Inhale for 4, Hold for 7, Exhale for 8
+            </p>
+        </div>
+
+        <!-- Coping Strategies -->
+        <div class="coping-strategies">
+            <h3>Quick Coping Strategies</h3>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">🧊</span>
+                <span>Hold ice cubes or splash cold water on your face</span>
+            </div>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">✍️</span>
+                <span>Write down your feelings in a journal</span>
+            </div>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">🎵</span>
+                <span>Listen to calming music or nature sounds</span>
+            </div>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">🚶</span>
+                <span>Take a short walk or do gentle stretches</span>
+            </div>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">🤗</span>
+                <span>Call a trusted friend or family member</span>
+            </div>
+            
+            <div class="strategy-item">
+                <span class="strategy-icon">🌿</span>
+                <span>Practice the 5-4-3-2-1 grounding technique</span>
+            </div>
+        </div>
+
+        <!-- Safety Reminder -->
+        <div class="safety-reminder">
+            <h4>⚠️ Remember Your Safety Plan</h4>
+            <ul>
+                <li>Remove any means of self-harm from your immediate area</li>
+                <li>Go to a safe space where you feel comfortable</li>
+                <li>Contact your support person or therapist</li>
+                <li>If in immediate danger, call 911</li>
+                <li>You are not alone - help is always available</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            <p>This page is cached for offline use</p>
+            <p>Last updated: <span id="lastUpdate"></span></p>
+            <p style="margin-top: 10px;">
+                <a href="/" style="color: #3b82f6; text-decoration: none;">← Return to App</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Set last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString();
+
+        // Breathing animation text updates
+        const breathCircle = document.getElementById('breathCircle');
+        const breathingSteps = [
+            { text: 'Inhale', duration: 4000 },
+            { text: 'Hold', duration: 7000 },
+            { text: 'Exhale', duration: 8000 },
+            { text: 'Rest', duration: 2000 }
+        ];
+        
+        let stepIndex = 0;
+        
+        function animateBreathing() {
+            const step = breathingSteps[stepIndex];
+            breathCircle.textContent = step.text;
+            
+            setTimeout(() => {
+                stepIndex = (stepIndex + 1) % breathingSteps.length;
+                animateBreathing();
+            }, step.duration);
+        }
+        
+        // Start breathing animation
+        animateBreathing();
+
+        // Add haptic feedback for mobile devices
+        document.querySelectorAll('.emergency-button, .crisis-card').forEach(element => {
+            element.addEventListener('click', () => {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+            });
+        });
+
+        // Register this page for offline use
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+                console.log('Offline crisis page ready');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -34,6 +34,7 @@ export default defineConfig({
   },
 
   projects: [
+    // Desktop browsers
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -47,6 +48,12 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
     {
+      name: 'edge',
+      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    },
+    
+    // Mobile devices
+    {
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] },
     },
@@ -55,16 +62,49 @@ export default defineConfig({
       use: { ...devices['iPhone 12'] },
     },
     {
+      name: 'mobile-safari-se',
+      use: { ...devices['iPhone SE'] },
+    },
+    {
+      name: 'samsung-galaxy',
+      use: { ...devices['Galaxy S9+'] },
+    },
+    
+    // Tablets
+    {
+      name: 'ipad',
+      use: { ...devices['iPad (gen 7)'] },
+    },
+    {
+      name: 'ipad-pro',
+      use: { ...devices['iPad Pro 11'] },
+    },
+    
+    // Accessibility testing
+    {
       name: 'accessibility',
       use: {
         ...devices['Desktop Chrome'],
         // Force high contrast mode for accessibility testing
         colorScheme: 'dark',
+        forcedColors: 'active',
         extraHTTPHeaders: {
           'prefers-reduced-motion': 'reduce',
         },
       },
     },
+    {
+      name: 'screen-reader',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Force screen reader mode
+        launchOptions: {
+          args: ['--force-renderer-accessibility'],
+        },
+      },
+    },
+    
+    // Crisis mode testing
     {
       name: 'crisis-response',
       use: {
@@ -73,6 +113,26 @@ export default defineConfig({
         offline: false,
         hasTouch: true,
         isMobile: false,
+      },
+      testMatch: /crisis.*\.spec\.ts$/,
+    },
+    {
+      name: 'crisis-slow-network',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Simulate slow 3G
+        offline: false,
+        launchOptions: {
+          args: ['--throttle-cpu=4'],
+        },
+      },
+      testMatch: /crisis.*\.spec\.ts$/,
+    },
+    {
+      name: 'crisis-offline',
+      use: {
+        ...devices['Desktop Chrome'],
+        offline: true,
       },
       testMatch: /crisis.*\.spec\.ts$/,
     },

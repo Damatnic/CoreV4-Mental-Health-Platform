@@ -1,0 +1,642 @@
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Target,
+  TrendingUp,
+  Award,
+  Activity,
+  Droplets,
+  Moon,
+  Users,
+  Heart,
+  Brain,
+  Zap,
+  Calendar,
+  ChevronRight,
+  Plus,
+  Edit2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Sparkles,
+  Flame
+} from 'lucide-react';
+import {
+  CircularProgressbar,
+  CircularProgressbarWithChildren,
+  buildStyles
+} from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import { useWellnessStore } from '../../../../stores/wellnessStore';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
+
+interface WellnessMetricsDashboardProps {
+  onSetGoal?: (category: string) => void;
+  onViewDetails?: (metric: string) => void;
+}
+
+interface MetricCard {
+  id: string;
+  category: 'physical' | 'mental' | 'emotional' | 'social' | 'spiritual';
+  title: string;
+  icon: React.ElementType;
+  value: number;
+  target: number;
+  unit: string;
+  color: string;
+  gradient: string;
+  trend: number; // percentage change
+  streak?: number;
+  lastUpdated?: Date;
+}
+
+export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
+  const { 
+    wellnessMetrics, 
+    wellnessGoals, 
+    moodEntries,
+    weeklyScore,
+    monthlyScore,
+    calculateWellnessScores 
+  } = useWellnessStore();
+  
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<string | null>(null);
+
+  // Calculate today's metrics
+  const todayMetrics = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const todayData = wellnessMetrics.find(m => {
+      const metricDate = new Date(m.date);
+      metricDate.setHours(0, 0, 0, 0);
+      return metricDate.getTime() === today.getTime();
+    });
+
+    const todayMoodEntries = moodEntries.filter(e => {
+      const entryDate = new Date(e.timestamp);
+      entryDate.setHours(0, 0, 0, 0);
+      return entryDate.getTime() === today.getTime();
+    });
+
+    // Calculate metrics with fallbacks
+    const metrics: MetricCard[] = [
+      {
+        id: 'sleep',
+        category: 'physical',
+        title: 'Sleep',
+        icon: Moon,
+        value: todayData?.sleepHours || todayMoodEntries[0]?.sleep || 0,
+        target: 8,
+        unit: 'hours',
+        color: '#6366f1',
+        gradient: 'from-indigo-400 to-indigo-600',
+        trend: calculateTrend('sleep', todayData?.sleepHours || 0),
+        streak: calculateStreak('sleep')
+      },
+      {
+        id: 'exercise',
+        category: 'physical',
+        title: 'Exercise',
+        icon: Activity,
+        value: todayData?.exerciseMinutes || 0,
+        target: 30,
+        unit: 'minutes',
+        color: '#10b981',
+        gradient: 'from-green-400 to-green-600',
+        trend: calculateTrend('exercise', todayData?.exerciseMinutes || 0),
+        streak: calculateStreak('exercise')
+      },
+      {
+        id: 'water',
+        category: 'physical',
+        title: 'Hydration',
+        icon: Droplets,
+        value: todayData?.waterIntake || 0,
+        target: 8,
+        unit: 'glasses',
+        color: '#3b82f6',
+        gradient: 'from-blue-400 to-blue-600',
+        trend: calculateTrend('water', todayData?.waterIntake || 0)
+      },
+      {
+        id: 'meditation',
+        category: 'mental',
+        title: 'Meditation',
+        icon: Brain,
+        value: todayData?.meditationMinutes || 0,
+        target: 15,
+        unit: 'minutes',
+        color: '#8b5cf6',
+        gradient: 'from-purple-400 to-purple-600',
+        trend: calculateTrend('meditation', todayData?.meditationMinutes || 0),
+        streak: calculateStreak('meditation')
+      },
+      {
+        id: 'social',
+        category: 'social',
+        title: 'Social Time',
+        icon: Users,
+        value: todayData?.socialInteractions || todayMoodEntries[0]?.socialInteraction || 0,
+        target: 3,
+        unit: 'interactions',
+        color: '#ec4899',
+        gradient: 'from-pink-400 to-pink-600',
+        trend: calculateTrend('social', todayData?.socialInteractions || 0)
+      },
+      {
+        id: 'outdoor',
+        category: 'physical',
+        title: 'Outdoor Time',
+        icon: Heart,
+        value: todayData?.outdoorTime || 0,
+        target: 60,
+        unit: 'minutes',
+        color: '#f59e0b',
+        gradient: 'from-amber-400 to-amber-600',
+        trend: calculateTrend('outdoor', todayData?.outdoorTime || 0)
+      },
+      {
+        id: 'journal',
+        category: 'emotional',
+        title: 'Journal Entries',
+        icon: Edit2,
+        value: todayData?.journalEntries || 0,
+        target: 1,
+        unit: 'entries',
+        color: '#14b8a6',
+        gradient: 'from-teal-400 to-teal-600',
+        trend: calculateTrend('journal', todayData?.journalEntries || 0),
+        streak: calculateStreak('journaling')
+      },
+      {
+        id: 'nutrition',
+        category: 'physical',
+        title: 'Nutrition Score',
+        icon: Zap,
+        value: todayData?.nutritionScore || 0,
+        target: 10,
+        unit: 'score',
+        color: '#84cc16',
+        gradient: 'from-lime-400 to-lime-600',
+        trend: calculateTrend('nutrition', todayData?.nutritionScore || 0)
+      }
+    ];
+
+    return metrics;
+  }, [wellnessMetrics, moodEntries]);
+
+  // Calculate trend for a metric
+  function calculateTrend(metricId: string, currentValue: number): number {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    
+    const yesterdayData = wellnessMetrics.find(m => {
+      const metricDate = new Date(m.date);
+      metricDate.setHours(0, 0, 0, 0);
+      return metricDate.getTime() === yesterday.getTime();
+    });
+
+    if (!yesterdayData) return 0;
+
+    const yesterdayValue = (yesterdayData as any)[metricId] || 0;
+    if (yesterdayValue === 0) return currentValue > 0 ? 100 : 0;
+    
+    return ((currentValue - yesterdayValue) / yesterdayValue) * 100;
+  }
+
+  // Calculate streak for a metric
+  function calculateStreak(type: string): number {
+    let streak = 0;
+    const today = new Date();
+    
+    for (let i = 0; i < 365; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      
+      const hasEntry = wellnessMetrics.some(m => {
+        const metricDate = new Date(m.date);
+        metricDate.setHours(0, 0, 0, 0);
+        
+        if (metricDate.getTime() !== date.getTime()) return false;
+        
+        switch (type) {
+          case 'sleep': return m.sleepHours >= 7;
+          case 'exercise': return m.exerciseMinutes >= 30;
+          case 'meditation': return m.meditationMinutes > 0;
+          case 'journaling': return m.journalEntries > 0;
+          default: return false;
+        }
+      });
+      
+      if (hasEntry) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      }
+    }
+    
+    return streak;
+  }
+
+  // Calculate wellness score
+  const wellnessScore = useMemo(() => {
+    const scores = todayMetrics.map(metric => {
+      const percentage = Math.min((metric.value / metric.target) * 100, 100);
+      return percentage;
+    });
+    
+    return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+  }, [todayMetrics]);
+
+  // Get active goals by category
+  const activeGoalsByCategory = useMemo(() => {
+    const goalMap = new Map<string, typeof wellnessGoals[0][]>();
+    
+    wellnessGoals
+      .filter(g => g.status === 'active')
+      .forEach(goal => {
+        const goals = goalMap.get(goal.category) || [];
+        goals.push(goal);
+        goalMap.set(goal.category, goals);
+      });
+    
+    return goalMap;
+  }, [wellnessGoals]);
+
+  // Get recommendations based on current metrics
+  const recommendations = useMemo(() => {
+    const recs = [];
+    
+    todayMetrics.forEach(metric => {
+      const percentage = (metric.value / metric.target) * 100;
+      
+      if (percentage < 50) {
+        recs.push({
+          metric: metric.title,
+          message: `Your ${metric.title.toLowerCase()} is below 50% of target. Consider focusing on this today.`,
+          priority: 'high' as const,
+          action: () => onSetGoal?.(metric.id)
+        });
+      } else if (percentage >= 100 && metric.streak && metric.streak >= 7) {
+        recs.push({
+          metric: metric.title,
+          message: `Great job! You're on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
+          priority: 'low' as const,
+          action: () => onViewDetails?.(metric.id)
+        });
+      }
+    });
+    
+    // Add score-based recommendation
+    if (wellnessScore < 40) {
+      recs.unshift({
+        metric: 'Overall',
+        message: 'Your wellness score is low. Consider taking a break and focusing on self-care.',
+        priority: 'critical' as const,
+        action: () => {}
+      });
+    } else if (wellnessScore > 80) {
+      recs.unshift({
+        metric: 'Overall',
+        message: 'Excellent wellness score! Keep up the great work!',
+        priority: 'low' as const,
+        action: () => {}
+      });
+    }
+    
+    return recs.slice(0, 3);
+  }, [todayMetrics, wellnessScore, onSetGoal, onViewDetails]);
+
+  // Render metric card
+  const renderMetricCard = (metric: MetricCard) => {
+    const percentage = Math.min((metric.value / metric.target) * 100, 100);
+    const Icon = metric.icon;
+    
+    return (
+      <motion.div
+        key={metric.id}
+        layout
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.02 }}
+        className={`relative bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer ${
+          selectedCategory && metric.category !== selectedCategory ? 'opacity-50' : ''
+        }`}
+        onClick={() => onViewDetails?.(metric.id)}
+      >
+        {/* Streak badge */}
+        {metric.streak && metric.streak >= 3 && (
+          <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+            <Flame className="h-3 w-3 mr-1" />
+            {metric.streak}
+          </div>
+        )}
+        
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-lg bg-gradient-to-br ${metric.gradient} bg-opacity-10`}>
+              <Icon className="h-5 w-5" style={{ color: metric.color }} />
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-800">{metric.title}</h4>
+              <p className="text-xs text-gray-500">
+                {metric.value} / {metric.target} {metric.unit}
+              </p>
+            </div>
+          </div>
+          
+          {/* Trend indicator */}
+          {metric.trend !== 0 && (
+            <div className={`flex items-center text-xs ${
+              metric.trend > 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
+              <TrendingUp className={`h-3 w-3 mr-1 ${metric.trend < 0 ? 'rotate-180' : ''}`} />
+              {Math.abs(metric.trend).toFixed(0)}%
+            </div>
+          )}
+        </div>
+        
+        {/* Progress bar */}
+        <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+          <motion.div
+            className={`absolute top-0 left-0 h-full bg-gradient-to-r ${metric.gradient}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          />
+        </div>
+        
+        {/* Percentage */}
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-gray-500">{percentage.toFixed(0)}% complete</span>
+          {percentage >= 100 && (
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header with wellness score */}
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-2xl font-bold mb-1">Today's Wellness Score</h3>
+            <p className="text-purple-100">Track your daily wellness metrics</p>
+          </div>
+          
+          <div className="relative">
+            <div className="w-24 h-24">
+              <CircularProgressbarWithChildren
+                value={wellnessScore}
+                styles={buildStyles({
+                  pathColor: '#ffffff',
+                  trailColor: 'rgba(255, 255, 255, 0.3)',
+                  strokeLinecap: 'round'
+                })}
+              >
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{wellnessScore}%</div>
+                  <div className="text-xs opacity-90">Overall</div>
+                </div>
+              </CircularProgressbarWithChildren>
+            </div>
+          </div>
+        </div>
+        
+        {/* Quick stats */}
+        <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="text-center">
+            <p className="text-3xl font-bold">{weeklyScore || 0}</p>
+            <p className="text-xs text-purple-100">Weekly Avg</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold">{monthlyScore || 0}</p>
+            <p className="text-xs text-purple-100">Monthly Avg</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold">
+              {todayMetrics.filter(m => (m.value / m.target) >= 1).length}
+            </p>
+            <p className="text-xs text-purple-100">Goals Met</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Category filter */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              !selectedCategory 
+                ? 'bg-purple-100 text-purple-700' 
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            All
+          </button>
+          {['physical', 'mental', 'emotional', 'social', 'spiritual'].map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                selectedCategory === category 
+                  ? 'bg-purple-100 text-purple-700' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
+        </div>
+        
+        <button
+          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`}
+        >
+          {viewMode === 'grid' ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* Metrics grid/list */}
+      <div className={
+        viewMode === 'grid' 
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+          : 'space-y-3'
+      }>
+        <AnimatePresence mode="popLayout">
+          {todayMetrics
+            .filter(m => !selectedCategory || m.category === selectedCategory)
+            .map(metric => renderMetricCard(metric))}
+        </AnimatePresence>
+      </div>
+
+      {/* Active goals section */}
+      {activeGoalsByCategory.size > 0 && (
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-semibold text-gray-800 flex items-center">
+              <Target className="h-5 w-5 mr-2 text-purple-600" />
+              Active Goals
+            </h4>
+            <button
+              onClick={() => setShowGoalModal(true)}
+              className="text-sm text-purple-600 hover:text-purple-700 flex items-center"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Goal
+            </button>
+          </div>
+          
+          <div className="space-y-2">
+            {Array.from(activeGoalsByCategory.entries()).map(([category, goals]) => (
+              <div key={category} className="space-y-1">
+                <p className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  {category}
+                </p>
+                {goals.map(goal => (
+                  <div
+                    key={goal.id}
+                    className="flex items-center justify-between p-2 bg-white rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-800">{goal.title}</p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-400 to-purple-600"
+                            style={{ width: `${goal.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500">{goal.progress}%</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setEditingGoal(goal.id)}
+                      className="p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-semibold text-gray-800 flex items-center">
+            <Sparkles className="h-5 w-5 mr-2 text-yellow-500" />
+            Personalized Recommendations
+          </h4>
+          {recommendations.map((rec, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className={`p-3 rounded-lg flex items-start space-x-3 cursor-pointer hover:shadow-sm transition-all ${
+                rec.priority === 'critical' 
+                  ? 'bg-red-50 border border-red-200'
+                  : rec.priority === 'high'
+                  ? 'bg-orange-50 border border-orange-200'
+                  : 'bg-green-50 border border-green-200'
+              }`}
+              onClick={rec.action}
+            >
+              {rec.priority === 'critical' ? (
+                <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+              ) : rec.priority === 'high' ? (
+                <AlertTriangle className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+              ) : (
+                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-800">{rec.metric}</p>
+                <p className="text-xs text-gray-600 mt-0.5">{rec.message}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-gray-400" />
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Weekly overview calendar */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200">
+        <h4 className="font-semibold text-gray-800 mb-3">Week at a Glance</h4>
+        <div className="grid grid-cols-7 gap-2">
+          {eachDayOfInterval({
+            start: startOfWeek(new Date()),
+            end: endOfWeek(new Date())
+          }).map(day => {
+            const dayMetrics = wellnessMetrics.find(m => {
+              const metricDate = new Date(m.date);
+              metricDate.setHours(0, 0, 0, 0);
+              day.setHours(0, 0, 0, 0);
+              return metricDate.getTime() === day.getTime();
+            });
+            
+            const dayScore = dayMetrics
+              ? Math.round(
+                  ((dayMetrics.sleepHours / 8) * 100 +
+                   (dayMetrics.exerciseMinutes / 30) * 100 +
+                   (dayMetrics.meditationMinutes / 15) * 100) / 3
+                )
+              : 0;
+            
+            const isCurrentDay = isToday(day);
+            
+            return (
+              <div
+                key={day.toISOString()}
+                className={`text-center p-2 rounded-lg ${
+                  isCurrentDay 
+                    ? 'bg-purple-100 border-2 border-purple-500' 
+                    : 'bg-gray-50'
+                }`}
+              >
+                <p className="text-xs font-medium text-gray-600">
+                  {format(day, 'EEE')}
+                </p>
+                <p className="text-lg font-bold text-gray-800">
+                  {format(day, 'd')}
+                </p>
+                {dayScore > 0 && (
+                  <div className={`mt-1 text-xs font-medium ${
+                    dayScore >= 80 ? 'text-green-600' :
+                    dayScore >= 60 ? 'text-blue-600' :
+                    dayScore >= 40 ? 'text-yellow-600' :
+                    'text-red-600'
+                  }`}>
+                    {dayScore}%
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

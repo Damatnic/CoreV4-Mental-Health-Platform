@@ -1,0 +1,438 @@
+name: Comprehensive Quality Assurance Suite
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  schedule:
+    # Run full test suite daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - crisis
+          - accessibility
+          - performance
+          - security
+          - e2e
+
+env:
+  NODE_VERSION: '22.17.0'
+  CRISIS_RESPONSE_THRESHOLD: 200  # milliseconds
+
+jobs:
+  # Job 1: Code Quality & Linting
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: TypeScript compilation
+        run: npm run typecheck
+        
+      - name: ESLint
+        run: npm run lint
+        
+      - name: Prettier check
+        run: npm run format -- --check
+
+  # Job 2: Crisis Intervention Testing (CRITICAL)
+  crisis-tests:
+    name: Crisis Intervention Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run crisis intervention tests
+        run: npm run test:crisis
+        
+      - name: Validate crisis response time
+        run: |
+          echo "Checking crisis response times..."
+          node -e "
+            const results = require('./test-results/crisis-performance.json');
+            const threshold = ${{ env.CRISIS_RESPONSE_THRESHOLD }};
+            if (results.maxResponseTime > threshold) {
+              console.error('CRITICAL: Crisis response time ' + results.maxResponseTime + 'ms exceeds ' + threshold + 'ms threshold!');
+              process.exit(1);
+            }
+            console.log('Crisis response time validated: ' + results.maxResponseTime + 'ms');
+          "
+        
+      - name: Upload crisis test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crisis-test-results
+          path: test-results/crisis-*.json
+
+  # Job 3: Accessibility Testing (WCAG 2.1 AA)
+  accessibility-tests:
+    name: Accessibility Compliance Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run accessibility tests
+        run: npm run test:accessibility
+        
+      - name: Validate WCAG compliance
+        run: |
+          echo "Validating WCAG 2.1 AA compliance..."
+          npm run test:accessibility -- --reporter=json --outputFile=test-results/wcag-results.json
+          
+      - name: Generate accessibility report
+        run: |
+          node -e "
+            const results = require('./test-results/wcag-results.json');
+            if (results.violations && results.violations.length > 0) {
+              console.error('WCAG violations found:', results.violations);
+              process.exit(1);
+            }
+            console.log('WCAG 2.1 AA compliance validated');
+          "
+        
+      - name: Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-results
+          path: test-results/wcag-*.json
+
+  # Job 4: Cross-Platform E2E Testing
+  e2e-tests:
+    name: E2E Tests - ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    needs: code-quality
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari, crisis-response]
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
+      - name: Run E2E tests - ${{ matrix.project }}
+        run: npx playwright test --project=${{ matrix.project }}
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ matrix.project }}
+          path: test-results/
+
+  # Job 5: Performance Testing
+  performance-tests:
+    name: Performance & Load Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run performance tests
+        run: npm run test:performance
+        
+      - name: Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --collect.url=http://localhost:5173 \
+            --assert.preset=lighthouse:recommended \
+            --assert.assertions.categories:performance=90 \
+            --assert.assertions.categories:accessibility=100 \
+            --assert.assertions.categories:best-practices=90 \
+            --assert.assertions.categories:seo=90
+        
+      - name: Bundle size check
+        run: |
+          echo "Checking bundle sizes..."
+          npm run analyze -- --json > bundle-stats.json
+          node -e "
+            const stats = require('./bundle-stats.json');
+            const MAX_MAIN_SIZE = 200 * 1024; // 200KB
+            const MAX_VENDOR_SIZE = 500 * 1024; // 500KB
+            
+            const mainSize = stats.assets.find(a => a.name.includes('main')).size;
+            const vendorSize = stats.assets.find(a => a.name.includes('vendor')).size;
+            
+            if (mainSize > MAX_MAIN_SIZE) {
+              console.error('Main bundle too large:', mainSize);
+              process.exit(1);
+            }
+            if (vendorSize > MAX_VENDOR_SIZE) {
+              console.error('Vendor bundle too large:', vendorSize);
+              process.exit(1);
+            }
+            console.log('Bundle sizes OK');
+          "
+        
+      - name: Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: |
+            test-results/performance-*.json
+            lighthouse-results/
+
+  # Job 6: Security Testing
+  security-tests:
+    name: Security & Privacy Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+        
+      - name: Run security tests
+        run: npm run test:security
+        
+      - name: OWASP dependency check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'CoreV4-Mental-Health'
+          path: '.'
+          format: 'JSON'
+          
+      - name: Upload security results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-results
+          path: |
+            test-results/security-*.json
+            dependency-check-report.json
+
+  # Job 7: Unit & Integration Tests with Coverage
+  unit-integration-tests:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+        
+      - name: Check coverage thresholds
+        run: |
+          echo "Checking coverage thresholds..."
+          node -e "
+            const coverage = require('./coverage/coverage-summary.json');
+            const global = coverage.total;
+            
+            const thresholds = {
+              statements: 85,
+              branches: 85,
+              functions: 85,
+              lines: 85
+            };
+            
+            let failed = false;
+            Object.keys(thresholds).forEach(key => {
+              if (global[key].pct < thresholds[key]) {
+                console.error(key + ' coverage ' + global[key].pct + '% is below threshold ' + thresholds[key] + '%');
+                failed = true;
+              }
+            });
+            
+            if (failed) process.exit(1);
+            console.log('Coverage thresholds met');
+          "
+        
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+        
+      - name: Upload coverage results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: coverage/
+
+  # Job 8: Generate Comprehensive Report
+  generate-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [crisis-tests, accessibility-tests, e2e-tests, performance-tests, security-tests, unit-integration-tests]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-artifacts/
+          
+      - name: Generate comprehensive report
+        run: |
+          npm ci
+          node src/test/scripts/generate-report.js test-artifacts/
+          
+      - name: Upload final report
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-test-report
+          path: test-results/report.html
+          
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('test-results/report.json', 'utf8'));
+            
+            const comment = `## 🧪 Test Results
+            
+            **Overall Status:** ${report.passed === report.totalSuites ? '✅ All tests passed' : '⚠️ Some tests failed'}
+            
+            ### Summary
+            - **Total Suites:** ${report.totalSuites}
+            - **Passed:** ${report.passed}
+            - **Failed:** ${report.failed}
+            - **Duration:** ${(report.totalDuration / 1000).toFixed(2)}s
+            
+            ### Critical Tests
+            - **Crisis Response:** ${report.results.find(r => r.suite === 'crisis').passed ? '✅' : '❌'}
+            - **Accessibility:** ${report.results.find(r => r.suite === 'accessibility').passed ? '✅' : '❌'}
+            - **Performance:** ${report.results.find(r => r.suite === 'performance').passed ? '✅' : '❌'}
+            
+            ${report.criticalFailures.length > 0 ? '### ⚠️ Critical Failures\n' + report.criticalFailures.map(f => '- ' + f.suite).join('\n') : ''}
+            
+            [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Job 9: Deploy to Staging (if all tests pass)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [generate-report]
+    if: success() && github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.corev4-mental-health.app
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build for staging
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_ENVIRONMENT: staging
+          
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment..."
+          # Add your deployment script here
+          
+      - name: Run smoke tests on staging
+        run: |
+          npm run test:e2e -- --project=chromium --grep="@smoke"
+        env:
+          PLAYWRIGHT_BASE_URL: https://staging.corev4-mental-health.app

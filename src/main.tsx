@@ -14,6 +14,32 @@ if (import.meta.env.PROD) {
   });
 }
 
+// Register Service Worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('[Service Worker] Registered successfully:', registration.scope);
+        
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('[Service Worker] Update available');
+                // In a real app, you might show a notification to the user
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('[Service Worker] Registration failed:', error);
+      });
+  });
+}
+
 // Initialize React 19 with concurrent features
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');

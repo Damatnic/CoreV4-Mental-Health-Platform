@@ -1,0 +1,199 @@
+{
+  "strategies": [
+    {
+      "id": "grounding-5-4-3-2-1",
+      "category": "grounding",
+      "name": "5-4-3-2-1 Technique",
+      "description": "Use your senses to ground yourself in the present moment",
+      "steps": [
+        "Name 5 things you can see",
+        "Name 4 things you can touch",
+        "Name 3 things you can hear",
+        "Name 2 things you can smell",
+        "Name 1 thing you can taste"
+      ],
+      "duration": "5-10 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "box-breathing",
+      "category": "breathing",
+      "name": "Box Breathing",
+      "description": "A simple breathing technique to reduce anxiety",
+      "steps": [
+        "Inhale for 4 counts",
+        "Hold for 4 counts",
+        "Exhale for 4 counts",
+        "Hold for 4 counts",
+        "Repeat 4-8 times"
+      ],
+      "duration": "3-5 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "478-breathing",
+      "category": "breathing",
+      "name": "4-7-8 Breathing",
+      "description": "Calming breath pattern for anxiety and sleep",
+      "steps": [
+        "Exhale completely",
+        "Inhale through nose for 4 counts",
+        "Hold breath for 7 counts",
+        "Exhale through mouth for 8 counts",
+        "Repeat 3-4 times"
+      ],
+      "duration": "3-5 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "progressive-muscle",
+      "category": "physical",
+      "name": "Progressive Muscle Relaxation",
+      "description": "Systematically tense and relax muscle groups",
+      "steps": [
+        "Start with your toes, tense for 5 seconds",
+        "Release and notice the relaxation",
+        "Move up to calves, thighs, abdomen",
+        "Continue through arms, shoulders, neck",
+        "End with facial muscles"
+      ],
+      "duration": "10-15 minutes",
+      "difficulty": "moderate",
+      "offlineAvailable": true
+    },
+    {
+      "id": "cold-water",
+      "category": "sensory",
+      "name": "Cold Water Technique",
+      "description": "Use cold sensations to interrupt distress",
+      "steps": [
+        "Splash cold water on your face",
+        "Or hold ice cubes in your hands",
+        "Or take a cold shower",
+        "Focus on the sensation",
+        "Breathe slowly and deeply"
+      ],
+      "duration": "1-3 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "safe-place",
+      "category": "visualization",
+      "name": "Safe Place Visualization",
+      "description": "Imagine a place where you feel completely safe",
+      "steps": [
+        "Close your eyes and breathe deeply",
+        "Picture a place where you feel safe",
+        "Notice the details - colors, sounds, smells",
+        "Imagine yourself there, feeling peaceful",
+        "Stay as long as you need"
+      ],
+      "duration": "5-10 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "tipp",
+      "category": "crisis",
+      "name": "TIPP Technique",
+      "description": "Fast-acting technique for extreme distress",
+      "steps": [
+        "Temperature: Use cold water on face",
+        "Intense exercise: Do jumping jacks for 1 minute",
+        "Paced breathing: Exhale longer than inhale",
+        "Paired muscle relaxation: Tense and release"
+      ],
+      "duration": "5-10 minutes",
+      "difficulty": "moderate",
+      "offlineAvailable": true
+    },
+    {
+      "id": "journaling",
+      "category": "cognitive",
+      "name": "Stream of Consciousness Writing",
+      "description": "Write without stopping to release thoughts",
+      "steps": [
+        "Get paper and pen or open notes app",
+        "Set a timer for 10 minutes",
+        "Write continuously without stopping",
+        "Don't worry about grammar or making sense",
+        "Tear up or delete after if desired"
+      ],
+      "duration": "10-15 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    },
+    {
+      "id": "opposite-action",
+      "category": "behavioral",
+      "name": "Opposite Action",
+      "description": "Act opposite to your emotional urge",
+      "steps": [
+        "Identify your current emotion",
+        "Identify the action urge",
+        "Do the opposite action",
+        "If sad and want to isolate - reach out",
+        "If angry and want to yell - speak softly"
+      ],
+      "duration": "Varies",
+      "difficulty": "moderate",
+      "offlineAvailable": true
+    },
+    {
+      "id": "self-soothe",
+      "category": "sensory",
+      "name": "Self-Soothing with Senses",
+      "description": "Use your five senses to calm yourself",
+      "steps": [
+        "Vision: Look at photos that make you happy",
+        "Hearing: Listen to calming music",
+        "Smell: Use essential oils or candles",
+        "Taste: Drink herbal tea or eat comfort food",
+        "Touch: Wrap in a soft blanket or take a warm bath"
+      ],
+      "duration": "10-20 minutes",
+      "difficulty": "easy",
+      "offlineAvailable": true
+    }
+  ],
+  "categories": {
+    "grounding": {
+      "name": "Grounding Techniques",
+      "description": "Bring yourself back to the present moment"
+    },
+    "breathing": {
+      "name": "Breathing Exercises",
+      "description": "Use breath to calm your nervous system"
+    },
+    "physical": {
+      "name": "Physical Techniques",
+      "description": "Use your body to release tension"
+    },
+    "sensory": {
+      "name": "Sensory Techniques",
+      "description": "Engage your senses for calming"
+    },
+    "visualization": {
+      "name": "Visualization",
+      "description": "Use imagination for peace"
+    },
+    "crisis": {
+      "name": "Crisis Techniques",
+      "description": "For intense distress moments"
+    },
+    "cognitive": {
+      "name": "Cognitive Techniques",
+      "description": "Work with thoughts and beliefs"
+    },
+    "behavioral": {
+      "name": "Behavioral Techniques",
+      "description": "Change actions to change feelings"
+    }
+  },
+  "lastUpdated": "2025-01-01T00:00:00Z",
+  "offlineCapable": true
+}
