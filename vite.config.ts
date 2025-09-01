@@ -132,30 +132,50 @@ export default defineConfig(({ command, mode }) => {
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        drop_console: false, // Keep console for debugging
+        drop_debugger: false,
+        pure_funcs: [],
         global_defs: {
-          __DEV__: false, // Explicitly define dev as false in production
+          __DEV__: false,
         },
-        passes: 1, // Reduce passes to prevent over-optimization
-        inline: false, // Prevent aggressive inlining that can cause lexical errors
-        reduce_vars: false, // Prevent variable reduction issues
-        hoist_vars: false, // Prevent variable hoisting issues
-        join_vars: false, // Prevent variable joining that can cause temporal dead zones
-        collapse_vars: false // Prevent variable collapsing issues
+        passes: 1,
+        inline: false, // CRITICAL: Prevent inlining
+        reduce_vars: false, // CRITICAL: Prevent variable reduction
+        hoist_vars: false, // CRITICAL: Prevent hoisting
+        join_vars: false, // CRITICAL: Prevent variable joining
+        collapse_vars: false, // CRITICAL: Prevent collapsing
+        sequences: false, // CRITICAL: Prevent sequence optimization
+        dead_code: false, // CRITICAL: Prevent dead code removal that causes issues
+        evaluate: false, // CRITICAL: Prevent constant evaluation
+        loops: false, // CRITICAL: Prevent loop optimization
+        unused: false, // CRITICAL: Prevent unused variable removal
+        toplevel: false, // CRITICAL: Prevent top-level optimization
+        keep_infinity: true,
+        keep_fargs: true
       },
       mangle: {
         safari10: true,
-        reserved: ['d', 'E', 'Error', 'Event', 'Element', 'Export'], // Prevent mangling of problematic variables
-        keep_fnames: true, // Keep function names for debugging
-        toplevel: false // Prevent top-level mangling issues
+        // Reserve ALL single letters and common variables
+        reserved: [
+          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
+          'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+          'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+          'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+          'Error', 'Event', 'Element', 'Export', 'React', 'ReactDOM'
+        ],
+        keep_fnames: true,
+        keep_classnames: true,
+        toplevel: false,
+        eval: false
       },
       format: {
-        comments: false
+        comments: false,
+        beautify: false,
+        preserve_line: false
       },
-      keep_fnames: true, // Preserve function names
-      keep_classnames: true // Preserve class names
+      keep_fnames: true,
+      keep_classnames: true,
+      safari10: true
     },
     rollupOptions: {
       external: (id) => {
