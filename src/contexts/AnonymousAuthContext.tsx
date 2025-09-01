@@ -34,6 +34,7 @@ interface AnonymousAuthContextType {
   updateNickname: (nickname: string) => void;
   updatePreferences: (preferences: Partial<AnonymousUser['preferences']>) => void;
   clearLocalData: () => void;
+  logout: () => void; // Alias for clearLocalData for compatibility
   
   // Session info
   sessionDuration: number; // Minutes since session started
@@ -49,6 +50,9 @@ export function useAnonymousAuth() {
   }
   return context;
 }
+
+// Compatibility export for components expecting useAuth
+export const useAuth = useAnonymousAuth;
 
 // Generate a random session ID (never sent to server)
 function generateSessionId(): string {
@@ -141,6 +145,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     updateNickname,
     updatePreferences,
     clearLocalData,
+    logout: clearLocalData, // Alias for compatibility
     sessionDuration,
     extendSession,
   };

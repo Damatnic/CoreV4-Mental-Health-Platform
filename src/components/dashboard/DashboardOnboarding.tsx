@@ -7,7 +7,7 @@ import {
   HelpCircle, Award, TrendingUp
 } from 'lucide-react';
 import { useAnalytics } from '../../hooks/useAnalytics';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 
 interface OnboardingStep {
   id: string;

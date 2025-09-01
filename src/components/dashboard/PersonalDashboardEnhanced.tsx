@@ -19,7 +19,7 @@ import {
   MeditationMindfulness
 } from './widgets/wellness';
 import { useWellnessStore } from '../../stores/wellnessStore';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 import { useDashboardData } from '../../hooks/useDashboardData';
 
 /**

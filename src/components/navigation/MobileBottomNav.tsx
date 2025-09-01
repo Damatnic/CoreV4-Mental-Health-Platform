@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 import { useMobileFeatures, useTouchGestures } from '../../hooks/useMobileFeatures';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 
 interface NavItem {
   id: string;

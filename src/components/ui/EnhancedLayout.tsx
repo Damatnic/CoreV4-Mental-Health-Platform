@@ -12,7 +12,7 @@ import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
 import { FloatingCrisisButton, MobileCrisisButton } from '../navigation/FloatingCrisisButton';
 import { MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
 import toast from 'react-hot-toast';
 

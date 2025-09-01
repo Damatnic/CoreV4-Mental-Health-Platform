@@ -24,7 +24,7 @@ import {
   DashboardWidget as WidgetType,
   DashboardNotification 
 } from '../../types/dashboard';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useKeyboardNavigation, useScreenReaderAnnouncement } from '../../hooks/useKeyboardNavigation';
 import { useNavigatorOnLine } from '../../hooks/useNavigatorOnLine';

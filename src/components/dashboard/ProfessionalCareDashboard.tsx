@@ -12,7 +12,7 @@ import { MedicationManagement } from './widgets/MedicationManagement';
 import { TreatmentPlanProgress } from './widgets/TreatmentPlanProgress';
 import { ProviderCommunication } from './widgets/ProviderCommunication';
 import { HealthRecordsIntegration } from './widgets/HealthRecordsIntegration';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 
 export function ProfessionalCareDashboard() {
   const { user } = useAuth();

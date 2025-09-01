@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AnonymousAuthContext';
 import { useDashboardData, useWidgetData } from '../../hooks/useDashboardData';
 import { useDataIntegration, IntegrationEvent } from '../../services/integration/DataIntegrationService';
 import { useRealtimeSync, RealtimeEvent } from '../../services/integration/RealtimeSyncService';
