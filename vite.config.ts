@@ -138,14 +138,24 @@ export default defineConfig(({ command, mode }) => {
         global_defs: {
           __DEV__: false, // Explicitly define dev as false in production
         },
-        passes: 2
+        passes: 1, // Reduce passes to prevent over-optimization
+        inline: false, // Prevent aggressive inlining that can cause lexical errors
+        reduce_vars: false, // Prevent variable reduction issues
+        hoist_vars: false, // Prevent variable hoisting issues
+        join_vars: false, // Prevent variable joining that can cause temporal dead zones
+        collapse_vars: false // Prevent variable collapsing issues
       },
       mangle: {
-        safari10: true
+        safari10: true,
+        reserved: ['d'], // Prevent mangling of common problematic variables
+        keep_fnames: true, // Keep function names for debugging
+        toplevel: false // Prevent top-level mangling issues
       },
       format: {
         comments: false
-      }
+      },
+      keep_fnames: true, // Preserve function names
+      keep_classnames: true // Preserve class names
     },
     rollupOptions: {
       external: (id) => {
@@ -209,7 +219,7 @@ export default defineConfig(({ command, mode }) => {
     },
     reportCompressedSize: true,
     chunkSizeWarningLimit: 500,
-    sourcemap: false, // Disable in production for better performance
+    sourcemap: true, // Enable source maps for debugging lexical declaration errors
     cssCodeSplit: true,
     assetsInlineLimit: 4096, // Inline assets smaller than 4kb
   },

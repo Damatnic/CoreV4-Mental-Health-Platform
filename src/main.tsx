@@ -2,6 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/index.css';
+import { EmergencyErrorBoundary, setupGlobalErrorHandling } from './components/ErrorBoundary';
+import { setupRuntimeGuards } from './utils/runtimeGuards';
+
+// Initialize global error handling and runtime guards immediately
+setupGlobalErrorHandling();
+setupRuntimeGuards();
 
 // Performance monitoring (quiet in production)
 if (import.meta.env.PROD) {
@@ -168,6 +174,8 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <App />
+    <EmergencyErrorBoundary>
+      <App />
+    </EmergencyErrorBoundary>
   </React.StrictMode>
 );
