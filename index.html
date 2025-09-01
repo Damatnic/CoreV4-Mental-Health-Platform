@@ -54,7 +54,18 @@
   <body>
     <!-- COMPREHENSIVE LEXICAL FIX - Handles ALL temporal dead zone errors -->
     <script src="/comprehensive-lexical-fix.js"></script>
-    <div id="root"></div>
+    <!-- REACT DIAGNOSTIC - Check why UI isn't loading -->
+    <script src="/react-diagnostic.js"></script>
+    <div id="root">
+      <!-- Fallback content while React loads -->
+      <div style="padding: 20px; text-align: center; font-family: system-ui;">
+        <h2>🔧 Loading Mental Health Platform...</h2>
+        <p>If this message persists, there may be a React initialization issue.</p>
+        <button onclick="window.location.reload()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Reload Page
+        </button>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     
     <!-- Service Worker Registration -->
