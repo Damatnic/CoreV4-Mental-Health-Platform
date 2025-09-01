@@ -75,13 +75,19 @@ class CryptographyService {
       const aad = additionalData ? encoder.encode(additionalData) : undefined;
       
       // Encrypt the data
+      const encryptParams: any = {
+        name: this.ALGORITHM,
+        iv: iv,
+        tagLength: this.TAG_LENGTH * 8,
+      };
+      
+      // Only add additionalData if it exists
+      if (aad) {
+        encryptParams.additionalData = aad;
+      }
+      
       const encryptedData = await crypto.subtle.encrypt(
-        {
-          name: this.ALGORITHM,
-          iv: iv,
-          additionalData: aad,
-          tagLength: this.TAG_LENGTH * 8,
-        },
+        encryptParams,
         this.masterKey!,
         encodedData
       );
@@ -121,13 +127,19 @@ class CryptographyService {
       const aad = additionalData ? encoder.encode(additionalData) : undefined;
       
       // Decrypt the data
+      const decryptParams: any = {
+        name: this.ALGORITHM,
+        iv: iv,
+        tagLength: this.TAG_LENGTH * 8,
+      };
+      
+      // Only add additionalData if it exists
+      if (aad) {
+        decryptParams.additionalData = aad;
+      }
+      
       const decryptedData = await crypto.subtle.decrypt(
-        {
-          name: this.ALGORITHM,
-          iv: iv,
-          additionalData: aad,
-          tagLength: this.TAG_LENGTH * 8,
-        },
+        decryptParams,
         this.masterKey!,
         ciphertext
       );
