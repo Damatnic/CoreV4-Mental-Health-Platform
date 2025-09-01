@@ -308,4 +308,5 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
   );
 };
 
-export default CrisisButton;
+// Export memoized component for critical performance
+export default React.memo(CrisisButton);
