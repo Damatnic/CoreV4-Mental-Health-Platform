@@ -147,7 +147,7 @@ export default defineConfig(({ command, mode }) => {
       },
       mangle: {
         safari10: true,
-        reserved: ['d'], // Prevent mangling of common problematic variables
+        reserved: ['d', 'E', 'Error', 'Event', 'Element', 'Export'], // Prevent mangling of problematic variables
         keep_fnames: true, // Keep function names for debugging
         toplevel: false // Prevent top-level mangling issues
       },
