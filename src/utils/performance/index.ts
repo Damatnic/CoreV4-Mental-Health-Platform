@@ -99,12 +99,7 @@ export function initializePerformanceOptimizations() {
   // Set up performance budget monitoring
   setupPerformanceBudget();
   
-  // Initialize service worker for offline support
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('Service Worker registration failed:', error);
-    });
-  }
+  // Service worker registration is handled in main.tsx to avoid conflicts
 }
 
 /**

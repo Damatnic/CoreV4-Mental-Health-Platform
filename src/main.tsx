@@ -54,7 +54,7 @@ if ('serviceWorker' in navigator) {
   let lastUpdateCheck = 0;
 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
+    navigator.serviceWorker.register('/sw-enhanced.js')
       .then((registration) => {
         console.log('[Service Worker] Registered successfully:', registration.scope);
         

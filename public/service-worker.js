@@ -80,64 +80,78 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip requests for Vite assets and ES modules during development
+  if (url.pathname.includes('/@vite/') || 
+      url.pathname.includes('/@fs/') ||
+      url.pathname.includes('/node_modules/') ||
+      url.searchParams.has('import') ||
+      request.destination === 'script' && url.pathname.includes('/assets/js/')) {
+    // Let these pass through to network without interception
+    return;
+  }
+
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleApiRequest(request));
     return;
   }
 
-  // Handle static assets
-  event.respondWith(
-    caches.match(request)
-      .then((response) => {
-        if (response) {
-          // Return cached version
-          return response;
-        }
-
-        // Fetch from network
-        return fetch(request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Additional safety check - only cache http/https requests
-            const requestUrl = new URL(request.url);
-            if (!['http:', 'https:'].includes(requestUrl.protocol)) {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            // Add to dynamic cache
-            caches.open(DYNAMIC_CACHE)
-              .then((cache) => {
-                cache.put(request, responseToCache).catch((error) => {
-                  console.warn('[Service Worker] Failed to cache request:', request.url, error);
-                });
-              });
-
+  // Only intercept navigation requests and critical assets for offline support
+  if (request.destination === 'document' || 
+      url.pathname === '/' ||
+      url.pathname === '/offline.html' ||
+      url.pathname === '/manifest.json' ||
+      request.destination === 'image') {
+    
+    event.respondWith(
+      caches.match(request)
+        .then((response) => {
+          if (response) {
+            // Return cached version
             return response;
-          })
-          .catch(() => {
-            // Return offline page for navigation requests
-            if (request.destination === 'document') {
-              return caches.match(OFFLINE_URL);
-            }
-            
-            // Return placeholder for images
-            if (request.destination === 'image') {
-              return new Response(
-                '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="300" fill="#f0f0f0"/><text x="50%" y="50%" text-anchor="middle" fill="#999">Offline</text></svg>',
-                { headers: { 'Content-Type': 'image/svg+xml' } }
-              );
-            }
-          });
-      })
-  );
+          }
+
+          // Fetch from network
+          return fetch(request)
+            .then((response) => {
+              // Don't cache non-successful responses
+              if (!response || response.status !== 200) {
+                return response;
+              }
+
+              // Clone the response
+              const responseToCache = response.clone();
+
+              // Add to dynamic cache
+              caches.open(DYNAMIC_CACHE)
+                .then((cache) => {
+                  cache.put(request, responseToCache).catch((error) => {
+                    console.warn('[Service Worker] Failed to cache request:', request.url, error);
+                  });
+                });
+
+              return response;
+            })
+            .catch(() => {
+              // Return offline page for navigation requests
+              if (request.destination === 'document') {
+                return caches.match(OFFLINE_URL);
+              }
+              
+              // Return placeholder for images
+              if (request.destination === 'image') {
+                return new Response(
+                  '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="300" fill="#f0f0f0"/><text x="50%" y="50%" text-anchor="middle" fill="#999">Offline</text></svg>',
+                  { headers: { 'Content-Type': 'image/svg+xml' } }
+                );
+              }
+            });
+        })
+    );
+  }
+  
+  // For all other requests (JS modules, CSS, etc.), let them pass through
+  // This prevents the service worker from interfering with Vite's module loading
 });
 
 // Handle API requests with network-first strategy
