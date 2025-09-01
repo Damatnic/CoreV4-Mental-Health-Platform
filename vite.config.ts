@@ -183,38 +183,81 @@ export default defineConfig(({ command, mode }) => {
       },
       output: {
         manualChunks: (id) => {
-          // Core React dependencies - keep scheduler with React
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
+          // Core React dependencies - optimized size
+          if (id.includes('react/') && !id.includes('react-dom') && !id.includes('react-router')) {
             return 'react-core';
           }
-          
-          // UI Libraries
-          if (id.includes('framer-motion') || id.includes('@radix-ui')) {
-            return 'ui-libs';
+          if (id.includes('react-dom') || id.includes('scheduler')) {
+            return 'react-dom';
+          }
+          if (id.includes('react-router')) {
+            return 'react-router';
           }
           
-          // Data management
-          if (id.includes('@tanstack') || id.includes('zustand') || id.includes('axios') || id.includes('socket.io')) {
-            return 'data-libs';
+          // UI Libraries - split by size
+          if (id.includes('framer-motion')) {
+            return 'framer-motion'; // Large library, separate chunk
+          }
+          if (id.includes('@radix-ui')) {
+            return 'radix-ui';
           }
           
-          // Utilities
-          if (id.includes('date-fns') || id.includes('clsx') || id.includes('zod') || id.includes('immer')) {
+          // Data management - split by usage
+          if (id.includes('@tanstack/react-query')) {
+            return 'react-query';
+          }
+          if (id.includes('zustand') || id.includes('immer')) {
+            return 'state-management';
+          }
+          if (id.includes('axios') || id.includes('socket.io')) {
+            return 'network';
+          }
+          
+          // Utilities - keep small
+          if (id.includes('date-fns') || id.includes('clsx') || id.includes('zod')) {
             return 'utils';
           }
           
-          // Charts and visualization
-          if (id.includes('chart') || id.includes('recharts')) {
-            return 'charts';
+          // Charts - separate large visualization library
+          if (id.includes('chart.js')) {
+            return 'charts-chartjs';
+          }
+          if (id.includes('recharts')) {
+            return 'charts-recharts';
           }
           
-          // Crisis components - load immediately
-          if (id.includes('/crisis/')) {
+          // Crisis components - immediate loading, separate for importance
+          if (id.includes('/crisis/') || id.includes('crisis')) {
             return 'crisis';
           }
           
-          // Node modules default chunk
+          // Dashboard components - lazy load non-critical
+          if (id.includes('/dashboard/') && !id.includes('PersonalDashboard')) {
+            return 'dashboard-extended';
+          }
+          
+          // Professional features - lazy load
+          if (id.includes('/professional/') || id.includes('ProfessionalCare')) {
+            return 'professional';
+          }
+          
+          // Crypto and security - separate sensitive code
+          if (id.includes('crypto') || id.includes('security')) {
+            return 'security-crypto';
+          }
+          
+          // AI features - lazy load heavy ML features
+          if (id.includes('ai') || id.includes('insights') || id.includes('AIInsights')) {
+            return 'ai-features';
+          }
+          
+          // Node modules - split by importance
           if (id.includes('node_modules')) {
+            // Critical for initial load
+            if (id.includes('react') || id.includes('react-dom')) {
+              return null; // Include in main bundle
+            }
+            // Secondary vendors
             return 'vendor';
           }
         },
@@ -237,7 +280,7 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     reportCompressedSize: true,
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 400, // More aggressive bundle size target
     sourcemap: true, // Enable source maps for debugging lexical declaration errors
     cssCodeSplit: true,
     assetsInlineLimit: 4096, // Inline assets smaller than 4kb

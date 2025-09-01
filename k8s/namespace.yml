@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: corev4-mental-health
+  labels:
+    name: corev4-mental-health
+    environment: production
+    compliance: hipaa
+    security-level: high
+  annotations:
+    description: "CoreV4 Mental Health Platform - HIPAA Compliant Healthcare Environment"
+    contact: "platform-team@corev4.health"
+    compliance.hipaa/enabled: "true"
+    monitoring.prometheus/enabled: "true"
+    security.pod-security/enforce: "restricted"
+    security.pod-security/warn: "restricted"
+    security.pod-security/audit: "restricted"

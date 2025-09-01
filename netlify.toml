@@ -1,19 +1,43 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm run build"
+  command = "npm install && npm run build"
   functions = "functions"
   publish = "dist"
   
 [build.environment]
   NODE_VERSION = "22"
   NPM_VERSION = "10"
-  GENERATE_SOURCEMAP = "false"
-  VITE_BUILD_CACHE = "false"
+  GENERATE_SOURCEMAP = "true"
+  VITE_BUILD_CACHE = "true"
+  VITE_ENVIRONMENT = "production"
+  VITE_CRISIS_HOTLINE = "988"
 
 [dev]
   command = "npm run dev"
   port = 5173
   publish = "dist"
 
+# Crisis-specific redirects for mental health platform
+[[redirects]]
+  from = "/help"
+  to = "/crisis"
+  status = 302
+
+[[redirects]]
+  from = "/emergency"
+  to = "/crisis"  
+  status = 302
+
+[[redirects]]
+  from = "/support"
+  to = "/crisis"
+  status = 302
+
+[[redirects]]
+  from = "/hotline"
+  to = "tel:988"
+  status = 302
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -1,0 +1,159 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: corev4-ingress
+  namespace: corev4-mental-health
+  labels:
+    app: corev4
+    tier: ingress
+  annotations:
+    # NGINX Ingress Controller Configuration
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    
+    # Security Headers - HIPAA Compliance
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws: https:; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" always;
+      add_header Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()" always;
+    
+    # Rate Limiting for Crisis Endpoints
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/rate-limit-connections: "100"
+    
+    # Crisis Endpoint Special Handling
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* ^/api/crisis {
+        # Priority routing for crisis endpoints
+        proxy_connect_timeout 1s;
+        proxy_send_timeout 5s;
+        proxy_read_timeout 10s;
+        # No rate limiting for crisis endpoints
+        limit_req off;
+        limit_conn off;
+      }
+    
+    # CORS Configuration
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://corev4.health,https://app.corev4.health"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    
+    # SSL Certificate
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/acme-challenge-type: "http01"
+    
+    # Monitoring
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "10254"
+spec:
+  tls:
+  - hosts:
+    - corev4.health
+    - app.corev4.health
+    - api.corev4.health
+    secretName: corev4-tls-secret
+  rules:
+  - host: corev4.health
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-frontend-service
+            port:
+              number: 80
+  - host: app.corev4.health
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-frontend-service
+            port:
+              number: 80
+  - host: api.corev4.health
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-backend-service
+            port:
+              number: 3000
+      # Crisis endpoints with priority routing
+      - path: /crisis
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-backend-service
+            port:
+              number: 3000
+      - path: /emergency
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-backend-service
+            port:
+              number: 3000
+---
+# Crisis-Specific Ingress for Emergency Services
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: corev4-crisis-ingress
+  namespace: corev4-mental-health
+  labels:
+    app: corev4-crisis
+    tier: ingress
+    priority: critical
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # No rate limiting for crisis services
+    nginx.ingress.kubernetes.io/rate-limit: "0"
+    # Priority class for crisis traffic
+    nginx.ingress.kubernetes.io/server-alias: "crisis.corev4.health,emergency.corev4.health"
+    # Dedicated backend pool for crisis services
+    nginx.ingress.kubernetes.io/upstream-vhost: "crisis.corev4.health"
+    # Enhanced monitoring for crisis endpoints
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "10254"
+    prometheus.io/path: "/metrics/crisis"
+spec:
+  tls:
+  - hosts:
+    - crisis.corev4.health
+    - emergency.corev4.health
+    secretName: corev4-crisis-tls-secret
+  rules:
+  - host: crisis.corev4.health
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-backend-service
+            port:
+              number: 3000
+  - host: emergency.corev4.health
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: corev4-backend-service
+            port:
+              number: 3000

@@ -2,15 +2,26 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
+import { Suspense, lazy } from 'react';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { DashboardPage } from './pages/DashboardPage';
-import { CrisisPage } from './pages/CrisisPage';
-import { WellnessPage } from './pages/WellnessPage';
-import { CommunityPage } from './pages/CommunityPage';
-import { ProfessionalPage } from './pages/ProfessionalPage';
+import { DashboardPage } from './pages/DashboardPage'; // Keep critical pages eager
+import { CrisisPage } from './pages/CrisisPage'; // Keep crisis page eager for emergency access
 import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
+
+// Lazy load non-critical pages for better initial bundle size
+const WellnessPage = lazy(() => import('./pages/WellnessPage').then(m => ({ default: m.WellnessPage })));
+const CommunityPage = lazy(() => import('./pages/CommunityPage').then(m => ({ default: m.CommunityPage })));
+const ProfessionalPage = lazy(() => import('./pages/ProfessionalPage').then(m => ({ default: m.ProfessionalPage })));
+
+// Loading component for lazy-loaded pages
+const PageLoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" aria-hidden="true"></div>
+    <span className="sr-only">Loading page content...</span>
+  </div>
+);
 
 // Create a client
 const queryClient = new QueryClient({
@@ -39,13 +50,27 @@ function App() {
             <Router>
               <EnhancedLayout>
                 <Routes>
-                  {/* All routes are accessible anonymously */}
+                  {/* Critical routes - loaded immediately */}
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/crisis" element={<CrisisPage />} />
-                  <Route path="/wellness/*" element={<WellnessPage />} />
-                  <Route path="/community/*" element={<CommunityPage />} />
-                  <Route path="/professional/*" element={<ProfessionalPage />} />
+                  
+                  {/* Non-critical routes - lazy loaded with suspense */}
+                  <Route path="/wellness/*" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureWellness />
+                    </Suspense>
+                  } />
+                  <Route path="/community/*" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureCommunity />
+                    </Suspense>
+                  } />
+                  <Route path="/professional/*" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureProfessional />
+                    </Suspense>
+                  } />
                 </Routes>
               </EnhancedLayout>
             </Router>

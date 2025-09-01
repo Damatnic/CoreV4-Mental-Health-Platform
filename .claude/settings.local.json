@@ -20,7 +20,9 @@
       "Bash(npx madge:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(git restore:*)",
+      "Bash(npx depcheck:*)"
     ],
     "deny": [],
     "ask": []

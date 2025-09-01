@@ -112,7 +112,7 @@ class SecureStorageService {
         const storageKey = this.getStorageKey(key);
         
         try {
-          secureStorage.setItem(storageKey, JSON.stringify(storageItem));
+          localStorage.setItem(storageKey, JSON.stringify(storageItem));
         } catch (error) {
           // Try IndexedDB as fallback for larger data
           await this.storeInIndexedDB(storageKey, storageItem);
@@ -140,7 +140,7 @@ class SecureStorageService {
         const storageKey = this.getStorageKey(key);
         
         // Try localStorage first
-        const stored = secureStorage.getItem(storageKey);
+        const stored = localStorage.getItem(storageKey);
         if (stored) {
           storageItem = JSON.parse(stored) as StorageItem;
         } else {
@@ -203,7 +203,7 @@ class SecureStorageService {
 
       // Remove from localStorage
       const storageKey = this.getStorageKey(key);
-      secureStorage.removeItem(storageKey);
+      localStorage.removeItem(storageKey);
 
       // Remove from IndexedDB
       await this.removeFromIndexedDB(storageKey);
@@ -231,7 +231,7 @@ class SecureStorageService {
           keysToRemove.push(key);
         }
       }
-      keysToRemove.forEach(key => secureStorage.removeItem(key));
+      keysToRemove.forEach(key => localStorage.removeItem(key));
 
       // Clear IndexedDB
       await this.clearIndexedDB();
@@ -290,7 +290,7 @@ class SecureStorageService {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key) {
-        used += (secureStorage.getItem(key) || '').length;
+        used += (localStorage.getItem(key) || '').length;
       }
     }
 
@@ -375,7 +375,7 @@ class SecureStorageService {
     
     for (const key of keys) {
       const storageKey = this.getStorageKey(key);
-      const stored = secureStorage.getItem(storageKey);
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         const item = JSON.parse(stored) as StorageItem;
         if (new Date(item.metadata.created) < thirtyDaysAgo) {
