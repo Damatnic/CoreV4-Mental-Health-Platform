@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import calming color palette for mental health support */
+@import './calming-palette.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;

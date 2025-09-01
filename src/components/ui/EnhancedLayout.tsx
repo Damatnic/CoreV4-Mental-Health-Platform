@@ -13,6 +13,7 @@ import { FloatingCrisisButton, MobileCrisisButton } from '../navigation/Floating
 import { MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../contexts/AuthContext';
+import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
 import toast from 'react-hot-toast';
 
 interface EnhancedLayoutProps {
@@ -318,6 +319,9 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
 
   return (
     <div className={`min-h-screen ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
+      {/* Privacy Banner - Always visible */}
+      <PrivacyBanner />
+      
       {/* Skip Links */}
       <SkipLinks />
 
@@ -343,13 +347,14 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                   C4
                 </div>
                 <span className="font-display font-semibold text-xl text-gray-900 hidden sm:block">
-                  CoreV4 {mode === 'crisis' && <span className="text-red-600 text-sm ml-1">(Crisis Mode)</span>}
+                  Safe Space {mode === 'crisis' && <span className="text-red-600 text-sm ml-1">(Crisis Mode)</span>}
                 </span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">
+              <FreeBadge />
               {navigation.map((item) => (
                 <Link
                   key={item.name}

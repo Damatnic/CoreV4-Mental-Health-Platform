@@ -1,5 +1,15 @@
-import { useCallback, useRef, useEffect } from 'react';
-import axios from 'axios';
+import { useCallback } from 'react';
+
+/**
+ * Privacy-First Analytics Hook
+ * 
+ * This hook provides a consistent interface for analytics but NEVER collects or sends any data.
+ * All methods are no-ops to maintain code compatibility while ensuring complete user privacy.
+ * 
+ * 🔒 NO DATA COLLECTION
+ * 🔒 NO TRACKING
+ * 🔒 100% ANONYMOUS
+ */
 
 interface AnalyticsEvent {
   category: string;
@@ -9,125 +19,41 @@ interface AnalyticsEvent {
   metadata?: Record<string, any>;
 }
 
-interface ExtendedAnalyticsEvent {
-  event: string;
-  properties?: Record<string, any>;
-}
-
 export const useAnalytics = () => {
-  const eventQueue = useRef<ExtendedAnalyticsEvent[]>([]);
-  const flushTimer = useRef<NodeJS.Timeout>();
-
-  // Check if tracking is allowed based on user consent
-  const isTrackingAllowed = useCallback(() => {
-    // Check localStorage for consent
-    const consent = localStorage.getItem('analytics_consent');
-    if (consent === 'denied') return false;
-    
-    // Check Do Not Track header
-    if (navigator.doNotTrack === '1') return false;
-    
-    // Only track if analytics is enabled
-    if (process.env.VITE_ENABLE_ANALYTICS === 'false') {
-      return false;
+  // All tracking methods are no-ops - we never collect any data
+  const trackEvent = useCallback(async (event: AnalyticsEvent | string, properties?: Record<string, any>) => {
+    // Intentionally empty - no data collection
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Privacy Mode] Analytics disabled - No data collected:', typeof event === 'string' ? event : event.action);
     }
-    
-    return true;
   }, []);
 
-  const trackEvent = useCallback(async (event: AnalyticsEvent | string, properties?: Record<string, any>) => {
-    if (!isTrackingAllowed()) return;
-
-    const eventData = typeof event === 'string' 
-      ? { event, properties }
-      : {
-          event: `${event.category}_${event.action}`,
-          properties: {
-            label: event.label,
-            value: event.value,
-            ...event.metadata
-          }
-        };
-
-    try {
-      // Send to analytics endpoint
-      await axios.post('/api/analytics/event', {
-        ...eventData,
-        timestamp: Date.now(),
-        sessionId: sessionStorage.getItem('sessionId') || generateSessionId(),
-        userAgent: navigator.userAgent,
-        url: window.location.href,
-      });
-
-      // Also log to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Analytics]', eventData);
-      }
-    } catch (error) {
-      console.error('Failed to track analytics event:', error);
-    }
-  }, [isTrackingAllowed]);
-
   const trackPageView = useCallback(async (page: string, properties?: Record<string, any>) => {
-    await trackEvent({
-      category: 'navigation',
-      action: 'page_view',
-      label: page,
-      metadata: properties
-    });
-  }, [trackEvent]);
+    // Intentionally empty - no page tracking
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Privacy Mode] Page view not tracked:', page);
+    }
+  }, []);
 
   const trackError = useCallback(async (errorType: string, errorDetails: Record<string, any>) => {
-    await trackEvent({
-      category: 'error',
-      action: errorType,
-      label: errorDetails.component || 'unknown',
-      metadata: {
-        message: errorDetails.message?.substring(0, 200),
-        stack: process.env.NODE_ENV === 'development' ? errorDetails.stack?.substring(0, 500) : undefined,
-        ...errorDetails
-      },
-    });
-  }, [trackEvent]);
+    // Only log errors locally for debugging, never send anywhere
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Local Error Log]', errorType, errorDetails);
+    }
+  }, []);
 
   const trackTiming = useCallback(async (category: string, variable: string, time: number, label?: string) => {
-    await trackEvent({
-      category: 'performance',
-      action: 'timing',
-      label: label || `${category}_${variable}`,
-      value: time,
-    });
-  }, [trackEvent]);
+    // Intentionally empty - no performance tracking
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Privacy Mode] Timing not tracked:', category, variable);
+    }
+  }, []);
 
   const trackInteraction = useCallback(async (element: string, action: string, value?: any) => {
-    await trackEvent({
-      category: 'interaction',
-      action,
-      label: element,
-      value: typeof value === 'number' ? value : undefined,
-      metadata: typeof value === 'object' ? value : { value }
-    });
-  }, [trackEvent]);
-
-  // Flush events on page unload
-  useEffect(() => {
-    const handleUnload = () => {
-      // Send any queued events
-      if (eventQueue.current.length > 0) {
-        navigator.sendBeacon('/api/analytics/batch', JSON.stringify(eventQueue.current));
-      }
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        handleUnload();
-      }
-    });
-
-    return () => {
-      window.removeEventListener('beforeunload', handleUnload);
-    };
+    // Intentionally empty - no interaction tracking
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Privacy Mode] Interaction not tracked:', element, action);
+    }
   }, []);
 
   return {
@@ -136,18 +62,19 @@ export const useAnalytics = () => {
     trackError,
     trackTiming,
     trackInteraction,
+    // These methods also do nothing - maintaining interface compatibility
     setUserId: (id: string) => {
-      sessionStorage.setItem('analytics_user_id', id);
+      // Never store user IDs - we're anonymous only
     },
     setUserProperties: (properties: Record<string, any>) => {
-      trackEvent('user_properties', properties);
+      // Never store user properties - complete privacy
     }
   };
 };
 
-// Helper function to generate session ID
-function generateSessionId(): string {
-  const id = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  sessionStorage.setItem('sessionId', id);
-  return id;
-}
+/**
+ * Privacy Notice:
+ * This application does not collect, store, or transmit any user data.
+ * All analytics functions are disabled to ensure complete user privacy.
+ * Your mental health journey remains completely private and anonymous.
+ */

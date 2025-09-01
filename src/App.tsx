@@ -9,7 +9,7 @@ import { CrisisPage } from './pages/CrisisPage';
 import { WellnessPage } from './pages/WellnessPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { ProfessionalPage } from './pages/ProfessionalPage';
-import { AuthProvider } from './contexts/AuthContext';
+import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
 
 // Create a client
@@ -35,41 +35,52 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <SecurityProvider>
-          <AuthProvider>
+          <AnonymousAuthProvider>
             <Router>
               <EnhancedLayout>
                 <Routes>
-                  {/* Dashboard is now the default home route without auth */}
+                  {/* All routes are accessible anonymously */}
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/crisis" element={<CrisisPage />} />
-                  <Route path="/wellness/*" element={<SecureWellness />} />
-                  <Route path="/community/*" element={<SecureCommunity />} />
-                  <Route path="/professional/*" element={<SecureProfessional />} />
+                  <Route path="/wellness/*" element={<WellnessPage />} />
+                  <Route path="/community/*" element={<CommunityPage />} />
+                  <Route path="/professional/*" element={<ProfessionalPage />} />
                 </Routes>
               </EnhancedLayout>
             </Router>
-          </AuthProvider>
+          </AnonymousAuthProvider>
         </SecurityProvider>
         <Toaster
-          position="top-right"
+          position="top-center"
           toastOptions={{
-            duration: 4000,
+            duration: 5000,
             style: {
-              background: '#1f2937',
-              color: '#f3f4f6',
-              borderRadius: '0.5rem',
+              background: 'linear-gradient(135deg, #E8F4FD 0%, #E8F5E8 100%)',
+              color: '#424242',
+              borderRadius: '1rem',
+              border: '1px solid #B3E5FC',
+              padding: '16px',
+              fontSize: '14px',
             },
             success: {
               iconTheme: {
-                primary: '#22c55e',
-                secondary: '#f3f4f6',
+                primary: '#66BB6A',
+                secondary: '#ffffff',
+              },
+              style: {
+                background: 'linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%)',
+                border: '1px solid #81C784',
               },
             },
             error: {
               iconTheme: {
-                primary: '#ef4444',
-                secondary: '#f3f4f6',
+                primary: '#FF8A80',
+                secondary: '#ffffff',
+              },
+              style: {
+                background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
+                border: '1px solid #FFAB91',
               },
             },
           }}

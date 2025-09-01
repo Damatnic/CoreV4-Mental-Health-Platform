@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="144" height="144" viewBox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background gradient -->
+    <defs>
+        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#E8F4FD;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#B3E5FC;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#5E92F3;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#4A7FDB;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="144" height="144" fill="url(#bg-gradient)"/>
+    
+    <!-- Heart symbol centered -->
+    <g transform="translate(72, 72)">
+        <path d="M 0,21.599999999999998
+                 C -36,-7.2 -36,-28.8 -14.4,-28.8
+                 C -7.2,-28.8 0,-21.599999999999998 0,-21.599999999999998
+                 C 0,-21.599999999999998 7.2,-28.8 14.4,-28.8
+                 C 36,-28.8 36,-7.2 0,21.599999999999998 Z"
+              fill="url(#heart-gradient)"/>
+    </g>
+    
+    
+</svg>

@@ -1,0 +1,291 @@
+/* 
+ * Calming Color Palette for Mental Health Platform
+ * Designed to create a soothing, safe, and welcoming environment
+ * All colors chosen for psychological comfort and accessibility
+ */
+
+@layer base {
+  :root {
+    /* Primary Palette - Soft Blue (Trust, Calm, Stability) */
+    --calm-blue-50: #E8F4FD;
+    --calm-blue-100: #D1E9FB;
+    --calm-blue-200: #B3E5FC;
+    --calm-blue-300: #81D4FA;
+    --calm-blue-400: #5E92F3;
+    --calm-blue-500: #4A7FDB;
+    --calm-blue-600: #3B6EC6;
+    --calm-blue-700: #2C5AA0;
+    --calm-blue-800: #1E3A8A;
+    --calm-blue-900: #1A2B5C;
+
+    /* Secondary Palette - Gentle Green (Growth, Balance, Nature) */
+    --gentle-green-50: #E8F5E8;
+    --gentle-green-100: #D4EDDA;
+    --gentle-green-200: #C8E6C9;
+    --gentle-green-300: #A5D6A7;
+    --gentle-green-400: #81C784;
+    --gentle-green-500: #66BB6A;
+    --gentle-green-600: #4CAF50;
+    --gentle-green-700: #43A047;
+    --gentle-green-800: #388E3C;
+    --gentle-green-900: #2E7D32;
+
+    /* Neutral Palette - Warm Grays (Comfort, Safety) */
+    --warm-gray-50: #FAFAFA;
+    --warm-gray-100: #F5F5F5;
+    --warm-gray-200: #EEEEEE;
+    --warm-gray-300: #E0E0E0;
+    --warm-gray-400: #BDBDBD;
+    --warm-gray-500: #9E9E9E;
+    --warm-gray-600: #757575;
+    --warm-gray-700: #616161;
+    --warm-gray-800: #424242;
+    --warm-gray-900: #212121;
+
+    /* Accent Colors - Soft Pastels */
+    --soft-lavender: #E1BEE7;
+    --soft-peach: #FFCCBC;
+    --soft-yellow: #FFF9C4;
+    --soft-mint: #C8E6C9;
+    --soft-pink: #F8BBD0;
+    --soft-sky: #B3E5FC;
+
+    /* Crisis/Alert Colors - Gentle but Clear */
+    --gentle-red: #FFCDD2;
+    --gentle-orange: #FFE0B2;
+    --gentle-amber: #FFECB3;
+
+    /* Updated CSS Variables for Application */
+    --background: 0 0% 98%; /* Soft off-white */
+    --foreground: 0 0% 26%; /* Warm dark gray instead of black */
+    
+    /* Primary colors - Calming blue */
+    --primary: 207 90% 61%; /* Soft blue */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary colors - Gentle green */
+    --secondary: 122 39% 49%; /* Soft green */
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Muted colors */
+    --muted: 210 40% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    /* Accent colors */
+    --accent: 280 20% 85%; /* Soft lavender */
+    --accent-foreground: 0 0% 20%;
+    
+    /* Destructive - Softer red */
+    --destructive: 0 70% 85%; /* Gentle red */
+    --destructive-foreground: 0 0% 20%;
+    
+    /* Borders and inputs */
+    --border: 0 0% 90%;
+    --input: 0 0% 94%;
+    --ring: 207 90% 70%;
+    
+    /* Border radius for softer edges */
+    --radius: 0.75rem;
+    
+    /* Transition timing for smooth interactions */
+    --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-gentle: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Dark mode - Still calming but with deeper tones */
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    
+    --primary: 207 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 122 30% 40%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 223 47% 20%;
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 280 15% 35%;
+    --accent-foreground: 0 0% 95%;
+    
+    --destructive: 0 50% 40%;
+    --destructive-foreground: 0 0% 95%;
+    
+    --border: 223 47% 20%;
+    --input: 223 47% 20%;
+    --ring: 207 70% 45%;
+  }
+}
+
+@layer utilities {
+  /* Calming gradient backgrounds */
+  .bg-calm-gradient {
+    background: linear-gradient(135deg, var(--calm-blue-50) 0%, var(--gentle-green-50) 100%);
+  }
+
+  .bg-morning-gradient {
+    background: linear-gradient(135deg, #FFF9C4 0%, #E8F4FD 50%, #E8F5E8 100%);
+  }
+
+  .bg-evening-gradient {
+    background: linear-gradient(135deg, #E1BEE7 0%, #E8F4FD 50%, #FFCCBC 100%);
+  }
+
+  .bg-safe-gradient {
+    background: linear-gradient(135deg, var(--gentle-green-50) 0%, var(--soft-mint) 100%);
+  }
+
+  /* Soft shadows for depth without harshness */
+  .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-soft-xl {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Calming animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-gentle-pulse {
+    animation: gentlePulse 3s ease-in-out infinite;
+  }
+
+  @keyframes gentlePulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all var(--transition-smooth);
+  }
+
+  .transition-gentle {
+    transition: all var(--transition-gentle);
+  }
+
+  /* Text colors for better readability */
+  .text-soft-black {
+    color: var(--warm-gray-800);
+  }
+
+  .text-soft-gray {
+    color: var(--warm-gray-600);
+  }
+
+  /* Calming hover states */
+  .hover-lift {
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Breathing animation for crisis support */
+  .breathing-circle {
+    animation: breatheCircle 4s ease-in-out infinite;
+  }
+
+  @keyframes breatheCircle {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  /* Focus states with calming colors */
+  .focus-calm:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(94, 146, 243, 0.2);
+    border-color: var(--calm-blue-400);
+  }
+
+  /* Supportive message styles */
+  .message-supportive {
+    background: linear-gradient(135deg, var(--soft-lavender) 0%, var(--soft-sky) 100%);
+    border-left: 4px solid var(--calm-blue-400);
+    color: var(--warm-gray-800);
+  }
+
+  /* Crisis alert - visible but not alarming */
+  .alert-gentle {
+    background: var(--gentle-red);
+    border: 1px solid rgba(239, 83, 80, 0.2);
+    color: var(--warm-gray-800);
+  }
+}
+
+/* Component-specific calming overrides */
+@layer components {
+  /* Buttons with softer appearance */
+  .btn-calm {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-300;
+    @apply bg-gradient-to-r from-calm-blue-400 to-calm-blue-500;
+    @apply text-white rounded-xl px-6 py-3;
+    @apply hover:from-calm-blue-500 hover:to-calm-blue-600;
+    @apply focus:outline-none focus:ring-4 focus:ring-calm-blue-200;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-supportive {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-300;
+    @apply bg-gradient-to-r from-gentle-green-400 to-gentle-green-500;
+    @apply text-white rounded-xl px-6 py-3;
+    @apply hover:from-gentle-green-500 hover:to-gentle-green-600;
+    @apply focus:outline-none focus:ring-4 focus:ring-gentle-green-200;
+  }
+
+  /* Cards with warm, welcoming appearance */
+  .card-calm {
+    @apply bg-white rounded-2xl border border-warm-gray-200;
+    @apply shadow-soft hover:shadow-soft-lg;
+    @apply transition-all duration-300;
+  }
+
+  /* Input fields that feel approachable */
+  .input-calm {
+    @apply w-full px-4 py-3 rounded-xl;
+    @apply bg-warm-gray-50 border border-warm-gray-200;
+    @apply text-warm-gray-800 placeholder-warm-gray-400;
+    @apply focus:bg-white focus:border-calm-blue-400;
+    @apply focus:outline-none focus:ring-4 focus:ring-calm-blue-100;
+    @apply transition-all duration-300;
+  }
+
+  /* Messages that feel supportive */
+  .message-warm {
+    @apply p-4 rounded-xl;
+    @apply bg-gradient-to-r from-soft-yellow to-soft-peach;
+    @apply text-warm-gray-700 font-medium;
+    @apply border-l-4 border-gentle-green-500;
+  }
+}
