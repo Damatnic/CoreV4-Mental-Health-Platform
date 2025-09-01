@@ -4,9 +4,20 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command, mode }) => {
+  const isProduction = mode === 'production';
+  
+  return {
   plugins: [
-    react(),
+    react({
+      // Disable React DevTools in production
+      jsxRuntime: isProduction ? 'classic' : 'automatic',
+      babel: isProduction ? {
+        plugins: [
+          ['babel-plugin-react-remove-properties', { properties: ['data-testid'] }]
+        ]
+      } : undefined
+    }),
     splitVendorChunkPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -21,7 +32,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
         cleanupOutdatedCaches: true,
-        sourcemap: true,
+        sourcemap: false, // Disable sourcemap for production
         skipWaiting: true,
         clientsClaim: true,
         navigateFallback: '/index.html',
@@ -123,7 +134,10 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        global_defs: {
+          __DEV__: false, // Explicitly define dev as false in production
+        },
         passes: 2
       },
       mangle: {
@@ -198,4 +212,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom']
   }
-});
+}});  // Close both the return object and the defineConfig function

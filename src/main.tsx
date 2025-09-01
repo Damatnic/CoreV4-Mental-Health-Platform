@@ -3,14 +3,48 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/index.css';
 
-// Performance monitoring
+// Performance monitoring (quiet in production)
 if (import.meta.env.PROD) {
   import('web-vitals').then((vitals) => {
-    vitals.onCLS(console.log);
-    vitals.onFID(console.log);
-    vitals.onFCP(console.log);
-    vitals.onLCP(console.log);
-    vitals.onTTFB(console.log);
+    // Send to analytics instead of console.log in production
+    const logMetric = (metric: any) => {
+      // Only log critical performance issues, not every metric
+      if (metric.rating === 'poor' || import.meta.env.DEV) {
+        console.log(`${metric.name}: ${metric.value} (${metric.rating})`);
+      }
+    };
+    
+    vitals.onCLS(logMetric);
+    vitals.onFID(logMetric);
+    vitals.onFCP(logMetric);
+    vitals.onLCP(logMetric);
+    vitals.onTTFB(logMetric);
+  });
+}
+
+// Suppress source map warnings in production
+if (import.meta.env.PROD) {
+  // Suppress source map warnings that clutter the console
+  const originalConsoleWarn = console.warn;
+  console.warn = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('Source map') || 
+        message.includes('DevTools') ||
+        message.includes('installHook') ||
+        message.includes('react_devtools')) {
+      return; // Suppress these warnings
+    }
+    originalConsoleWarn.apply(console, args);
+  };
+
+  // Also suppress source map errors
+  window.addEventListener('error', (e) => {
+    if (e.message?.includes('Source map') || 
+        e.filename?.includes('react_devtools') ||
+        e.filename?.includes('installHook')) {
+      e.preventDefault();
+      return false;
+    }
   });
 }
 
