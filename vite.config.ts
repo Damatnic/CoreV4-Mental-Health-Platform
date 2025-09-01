@@ -170,8 +170,7 @@ export default defineConfig(({ command, mode }) => {
       },
       format: {
         comments: false,
-        beautify: false,
-        preserve_line: false
+        beautify: false
       },
       keep_fnames: true,
       keep_classnames: true,
