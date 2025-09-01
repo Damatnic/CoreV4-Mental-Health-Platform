@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { z } from 'zod';
+import { secureStorage } from '../security/SecureLocalStorage';
 
 // API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -155,7 +156,7 @@ class CommunityService {
   constructor() {
     // Add auth interceptor
     this.apiClient.interceptors.request.use((config) => {
-      const token = localStorage.getItem('auth_token');
+      const token = secureStorage.getItem('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

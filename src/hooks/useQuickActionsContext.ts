@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { QuickAction } from '../types/dashboard';
 import { useNavigate } from 'react-router-dom';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface QuickActionsContext {
   actions: QuickAction[];
@@ -188,8 +189,8 @@ export function useQuickActionsContext(): QuickActionsContext {
 
   // Load custom actions and history from localStorage
   useEffect(() => {
-    const savedCustomActions = localStorage.getItem('customQuickActions');
-    const savedHistory = localStorage.getItem('actionHistory');
+    const savedCustomActions = secureStorage.getItem('customQuickActions');
+    const savedHistory = secureStorage.getItem('actionHistory');
     
     if (savedCustomActions) {
       try {
@@ -213,14 +214,14 @@ export function useQuickActionsContext(): QuickActionsContext {
   // Save custom actions to localStorage
   useEffect(() => {
     if (customActions.length > 0) {
-      localStorage.setItem('customQuickActions', JSON.stringify(customActions));
+      secureStorage.setItem('customQuickActions', JSON.stringify(customActions));
     }
   }, [customActions]);
 
   // Save action history to localStorage
   useEffect(() => {
     if (actionHistory.length > 0) {
-      localStorage.setItem('actionHistory', JSON.stringify(actionHistory.slice(-100))); // Keep last 100
+      secureStorage.setItem('actionHistory', JSON.stringify(actionHistory.slice(-100))); // Keep last 100
     }
   }, [actionHistory]);
 

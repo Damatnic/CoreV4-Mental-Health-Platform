@@ -5,6 +5,7 @@
  */
 
 import { cryptoService } from './cryptoService';
+import { secureStorage } from 'SecureLocalStorage';
 
 interface StorageOptions {
   persistent?: boolean;
@@ -111,7 +112,7 @@ class SecureStorageService {
         const storageKey = this.getStorageKey(key);
         
         try {
-          localStorage.setItem(storageKey, JSON.stringify(storageItem));
+          secureStorage.setItem(storageKey, JSON.stringify(storageItem));
         } catch (error) {
           // Try IndexedDB as fallback for larger data
           await this.storeInIndexedDB(storageKey, storageItem);
@@ -139,7 +140,7 @@ class SecureStorageService {
         const storageKey = this.getStorageKey(key);
         
         // Try localStorage first
-        const stored = localStorage.getItem(storageKey);
+        const stored = secureStorage.getItem(storageKey);
         if (stored) {
           storageItem = JSON.parse(stored) as StorageItem;
         } else {
@@ -202,7 +203,7 @@ class SecureStorageService {
 
       // Remove from localStorage
       const storageKey = this.getStorageKey(key);
-      localStorage.removeItem(storageKey);
+      secureStorage.removeItem(storageKey);
 
       // Remove from IndexedDB
       await this.removeFromIndexedDB(storageKey);
@@ -230,7 +231,7 @@ class SecureStorageService {
           keysToRemove.push(key);
         }
       }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
+      keysToRemove.forEach(key => secureStorage.removeItem(key));
 
       // Clear IndexedDB
       await this.clearIndexedDB();
@@ -289,7 +290,7 @@ class SecureStorageService {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key) {
-        used += (localStorage.getItem(key) || '').length;
+        used += (secureStorage.getItem(key) || '').length;
       }
     }
 
@@ -374,7 +375,7 @@ class SecureStorageService {
     
     for (const key of keys) {
       const storageKey = this.getStorageKey(key);
-      const stored = localStorage.getItem(storageKey);
+      const stored = secureStorage.getItem(storageKey);
       if (stored) {
         const item = JSON.parse(stored) as StorageItem;
         if (new Date(item.metadata.created) < thirtyDaysAgo) {

@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
 import { useWellnessStore } from '../../stores/wellnessStore';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Wellness metrics categories
 const WELLNESS_CATEGORIES = {
@@ -172,9 +173,9 @@ export const WellnessDashboard: React.FC = () => {
     generateInsights();
     
     // Load legacy localStorage data if exists
-    const savedData = localStorage.getItem('wellnessData');
-    const savedStreaks = localStorage.getItem('habitStreaks');
-    const savedToday = localStorage.getItem('wellnessTodayData');
+    const savedData = secureStorage.getItem('wellnessData');
+    const savedStreaks = secureStorage.getItem('habitStreaks');
+    const savedToday = secureStorage.getItem('wellnessTodayData');
     
     if (savedData) {
       setWellnessData(JSON.parse(savedData).map((d: any) => ({
@@ -200,7 +201,7 @@ export const WellnessDashboard: React.FC = () => {
 
   // Save today's data
   useEffect(() => {
-    localStorage.setItem('wellnessTodayData', JSON.stringify(todayData));
+    secureStorage.setItem('wellnessTodayData', JSON.stringify(todayData));
   }, [todayData]);
 
   // Toggle habit completion
@@ -248,7 +249,7 @@ export const WellnessDashboard: React.FC = () => {
         s.habitId === habitId ? newStreak : s
       );
       setHabitStreaks(updatedStreaks);
-      localStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
+      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
     } else {
       // New streak
       const newStreak: HabitStreak = {
@@ -259,7 +260,7 @@ export const WellnessDashboard: React.FC = () => {
       };
       const updatedStreaks = [...habitStreaks, newStreak];
       setHabitStreaks(updatedStreaks);
-      localStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
+      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
     }
   };
 
@@ -295,14 +296,14 @@ export const WellnessDashboard: React.FC = () => {
   const saveDayData = () => {
     const updatedData = [...wellnessData, todayData];
     setWellnessData(updatedData);
-    localStorage.setItem('wellnessData', JSON.stringify(updatedData));
+    secureStorage.setItem('wellnessData', JSON.stringify(updatedData));
     
     // Reset today's data
     setTodayData({
       date: new Date(),
       habits: []
     });
-    localStorage.removeItem('wellnessTodayData');
+    secureStorage.removeItem('wellnessTodayData');
   };
 
   // Add new goal using store

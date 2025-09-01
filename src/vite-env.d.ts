@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_VERSION: string
   readonly VITE_APP_ENV: string
   readonly VITE_API_BASE_URL: string
+  readonly VITE_API_URL: string
   readonly VITE_API_TIMEOUT: string
   readonly VITE_API_RETRY_ATTEMPTS: string
   readonly VITE_AUTH_DOMAIN: string
@@ -35,6 +36,9 @@ interface ImportMetaEnv {
   readonly VITE_DEV_TOOLS: string
   readonly VITE_MOCK_API: string
   readonly VITE_LOG_LEVEL: string
+  readonly DEV: boolean
+  readonly PROD: boolean
+  readonly MODE: string
 }
 
 interface ImportMeta {

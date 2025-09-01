@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { logger, LogCategory } from '../services/logging/logger';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface AssessmentData {
   moodScore?: number;
@@ -21,8 +22,8 @@ interface CrisisAssessmentHook {
 
 export function useCrisisAssessment(): CrisisAssessmentHook {
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(() => {
-    // Load from localStorage if available
-    const stored = localStorage.getItem('crisis_assessment');
+    // Load from secure storage (crisis assessments are sensitive mental health data)
+    const stored = secureStorage.getItem('crisis_assessment');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -41,14 +42,14 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
 
   const [isAssessing, setIsAssessing] = useState(false);
   const [lastAssessment, setLastAssessment] = useState<Date | null>(() => {
-    const stored = localStorage.getItem('last_crisis_assessment');
+    const stored = secureStorage.getItem('last_crisis_assessment');
     return stored ? new Date(stored) : null;
   });
 
-  // Save assessment data to localStorage
+  // Save assessment data to secure storage (encrypted for sensitive data)
   useEffect(() => {
     if (assessmentData) {
-      localStorage.setItem('crisis_assessment', JSON.stringify(assessmentData));
+      secureStorage.setItem('crisis_assessment', JSON.stringify(assessmentData));
     }
   }, [assessmentData]);
 
@@ -84,7 +85,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
     });
 
     setLastAssessment(new Date());
-    localStorage.setItem('last_crisis_assessment', new Date().toISOString());
+    secureStorage.setItem('last_crisis_assessment', new Date().toISOString());
     
     setTimeout(() => setIsAssessing(false), 500);
 
@@ -98,7 +99,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
   // Clear assessment data
   const clearAssessment = useCallback(() => {
     setAssessmentData(null);
-    localStorage.removeItem('crisis_assessment');
+    secureStorage.removeItem('crisis_assessment');
     logger.info('Crisis assessment cleared', {
       category: LogCategory.CRISIS
     });

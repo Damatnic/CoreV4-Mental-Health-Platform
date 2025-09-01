@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Plus, Edit2, Trash2, User, Star, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 interface EmergencyContact {
   id: string;
@@ -25,7 +26,7 @@ export function EmergencyContacts() {
 
   // Load contacts from localStorage on mount
   useEffect(() => {
-    const savedContacts = localStorage.getItem('emergencyContacts');
+    const savedContacts = secureStorage.getItem('emergencyContacts');
     if (savedContacts) {
       setContacts(JSON.parse(savedContacts));
     } else {
@@ -49,14 +50,14 @@ export function EmergencyContacts() {
         }
       ];
       setContacts(defaultContacts);
-      localStorage.setItem('emergencyContacts', JSON.stringify(defaultContacts));
+      secureStorage.setItem('emergencyContacts', JSON.stringify(defaultContacts));
     }
   }, []);
 
   // Save contacts to localStorage whenever they change
   useEffect(() => {
     if (contacts.length > 0) {
-      localStorage.setItem('emergencyContacts', JSON.stringify(contacts));
+      secureStorage.setItem('emergencyContacts', JSON.stringify(contacts));
     }
   }, [contacts]);
 

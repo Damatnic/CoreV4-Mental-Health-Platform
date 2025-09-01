@@ -1,9 +1,11 @@
 /**
  * Crisis System Integration Service
  * Manages crisis detection, response, and coordination across all crisis-related components
+ * SECURITY: Updated to use secure storage for sensitive crisis data
  */
 
 import { EventEmitter } from 'events';
+import { secureStorage } from '../security/SecureLocalStorage';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
@@ -624,21 +626,21 @@ class CrisisIntegrationService extends EventEmitter {
   }
   
   /**
-   * Store session history
+   * Store session history - SECURITY: Using secure storage
    */
   private storeSessionHistory(session: CrisisSession) {
-    // Store in local storage or send to API
-    const history = JSON.parse(localStorage.getItem('crisis_sessions') || '[]');
+    // Store in secure storage (encrypted for sensitive crisis data)
+    const history = JSON.parse(secureStorage.getItem('crisis_sessions') || '[]');
     history.push(session);
-    localStorage.setItem('crisis_sessions', JSON.stringify(history));
+    secureStorage.setItem('crisis_sessions', JSON.stringify(history));
   }
   
   /**
-   * Load safety plan
+   * Load safety plan - SECURITY: Using secure storage
    */
   private loadSafetyPlan() {
-    // Load from storage or API
-    const stored = localStorage.getItem('safety_plan');
+    // Load from secure storage (crisis safety plans are sensitive data)
+    const stored = secureStorage.getItem('safety_plan');
     if (stored) {
       this.safetyPlan = JSON.parse(stored);
     }
@@ -654,8 +656,8 @@ class CrisisIntegrationService extends EventEmitter {
       lastUpdated: new Date()
     } as SafetyPlan;
     
-    // Persist
-    localStorage.setItem('safety_plan', JSON.stringify(this.safetyPlan));
+    // Persist to secure storage (safety plans contain sensitive crisis data)
+    secureStorage.setItem('safety_plan', JSON.stringify(this.safetyPlan));
   }
   
   /**

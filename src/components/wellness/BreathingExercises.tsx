@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
+import { secureStorage } from '../../services/security/SecureLocalStorage';
   Wind, 
   Heart, 
   Circle, 
@@ -95,7 +96,7 @@ export const BreathingExercises: React.FC = () => {
     }
     
     // Load saved sessions
-    const savedSessions = localStorage.getItem('breathingSessions');
+    const savedSessions = secureStorage.getItem('breathingSessions');
     if (savedSessions) {
       setSessions(JSON.parse(savedSessions));
     }
@@ -191,7 +192,7 @@ export const BreathingExercises: React.FC = () => {
       
       const updatedSessions = [...sessions, session];
       setSessions(updatedSessions);
-      localStorage.setItem('breathingSessions', JSON.stringify(updatedSessions));
+      secureStorage.setItem('breathingSessions', JSON.stringify(updatedSessions));
     }
     
     setStressLevelBefore(null);

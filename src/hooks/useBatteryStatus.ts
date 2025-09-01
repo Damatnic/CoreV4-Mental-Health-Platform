@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface BatteryStatus {
   level: number | null;
@@ -30,7 +31,7 @@ export function useBatteryStatus(): BatteryStatus {
       if (batteryManager.level < 0.1 && !batteryManager.charging) {
         // Store critical battery warning
         if ('localStorage' in window) {
-          localStorage.setItem('lowBatteryWarning', new Date().toISOString());
+          secureStorage.setItem('lowBatteryWarning', new Date().toISOString());
         }
         
         // Show notification if permissions granted

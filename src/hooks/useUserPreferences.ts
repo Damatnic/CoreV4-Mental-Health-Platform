@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface UserPreferences {
   theme: 'light' | 'dark' | 'auto' | 'calm' | 'focus';
@@ -125,7 +126,7 @@ export function useUserPreferences(userId: string) {
         
         // Try to load from localStorage first
         const localKey = `userPreferences_${userId}`;
-        const savedPreferences = localStorage.getItem(localKey);
+        const savedPreferences = secureStorage.getItem(localKey);
         
         if (savedPreferences) {
           const parsed = JSON.parse(savedPreferences);
@@ -151,7 +152,7 @@ export function useUserPreferences(userId: string) {
   const savePreferences = useCallback(async (newPreferences: UserPreferences) => {
     try {
       const localKey = `userPreferences_${userId}`;
-      localStorage.setItem(localKey, JSON.stringify(newPreferences));
+      secureStorage.setItem(localKey, JSON.stringify(newPreferences));
       
       // Optionally save to API
       // await fetch(`/api/users/${userId}/preferences`, {

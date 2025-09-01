@@ -4,9 +4,12 @@
  * Provides anonymous access without any registration or data collection
  * All user data is stored locally and never transmitted
  * Complete privacy and anonymity guaranteed
+ * SECURITY: Updated to use secure storage and backend integration
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { secureStorage } from '../services/security/SecureLocalStorage';
+import { ApiService } from '../services/api/ApiService';
 
 interface AnonymousUser {
   id: string; // Random session ID stored locally only
@@ -52,9 +55,9 @@ function generateSessionId(): string {
   return `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Get or create anonymous user from localStorage
+// Get or create anonymous user from secure storage
 function getOrCreateAnonymousUser(): AnonymousUser {
-  const stored = localStorage.getItem('anonymous_user');
+  const stored = secureStorage.getItem('anonymous_user');
   
   if (stored) {
     try {
@@ -80,7 +83,7 @@ function getOrCreateAnonymousUser(): AnonymousUser {
     isAnonymous: true,
   };
   
-  localStorage.setItem('anonymous_user', JSON.stringify(newUser));
+  secureStorage.setItem('anonymous_user', JSON.stringify(newUser));
   return newUser;
 }
 
@@ -101,9 +104,9 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [user.sessionStarted]);
   
-  // Save user to localStorage whenever it changes
+  // Save user to secure storage whenever it changes
   useEffect(() => {
-    localStorage.setItem('anonymous_user', JSON.stringify(user));
+    secureStorage.setItem('anonymous_user', JSON.stringify(user));
   }, [user]);
   
   const updateNickname = (nickname: string) => {
@@ -118,9 +121,9 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   };
   
   const clearLocalData = () => {
-    localStorage.removeItem('anonymous_user');
-    // Clear all other local data
-    localStorage.clear();
+    secureStorage.removeItem('anonymous_user');
+    // Clear all other local data (both secure and regular storage)
+    secureStorage.clear();
     sessionStorage.clear();
     // Create fresh anonymous user
     setUser(getOrCreateAnonymousUser());

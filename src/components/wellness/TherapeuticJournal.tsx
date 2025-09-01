@@ -30,6 +30,7 @@ import {
   FileText
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Journal entry types based on therapeutic approaches
 const JOURNAL_TYPES = {
@@ -178,7 +179,7 @@ export const TherapeuticJournal: React.FC = () => {
 
   // Load entries from localStorage
   useEffect(() => {
-    const savedEntries = localStorage.getItem('journalEntries');
+    const savedEntries = secureStorage.getItem('journalEntries');
     if (savedEntries) {
       const parsed = JSON.parse(savedEntries);
       setEntries(parsed.map((e: any) => ({
@@ -217,7 +218,7 @@ export const TherapeuticJournal: React.FC = () => {
       timestamp: new Date(),
       lastSaved: new Date()
     };
-    localStorage.setItem('journalDraft', JSON.stringify(draft));
+    secureStorage.setItem('journalDraft', JSON.stringify(draft));
   };
 
   // Calculate word count and reading time
@@ -264,10 +265,10 @@ export const TherapeuticJournal: React.FC = () => {
     
     const updatedEntries = [...entries, newEntry];
     setEntries(updatedEntries);
-    localStorage.setItem('journalEntries', JSON.stringify(updatedEntries));
+    secureStorage.setItem('journalEntries', JSON.stringify(updatedEntries));
     
     // Clear draft
-    localStorage.removeItem('journalDraft');
+    secureStorage.removeItem('journalDraft');
     
     // Reset form
     setCurrentEntry({

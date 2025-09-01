@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { secureStorage } from '../security/SecureLocalStorage';
 
 // API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -217,7 +218,7 @@ class GamificationService {
   constructor() {
     // Add auth interceptor
     this.apiClient.interceptors.request.use((config) => {
-      const token = localStorage.getItem('auth_token');
+      const token = secureStorage.getItem('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

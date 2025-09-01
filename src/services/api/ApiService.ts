@@ -1,7 +1,9 @@
 // Core API Service with comprehensive error handling and retry logic
 // Implements HIPAA-compliant data transmission and caching strategies
+// SECURITY: Updated to use secure token storage
 
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
+import { secureStorage } from '../security/SecureLocalStorage';
 import { 
   ApiResponse, 
   ApiError, 
@@ -18,15 +20,16 @@ import {
   SupportGroup
 } from './types';
 
-// API Configuration
+// API Configuration - Updated for secure backend
 const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
+  baseURL: import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   timeout: 30000,
   retryAttempts: 3,
   retryDelay: 1000,
   headers: {
     'Content-Type': 'application/json',
     'X-Client-Version': '4.0.0',
+    'X-Platform': 'CoreV4-Web'
   }
 };
 
@@ -246,35 +249,38 @@ export class ApiService {
     }
   }
 
-  // Token management methods
+  // Token management methods - SECURITY: Updated to use secure storage
   private loadTokensFromStorage(): void {
     try {
-      this.accessToken = localStorage.getItem('access_token');
-      this.refreshToken = localStorage.getItem('refresh_token');
+      // Use secure storage for sensitive authentication tokens
+      this.accessToken = secureStorage.getItem('access_token');
+      this.refreshToken = secureStorage.getItem('refresh_token');
     } catch (error) {
-      console.error('Failed to load tokens from storage:', error);
+      console.error('Failed to load tokens from secure storage:', error);
     }
   }
 
   private saveTokensToStorage(accessToken: string, refreshToken: string): void {
     try {
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
+      // Use secure storage for sensitive authentication tokens
+      secureStorage.setItem('access_token', accessToken);
+      secureStorage.setItem('refresh_token', refreshToken);
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
     } catch (error) {
-      console.error('Failed to save tokens to storage:', error);
+      console.error('Failed to save tokens to secure storage:', error);
     }
   }
 
   private clearTokensFromStorage(): void {
     try {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      // Use secure storage for token removal
+      secureStorage.removeItem('access_token');
+      secureStorage.removeItem('refresh_token');
       this.accessToken = null;
       this.refreshToken = null;
     } catch (error) {
-      console.error('Failed to clear tokens from storage:', error);
+      console.error('Failed to clear tokens from secure storage:', error);
     }
   }
 
@@ -313,7 +319,7 @@ export class ApiService {
 
   private getCurrentUserId(): string | null {
     try {
-      const userStr = localStorage.getItem('current_user');
+      const userStr = secureStorage.getItem('current_user');
       if (userStr) {
         const user = JSON.parse(userStr);
         return user.id;
@@ -375,7 +381,7 @@ export class ApiService {
       
       const { accessToken, refreshToken, user } = response.data;
       this.saveTokensToStorage(accessToken, refreshToken);
-      localStorage.setItem('current_user', JSON.stringify(user));
+      secureStorage.setItem('current_user', JSON.stringify(user));
       
       return response.data;
     } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, AlertCircle, Heart, Users, Activity, MapPin, Save, Download, Share2, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 interface SafetyPlanData {
   warningSignals: string[];
@@ -35,7 +36,7 @@ export function SafetyPlan() {
 
   // Load safety plan from localStorage
   useEffect(() => {
-    const savedPlan = localStorage.getItem('safetyPlan');
+    const savedPlan = secureStorage.getItem('safetyPlan');
     if (savedPlan) {
       setSafetyPlan(JSON.parse(savedPlan));
     }
@@ -46,7 +47,7 @@ export function SafetyPlan() {
     const saveTimer = setTimeout(() => {
       if (isEditing) {
         setAutoSaveStatus('saving');
-        localStorage.setItem('safetyPlan', JSON.stringify(safetyPlan));
+        secureStorage.setItem('safetyPlan', JSON.stringify(safetyPlan));
         setTimeout(() => setAutoSaveStatus('saved'), 1000);
       }
     }, 2000);

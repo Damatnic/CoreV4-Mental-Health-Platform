@@ -17,6 +17,7 @@ import {
 } from 'chart.js';
 import { useDebounce } from 'react-use';
 import CrisisButton from '../crisis/CrisisButton';
+import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Register ChartJS components
 ChartJS.register(
@@ -153,7 +154,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
   // Store mood data locally (encrypted)
   const storeMoodLocally = (data: any) => {
     try {
-      const existingData = localStorage.getItem('mood_data');
+      const existingData = secureStorage.getItem('mood_data');
       const moodHistory = existingData ? JSON.parse(atob(existingData)) : [];
       moodHistory.push(data);
       
@@ -162,7 +163,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         moodHistory.shift();
       }
       
-      localStorage.setItem('mood_data', btoa(JSON.stringify(moodHistory)));
+      secureStorage.setItem('mood_data', btoa(JSON.stringify(moodHistory)));
     } catch (error) {
       console.error('Failed to store mood locally:', error);
     }

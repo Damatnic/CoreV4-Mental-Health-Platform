@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface FeatureFlags {
   [key: string]: boolean | string | number | object;
@@ -61,7 +62,7 @@ export function useFeatureFlag(
     }
     
     // Check localStorage for override
-    const override = localStorage.getItem(`feature_flag_${flagName}`);
+    const override = secureStorage.getItem(`feature_flag_${flagName}`);
     if (override !== null) {
       try {
         return JSON.parse(override);
@@ -186,7 +187,7 @@ export function useFeatureFlags(): FeatureFlags {
  */
 export function useFeatureFlagOverride() {
   const setOverride = useCallback((flagName: string, value: any) => {
-    localStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(value));
+    secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(value));
     // Clear cache to force refresh
     flagCache.delete(flagName);
     // Trigger re-render
@@ -194,7 +195,7 @@ export function useFeatureFlagOverride() {
   }, []);
 
   const clearOverride = useCallback((flagName: string) => {
-    localStorage.removeItem(`feature_flag_${flagName}`);
+    secureStorage.removeItem(`feature_flag_${flagName}`);
     flagCache.delete(flagName);
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
@@ -203,7 +204,7 @@ export function useFeatureFlagOverride() {
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
       if (key.startsWith('feature_flag_')) {
-        localStorage.removeItem(key);
+        secureStorage.removeItem(key);
       }
     });
     flagCache.clear();

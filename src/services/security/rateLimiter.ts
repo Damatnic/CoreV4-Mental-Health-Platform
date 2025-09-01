@@ -6,6 +6,7 @@
 
 import { auditLogger } from './auditLogger';
 import { cryptoService } from './cryptoService';
+import { secureStorage } from 'SecureLocalStorage';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -686,7 +687,7 @@ class RateLimiterService {
   private async loadBlockedIPs(): Promise<void> {
     // Load blocked IPs from storage
     try {
-      const stored = localStorage.getItem('blocked_ips');
+      const stored = secureStorage.getItem('blocked_ips');
       if (stored) {
         const parsed = JSON.parse(stored);
         Object.entries(parsed).forEach(([ip, blockUntil]) => {
@@ -705,7 +706,7 @@ class RateLimiterService {
       this.blockedIPs.forEach((blockUntil, ip) => {
         data[ip] = blockUntil.toISOString();
       });
-      localStorage.setItem('blocked_ips', JSON.stringify(data));
+      secureStorage.setItem('blocked_ips', JSON.stringify(data));
     } catch (error) {
       console.error('Failed to persist blocked IPs:', error);
     }

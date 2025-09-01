@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+import { secureStorage } from '../../services/security/SecureLocalStorage';
   Play,
   Pause,
   RotateCcw,
@@ -127,8 +128,8 @@ export const MeditationTimer: React.FC = () => {
     }
     
     // Load saved sessions and streak
-    const savedSessions = localStorage.getItem('meditationSessions');
-    const savedStreak = localStorage.getItem('meditationStreak');
+    const savedSessions = secureStorage.getItem('meditationSessions');
+    const savedStreak = secureStorage.getItem('meditationStreak');
     
     if (savedSessions) {
       const parsed = JSON.parse(savedSessions);
@@ -309,7 +310,7 @@ export const MeditationTimer: React.FC = () => {
       
       const updatedSessions = [...sessions, session];
       setSessions(updatedSessions);
-      localStorage.setItem('meditationSessions', JSON.stringify(updatedSessions));
+      secureStorage.setItem('meditationSessions', JSON.stringify(updatedSessions));
       
       // Update streak
       updateStreak();
@@ -344,7 +345,7 @@ export const MeditationTimer: React.FC = () => {
     
     newStreak.lastSessionDate = today;
     setStreak(newStreak);
-    localStorage.setItem('meditationStreak', JSON.stringify(newStreak));
+    secureStorage.setItem('meditationStreak', JSON.stringify(newStreak));
   };
 
   // Main timer effect

@@ -9,6 +9,7 @@ import { sessionManager } from '../security/sessionManager';
 import { fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
 import { securityMonitor } from '../security/securityMonitor';
+import { secureStorage } from '../security/SecureLocalStorage';
 
 interface SecureRequestConfig {
   url: string;
@@ -599,11 +600,11 @@ class SecureAPIService {
   }
 
   private getSessionId(): string | null {
-    return localStorage.getItem('sessionId');
+    return secureStorage.getItem('sessionId');
   }
 
   private getCurrentUserId(): string | undefined {
-    return localStorage.getItem('userId') || undefined;
+    return secureStorage.getItem('userId') || undefined;
   }
 
   private async getClientIP(): Promise<string> {

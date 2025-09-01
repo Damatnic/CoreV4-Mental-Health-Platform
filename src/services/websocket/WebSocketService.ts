@@ -3,6 +3,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import {
+import { secureStorage } from '../security/SecureLocalStorage';
   WebSocketEvent,
   CrisisWebSocketEvent,
   CommunityWebSocketEvent,
@@ -516,7 +517,7 @@ export class WebSocketService {
 
   private saveQueuedMessages(): void {
     try {
-      localStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
+      secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
     } catch (error) {
       console.error('Failed to save message queue:', error);
     }
@@ -524,7 +525,7 @@ export class WebSocketService {
 
   private loadQueuedMessages(): void {
     try {
-      const saved = localStorage.getItem('ws_message_queue');
+      const saved = secureStorage.getItem('ws_message_queue');
       if (saved) {
         this.messageQueue = JSON.parse(saved);
       }
@@ -632,7 +633,7 @@ export class WebSocketService {
     
     // Also store locally for offline access
     try {
-      const logs = JSON.parse(localStorage.getItem('critical_events') || '[]');
+      const logs = JSON.parse(secureStorage.getItem('critical_events') || '[]');
       logs.push(logEntry);
       
       // Keep only last 100 events
@@ -640,7 +641,7 @@ export class WebSocketService {
         logs.splice(0, logs.length - 100);
       }
       
-      localStorage.setItem('critical_events', JSON.stringify(logs));
+      secureStorage.setItem('critical_events', JSON.stringify(logs));
     } catch (error) {
       console.error('Failed to log critical event:', error);
     }

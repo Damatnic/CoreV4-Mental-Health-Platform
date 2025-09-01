@@ -2,6 +2,7 @@
 // Ensures all PHI (Protected Health Information) is handled according to HIPAA standards
 
 import CryptoJS from 'crypto-js';
+import { secureStorage } from 'SecureLocalStorage';
 
 // HIPAA compliance requirements
 export enum ComplianceRequirement {
@@ -123,17 +124,22 @@ export class HIPAAComplianceService {
 
   // Initialize encryption key
   private getOrGenerateEncryptionKey(): string {
-    // In production, this should be stored in a secure key management service
-    let key = localStorage.getItem('hipaa_encryption_key');
+    // SECURITY FIX: Never store encryption keys in localStorage
+    // Use environment variables or secure key management service
+    
+    // Get key from environment variable (secure approach)
+    let key = import.meta.env.VITE_ENCRYPTION_KEY;
     
     if (!key) {
-      // Generate a new key
+      // Generate a temporary key for development ONLY
+      // WARNING: This key will not persist between sessions
       key = CryptoJS.lib.WordArray.random(256/8).toString();
       
-      // In production, store in KMS, not localStorage
-      if (import.meta.env.MODE === 'development') {
-        localStorage.setItem('hipaa_encryption_key', key);
-      }
+      // Log warning about temporary key
+      console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
+      
+      // NEVER store in localStorage - this was the critical vulnerability
+      // secureStorage.setItem('hipaa_encryption_key', key); // REMOVED
     }
     
     return key;
@@ -662,10 +668,18 @@ export class HIPAAComplianceService {
   }
 
   private getCurrentUserId(): string {
-    // Get from authentication service
+    // SECURITY FIX: Get user ID from secure authentication context
+    // instead of localStorage which is vulnerable to XSS
+    
     try {
-      const user = JSON.parse(localStorage.getItem('current_user') || '{}');
-      return user.id || 'anonymous';
+      // In production, get from secure HTTP-only cookie or authentication service
+      // For now, return anonymous to prevent localStorage access
+      
+      // TODO: Implement secure user ID retrieval from authentication context
+      // const authService = AuthService.getInstance();
+      // return authService.getCurrentUserId();
+      
+      return 'anonymous';
     } catch {
       return 'anonymous';
     }

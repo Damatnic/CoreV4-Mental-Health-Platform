@@ -8,6 +8,7 @@ import { User, ApiResponse } from '@/types';
 import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
+import { secureStorage } from '../security/SecureLocalStorage';
 
 interface AuthTokens {
   accessToken: string;
@@ -622,8 +623,8 @@ class AuthenticationService {
 
   private getDeviceFingerprint(): string {
     // Generate a unique device fingerprint
-    const deviceId = localStorage.getItem('deviceId') || this.generateDeviceId();
-    localStorage.setItem('deviceId', deviceId);
+    const deviceId = secureStorage.getItem('deviceId') || this.generateDeviceId();
+    secureStorage.setItem('deviceId', deviceId);
     return deviceId;
   }
 
