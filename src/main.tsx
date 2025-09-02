@@ -24,7 +24,7 @@ if (import.meta.env.PROD) {
     // Send to analytics instead of console.log in production
     const logMetric = (metric: any) => {
       // Only log critical performance issues, not every metric
-      if (metric.rating === 'poor' || import.meta.env.DEV) {
+      if (metric.rating === 'poor' && import.meta.env.DEV) {
         console.log(`${metric.name}: ${metric.value} (${metric.rating})`);
       }
     };
@@ -68,7 +68,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw-enhanced.js')
       .then((registration) => {
-        console.log('[Service Worker] Registered successfully:', registration.scope);
+        // Service Worker registered successfully
         
         // Handle updates silently - no user notifications
         registration.addEventListener('updatefound', () => {
@@ -77,7 +77,7 @@ if ('serviceWorker' in navigator) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 // Update silently - will activate on next page load naturally
-                console.log('[Service Worker] Update available - will activate on next visit');
+                // Update available - will activate on next visit
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
               }
             });
@@ -92,15 +92,11 @@ if ('serviceWorker' in navigator) {
 
 // Initialize React with DOM ready check
 function initializeReact() {
-  console.log('🔍 Looking for root element...');
   const rootElement = document.getElementById('root');
   
   if (!rootElement) {
-    console.error('❌ Root element #root not found! DOM ready state:', document.readyState);
-    
     // If DOM isn't ready, wait and retry
     if (document.readyState !== 'complete') {
-      console.log('🔄 DOM not ready, retrying in 100ms...');
       setTimeout(() => {
         initializeReact();
       }, 100);
@@ -108,7 +104,6 @@ function initializeReact() {
     }
     
     // If DOM is ready but no root element, create it
-    console.log('🏠 Creating missing root element...');
     const newRoot = document.createElement('div');
     newRoot.id = 'root';
     document.body.appendChild(newRoot);
@@ -120,8 +115,6 @@ function initializeReact() {
     return;
   }
 
-  console.log('✅ Found root element, initializing React...');
-  
   try {
     const root = ReactDOM.createRoot(rootElement);
 
@@ -132,8 +125,6 @@ function initializeReact() {
         </EmergencyErrorBoundary>
       </React.StrictMode>
     );
-    
-    console.log('✅ React successfully initialized!');
   } catch (error) {
     console.error('🚨 React initialization failed:', error);
     // Show emergency fallback

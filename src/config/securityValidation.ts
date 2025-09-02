@@ -107,25 +107,28 @@ export class SecurityValidationService {
   static validateAndLog(): boolean {
     const validation = this.validateClientEnvironment();
     
-    console.log('🔐 SECURITY VALIDATION REPORT');
-    console.log('============================');
-    
-    if (validation.isSecure) {
-      console.log('✅ CLIENT SECURITY: PASSED');
-    } else {
-      console.error('❌ CLIENT SECURITY: FAILED');
-      console.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
-      validation.criticalIssues.forEach(issue => console.error(issue));
-    }
+    // Only log security issues in development or when critical errors exist
+    if (import.meta.env.DEV || !validation.isSecure) {
+      console.log('🔐 SECURITY VALIDATION REPORT');
+      console.log('============================');
+      
+      if (validation.isSecure) {
+        console.log('✅ CLIENT SECURITY: PASSED');
+      } else {
+        console.error('❌ CLIENT SECURITY: FAILED');
+        console.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
+        validation.criticalIssues.forEach(issue => console.error(issue));
+      }
 
-    if (validation.warnings.length > 0) {
-      console.warn('⚠️  SECURITY WARNINGS:');
-      validation.warnings.forEach(warning => console.warn(warning));
-    }
+      if (validation.warnings.length > 0) {
+        console.warn('⚠️  SECURITY WARNINGS:');
+        validation.warnings.forEach(warning => console.warn(warning));
+      }
 
-    if (validation.recommendations.length > 0) {
-      console.log('💡 SECURITY RECOMMENDATIONS:');
-      validation.recommendations.forEach(rec => console.log(rec));
+      if (validation.recommendations.length > 0 && import.meta.env.DEV) {
+        console.log('💡 SECURITY RECOMMENDATIONS:');
+        validation.recommendations.forEach(rec => console.log(rec));
+      }
     }
 
     // In production, fail hard on security issues
