@@ -35,10 +35,19 @@ const SENSITIVE_DATA_KEYS = [
 
 class SecureLocalStorage {
   private encryptionKey: string;
+  private isInitialized: boolean = false;
 
   constructor() {
-    // Get encryption key from environment (secure approach)
-    this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
+    try {
+      // Get encryption key from environment (secure approach)
+      this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('🔒 SecureLocalStorage initialization failed:', error);
+      // Fallback to a simple key to prevent app crashes
+      this.encryptionKey = 'fallback_emergency_key_' + Date.now();
+      this.isInitialized = false;
+    }
   }
 
   /**
@@ -46,10 +55,32 @@ class SecureLocalStorage {
    * WARNING: This key will not persist between sessions
    */
   private generateTempKey(): string {
-    // @ts-ignore - CryptoJS lib property access
-    const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
-    console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
-    return tempKey;
+    try {
+      // Try CryptoJS first
+      // @ts-ignore - CryptoJS lib property access
+      const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
+      console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
+      return tempKey;
+    } catch (error) {
+      // Fallback to browser crypto API or manual generation
+      console.warn('⚠️ CryptoJS random failed, using fallback method:', error);
+      
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        // Use browser's crypto API
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        const tempKey = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        console.warn('⚠️ Using browser crypto for temporary key. Set VITE_ENCRYPTION_KEY for production.');
+        return tempKey;
+      } else {
+        // Final fallback - deterministic but unique per session
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2);
+        const tempKey = `fallback_${timestamp}_${random}`;
+        console.warn('⚠️ Using fallback key generation. Set VITE_ENCRYPTION_KEY for production.');
+        return tempKey;
+      }
+    }
   }
 
   /**
@@ -66,6 +97,12 @@ class SecureLocalStorage {
    */
   private encrypt(data: string): string {
     try {
+      // Check if CryptoJS is properly initialized
+      if (!CryptoJS || !CryptoJS.AES || !this.isInitialized) {
+        console.warn('🔒 CryptoJS not properly initialized, storing data unencrypted');
+        return data; // Store unencrypted but warn about it
+      }
+
       // @ts-ignore - CryptoJS method access
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey, {
         // @ts-ignore - CryptoJS mode property access
@@ -76,7 +113,8 @@ class SecureLocalStorage {
       return encrypted.toString();
     } catch (error) {
       console.error('🔒 Encryption failed:', error);
-      throw new Error('Failed to encrypt sensitive data');
+      console.warn('🔒 Storing data unencrypted due to encryption failure');
+      return data; // Fallback to unencrypted to prevent app crashes
     }
   }
 
@@ -89,6 +127,12 @@ class SecureLocalStorage {
       if (!encryptedData || typeof encryptedData !== 'string') {
         console.warn('🔒 Invalid encrypted data format, clearing...');
         return '';
+      }
+
+      // Check if CryptoJS is properly initialized
+      if (!CryptoJS || !CryptoJS.AES || !this.isInitialized) {
+        console.warn('🔒 CryptoJS not properly initialized, returning data as-is');
+        return encryptedData; // Return unencrypted data
       }
       
       // @ts-ignore - CryptoJS method access
@@ -103,15 +147,16 @@ class SecureLocalStorage {
       const result = decrypted.toString(CryptoJS.enc.Utf8);
       
       if (!result) {
-        console.warn('🔒 Corrupted data detected, clearing...');
-        return '';
+        console.warn('🔒 Corrupted data detected, returning original...');
+        return encryptedData; // Return original data instead of empty string
       }
       
       return result;
     } catch (error) {
       console.error('🔒 Decryption failed:', error);
-      // Return empty string instead of throwing to prevent app crashes
-      return '';
+      // Return original data instead of throwing to prevent app crashes
+      console.warn('🔒 Returning data unencrypted due to decryption failure');
+      return encryptedData;
     }
   }
 
