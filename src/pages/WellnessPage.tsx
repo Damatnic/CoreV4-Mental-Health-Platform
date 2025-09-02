@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { WellnessToolsSuite } from '../components/wellness/WellnessToolsSuite';
 
 export function WellnessPage() {
-  const [showFullSuite, setShowFullSuite] = useState(false);
+  const [showFullSuite, setShowFullSuite] = useState(true); // Default to full suite
 
   // If full suite is active, render it
   if (showFullSuite) {

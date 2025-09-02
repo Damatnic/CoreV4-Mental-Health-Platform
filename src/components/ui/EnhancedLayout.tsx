@@ -5,7 +5,8 @@ import {
   Menu, X, AlertTriangle, Search, User, Settings, LogOut, 
   Home, BarChart3, Heart, Users, Stethoscope, Bell, 
   ChevronDown, Star, Clock, Command, Accessibility,
-  Sparkles, Moon, Sun, ChevronLeft
+  Sparkles, Moon, Sun, ChevronLeft, Phone, MessageCircle,
+  Wind, Timer, BookOpen, Activity
 } from 'lucide-react';
 import { NavigationProvider, useNavigation } from '../navigation/NavigationContext';
 import { GlobalSearch } from '../navigation/GlobalSearch';
@@ -261,23 +262,24 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   // Enhanced keyboard navigation
   useEnhancedKeyboardNavigation();
 
-  // Navigation items based on mode
+  // Navigation items based on mode - Crisis-first design
   const getNavigationItems = () => {
     if (mode === 'crisis') {
       // Simplified navigation for crisis mode
       return [
-        { name: 'Help', href: '/crisis', icon: <AlertTriangle className="h-4 w-4" /> },
-        { name: 'Breathe', href: '/wellness/breathing', icon: <Heart className="h-4 w-4" /> },
-        { name: 'Support', href: '/community', icon: <Users className="h-4 w-4" /> },
+        { name: '🆘 Crisis Help', href: '/crisis', icon: <AlertTriangle className="h-5 w-5" /> },
+        { name: '🌬️ Breathe', href: '/wellness/breathing', icon: <Wind className="h-5 w-5" /> },
+        { name: '💬 Support', href: '/community', icon: <Users className="h-5 w-5" /> },
       ];
     }
     
-    // Normal navigation - Dashboard is now the home page
+    // Normal navigation - Maximum 5 sections with emoji visual anchors
     return [
-      { name: 'Dashboard', href: '/', icon: <BarChart3 className="h-4 w-4" /> },
-      { name: 'Wellness', href: '/wellness', icon: <Heart className="h-4 w-4" /> },
-      { name: 'Community', href: '/community', icon: <Users className="h-4 w-4" /> },
-      { name: 'Professional', href: '/professional', icon: <Stethoscope className="h-4 w-4" /> },
+      { name: '🏠 Home', href: '/', icon: <Home className="h-5 w-5" /> },
+      { name: '🧘 Wellness Tools', href: '/wellness', icon: <Heart className="h-5 w-5" /> },
+      { name: '💬 Community Support', href: '/community', icon: <Users className="h-5 w-5" /> },
+      { name: '👨‍⚕️ Find Professionals', href: '/professional', icon: <Stethoscope className="h-5 w-5" /> },
+      { name: '⚙️ My Settings', href: '/settings', icon: <Settings className="h-5 w-5" /> },
     ];
   };
 
@@ -319,248 +321,184 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
-      {/* Privacy Banner - Always visible */}
-      <PrivacyBanner />
+    <div className={`h-screen bg-gray-50 dark:bg-gray-900 flex ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
+      {/* Crisis Banner - Always at top */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2">
+        <div className="flex items-center justify-center space-x-4 text-sm font-medium">
+          <span>🆘 NEED HELP NOW?</span>
+          <a 
+            href="tel:988" 
+            className="flex items-center space-x-1 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition-all"
+          >
+            <Phone className="h-4 w-4" />
+            <span>Call 988</span>
+          </a>
+          <Link 
+            to="/crisis" 
+            className="flex items-center space-x-1 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition-all"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span>Crisis Chat</span>
+          </Link>
+        </div>
+      </div>
       
       {/* Skip Links */}
       <SkipLinks />
 
-      {/* Header */}
-      <header 
-        id="main-navigation"
-        className={`sticky top-0 z-50 ${
-          mode === 'crisis' 
-            ? 'bg-gradient-to-r from-pink-50 to-red-50 border-b-2 border-red-200' 
-            : 'bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'
-        } transition-all duration-300`}
+      {/* Sidebar Navigation */}
+      <motion.aside
+        animate={{ width: isMobileMenuOpen ? 280 : 80 }}
+        className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 overflow-hidden"
+        style={{ marginTop: '48px' }} // Space for crisis banner
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Simplified Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div className="hidden sm:block">
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Wellness Suite
-                  </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Your mental health toolkit</p>
-                </div>
-              </Link>
+        <div className="p-4">
+          {/* Logo */}
+          <div className="flex items-center mb-8">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
+            <motion.div
+              animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
+              className="ml-3 overflow-hidden"
+            >
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                Wellness Suite
+              </h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Your mental health toolkit</p>
+            </motion.div>
+          </div>
 
-            {/* Simplified Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-4">
-              {navigation.map((item) => (
+          {/* Main Navigation */}
+          <nav className="space-y-2">
+            {navigation.map((item) => {
+              const isActiveRoute = isActive(item.href);
+              return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                    ${isActive(item.href)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                  className={`group flex items-center p-3 rounded-lg transition-all duration-200 ${
+                    isActiveRoute
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }
-                  `}
+                  }`}
                 >
-                  {item.name}
+                  <div className="flex-shrink-0">
+                    {item.icon}
+                  </div>
+                  <motion.span
+                    animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
+                    className="ml-3 font-medium overflow-hidden whitespace-nowrap"
+                  >
+                    {item.name}
+                  </motion.span>
                 </Link>
-              ))}
-            </nav>
+              );
+            })}
+          </nav>
 
-            {/* Right side actions */}
-            <div className="flex items-center space-x-2">
-              {/* Simplified Search Button */}
+          {/* Wellness Tools - Show when expanded */}
+          <motion.div
+            animate={{ opacity: isMobileMenuOpen ? 1 : 0, height: isMobileMenuOpen ? 'auto' : 0 }}
+            className="mt-8 overflow-hidden"
+          >
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              Quick Wellness
+            </h3>
+            <div className="space-y-2">
+              <Link
+                to="/wellness/breathing"
+                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-cyan-50 hover:text-cyan-700 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Wind className="h-4 w-4" />
+                <span className="ml-3 text-sm">Breathing</span>
+              </Link>
+              <Link
+                to="/wellness/meditation"
+                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Timer className="h-4 w-4" />
+                <span className="ml-3 text-sm">Meditation</span>
+              </Link>
+              <Link
+                to="/wellness/journal"
+                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-700 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="ml-3 text-sm">Journal</span>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Bottom Actions */}
+          <motion.div
+            animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
+            className="absolute bottom-4 left-4 right-4"
+          >
+            <div className="space-y-2">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-                aria-label="Search"
+                className="w-full flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4" />
+                <span className="ml-3 text-sm">Search</span>
               </button>
-
-              {/* Notifications - Simplified */}
-              <button
-                className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-                aria-label="Notifications"
-              >
-                <Bell className="h-5 w-5" />
-                {notificationCount > 0 && (
-                  <span className="absolute top-1 right-1 h-2 w-2 bg-gradient-to-r from-pink-400 to-red-500 rounded-full animate-pulse"></span>
-                )}
-              </button>
-
-              {/* User Menu */}
               <UserMenu />
-
-              {/* Install PWA Button */}
-              {isInstallable && (
-                <button
-                  onClick={handleInstallClick}
-                  className="hidden sm:flex px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
-                >
-                  Install App
-                </button>
-              )}
-              
-              {/* Crisis Button - Always Visible */}
-              <Link
-                to="/crisis"
-                id="crisis-help"
-                className={`flex items-center space-x-1 px-4 py-2 ${
-                  crisisDetected 
-                    ? 'bg-gradient-to-r from-pink-500 to-red-600 animate-pulse' 
-                    : 'bg-gradient-to-r from-pink-400 to-red-500'
-                } text-white rounded-lg font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200`}
-              >
-                <AlertTriangle className="h-4 w-4" />
-                <span className="hidden sm:inline">Crisis</span>
-              </Link>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                aria-label="Toggle menu"
-                aria-expanded={isMobileMenuOpen}
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
             </div>
+          </motion.div>
+        </div>
+      </motion.aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col" style={{ marginTop: '48px' }}>
+        {/* Top Bar - Mobile Actions */}
+        <header 
+          id="main-navigation"
+          className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 lg:hidden"
+        >
+          <div className="flex justify-between items-center">
+            {/* Mobile Title */}
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+              Wellness Suite
+            </h1>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Toggle sidebar"
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? (
+                <ChevronLeft className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </button>
           </div>
+        </header>
+
+        {/* Breadcrumbs */}
+        <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <Breadcrumbs />
         </div>
 
-        {/* Mobile Menu Dropdown */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-            >
-              <div className="px-4 py-2 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`
-                      flex items-center px-3 py-2 rounded-lg text-base font-medium transition-all duration-200
-                      ${isActive(item.href)
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }
-                    `}
-                  >
-                    {item.icon}
-                    <span className="ml-2">{item.name}</span>
-                  </Link>
-                ))}
-                
-                {/* Mobile Search */}
-                <button
-                  onClick={() => {
-                    setSearchOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <Search className="h-4 w-4" />
-                  <span className="ml-2">Search</span>
-                </button>
-                
-                {/* Mobile Install Button */}
-                {isInstallable && (
-                  <button
-                    onClick={handleInstallClick}
-                    className="w-full text-left px-3 py-2 rounded-lg text-base font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:shadow-lg transition-all duration-200"
-                  >
-                    📱 Install App
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-
-      {/* Breadcrumbs */}
-      <Breadcrumbs />
-      <MobileBreadcrumbs />
-
-      {/* Main Content */}
-      <main id="main-content" className="flex-1 pb-16 md:pb-0 bg-gray-50 dark:bg-gray-900">
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: preferences.reducedMotion ? 0 : 0.3 }}
-        >
-          {children}
-        </motion.div>
-      </main>
+        {/* Main Content */}
+        <main id="main-content" className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: preferences.reducedMotion ? 0 : 0.3 }}
+          >
+            {children}
+          </motion.div>
+        </main>
+      </div>
 
       {/* Global Search */}
       <GlobalSearch />
-
-      {/* Floating Crisis Button */}
-      <FloatingCrisisButton />
-      <MobileCrisisButton />
-
-      {/* Mobile Navigation */}
-      <MobileNavigation />
-
-      {/* Footer - Hidden on mobile to save space */}
-      <footer className="hidden md:block bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Resources</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link to="/wellness/guide" className="hover:text-primary-600">Mental Health Guide</Link></li>
-                <li><Link to="/crisis" className="hover:text-primary-600">Crisis Resources</Link></li>
-                <li><Link to="/wellness/self-care" className="hover:text-primary-600">Self-Care Tips</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Community</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link to="/community/groups" className="hover:text-primary-600">Support Groups</Link></li>
-                <li><Link to="/community/stories" className="hover:text-primary-600">Success Stories</Link></li>
-                <li><Link to="/community/events" className="hover:text-primary-600">Events</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">About</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link to="/about" className="hover:text-primary-600">Our Mission</Link></li>
-                <li><Link to="/privacy" className="hover:text-primary-600">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-primary-600">Terms of Service</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Emergency Contacts</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="text-red-600 font-semibold">Crisis Hotline: 988</li>
-                <li className="text-gray-600">Text HOME to 741741</li>
-                <li className="text-gray-600">Emergency: 911</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-            <p>© 2025 CoreV4 Mental Health Platform. Built with care for your wellbeing.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
