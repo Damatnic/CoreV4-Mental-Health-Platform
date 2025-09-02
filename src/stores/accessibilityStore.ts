@@ -435,9 +435,8 @@ function applyColorBlindFilter(mode: string) {
   
   const colorMatrix = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
   colorMatrix.setAttribute('type', 'matrix');
-  const filterValue = (mode && filterValues[mode as keyof typeof filterValues]) 
-    || filterValues.protanopia;
-  colorMatrix.setAttribute('values', filterValue);
+  const filterValue = (mode && filterValues[mode]) || filterValues.protanopia;
+  colorMatrix.setAttribute('values', filterValue!);
   
   filter.appendChild(colorMatrix);
   defs.appendChild(filter);

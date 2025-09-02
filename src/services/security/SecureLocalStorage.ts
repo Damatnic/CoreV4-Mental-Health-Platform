@@ -5,7 +5,7 @@
  * Prevents XSS attacks from accessing plain text mental health data
  */
 
-import CryptoJS from 'crypto-js';
+const CryptoJS = require('crypto-js');
 
 // Sensitive data types that must be encrypted
 const SENSITIVE_DATA_KEYS = [

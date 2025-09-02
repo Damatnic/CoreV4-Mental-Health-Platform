@@ -228,22 +228,6 @@ export interface TypingUser {
   timestamp: number;
 }
 
-export interface ConnectionState {
-  isConnected: boolean;
-  reconnectAttempts: number;
-  lastError?: Error;
-  latency: number;
-  connectionQuality: 'excellent' | 'good' | 'fair' | 'poor';
-  lastSuccessfulMessage: Date;
-  messagesQueued: number;
-  dataUsage: {
-    sent: number;
-    received: number;
-    session: number;
-  };
-  serverRegion?: string;
-  protocolVersion?: string;
-}
 
 export interface QueuedMessage {
   event: string;
