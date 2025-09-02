@@ -4,17 +4,20 @@
  */
 
 (function() {
-  console.log('🔍 REACT DIAGNOSTIC STARTING...');
-  
-  // Check if root element exists
-  const rootElement = document.getElementById('root');
-  console.log('📍 Root element found:', !!rootElement);
-  if (rootElement) {
-    console.log('📍 Root element innerHTML:', rootElement.innerHTML.length, 'characters');
-    console.log('📍 Root element content:', rootElement.innerHTML.substring(0, 200));
-  } else {
-    console.error('❌ Root element #root not found!');
-  }
+  // Wait for DOM to be ready before running diagnostics
+  function runDiagnostics() {
+    console.log('🔍 REACT DIAGNOSTIC STARTING...');
+    
+    // Check if root element exists
+    const rootElement = document.getElementById('root');
+    console.log('📍 Root element found:', !!rootElement);
+    if (rootElement) {
+      console.log('📍 Root element innerHTML:', rootElement.innerHTML.length, 'characters');
+      console.log('📍 Root element content:', rootElement.innerHTML.substring(0, 200));
+    } else {
+      console.warn('⚠️ Root element #root not found yet - DOM may still be loading');
+      return; // Don't proceed if root element is missing
+    }
   
   // Check if React is available
   console.log('⚛️ React available:', typeof window.React);
@@ -111,14 +114,22 @@
   observer.observe(document.head, { childList: true });
   observer.observe(document.body, { childList: true });
   
-  console.log('✅ React diagnostic active - monitoring for 60 seconds...');
+    console.log('✅ React diagnostic active - monitoring for 60 seconds...');
+    
+    // Stop monitoring after 60 seconds
+    setTimeout(() => {
+      observer.disconnect();
+      console.log('🔍 React diagnostic monitoring ended');
+    }, 60000);
+  }
   
-  // Stop monitoring after 60 seconds
-  setTimeout(() => {
-    observer.disconnect();
-    console.log('🔍 React diagnostic monitoring ended');
-  }, 60000);
-  
+  // Run diagnostics when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runDiagnostics);
+  } else {
+    // DOM is already ready, wait a bit for modules to load
+    setTimeout(runDiagnostics, 1000);
+  }
 })();
 
 console.log('🔍 React diagnostic script loaded');

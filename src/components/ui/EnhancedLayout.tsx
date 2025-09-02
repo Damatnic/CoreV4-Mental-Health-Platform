@@ -336,66 +336,51 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+            {/* Simplified Logo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <div className={`w-8 h-8 ${
-                  mode === 'crisis' 
-                    ? 'bg-red-500' 
-                    : 'bg-gradient-to-br from-primary-500 to-secondary-500'
-                } rounded-lg flex items-center justify-center text-white font-bold`}>
-                  C4
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-medium">
+                  S
                 </div>
-                <span className="font-display font-semibold text-xl text-gray-900 hidden sm:block">
-                  Safe Space {mode === 'crisis' && <span className="text-red-600 text-sm ml-1">(Crisis Mode)</span>}
+                <span className="font-medium text-lg text-gray-800 hidden sm:block">
+                  SafeSpace
                 </span>
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              <FreeBadge />
+            {/* Simplified Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-4">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`
-                    flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all
+                    text-sm font-medium transition-all duration-200
                     ${isActive(item.href)
-                      ? mode === 'crisis' 
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-primary-100 text-primary-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      ? 'text-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
                     }
                   `}
                 >
-                  {item.icon}
-                  <span className="ml-2">{item.name}</span>
+                  {item.name}
                 </Link>
               ))}
             </nav>
 
             {/* Right side actions */}
             <div className="flex items-center space-x-2">
-              {/* Search Button */}
+              {/* Simplified Search Button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden sm:flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Search (Cmd+K)"
+                className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-50 transition-all duration-200"
+                aria-label="Search"
               >
-                <Search className="h-4 w-4" />
-                <span className="ml-2 text-sm hidden lg:inline">Search</span>
-                <kbd className="ml-2 px-1.5 py-0.5 text-xs bg-gray-100 border border-gray-300 rounded hidden lg:inline">⌘K</kbd>
+                <Search className="h-5 w-5" />
               </button>
 
-              {/* Quick Access */}
-              {preferences.showQuickAccess && (
-                <QuickAccessPanel />
-              )}
-
-              {/* Notifications */}
+              {/* Notifications - Simplified */}
               <button
-                className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="relative p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-50 transition-all duration-200"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />

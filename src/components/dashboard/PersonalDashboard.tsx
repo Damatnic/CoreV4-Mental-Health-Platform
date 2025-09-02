@@ -199,8 +199,8 @@ export function PersonalDashboard() {
     }
   }, [isOnline, enableOfflineMode, refetch, announce, trackEvent, trackError, errorRetryCount]);
 
-  // Greeting based on time of day
-  const getGreeting = () => {
+  // Greeting based on time of day - memoized to prevent re-calculation
+  const getGreeting = useMemo(() => {
     const hour = new Date().getHours();
     const name = user?.name?.split(' ')[0] || 'there';
     
@@ -208,10 +208,10 @@ export function PersonalDashboard() {
     if (hour < 17) return `Good afternoon, ${name}`;
     if (hour < 21) return `Good evening, ${name}`;
     return `Good night, ${name}`;
-  };
+  }, [user?.name]);
 
-  // Get motivational message
-  const getMotivationalMessage = () => {
+  // Motivational message - memoized to prevent flickering on re-renders
+  const motivationalMessage = useMemo(() => {
     const messages = [
       "You're doing great today!",
       "Every step forward counts.",
@@ -220,8 +220,11 @@ export function PersonalDashboard() {
       "You've got this!",
       "Remember to be kind to yourself.",
     ];
-    return messages[Math.floor(Math.random() * messages.length)];
-  };
+    // Use a stable index based on the day to keep message consistent
+    const today = new Date().toDateString();
+    const index = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % messages.length;
+    return messages[index];
+  }, []);
 
   // Loading state
   if (isLoading && !dashboardData) {
@@ -247,59 +250,26 @@ export function PersonalDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
-      {/* Dashboard Header */}
-      <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Simplified Dashboard Header - Clean and Calming */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-display font-bold text-gray-900">
-                {getGreeting()}
+              <h1 className="text-2xl font-medium text-gray-800">
+                {getGreeting}
               </h1>
-              <p className="text-sm text-gray-600 mt-1 flex items-center">
-                <Sparkles className="h-4 w-4 mr-1 text-yellow-500" />
-                {getMotivationalMessage()}
+              <p className="text-sm text-gray-500 mt-2">
+                {motivationalMessage}
               </p>
             </div>
             
-            <div className="flex items-center space-x-3">
-              {/* Notifications */}
-              <button 
-                className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label={`View notifications. ${notifications.length} unread`}
-                aria-live="polite"
-              >
-                <Bell className="h-5 w-5" />
-                {notifications.length > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </button>
-              
-              {/* Refresh */}
-              <button 
-                onClick={handleGlobalRefresh}
-                disabled={refreshing}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Refresh dashboard"
-              >
-                <RefreshCw className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
-              </button>
-              
-              {/* Customize Layout */}
-              <button 
-                onClick={() => setIsCustomizing(!isCustomizing)}
-                className={`p-2 rounded-lg transition-colors ${
-                  isCustomizing ? 'bg-primary-100 text-primary-600' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-                aria-label="Customize dashboard layout"
-              >
-                <Grid3x3 className="h-5 w-5" />
-              </button>
-              
+            {/* Simplified action buttons - only essentials */}
+            <div className="flex items-center space-x-2">
               {/* Settings */}
               <button 
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Dashboard settings"
+                className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-full transition-all duration-200"
+                aria-label="Settings"
               >
                 <Settings className="h-5 w-5" />
               </button>
@@ -330,75 +300,40 @@ export function PersonalDashboard() {
         </div>
       )}
 
-      {/* View Toggle Buttons */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="flex space-x-2 mb-4 flex-wrap">
+      {/* Simplified View Navigation - Less overwhelming */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <nav className="flex space-x-2 mb-8" role="navigation" aria-label="Dashboard views">
           <button
             onClick={() => setActiveView('main')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
               activeView === 'main' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 text-blue-700' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
-            Main Dashboard
-          </button>
-          <button
-            onClick={() => setActiveView('prevention')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
-              activeView === 'prevention' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            <Brain className="h-4 w-4" />
-            <span>Crisis Prevention</span>
-          </button>
-          <button
-            onClick={() => setActiveView('network')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
-              activeView === 'network' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            <Users className="h-4 w-4" />
-            <span>Support Network</span>
+            Overview
           </button>
           <button
             onClick={() => setActiveView('activities')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
               activeView === 'activities' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 text-blue-700' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
-            <Target className="h-4 w-4" />
-            <span>Activities & Progress</span>
+            Activities
           </button>
           <button
-            onClick={() => setActiveView('professional')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
-              activeView === 'professional' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            onClick={() => setActiveView('network')}
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+              activeView === 'network' 
+                ? 'bg-blue-100 text-blue-700' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
-            <Shield className="h-4 w-4" />
-            <span>Professional Care</span>
+            Support
           </button>
-          <button
-            onClick={() => setActiveView('ai-insights')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
-              activeView === 'ai-insights' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>AI Insights</span>
-          </button>
-        </div>
+        </nav>
       </div>
 
       {/* Main Dashboard Content */}
@@ -406,14 +341,14 @@ export function PersonalDashboard() {
         {/* Main Dashboard View */}
         {activeView === 'main' && (
           <div className="
-            grid gap-4 auto-rows-[minmax(150px,auto)]
+            grid gap-6 auto-rows-[minmax(150px,auto)]
             grid-cols-1
-            md:grid-cols-6
-            lg:grid-cols-12
+            md:grid-cols-2
+            lg:grid-cols-3
           ">
-            {/* Enhanced Crisis Panel - Always First, Always Visible */}
+            {/* Crisis Support - Simplified and welcoming */}
             <motion.div
-              className="col-span-1 md:col-span-6 lg:col-span-6 row-span-3"
+              className="col-span-1 md:col-span-2 lg:col-span-1 bg-white rounded-xl shadow-sm p-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -465,7 +400,7 @@ export function PersonalDashboard() {
 
             {/* Wellness Status */}
             <motion.div
-              className="col-span-1 md:col-span-3 lg:col-span-3 row-span-2"
+              className="col-span-1 bg-white rounded-xl shadow-sm p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
@@ -494,7 +429,7 @@ export function PersonalDashboard() {
 
             {/* Today's Schedule */}
             <motion.div
-              className="col-span-1 md:col-span-3 lg:col-span-3 row-span-2"
+              className="col-span-1 bg-white rounded-xl shadow-sm p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
@@ -524,7 +459,7 @@ export function PersonalDashboard() {
 
             {/* Quick Actions */}
             <motion.div
-              className="col-span-1 md:col-span-3 lg:col-span-3 row-span-2"
+              className="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-xl shadow-sm p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
@@ -547,9 +482,10 @@ export function PersonalDashboard() {
             </DashboardWidget>
           </motion.div>
 
-            {/* Crisis Support Network Widget */}
+            {/* Support Network - Hidden for now to reduce clutter */}
+            {false && (
             <motion.div
-              className="col-span-1 md:col-span-6 lg:col-span-6 row-span-3"
+              className="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-xl shadow-sm p-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.4 }}
@@ -575,6 +511,7 @@ export function PersonalDashboard() {
                 <CrisisSupportNetwork />
               </DashboardWidget>
             </motion.div>
+            )}
           </div>
         )}
 
