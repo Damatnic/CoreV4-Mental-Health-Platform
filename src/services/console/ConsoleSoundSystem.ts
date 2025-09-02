@@ -139,17 +139,17 @@ export class ConsoleSoundSystem {
       haptic: { pattern: [50, 50, 50], intensity: 'medium' }
     },
     
-    // Emergency/Alert sounds
+    // Emergency/Alert sounds - MUTED: Sound was too loud/annoying for users
     emergency: {
       type: 'alert',
-      volume: 0.8,
+      volume: 0.0, // DISABLED: Sound muted per user feedback
       pitch: 1000,
       duration: 0.3,
       haptic: { pattern: [100, 100, 100, 100, 200], intensity: 'strong' }
     },
     warning: {
       type: 'alert',
-      volume: 0.5,
+      volume: 0.0, // DISABLED: Sound muted per user feedback
       pitch: 600,
       duration: 0.2,
       haptic: { pattern: [80, 80, 80], intensity: 'medium' }

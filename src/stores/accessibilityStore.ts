@@ -93,7 +93,7 @@ const defaultSettings: AccessibilitySettings = {
   screenReaderMode: false,
   voiceSpeed: 1,
   voicePitch: 1,
-  soundEffects: true,
+  soundEffects: false, // DISABLED: Emergency alert sounds were too annoying
   voiceCommands: false,
   voiceNavigation: false,
   voiceFeedback: false,
