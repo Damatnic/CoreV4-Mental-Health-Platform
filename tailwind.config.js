@@ -7,71 +7,79 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Calming primary colors
+        // Therapeutic primary colors - soft blues for trust and calm
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50: '#EBF3FA',
+          100: '#D6E7F5',
+          200: '#B3CCDF',
+          300: '#9BB9D4',
+          400: '#84A6C9',
+          500: '#7BA7D9',
+          600: '#6A93C2',
+          700: '#5A7FA8',
+          800: '#4A6B8E',
+          900: '#3A5774',
+          950: '#2A435A',
         },
-        // Soothing secondary colors
+        // Soothing secondary colors - sage greens for balance and growth
         secondary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#E8F4F1',
+          100: '#D1E9E3',
+          200: '#B3D9CF',
+          300: '#95C9BB',
+          400: '#79A89D',
+          500: '#668F85',
+          600: '#567B71',
+          700: '#46675D',
+          800: '#365349',
+          900: '#263F35',
+          950: '#162B21',
         },
-        // Wellness colors
+        // Wellness colors - muted and calming
         wellness: {
-          meditation: '#8b5cf6',
-          mindfulness: '#06b6d4',
-          gratitude: '#f59e0b',
-          reflection: '#3b82f6',
-          growth: '#10b981',
+          meditation: '#9B8EC1',  // Soft purple
+          mindfulness: '#87CEEB',  // Sky blue
+          gratitude: '#F4C97D',    // Warm gold
+          reflection: '#8FA5D1',   // Gentle blue
+          growth: '#90C5A9',       // Soft mint green
         },
-        // Mood tracking colors
+        // Mood tracking colors - softer, less jarring
         mood: {
-          excellent: '#22c55e',
-          good: '#84cc16',
-          neutral: '#eab308',
-          low: '#f97316',
-          crisis: '#ef4444',
+          excellent: '#90C5A9',  // Soft mint
+          good: '#A8D5BA',       // Light sage
+          neutral: '#F6E6A8',    // Warm yellow
+          low: '#F4C097',        // Peach
+          crisis: '#DFA4A0',     // Muted coral
         },
-        // Alert and status colors
+        // Alert and status colors - visible but not alarming
         alert: {
-          info: '#3b82f6',
-          success: '#22c55e',
-          warning: '#f59e0b',
-          error: '#ef4444',
-          crisis: '#dc2626',
+          info: '#8FA5D1',       // Soft blue
+          success: '#90C5A9',    // Soft green
+          warning: '#F4C97D',    // Warm amber
+          error: '#DFA4A0',      // Muted coral
+          crisis: '#D4908B',     // Deeper coral
         },
-        // Neutral palette
+        // Neutral palette - warmer and softer
         neutral: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
-          950: '#0a0a0a',
+          50: '#FAF9F6',   // Warm off-white
+          100: '#F5F4F1',  // Light cream
+          200: '#EBEBEB',  // Light gray
+          300: '#D6D6D6',  // Soft gray
+          400: '#A8A8A8',  // Medium gray
+          500: '#787878',  // Gray
+          600: '#5A5A5A',  // Dark gray
+          700: '#404040',  // Charcoal
+          800: '#2B2B2B',  // Deep charcoal
+          900: '#1A1A1A',  // Near black
+          950: '#0D0D0D',  // Black
+        },
+        // Additional calming colors
+        calm: {
+          lavender: '#D4C5E8',
+          peach: '#FFE5D9',
+          mint: '#C8E6C9',
+          sky: '#E5F0FA',
+          sand: '#F6E6D3',
         }
       },
       fontFamily: {
@@ -80,14 +88,14 @@ export default {
         mono: ['Fira Code', 'monospace'],
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'fade-in': 'fadeIn 0.6s ease-in-out',
         'fade-out': 'fadeOut 0.5s ease-in-out',
-        'slide-in': 'slideIn 0.3s ease-out',
-        'slide-out': 'slideOut 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'pulse-soft': 'pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'breathe': 'breathe 4s ease-in-out infinite',
-        'float': 'float 6s ease-in-out infinite',
+        'slide-in': 'slideIn 0.4s ease-out',
+        'slide-out': 'slideOut 0.4s ease-out',
+        'scale-in': 'scaleIn 0.3s ease-out',
+        'pulse-soft': 'pulseSoft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'breathe': 'breathe 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 8s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -115,8 +123,8 @@ export default {
           '50%': { opacity: '0.8' },
         },
         breathe: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.05)' },
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+          '50%': { transform: 'scale(1.04)', opacity: '1' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
@@ -134,9 +142,11 @@ export default {
         '3xl': '2rem',
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
-        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
+        'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.03)',
+        'glow': '0 0 15px rgba(123, 167, 217, 0.2)',
+        'inner-soft': 'inset 0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        'gentle': '0 1px 4px rgba(0, 0, 0, 0.03)',
       },
     },
   },

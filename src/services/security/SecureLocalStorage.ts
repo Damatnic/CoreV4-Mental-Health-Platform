@@ -131,17 +131,30 @@ class SecureLocalStorage {
         // Try to get encrypted version first
         const encryptedValue = localStorage.getItem(`encrypted_${key}`);
         if (encryptedValue) {
-          return this.decrypt(encryptedValue);
+          try {
+            return this.decrypt(encryptedValue);
+          } catch (decryptError) {
+            // If decryption fails (malformed data/wrong key), clear corrupted data
+            console.warn('🔒 Corrupted encrypted data detected, clearing:', key);
+            localStorage.removeItem(`encrypted_${key}`);
+            localStorage.removeItem(key);
+            return null;
+          }
         }
         
         // Fall back to plain text (for migration)
         const plainValue = localStorage.getItem(key);
         if (plainValue) {
-          // Migrate to encrypted storage
-          this.setItem(key, plainValue);
-          localStorage.removeItem(key); // Remove plain text version
-          console.info('🔒 Migrated plain text data to encrypted storage:', key);
-          return plainValue;
+          try {
+            // Migrate to encrypted storage
+            this.setItem(key, plainValue);
+            localStorage.removeItem(key); // Remove plain text version
+            console.info('🔒 Migrated plain text data to encrypted storage:', key);
+            return plainValue;
+          } catch (encryptError) {
+            console.warn('🔒 Failed to encrypt during migration, returning plain value:', key);
+            return plainValue;
+          }
         }
         
         return null;

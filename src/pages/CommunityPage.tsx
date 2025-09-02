@@ -5,11 +5,11 @@ import { CommunityPosts } from '../components/community/CommunityPosts';
 import { SupportGroups } from '../components/community/SupportGroups';
 import { CommunityEvents } from '../components/community/CommunityEvents';
 import { websocketService } from '../services/realtime/websocketService';
-import { useAuth } from '../hooks/useAuth';
+import { useAnonymousAuth } from '../contexts/AnonymousAuthContext';
 import { toast } from 'react-hot-toast';
 
 export function CommunityPage() {
-  const { user } = useAuth();
+  const { user } = useAnonymousAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('posts');
   const [onlineCount, setOnlineCount] = useState(0);

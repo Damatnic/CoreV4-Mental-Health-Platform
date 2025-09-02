@@ -1,0 +1,369 @@
+/**
+ * Therapeutic Visual Overrides
+ * This file contains specific CSS overrides to create a calmer, more therapeutic environment
+ * for mental health platform users. All colors and animations are designed to promote
+ * feelings of safety, calm, and support.
+ */
+
+/* ===== Global Overrides ===== */
+
+/* Replace harsh colors with softer alternatives */
+.bg-red-50 { @apply bg-calm-peach/20 !important; }
+.bg-red-100 { @apply bg-calm-peach/30 !important; }
+.bg-red-500 { @apply bg-[#DFA4A0] !important; }
+.bg-red-600 { @apply bg-[#D4908B] !important; }
+.bg-red-700 { @apply bg-[#C97C76] !important; }
+.bg-red-900 { @apply bg-[#A8706C] !important; }
+
+.text-red-50 { @apply text-calm-peach !important; }
+.text-red-500 { @apply text-[#C97C76] !important; }
+.text-red-600 { @apply text-[#B86862] !important; }
+.text-red-700 { @apply text-[#A75A54] !important; }
+
+.border-red-500 { @apply border-[#DFA4A0] !important; }
+.border-red-600 { @apply border-[#D4908B] !important; }
+
+/* Soften blues */
+.bg-blue-50 { @apply bg-primary-50 !important; }
+.bg-blue-100 { @apply bg-primary-100 !important; }
+.bg-blue-500 { @apply bg-primary-500 !important; }
+.bg-blue-600 { @apply bg-primary-600 !important; }
+.bg-blue-700 { @apply bg-primary-700 !important; }
+.bg-blue-900 { @apply bg-primary-900 !important; }
+
+.text-blue-500 { @apply text-primary-600 !important; }
+.text-blue-600 { @apply text-primary-700 !important; }
+.text-blue-700 { @apply text-primary-800 !important; }
+
+.border-blue-200 { @apply border-primary-200 !important; }
+.border-blue-500 { @apply border-primary-400 !important; }
+.border-blue-600 { @apply border-primary-500 !important; }
+
+/* Soften greens */
+.bg-green-50 { @apply bg-secondary-50 !important; }
+.bg-green-100 { @apply bg-secondary-100 !important; }
+.bg-green-500 { @apply bg-secondary-500 !important; }
+.bg-green-600 { @apply bg-secondary-600 !important; }
+
+.text-green-500 { @apply text-secondary-600 !important; }
+.text-green-600 { @apply text-secondary-700 !important; }
+
+/* ===== Button Overrides ===== */
+
+/* All buttons should have gentler hover states */
+button {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+button:hover {
+  @apply shadow-soft;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Primary action buttons */
+.bg-primary-500,
+.bg-primary-600 {
+  background-color: rgb(123 167 217) !important; /* Therapeutic sky blue */
+  box-shadow: 0 2px 8px rgba(123, 167, 217, 0.15);
+}
+
+.hover\:bg-primary-600:hover,
+.hover\:bg-primary-700:hover {
+  background-color: rgb(105 149 199) !important; /* Slightly darker on hover */
+  box-shadow: 0 4px 12px rgba(123, 167, 217, 0.2);
+}
+
+/* Crisis buttons - important but not alarming */
+.btn-crisis,
+[class*="crisis-button"],
+[class*="emergency"] {
+  @apply bg-[#DFA4A0] text-gray-800 !important;
+  box-shadow: 0 3px 10px rgba(223, 164, 160, 0.25);
+  border: 1px solid rgba(223, 164, 160, 0.3);
+}
+
+.btn-crisis:hover,
+[class*="crisis-button"]:hover {
+  @apply bg-[#D4908B] !important;
+  box-shadow: 0 4px 14px rgba(212, 144, 139, 0.3);
+}
+
+/* ===== Card and Panel Overrides ===== */
+
+.card,
+[class*="panel"],
+[class*="widget"] {
+  @apply bg-white/95 backdrop-blur-sm !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover,
+[class*="panel"]:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Form Elements ===== */
+
+input,
+textarea,
+select {
+  @apply border-gray-200 bg-white/80 !important;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  @apply border-primary-300 bg-white !important;
+  box-shadow: 0 0 0 3px rgba(179, 204, 223, 0.15);
+}
+
+/* ===== Alert and Message Styles ===== */
+
+.alert,
+[class*="notification"],
+[class*="message"] {
+  @apply rounded-xl !important;
+  animation: gentleSlideIn 0.5s ease-out;
+}
+
+@keyframes gentleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Error messages - visible but not alarming */
+.text-red-500,
+.text-red-600,
+[class*="error"] {
+  @apply text-[#B86862] !important;
+}
+
+.bg-red-50,
+[class*="error-bg"] {
+  @apply bg-[#FAE8E7] !important;
+}
+
+/* Success messages - positive but subtle */
+.text-green-500,
+.text-green-600,
+[class*="success"] {
+  @apply text-secondary-700 !important;
+}
+
+.bg-green-50,
+[class*="success-bg"] {
+  @apply bg-secondary-50 !important;
+}
+
+/* ===== Loading and Animation States ===== */
+
+/* Soften all spinning animations */
+.animate-spin {
+  animation: gentleSpin 1.5s linear infinite !important;
+}
+
+@keyframes gentleSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading indicators should be calming */
+[class*="loading"],
+[class*="spinner"] {
+  @apply text-primary-400 !important;
+}
+
+/* ===== Modal and Overlay Styles ===== */
+
+/* Softer backdrop for modals */
+[class*="backdrop"],
+[class*="overlay"] {
+  @apply bg-black/20 !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Modal content */
+[class*="modal-content"],
+[class*="dialog"] {
+  @apply bg-white rounded-2xl shadow-soft-lg !important;
+  animation: gentleModalIn 0.4s ease-out;
+}
+
+@keyframes gentleModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== Hover States ===== */
+
+/* All interactive elements should have gentle hover effects */
+a:hover,
+button:hover,
+[role="button"]:hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Links should be calming */
+a {
+  @apply text-primary-600 !important;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  @apply text-primary-700 !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(106, 147, 194, 0.3);
+  text-underline-offset: 2px;
+}
+
+/* ===== Focus States ===== */
+
+/* Gentle focus rings for all interactive elements */
+*:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(179, 204, 223, 0.3) !important;
+  transition: box-shadow 0.3s ease;
+}
+
+/* ===== Badge and Tag Overrides ===== */
+
+.badge,
+[class*="tag"] {
+  @apply rounded-full px-3 py-1 text-xs font-medium !important;
+  transition: all 0.3s ease;
+}
+
+/* ===== Progress Indicators ===== */
+
+/* Progress bars should be encouraging */
+[class*="progress"] {
+  @apply bg-gray-100 !important;
+}
+
+[class*="progress-bar"],
+[class*="progress-fill"] {
+  @apply bg-gradient-to-r from-primary-400 to-secondary-400 !important;
+  transition: width 0.5s ease-out;
+}
+
+/* ===== Tooltip Styles ===== */
+
+[class*="tooltip"] {
+  @apply bg-gray-800/90 text-white rounded-lg !important;
+  backdrop-filter: blur(4px);
+  animation: tooltipFadeIn 0.3s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Breathing and Meditation Elements ===== */
+
+.breathing-circle,
+[class*="meditation"] {
+  animation: calmBreathing 6s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+@keyframes calmBreathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* ===== Dark Mode Adjustments ===== */
+
+.dark {
+  /* Ensure dark mode is also calming */
+  --tw-bg-opacity: 0.95;
+}
+
+.dark button {
+  @apply bg-opacity-90 !important;
+}
+
+.dark .card,
+.dark [class*="panel"] {
+  @apply bg-gray-800/90 border-gray-700/50 !important;
+}
+
+/* ===== Accessibility Improvements ===== */
+
+/* Ensure sufficient but not harsh contrast */
+.text-gray-900 {
+  @apply text-gray-800 !important;
+}
+
+.text-gray-800 {
+  @apply text-gray-700 !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    transition-duration: 0.1s !important;
+  }
+  
+  button {
+    border: 2px solid currentColor !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== Print Styles ===== */
+
+@media print {
+  body {
+    @apply bg-white text-black !important;
+  }
+  
+  .btn-crisis,
+  [class*="crisis"] {
+    @apply border-2 border-black !important;
+  }
+}

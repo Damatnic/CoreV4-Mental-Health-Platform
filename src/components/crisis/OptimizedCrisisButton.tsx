@@ -392,55 +392,61 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         }
         
         .crisis-btn-primary {
-          background: #dc2626;
-          color: white;
-          border: 2px solid transparent;
+          background: linear-gradient(135deg, #DFA4A0, #E5B3AF);
+          color: #4A4A4A;
+          border: 1px solid rgba(223, 164, 160, 0.3);
+          box-shadow: 0 2px 8px rgba(223, 164, 160, 0.2);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .crisis-btn-primary:hover {
-          background: #b91c1c;
-          transform: scale(1.02);
+          background: linear-gradient(135deg, #D4908B, #DFA4A0);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(212, 144, 139, 0.3);
         }
         
         .crisis-btn-primary:active {
-          background: #991b1b;
-          transform: scale(0.98);
+          background: #D4908B;
+          transform: translateY(0);
         }
         
         .crisis-btn-secondary {
-          background: #fee2e2;
-          color: #991b1b;
-          border: 2px solid #fca5a5;
+          background: #FAE8E7;
+          color: #6B5555;
+          border: 1px solid #E5D0CF;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .crisis-modal-overlay {
           position: fixed;
           inset: 0;
           z-index: 9999;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.25);
+          backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 1rem;
-          animation: fadeIn 0.1s ease;
+          animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .crisis-modal {
-          background: white;
-          border-radius: 1rem;
+          background: linear-gradient(to bottom, #FAFAF9, #FFFFFF);
+          border-radius: 1.5rem;
           max-width: 42rem;
           width: 100%;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          animation: slideUp 0.15s ease;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           transform: translateZ(0);
+          border: 1px solid rgba(0, 0, 0, 0.05);
         }
         
         .crisis-header {
           padding: 1.5rem;
-          border-bottom: 2px solid #fee2e2;
-          background: linear-gradient(to bottom, #fef2f2, white);
+          border-bottom: 1px solid #F0E8E7;
+          background: linear-gradient(to bottom, #FAF6F5, #FFFFFF);
         }
         
         .crisis-title {
@@ -451,11 +457,13 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         }
         
         .crisis-emergency {
-          background: #dc2626;
-          color: white;
+          background: linear-gradient(135deg, #DFA4A0, #D4908B);
+          color: #3A3A3A;
           padding: 0.75rem;
-          border-radius: 0.5rem;
+          border-radius: 0.75rem;
           text-align: center;
+          border: 1px solid rgba(223, 164, 160, 0.2);
+          box-shadow: 0 2px 6px rgba(223, 164, 160, 0.15);
         }
         
         .emergency-number {
@@ -465,7 +473,8 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         
         .emergency-text {
           font-size: 0.875rem;
-          opacity: 0.9;
+          opacity: 0.85;
+          color: #5A5A5A;
         }
         
         .crisis-primary-resources {
@@ -480,30 +489,30 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
           align-items: center;
           gap: 1rem;
           padding: 1rem;
-          background: #fef2f2;
-          border: 2px solid #fca5a5;
-          border-radius: 0.5rem;
+          background: linear-gradient(135deg, #FAF6F5, #FAE8E7);
+          border: 1px solid #E5D0CF;
+          border-radius: 0.75rem;
           text-decoration: none;
           color: inherit;
-          transition: all 0.15s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .crisis-hotline-primary:hover {
-          background: #fee2e2;
-          transform: scale(1.02);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          background: linear-gradient(135deg, #FAE8E7, #F5DDD9);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(223, 164, 160, 0.2);
         }
         
         .hotline-icon {
           width: 2rem;
           height: 2rem;
-          color: #dc2626;
+          color: #C97C76;
         }
         
         .hotline-number {
           font-size: 2rem;
           font-weight: 700;
-          color: #dc2626;
+          color: #B86862;
         }
         
         .hotline-name {
@@ -514,7 +523,7 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         
         .hotline-availability {
           font-size: 0.875rem;
-          color: #059669;
+          color: #668F85;
         }
         
         .crisis-text-line {
@@ -522,21 +531,22 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
           align-items: center;
           gap: 1rem;
           padding: 1rem;
-          background: #eff6ff;
-          border: 2px solid #93c5fd;
-          border-radius: 0.5rem;
+          background: linear-gradient(135deg, #EBF3FA, #E5F0FA);
+          border: 1px solid #B3CCDF;
+          border-radius: 0.75rem;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .text-icon {
           width: 2rem;
           height: 2rem;
-          color: #2563eb;
+          color: #6A93C2;
         }
         
         .text-action {
           font-size: 1.25rem;
           font-weight: 700;
-          color: #2563eb;
+          color: #5A7FA8;
         }
         
         .text-name {
@@ -547,7 +557,7 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         
         .text-availability {
           font-size: 0.875rem;
-          color: #059669;
+          color: #668F85;
         }
         
         .crisis-additional-resources {
@@ -569,12 +579,12 @@ const OptimizedCrisisButton: React.FC<OptimizedCrisisButtonProps> = memo(({
         .crisis-resource-item {
           display: block;
           padding: 0.75rem;
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 0.375rem;
+          background: #FAF9F6;
+          border: 1px solid #EBEBEB;
+          border-radius: 0.5rem;
           text-decoration: none;
           color: inherit;
-          transition: all 0.15s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .crisis-resource-item:hover {
