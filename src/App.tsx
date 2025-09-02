@@ -11,10 +11,13 @@ import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
 
 // Lazy load non-critical pages for better initial bundle size
-const WellnessPage = lazy(() => import('./pages/WellnessPage').then(m => ({ default: m.WellnessPage })));
-const CommunityPage = lazy(() => import('./pages/CommunityPage').then(m => ({ default: m.CommunityPage })));
-const ProfessionalPage = lazy(() => import('./pages/ProfessionalPage').then(m => ({ default: m.ProfessionalPage })));
-const SettingsPage = lazy(() => import('./pages/Settings').then(m => ({ default: m.default })));
+const WellnessPage = lazy(() => import('./pages/WellnessPage'));
+const CommunityPage = lazy(() => import('./pages/CommunityPage'));
+const ProfessionalPage = lazy(() => import('./pages/ProfessionalPage'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const AnalyticsPage = lazy(() => import('./pages/Analytics'));
+const AccessibilityPage = lazy(() => import('./pages/AccessibilitySettings'));
+const NotificationCenterPage = lazy(() => import('./pages/NotificationCenter'));
 
 // Loading component for lazy-loaded pages
 const PageLoadingSpinner = () => (
@@ -41,6 +44,9 @@ const SecureWellness = withSecurity(WellnessPage, 'basic'); // Reduced from 'ele
 const SecureProfessional = withSecurity(ProfessionalPage, 'basic'); // Reduced from 'maximum' for demo
 const SecureCommunity = withSecurity(CommunityPage, 'basic'); // Already at basic level
 const SecureSettings = withSecurity(SettingsPage, 'basic'); // Settings with basic security
+const SecureAnalytics = withSecurity(AnalyticsPage, 'basic'); // Analytics with basic security
+const SecureAccessibility = withSecurity(AccessibilityPage, 'basic'); // Accessibility settings
+const SecureNotifications = withSecurity(NotificationCenterPage, 'basic'); // Notifications center
 
 function App() {
   return (
@@ -69,6 +75,21 @@ function App() {
                   <Route path="/professional/*" element={
                     <Suspense fallback={<PageLoadingSpinner />}>
                       <SecureProfessional />
+                    </Suspense>
+                  } />
+                  <Route path="/analytics" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureAnalytics />
+                    </Suspense>
+                  } />
+                  <Route path="/accessibility" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureAccessibility />
+                    </Suspense>
+                  } />
+                  <Route path="/notifications" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureNotifications />
                     </Suspense>
                   } />
                   <Route path="/settings" element={

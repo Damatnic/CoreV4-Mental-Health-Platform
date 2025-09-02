@@ -22,7 +22,10 @@ import {
   MessageSquare,
   Shield,
   Target,
-  ChevronUp
+  ChevronUp,
+  BarChart3,
+  Accessibility,
+  Bell
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 import { useMobileFeatures, useTouchGestures } from '../../hooks/useMobileFeatures';
@@ -110,6 +113,25 @@ const drawerItems: NavItem[] = [
     icon: <Shield className="h-5 w-5" />,
     label: 'Safety Plan',
     requiresAuth: true
+  },
+  {
+    id: 'analytics',
+    path: '/analytics',
+    icon: <BarChart3 className="h-5 w-5" />,
+    label: 'Analytics',
+    requiresAuth: true
+  },
+  {
+    id: 'accessibility',
+    path: '/accessibility',
+    icon: <Accessibility className="h-5 w-5" />,
+    label: 'Accessibility'
+  },
+  {
+    id: 'notifications',
+    path: '/notifications',
+    icon: <Bell className="h-5 w-5" />,
+    label: 'Notifications'
   },
   {
     id: 'settings',
@@ -231,7 +253,7 @@ export function MobileBottomNav() {
   useEffect(() => {
     const currentPath = location.pathname;
     const item = mainNavItems.find(item => 
-      currentPath === item.path || currentPath.startsWith(item.path + '/')
+      currentPath === item.path || currentPath.startsWith(`${item.path  }/`)
     );
     if (item) {
       setActiveTab(item.id);

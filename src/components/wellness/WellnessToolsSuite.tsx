@@ -186,7 +186,7 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
                   onClick={() => handleToolSelect(tool.id)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
                     isSelected
-                      ? 'bg-gradient-to-r ' + tool.color + ' text-white shadow-lg'
+                      ? `bg-gradient-to-r ${  tool.color  } text-white shadow-lg`
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                   } ${sidebarCollapsed ? 'justify-center' : ''}`}
                   title={sidebarCollapsed ? tool.name : undefined}
@@ -318,9 +318,14 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
   );
 };
 
+// Main export
+export default WellnessToolsSuite;
+
 // Export individual components for standalone use
 export { BreathingExercises } from './BreathingExercises';
 export { TherapeuticJournal } from './TherapeuticJournal';
 export { MeditationTimer } from './MeditationTimer';
 export { WellnessDashboard } from './WellnessDashboard';
 export { default as MoodTracker } from './MoodTracker';
+
+// Named export for compatibility (already exported above as const)

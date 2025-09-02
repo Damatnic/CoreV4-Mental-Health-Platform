@@ -169,7 +169,7 @@ describe('Performance Testing Suite', () => {
       const fps = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
           let frames = 0;
-          let startTime = performance.now();
+          const startTime = performance.now();
           
           function measureFPS() {
             frames++;

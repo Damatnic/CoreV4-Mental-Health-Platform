@@ -141,7 +141,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
           if (document.activeElement !== activeElement) {
             activeElement = document.activeElement;
             if (activeElement) {
-              elements.push(activeElement.tagName + (activeElement.id ? '#' + activeElement.id : ''));
+              elements.push(activeElement.tagName + (activeElement.id ? `#${  activeElement.id}` : ''));
             }
           } else {
             break;
@@ -197,7 +197,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         if (!modal) return false;
         
         const focusableElements = modal.querySelectorAll('button, input, select, textarea, a, [tabindex]');
-        let currentIndex = 0;
+        const currentIndex = 0;
         
         // Tab through elements
         for (let i = 0; i < focusableElements.length + 2; i++) {
@@ -228,7 +228,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
                           (el as HTMLInputElement).placeholder;
           
           if (!hasLabel) {
-            missing.push(el.tagName + (el.id ? '#' + el.id : ''));
+            missing.push(el.tagName + (el.id ? `#${  el.id}` : ''));
           }
         });
         

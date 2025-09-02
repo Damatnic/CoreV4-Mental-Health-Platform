@@ -23,6 +23,7 @@ import {
   DBTSkillsAnalysis,
   TherapyProgressAnalysis,
   WellnessMetric,
+  CrisisProfile,
 } from '../types/ai-insights';
 
 // Enhanced AI types for crisis prediction and mood analysis
@@ -1367,7 +1368,15 @@ export function useAIInsights() {
         environmentalCorrelations: environmentalInsights,
         progressMetrics,
         aiConfidence: 0.82,
-        crisisRiskPrediction,
+        crisisRiskPrediction: {
+          userId: user?.id || '',
+          riskLevel: crisisRiskPrediction.riskLevel === 'low' ? 'stable' : 
+                    crisisRiskPrediction.riskLevel === 'moderate' ? 'elevated' : crisisRiskPrediction.riskLevel,
+          indicators: crisisRiskPrediction.primaryRiskFactors.map(factor => factor.description),
+          patterns: crisisRiskPrediction.preventiveStrategies,
+          recommendations: crisisRiskPrediction.immediateActions,
+          lastUpdated: crisisRiskPrediction.lastPrediction
+        } as CrisisProfile,
         moodAnalysis: moodAnalysisData,
         personalizedInterventions,
         therapeuticContent

@@ -77,7 +77,7 @@ class CryptographyService {
       // Encrypt the data
       const encryptParams: any = {
         name: this.ALGORITHM,
-        iv: iv,
+        iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       
@@ -129,7 +129,7 @@ class CryptographyService {
       // Decrypt the data
       const decryptParams: any = {
         name: this.ALGORITHM,
-        iv: iv,
+        iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       

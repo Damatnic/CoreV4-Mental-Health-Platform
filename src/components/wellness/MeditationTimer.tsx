@@ -329,7 +329,7 @@ export const MeditationTimer: React.FC = () => {
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     
-    let newStreak = { ...streak };
+    const newStreak = { ...streak };
     
     if (streak.lastSessionDate === today) {
       // Already meditated today, don't change streak
@@ -496,7 +496,7 @@ export const MeditationTimer: React.FC = () => {
                   }}
                   className={`p-4 rounded-xl cursor-pointer transition-all ${
                     selectedType === key
-                      ? 'bg-gradient-to-r ' + type.color + ' text-white shadow-lg'
+                      ? `bg-gradient-to-r ${  type.color  } text-white shadow-lg`
                       : 'bg-white dark:bg-gray-800 hover:shadow-md'
                   }`}
                 >

@@ -11,7 +11,7 @@ const crisisHandlers = [
     await delay(50);
     
     return HttpResponse.json({
-      id: 'crisis-' + Date.now(),
+      id: `crisis-${  Date.now()}`,
       severity: body.severity || 'high',
       responseTime: 50,
       hotlineNumber: '988',
@@ -106,7 +106,7 @@ const wellnessHandlers = [
     await delay(50);
     
     return HttpResponse.json({
-      id: 'mood-' + Date.now(),
+      id: `mood-${  Date.now()}`,
       mood: body.mood,
       score: body.score,
       timestamp: Date.now(),
@@ -170,12 +170,12 @@ const professionalHandlers = [
     await delay(150);
     
     return HttpResponse.json({
-      appointmentId: 'apt-' + Date.now(),
+      appointmentId: `apt-${  Date.now()}`,
       professionalId: body.professionalId,
       datetime: body.datetime,
       type: body.type || 'video',
       status: 'confirmed',
-      confirmationCode: 'CONF-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      confirmationCode: `CONF-${  Math.random().toString(36).substr(2, 9).toUpperCase()}`,
     });
   }),
 ];
@@ -217,7 +217,7 @@ const communityHandlers = [
     
     if (hasTriggerWords) {
       return HttpResponse.json({
-        id: 'msg-' + Date.now(),
+        id: `msg-${  Date.now()}`,
         status: 'flagged',
         crisisResourcesProvided: true,
         message: 'Your message has been flagged for safety review. Crisis resources have been provided.',
@@ -225,7 +225,7 @@ const communityHandlers = [
     }
     
     return HttpResponse.json({
-      id: 'msg-' + Date.now(),
+      id: `msg-${  Date.now()}`,
       status: 'posted',
       timestamp: Date.now(),
     });
@@ -240,7 +240,7 @@ const analyticsHandlers = [
     await delay(20);
     
     return HttpResponse.json({
-      eventId: 'evt-' + Date.now(),
+      eventId: `evt-${  Date.now()}`,
       tracked: true,
       category: body.category,
       action: body.action,

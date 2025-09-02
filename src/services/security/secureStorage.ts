@@ -332,18 +332,43 @@ class SecureStorageService {
   }
 
   private async decompress(data: string): Promise<string> {
-    // Decompress using browser's DecompressionStream API if available
-    if ('DecompressionStream' in window) {
-      const compressed = Uint8Array.from(atob(data), c => c.charCodeAt(0));
-      const stream = new Response(
-        new Blob([compressed])
-          .stream()
-          .pipeThrough(new (window as any).DecompressionStream('gzip'))
-      );
-      const decompressed = await stream.text();
-      return decompressed;
+    try {
+      // Validate base64 input
+      if (!data || typeof data !== 'string') {
+        console.warn('[SecureStorage] Invalid data for decompression');
+        return '';
+      }
+      
+      // Check if data is already decompressed (not base64)
+      if (!this.isBase64(data)) {
+        return data;
+      }
+      
+      // Decompress using browser's DecompressionStream API if available
+      if ('DecompressionStream' in window) {
+        const compressed = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+        const stream = new Response(
+          new Blob([compressed])
+            .stream()
+            .pipeThrough(new (window as any).DecompressionStream('gzip'))
+        );
+        const decompressed = await stream.text();
+        return decompressed;
+      }
+      return data; // Return as-is if API not available
+    } catch (error) {
+      console.error('[SecureStorage] Decompression failed:', error);
+      return ''; // Return empty string instead of throwing
     }
-    return data; // Return as-is if API not available
+  }
+
+  private isBase64(str: string): boolean {
+    try {
+      // Basic base64 validation
+      return btoa(atob(str)) === str;
+    } catch {
+      return false;
+    }
   }
 
   private async checkStorageQuota(): Promise<void> {

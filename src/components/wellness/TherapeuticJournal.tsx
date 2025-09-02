@@ -315,7 +315,7 @@ export const TherapeuticJournal: React.FC = () => {
   const exportEntries = (format: 'json' | 'txt' | 'pdf') => {
     if (format === 'json') {
       const dataStr = JSON.stringify(entries, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
       const exportFileDefaultName = `journal-export-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
@@ -324,7 +324,7 @@ export const TherapeuticJournal: React.FC = () => {
       linkElement.click();
     } else if (format === 'txt') {
       let textContent = 'Therapeutic Journal Export\n';
-      textContent += '=' .repeat(50) + '\n\n';
+      textContent += `${'=' .repeat(50)  }\n\n`;
       
       entries.forEach(entry => {
         textContent += `Date: ${formatDate(entry.timestamp, 'PPP')}\n`;
@@ -342,7 +342,7 @@ export const TherapeuticJournal: React.FC = () => {
           });
         }
         
-        textContent += '\n' + '-'.repeat(50) + '\n\n';
+        textContent += `\n${  '-'.repeat(50)  }\n\n`;
       });
       
       const blob = new Blob([textContent], { type: 'text/plain' });
@@ -619,7 +619,7 @@ export const TherapeuticJournal: React.FC = () => {
                           </div>
                           <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                             {typeof entry.content === 'string'
-                              ? entry.content.substring(0, 100) + '...'
+                              ? `${entry.content.substring(0, 100)  }...`
                               : 'Structured entry'
                             }
                           </p>

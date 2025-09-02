@@ -291,31 +291,31 @@ export class ComponentPreloader {
 export const RouteComponents = {
   // Core routes (always loaded)
   Dashboard: createLazyComponent(
-    () => import('../../pages/Dashboard'),
+    () => import('../../pages/DashboardPage'),
     'Dashboard'
   ),
   
   // Crisis routes (high priority)
   Crisis: createLazyComponent(
-    () => import('../../pages/Crisis'),
+    () => import('../../pages/CrisisPage'),
     'Crisis'
   ),
   
   // Wellness routes (medium priority)
   Wellness: createLazyComponent(
-    () => import('../../pages/Wellness'),
+    () => import('../../pages/WellnessPage'),
     'Wellness'
   ),
   
   // Community routes (lower priority)
   Community: createLazyComponent(
-    () => import('../../pages/Community'),
+    () => import('../../pages/CommunityPage'),
     'Community'
   ),
   
   // Professional routes
   Professional: createLazyComponent(
-    () => import('../../pages/Professional'),
+    () => import('../../pages/ProfessionalPage'),
     'Professional'
   ),
   

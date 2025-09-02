@@ -210,7 +210,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
     triggerWarningType: editPost?.triggerWarningType || [],
     visibility: editPost?.visibility || 'public',
     mood: editPost?.metadata?.mood || '',
-    groupId: groupId,
+    groupId,
   });
   const [tagInput, setTagInput] = useState('');
 

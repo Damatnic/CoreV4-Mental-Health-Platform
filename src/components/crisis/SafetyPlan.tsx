@@ -65,7 +65,7 @@ export function SafetyPlan() {
 
   const exportSafetyPlan = () => {
     const dataStr = JSON.stringify(safetyPlan, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
     const exportFileDefaultName = `safety-plan-${new Date().toISOString().split('T')[0]}.json`;
     
     const linkElement = document.createElement('a');
@@ -95,7 +95,7 @@ export function SafetyPlan() {
 
   const generatePlainTextPlan = () => {
     let text = 'MY SAFETY PLAN\n';
-    text += '=' .repeat(40) + '\n\n';
+    text += `${'=' .repeat(40)  }\n\n`;
     
     text += '1. WARNING SIGNALS:\n';
     safetyPlan.warningSignals.forEach(signal => text += `   • ${signal}\n`);

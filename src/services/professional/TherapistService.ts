@@ -492,7 +492,7 @@ export class TherapistService {
     const therapist = await apiService.getTherapist(request.therapistId);
     
     let amount = therapist.sessionRate;
-    let method = request.paymentMethod;
+    const method = request.paymentMethod;
     
     // Handle sliding scale
     if (method === 'sliding-scale' && therapist.slidingScale) {

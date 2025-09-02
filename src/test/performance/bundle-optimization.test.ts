@@ -9,7 +9,7 @@ import { join } from 'path';
 import { glob } from 'glob';
 
 describe('Bundle Optimization Tests', () => {
-  let bundleStats: Record<string, number> = {};
+  const bundleStats: Record<string, number> = {};
   let manifestContent: string = '';
   
   beforeAll(async () => {

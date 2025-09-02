@@ -267,7 +267,7 @@ class PushNotificationService {
       data: { 
         type: 'therapy-reminder',
         therapist: therapistName,
-        time: time
+        time
       }
     } as NotificationOptions);
   }

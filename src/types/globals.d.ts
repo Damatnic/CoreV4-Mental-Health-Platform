@@ -39,6 +39,12 @@ declare global {
     ontypechange?: ((this: NetworkInformation, ev: Event) => any) | null;
   }
 
+  // Speech Recognition API for accessibility features
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
+  }
+
   // Geolocation types for crisis location services
   interface GeolocationPosition {
     coords: GeolocationCoordinates;

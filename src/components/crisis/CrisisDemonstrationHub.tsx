@@ -395,7 +395,16 @@ export function CrisisDemonstrationHub() {
         );
 
       case 'emergency-services':
-        return <EmergencyServicesInterface />;
+        return <EmergencyServicesInterface 
+          crisisProfile={{
+            userId: 'demo',
+            riskLevel: 'elevated',
+            indicators: ['stress', 'anxiety'],
+            patterns: [],
+            recommendations: [],
+            lastUpdated: new Date()
+          }}
+        />;
 
       case 'offline-resources':
         return (

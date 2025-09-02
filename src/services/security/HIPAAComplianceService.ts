@@ -133,7 +133,7 @@ export class HIPAAComplianceService {
     if (!key) {
       // Generate a temporary key for development ONLY
       // WARNING: This key will not persist between sessions
-      key = 'temp_key_' + Date.now() + '_' + Math.random().toString(36);
+      key = `temp_key_${  Date.now()  }_${  Math.random().toString(36)}`;
       
       // Log warning about temporary key
       console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');

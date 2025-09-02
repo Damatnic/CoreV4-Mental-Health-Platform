@@ -232,11 +232,11 @@ export const getComponentStyles = (
   let styles = comp.base || '';
   
   if (variant && 'variants' in comp) {
-    styles += ' ' + (comp.variants as any)[variant];
+    styles += ` ${  (comp.variants as any)[variant]}`;
   }
   
   if (size && 'sizes' in comp) {
-    styles += ' ' + (comp.sizes as any)[size];
+    styles += ` ${  (comp.sizes as any)[size]}`;
   }
   
   return styles;

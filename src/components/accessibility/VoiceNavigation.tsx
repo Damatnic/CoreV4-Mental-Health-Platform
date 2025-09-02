@@ -277,12 +277,7 @@ export const VoiceNavigation: React.FC = () => {
 };
 
 // Type declarations for Speech Recognition API
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+// Speech recognition types are declared in src/types/globals.d.ts
 
 // Speech Recognition interfaces
 interface SpeechRecognitionResult {

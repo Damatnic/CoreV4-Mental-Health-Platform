@@ -229,7 +229,7 @@ export const WellnessDashboard: React.FC = () => {
     
     if (existingStreak) {
       const yesterday = new Date(Date.now() - 86400000).toDateString();
-      let newStreak = { ...existingStreak };
+      const newStreak = { ...existingStreak };
       
       if (existingStreak.lastCompleted === today) {
         // Already completed today
@@ -453,7 +453,7 @@ export const WellnessDashboard: React.FC = () => {
     if (format === 'json') {
       // Use the store's export function
       const dataStr = exportData();
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
       const exportFileDefaultName = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
@@ -594,7 +594,7 @@ export const WellnessDashboard: React.FC = () => {
               onClick={() => setSelectedCategory(key as keyof typeof WELLNESS_CATEGORIES)}
               className={`px-4 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap ${
                 selectedCategory === key
-                  ? 'bg-gradient-to-r ' + category.color + ' text-white'
+                  ? `bg-gradient-to-r ${  category.color  } text-white`
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
               }`}
             >

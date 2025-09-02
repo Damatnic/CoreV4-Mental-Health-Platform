@@ -68,7 +68,7 @@ export function VoiceCommandInterface({
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          final += transcript + ' ';
+          final += `${transcript  } `;
         } else {
           interim += transcript;
         }

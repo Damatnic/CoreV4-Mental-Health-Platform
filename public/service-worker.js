@@ -7,16 +7,13 @@ const CACHE_NAME = 'astral-core-v4-cache-v1';
 const DYNAMIC_CACHE = 'astral-core-dynamic-v1';
 const OFFLINE_URL = '/offline.html';
 
-// Critical assets to cache for offline use
+// Critical assets to cache for offline use (only existing files)
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/offline.html',
   '/manifest.json',
-  '/favicon.ico',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  // Critical CSS and JS will be added dynamically
+  '/vite.svg',
+  // Only cache files that actually exist
 ];
 
 // API endpoints to cache responses for offline access
@@ -35,7 +32,19 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        // Cache assets individually to handle missing files gracefully
+        return Promise.allSettled(
+          STATIC_ASSETS.map(asset => 
+            fetch(asset).then(response => {
+              if (response.ok) {
+                return cache.put(asset, response);
+              }
+              console.warn(`[Service Worker] Failed to cache ${asset}: ${response.status}`);
+            }).catch(error => {
+              console.warn(`[Service Worker] Error caching ${asset}:`, error);
+            })
+          )
+        );
       })
       .then(() => self.skipWaiting())
       .catch((error) => {

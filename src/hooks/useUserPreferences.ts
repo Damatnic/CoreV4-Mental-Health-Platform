@@ -208,7 +208,7 @@ export function useUserPreferences(userId: string) {
   // Export preferences
   const exportPreferences = useCallback(() => {
     const dataStr = JSON.stringify(preferences, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
     
     const exportFileDefaultName = `preferences_${userId}_${Date.now()}.json`;
     

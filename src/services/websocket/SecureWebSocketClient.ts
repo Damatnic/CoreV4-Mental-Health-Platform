@@ -78,7 +78,7 @@ export class SecureWebSocketClient {
 
       this.socket = io(wsUrl, {
         auth: {
-          token: token
+          token
         },
         timeout: 20000,
         forceNew: true

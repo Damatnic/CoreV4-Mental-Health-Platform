@@ -70,11 +70,11 @@ export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
     let styles = comp.base || '';
     
     if (variant && comp.variants) {
-      styles += ' ' + comp.variants[variant];
+      styles += ` ${  comp.variants[variant]}`;
     }
     
     if (size && comp.sizes) {
-      styles += ' ' + comp.sizes[size];
+      styles += ` ${  comp.sizes[size]}`;
     }
     
     return styles;

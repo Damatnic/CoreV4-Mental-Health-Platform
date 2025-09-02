@@ -56,7 +56,7 @@ const CreatePostModal = optimizedMemo<any>(({
     triggerWarningType: editPost?.triggerWarningType || [],
     visibility: editPost?.visibility || 'public',
     mood: editPost?.metadata?.mood || '',
-    groupId: groupId,
+    groupId,
   });
   
   const mutation = useMutation({

@@ -85,6 +85,12 @@ class SecureLocalStorage {
    */
   private decrypt(encryptedData: string): string {
     try {
+      // Validate input data
+      if (!encryptedData || typeof encryptedData !== 'string') {
+        console.warn('🔒 Invalid encrypted data format, clearing...');
+        return '';
+      }
+      
       // @ts-ignore - CryptoJS method access
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey, {
         // @ts-ignore - CryptoJS mode property access
@@ -92,11 +98,20 @@ class SecureLocalStorage {
         // @ts-ignore - CryptoJS padding property access
         padding: CryptoJS.pad.Pkcs7
       });
+      
       // @ts-ignore - CryptoJS encoding access
-      return decrypted.toString(CryptoJS.enc.Utf8);
+      const result = decrypted.toString(CryptoJS.enc.Utf8);
+      
+      if (!result) {
+        console.warn('🔒 Corrupted data detected, clearing...');
+        return '';
+      }
+      
+      return result;
     } catch (error) {
       console.error('🔒 Decryption failed:', error);
-      throw new Error('Failed to decrypt sensitive data');
+      // Return empty string instead of throwing to prevent app crashes
+      return '';
     }
   }
 

@@ -30,7 +30,11 @@ export enum LogCategory {
   SYSTEM = 'SYSTEM',
   USER_ACTION = 'USER_ACTION',
   API = 'API',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
+  AI = 'AI',
+  EMERGENCY = 'EMERGENCY',
+  NOTIFICATIONS = 'NOTIFICATIONS',
+  ACCESSIBILITY = 'ACCESSIBILITY'
 }
 
 interface LogContext {

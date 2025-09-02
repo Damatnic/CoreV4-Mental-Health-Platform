@@ -7,19 +7,20 @@
     <meta name="description" content="CoreV4 - Comprehensive mental health support platform with crisis intervention, wellness tracking, and community features" />
     <meta name="theme-color" content="#6366f1" />
     
-    <!-- SECURITY: Content Security Policy (Critical Security Fix) -->
+    <!-- SECURITY: Content Security Policy (Updated for development) -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      script-src 'self' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
       font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' data: https:;
-      connect-src 'self' wss: ws: https:;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' wss: ws: https: http://localhost:*;
       media-src 'self';
       object-src 'none';
       base-uri 'self';
       form-action 'self';
-      upgrade-insecure-requests;
+      frame-src 'none';
+      worker-src 'self' blob:;
     " />
     
     <!-- PWA Meta Tags -->

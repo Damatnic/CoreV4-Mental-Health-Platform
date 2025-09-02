@@ -114,7 +114,7 @@ export function CrisisQuickActionsHub({
       number,
       name,
       timestamp: new Date().toISOString(),
-      location: location
+      location
     });
     
     // Reset after delay

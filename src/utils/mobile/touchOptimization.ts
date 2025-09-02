@@ -648,7 +648,7 @@ export const MobileOptimizationUtils = {
           const viewport = document.querySelector('meta[name="viewport"]');
           if (viewport) {
             const currentContent = viewport.getAttribute('content') || '';
-            viewport.setAttribute('content', currentContent + ', user-scalable=no');
+            viewport.setAttribute('content', `${currentContent  }, user-scalable=no`);
             
             // Restore after blur
             input.addEventListener('blur', () => {

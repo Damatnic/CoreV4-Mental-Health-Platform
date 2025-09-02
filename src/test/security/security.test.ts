@@ -466,7 +466,7 @@ describe('Security Testing Suite', () => {
       const invalidRequests = [
         { endpoint: '/api/user/-1', expected: 400 },
         { endpoint: '/api/posts?limit=10000', expected: 400 },
-        { endpoint: '/api/search?q=' + 'a'.repeat(1000), expected: 400 },
+        { endpoint: `/api/search?q=${  'a'.repeat(1000)}`, expected: 400 },
       ];
       
       for (const req of invalidRequests) {

@@ -26,7 +26,10 @@
       "Bash(curl:*)",
       "Bash(npx eslint:*)",
       "Bash(python:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(timeout 30s npm run typecheck)",
+      "Bash(timeout 20s npx tsc --noEmit --project tsconfig.temp.json)",
+      "Bash(del:*)"
     ],
     "deny": [],
     "ask": []

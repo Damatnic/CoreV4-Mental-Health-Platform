@@ -1,6 +1,15 @@
 // AI-Powered Insights System Types
 // Advanced mental health pattern recognition and predictive analytics
 
+export interface CrisisProfile {
+  userId: string;
+  riskLevel: 'stable' | 'elevated' | 'high' | 'critical';
+  indicators: string[];
+  patterns: any[];
+  recommendations: any[];
+  lastUpdated: Date;
+}
+
 export interface AIInsightsDashboard {
   id: string;
   userId: string;
@@ -13,7 +22,7 @@ export interface AIInsightsDashboard {
   environmentalCorrelations: EnvironmentalInsight[];
   progressMetrics: ProgressMetrics;
   aiConfidence: number; // 0-1 confidence in insights
-  crisisRiskPrediction?: any; // Optional crisis risk prediction data
+  crisisRiskPrediction?: CrisisProfile; // Optional crisis risk prediction data
   moodAnalysis?: any; // Optional mood analysis data  
   personalizedInterventions?: any; // Optional personalized interventions
   therapeuticContent?: any; // Optional therapeutic content
