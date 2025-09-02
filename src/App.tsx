@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { Suspense, lazy } from 'react';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { DashboardPage } from './pages/DashboardPage'; // Keep critical pages eager
+import { HomePage } from './pages/HomePage'; // Main entry point
 import { CrisisPage } from './pages/CrisisPage'; // Keep crisis page eager for emergency access
 import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
@@ -14,6 +14,7 @@ import { SecurityProvider, withSecurity } from './middleware/securityMiddleware'
 const WellnessPage = lazy(() => import('./pages/WellnessPage').then(m => ({ default: m.WellnessPage })));
 const CommunityPage = lazy(() => import('./pages/CommunityPage').then(m => ({ default: m.CommunityPage })));
 const ProfessionalPage = lazy(() => import('./pages/ProfessionalPage').then(m => ({ default: m.ProfessionalPage })));
+const SettingsPage = lazy(() => import('./pages/Settings').then(m => ({ default: m.default })));
 
 // Loading component for lazy-loaded pages
 const PageLoadingSpinner = () => (
@@ -36,10 +37,10 @@ const queryClient = new QueryClient({
 });
 
 // Adjusted security levels for development/demo - production should use higher levels
-// const SecureDashboard = withSecurity(DashboardPage, 'basic'); // Dashboard doesn't need security wrapper
 const SecureWellness = withSecurity(WellnessPage, 'basic'); // Reduced from 'elevated' for demo
 const SecureProfessional = withSecurity(ProfessionalPage, 'basic'); // Reduced from 'maximum' for demo
 const SecureCommunity = withSecurity(CommunityPage, 'basic'); // Already at basic level
+const SecureSettings = withSecurity(SettingsPage, 'basic'); // Settings with basic security
 
 function App() {
   return (
@@ -51,8 +52,7 @@ function App() {
               <EnhancedLayout>
                 <Routes>
                   {/* Critical routes - loaded immediately */}
-                  <Route path="/" element={<DashboardPage />} />
-                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/" element={<HomePage />} />
                   <Route path="/crisis" element={<CrisisPage />} />
                   
                   {/* Non-critical routes - lazy loaded with suspense */}
@@ -69,6 +69,11 @@ function App() {
                   <Route path="/professional/*" element={
                     <Suspense fallback={<PageLoadingSpinner />}>
                       <SecureProfessional />
+                    </Suspense>
+                  } />
+                  <Route path="/settings" element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <SecureSettings />
                     </Suspense>
                   } />
                 </Routes>
