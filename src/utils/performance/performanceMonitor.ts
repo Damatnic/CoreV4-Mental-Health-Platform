@@ -683,24 +683,25 @@ class PerformanceMonitor {
    * Send metrics to analytics service
    */
   private async sendMetrics(metrics: PerformanceMetric[]): Promise<void> {
+    // DISABLED: No external API calls - only local storage in production
     if (metrics.length === 0) return;
     
     try {
-      // In production, only log to console (no backend API available)
+      // Production: Store locally only, no network calls
       if (process.env.NODE_ENV === 'production') {
-        // Store metrics locally for potential future use
         try {
           const storedMetrics = localStorage.getItem('performance_metrics') || '[]';
           const existingMetrics = JSON.parse(storedMetrics);
-          const updatedMetrics = [...existingMetrics, ...metrics].slice(-100); // Keep last 100 metrics
+          const updatedMetrics = [...existingMetrics, ...metrics].slice(-100);
           localStorage.setItem('performance_metrics', JSON.stringify(updatedMetrics));
+          console.debug('[Performance] Metrics stored locally:', metrics.length);
         } catch (localError) {
-          // Ignore localStorage errors
           console.debug('[Performance] LocalStorage unavailable:', localError);
         }
+        return; // Exit early - no network calls
       }
       
-      // Log in development
+      // Development: Console logging only
       if (process.env.NODE_ENV === 'development') {
         console.log('[Performance Metrics]', metrics);
       }
