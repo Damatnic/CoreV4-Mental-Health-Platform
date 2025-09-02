@@ -200,15 +200,7 @@ function App() {
     });
   }, []);
 
-  if (showBoot) {
-    return (
-      <ConsoleBootSequence 
-        onBootComplete={handleBootComplete}
-        skipBoot={import.meta.env.DEV} // Skip in development for faster testing
-      />
-    );
-  }
-
+  // CRITICAL: All hooks must be declared BEFORE any conditional returns
   // Memoize toast options to prevent unnecessary re-renders
   const toasterOptions = useMemo(() => ({
     position: 'top-center' as const,
@@ -227,6 +219,16 @@ function App() {
       },
     },
   }), []);
+
+  // Conditional return MUST come after all hooks
+  if (showBoot) {
+    return (
+      <ConsoleBootSequence 
+        onBootComplete={handleBootComplete}
+        skipBoot={import.meta.env.DEV} // Skip in development for faster testing
+      />
+    );
+  }
 
   return (
     <ErrorBoundary>

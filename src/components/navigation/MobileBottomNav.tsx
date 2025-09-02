@@ -545,7 +545,7 @@ export function MobileBottomNav() {
                     })}
                     {item.badge && item.badge > 0 && (
                       <span 
-                        className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-pulse"
+                        className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1"
                         style={{ backgroundColor: getConsoleAccentColor(consoleMode) }}
                       >
                         {item.badge > 99 ? '99+' : item.badge}

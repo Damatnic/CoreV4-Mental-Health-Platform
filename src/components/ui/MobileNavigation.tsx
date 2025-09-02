@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
     label: 'Crisis',
     icon: AlertTriangle,
     color: 'text-red-400',
-    urgent: true,
+    urgent: false, // DISABLED: Removed annoying demo urgency
   },
   {
     path: '/wellness',
@@ -144,7 +144,6 @@ export function MobileNavigation() {
                 <span className={`
                   text-xs mt-1 font-medium tracking-wide transition-all duration-300 z-10 relative
                   ${active ? `${item.color} font-bold` : 'text-gray-400 group-hover:text-white'}
-                  ${item.urgent && !active ? 'font-bold animate-pulse' : ''}
                 `}>
                   {item.label}
                 </span>
