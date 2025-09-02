@@ -47,14 +47,14 @@ function WidgetErrorBoundary({ children, widgetName }: { children: React.ReactNo
         });
         
         return (
-          <div className="flex flex-col items-center justify-center h-full p-4 bg-red-50 rounded-lg">
-            <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
-            <p className="text-sm text-red-700 text-center mb-3">
+          <div className="flex flex-col items-center justify-center h-full p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <AlertCircle className="h-8 w-8 text-red-500 dark:text-red-400 mb-2" />
+            <p className="text-sm text-red-700 dark:text-red-300 text-center mb-3">
               Error loading {widgetName}
             </p>
             <button
               onClick={resetErrorBoundary}
-              className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+              className="px-4 py-2 bg-gradient-to-r from-pink-400 to-red-500 text-white rounded-lg text-sm hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
             >
               Retry
             </button>

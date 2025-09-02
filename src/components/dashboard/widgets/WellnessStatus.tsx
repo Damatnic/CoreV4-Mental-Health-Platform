@@ -25,31 +25,31 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
 
   const statusData = data || defaultData;
 
-  // Score color based on value
+  // Score color based on value - matching wellness suite colors
   const getScoreColor = () => {
-    if (statusData.overallScore >= 80) return 'text-green-600';
-    if (statusData.overallScore >= 60) return 'text-blue-600';
-    if (statusData.overallScore >= 40) return 'text-yellow-600';
-    return 'text-red-600';
+    if (statusData.overallScore >= 80) return 'text-emerald-600 dark:text-emerald-400';
+    if (statusData.overallScore >= 60) return 'text-blue-600 dark:text-blue-400';
+    if (statusData.overallScore >= 40) return 'text-amber-600 dark:text-amber-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
-  // Score background gradient
+  // Score background gradient - matching wellness suite gradients
   const getScoreGradient = () => {
-    if (statusData.overallScore >= 80) return 'from-green-400 to-green-600';
-    if (statusData.overallScore >= 60) return 'from-blue-400 to-blue-600';
-    if (statusData.overallScore >= 40) return 'from-yellow-400 to-yellow-600';
-    return 'from-red-400 to-red-600';
+    if (statusData.overallScore >= 80) return 'from-green-400 to-emerald-500';
+    if (statusData.overallScore >= 60) return 'from-cyan-400 to-blue-500';
+    if (statusData.overallScore >= 40) return 'from-amber-400 to-orange-500';
+    return 'from-pink-400 to-red-500';
   };
 
   // Trend icon component
   const TrendIcon = () => {
     switch (statusData.trend) {
       case 'improving':
-        return <TrendingUp className="h-5 w-5 text-green-500" />;
+        return <TrendingUp className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />;
       case 'declining':
-        return <TrendingDown className="h-5 w-5 text-red-500" />;
+        return <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-400" />;
       default:
-        return <Minus className="h-5 w-5 text-gray-500" />;
+        return <Minus className="h-5 w-5 text-gray-500 dark:text-gray-400" />;
     }
   };
 
@@ -86,7 +86,7 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
               stroke="currentColor"
               strokeWidth="8"
               fill="none"
-              className="text-gray-200"
+              className="text-gray-200 dark:text-gray-700"
             />
             <motion.circle
               cx="64"
@@ -151,13 +151,13 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
           <h4 className="text-sm font-semibold text-gray-700">Active Streaks</h4>
           <div className="grid grid-cols-2 gap-2">
             {statusData.streaks.slice(0, 4).map((streak, idx) => (
-              <div key={idx} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
-                <Flame className="h-4 w-4 text-orange-500" />
+              <div key={idx} className="flex items-center space-x-2 p-2 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <Flame className="h-4 w-4 text-orange-500 dark:text-orange-400" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-900 truncate">
+                  <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                     {streak.type.replace('_', ' ')}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {streak.count} {streak.unit}
                   </p>
                 </div>
@@ -170,17 +170,17 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
       {/* Active Goals Progress */}
       {statusData.activeGoals && statusData.activeGoals.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-700">Active Goals</h4>
+          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Active Goals</h4>
           <div className="space-y-2">
             {statusData.activeGoals.slice(0, 3).map((goal) => (
               <div key={goal.id} className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-900 truncate flex-1">{goal.title}</p>
-                  <span className="text-xs text-gray-500 ml-2">{goal.progress}%</span>
+                  <p className="text-sm text-gray-900 dark:text-white truncate flex-1">{goal.title}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">{goal.progress}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <motion.div
-                    className="bg-gradient-to-r from-primary-400 to-primary-600 h-2 rounded-full"
+                    className="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${goal.progress}%` }}
                     transition={{ duration: 0.5 }}
@@ -198,9 +198,9 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
           <h4 className="text-sm font-semibold text-gray-700">Today's Recommendations</h4>
           <div className="space-y-1">
             {statusData.recommendations.map((rec, idx) => (
-              <div key={idx} className="flex items-start space-x-2 p-2 bg-blue-50 rounded-lg">
-                <Activity className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-gray-700">{rec}</p>
+              <div key={idx} className="flex items-start space-x-2 p-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-gray-700 dark:text-gray-300">{rec}</p>
               </div>
             ))}
           </div>
@@ -210,7 +210,7 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
       {/* View Details Button */}
       <button
         onClick={onViewDetails}
-        className="w-full py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-colors"
+        className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 font-medium"
       >
         View Detailed Analytics
       </button>

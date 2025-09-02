@@ -4,60 +4,76 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Therapeutic primary colors - soft blues for trust and calm
+        // Primary colors - matching WellnessToolsSuite gradients
         primary: {
-          50: '#EBF3FA',
-          100: '#D6E7F5',
-          200: '#B3CCDF',
-          300: '#9BB9D4',
-          400: '#84A6C9',
-          500: '#7BA7D9',
-          600: '#6A93C2',
-          700: '#5A7FA8',
-          800: '#4A6B8E',
-          900: '#3A5774',
-          950: '#2A435A',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6', // Main blue
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+          950: '#172554',
         },
-        // Soothing secondary colors - sage greens for balance and growth
+        // Secondary colors - purple for harmony
         secondary: {
-          50: '#E8F4F1',
-          100: '#D1E9E3',
-          200: '#B3D9CF',
-          300: '#95C9BB',
-          400: '#79A89D',
-          500: '#668F85',
-          600: '#567B71',
-          700: '#46675D',
-          800: '#365349',
-          900: '#263F35',
-          950: '#162B21',
+          50: '#FAF5FF',
+          100: '#F3E8FF',
+          200: '#E9D5FF',
+          300: '#D8B4FE',
+          400: '#C084FC',
+          500: '#A855F7', // Main purple
+          600: '#9333EA',
+          700: '#7E22CE',
+          800: '#6B21A8',
+          900: '#581C87',
+          950: '#3B0764',
         },
-        // Wellness colors - muted and calming
+        // Wellness gradient colors - matching tool buttons
         wellness: {
-          meditation: '#9B8EC1',  // Soft purple
-          mindfulness: '#87CEEB',  // Sky blue
-          gratitude: '#F4C97D',    // Warm gold
-          reflection: '#8FA5D1',   // Gentle blue
-          growth: '#90C5A9',       // Soft mint green
+          purple: {
+            from: '#C084FC', // from-purple-400
+            to: '#8B5CF6',   // to-violet-500
+          },
+          pink: {
+            from: '#F472B6', // from-pink-400
+            to: '#EF4444',   // to-red-500
+          },
+          cyan: {
+            from: '#22D3EE', // from-cyan-400
+            to: '#3B82F6',   // to-blue-500
+          },
+          indigo: {
+            from: '#818CF8', // from-indigo-400
+            to: '#A855F7',   // to-purple-500
+          },
+          green: {
+            from: '#4ADE80', // from-green-400
+            to: '#10B981',   // to-emerald-500
+          },
         },
-        // Mood tracking colors - softer, less jarring
+        // Mood tracking colors - gentle and calming
         mood: {
-          excellent: '#90C5A9',  // Soft mint
-          good: '#A8D5BA',       // Light sage
-          neutral: '#F6E6A8',    // Warm yellow
-          low: '#F4C097',        // Peach
-          crisis: '#DFA4A0',     // Muted coral
+          excellent: '#10B981',  // Emerald
+          good: '#3B82F6',       // Blue
+          neutral: '#F59E0B',    // Amber
+          low: '#F97316',        // Orange
+          crisis: '#EF4444',     // Red
         },
-        // Alert and status colors - visible but not alarming
+        // Alert and status colors - clear but calm
         alert: {
-          info: '#8FA5D1',       // Soft blue
-          success: '#90C5A9',    // Soft green
-          warning: '#F4C97D',    // Warm amber
-          error: '#DFA4A0',      // Muted coral
-          crisis: '#D4908B',     // Deeper coral
+          info: '#3B82F6',       // Blue
+          success: '#10B981',    // Emerald
+          warning: '#F59E0B',    // Amber
+          error: '#EF4444',      // Red
+          crisis: '#DC2626',     // Red-600
         },
         // Neutral palette - warmer and softer
         neutral: {

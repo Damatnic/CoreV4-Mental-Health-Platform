@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, AlertTriangle, Search, User, Settings, LogOut, 
   Home, BarChart3, Heart, Users, Stethoscope, Bell, 
-  ChevronDown, Star, Clock, Command, Accessibility
+  ChevronDown, Star, Clock, Command, Accessibility,
+  Sparkles, Moon, Sun, ChevronLeft
 } from 'lucide-react';
 import { NavigationProvider, useNavigation } from '../navigation/NavigationContext';
 import { GlobalSearch } from '../navigation/GlobalSearch';
@@ -56,14 +57,14 @@ function UserMenu() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
         aria-label="User menu"
         aria-expanded={isOpen}
       >
-        <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white font-semibold">
+        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
           {user?.name?.charAt(0) || 'U'}
         </div>
-        <ChevronDown className={`h-4 w-4 text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-4 w-4 text-gray-600 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -80,12 +81,12 @@ function UserMenu() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 z-40"
+              className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-40"
             >
               {/* User info */}
-              <div className="px-4 py-3 border-b border-gray-200">
-                <div className="font-semibold text-gray-900">{user?.name || 'Guest User'}</div>
-                <div className="text-sm text-gray-500">{user?.email || 'Not signed in'}</div>
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="font-semibold text-gray-900 dark:text-white">{user?.name || 'Guest User'}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{user?.email || 'Not signed in'}</div>
               </div>
 
               {/* Favorite routes */}
@@ -97,7 +98,7 @@ function UserMenu() {
                       key={route}
                       to={route}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                      className="flex items-center px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <Star className="h-3 w-3 mr-2 text-yellow-500" />
                       {route.split('/').pop() || 'Dashboard'}
@@ -224,7 +225,7 @@ function QuickAccessPanel() {
                         key={index}
                         to={route}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                        className="flex items-center px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                       >
                         <Clock className="h-3 w-3 mr-2 text-gray-400" />
                         {route.split('/').pop() || 'Dashboard'}
@@ -318,7 +319,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   };
 
   return (
-    <div className={`min-h-screen ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
       {/* Privacy Banner - Always visible */}
       <PrivacyBanner />
       
@@ -330,21 +331,24 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
         id="main-navigation"
         className={`sticky top-0 z-50 ${
           mode === 'crisis' 
-            ? 'bg-red-50 border-b-2 border-red-200' 
-            : 'bg-white/80 backdrop-blur-md border-b border-gray-200'
-        }`}
+            ? 'bg-gradient-to-r from-pink-50 to-red-50 border-b-2 border-red-200' 
+            : 'bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'
+        } transition-all duration-300`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Simplified Logo */}
             <div className="flex items-center">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-medium">
-                  S
+              <Link to="/" className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="font-medium text-lg text-gray-800 hidden sm:block">
-                  SafeSpace
-                </span>
+                <div className="hidden sm:block">
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                    Wellness Suite
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Your mental health toolkit</p>
+                </div>
               </Link>
             </div>
 
@@ -355,10 +359,10 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                   key={item.name}
                   to={item.href}
                   className={`
-                    text-sm font-medium transition-all duration-200
+                    px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                     ${isActive(item.href)
-                      ? 'text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }
                   `}
                 >
@@ -372,7 +376,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               {/* Simplified Search Button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-50 transition-all duration-200"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                 aria-label="Search"
               >
                 <Search className="h-5 w-5" />
@@ -380,12 +384,12 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
 
               {/* Notifications - Simplified */}
               <button
-                className="relative p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-50 transition-all duration-200"
+                className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />
                 {notificationCount > 0 && (
-                  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute top-1 right-1 h-2 w-2 bg-gradient-to-r from-pink-400 to-red-500 rounded-full animate-pulse"></span>
                 )}
               </button>
 
@@ -396,7 +400,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               {isInstallable && (
                 <button
                   onClick={handleInstallClick}
-                  className="hidden sm:flex px-3 py-1.5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                  className="hidden sm:flex px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                 >
                   Install App
                 </button>
@@ -406,11 +410,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               <Link
                 to="/crisis"
                 id="crisis-help"
-                className={`flex items-center space-x-1 px-3 py-2 ${
+                className={`flex items-center space-x-1 px-4 py-2 ${
                   crisisDetected 
-                    ? 'bg-red-600 animate-pulse' 
-                    : 'bg-red-500'
-                } text-white rounded-lg font-medium hover:bg-red-600 transition-colors`}
+                    ? 'bg-gradient-to-r from-pink-500 to-red-600 animate-pulse' 
+                    : 'bg-gradient-to-r from-pink-400 to-red-500'
+                } text-white rounded-lg font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200`}
               >
                 <AlertTriangle className="h-4 w-4" />
                 <span className="hidden sm:inline">Crisis</span>
@@ -419,7 +423,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+                className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="Toggle menu"
                 aria-expanded={isMobileMenuOpen}
               >
@@ -440,7 +444,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-gray-200 bg-white"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
             >
               <div className="px-4 py-2 space-y-1">
                 {navigation.map((item) => (
@@ -449,10 +453,10 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`
-                      flex items-center px-3 py-2 rounded-lg text-base font-medium
+                      flex items-center px-3 py-2 rounded-lg text-base font-medium transition-all duration-200
                       ${isActive(item.href)
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }
                     `}
                   >
@@ -467,7 +471,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                     setSearchOpen(true);
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 hover:bg-gray-100"
+                  className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Search className="h-4 w-4" />
                   <span className="ml-2">Search</span>
@@ -477,7 +481,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                 {isInstallable && (
                   <button
                     onClick={handleInstallClick}
-                    className="w-full text-left px-3 py-2 rounded-lg text-base font-medium bg-primary-500 text-white"
+                    className="w-full text-left px-3 py-2 rounded-lg text-base font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:shadow-lg transition-all duration-200"
                   >
                     📱 Install App
                   </button>
@@ -493,7 +497,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       <MobileBreadcrumbs />
 
       {/* Main Content */}
-      <main id="main-content" className="flex-1 pb-16 md:pb-0">
+      <main id="main-content" className="flex-1 pb-16 md:pb-0 bg-gray-50 dark:bg-gray-900">
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0, y: 20 }}
