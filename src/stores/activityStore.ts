@@ -214,7 +214,7 @@ interface ActivityStore {
   addTherapySession: (session: Omit<TherapyProgress, 'id'>) => void;
   updateTherapyProgress: (id: string, updates: Partial<TherapyProgress>) => void;
   completeHomework: (sessionId: string, homeworkId: string, notes?: string) => void;
-  addSkillPractice: (skill: { name: string; type: string; effectiveness: number; notes?: string }) => void;
+  addSkillPractice: (skill: { name: string; type: 'CBT' | 'DBT' | 'mindfulness' | 'other'; effectiveness: number; notes?: string }) => void;
   
   // Achievement system
   checkAchievements: () => void;
@@ -246,6 +246,7 @@ export const useActivityStore = create<ActivityStore>()(
       activities: [],
       goals: [],
       habits: [],
+      medications: [],
       therapyProgress: [],
       achievements: [],
       analytics: [],
@@ -861,6 +862,7 @@ export const useActivityStore = create<ActivityStore>()(
             activities: parsed.activities || [],
             goals: parsed.goals || [],
             habits: parsed.habits || [],
+            medications: parsed.medications || [],
             therapyProgress: parsed.therapyProgress || [],
             achievements: parsed.achievements || [],
             analytics: parsed.analytics || [],
@@ -875,6 +877,7 @@ export const useActivityStore = create<ActivityStore>()(
           activities: [],
           goals: [],
           habits: [],
+          medications: [],
           therapyProgress: [],
           achievements: [],
           analytics: [],

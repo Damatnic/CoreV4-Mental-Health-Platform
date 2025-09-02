@@ -612,7 +612,7 @@ class SecurityMonitorService {
     };
     
     const key = `${severity}:${eventType}`;
-    return playbooks[key] || playbooks['default'];
+    return playbooks[key] || playbooks['default'] || [];
   }
 
   private async executeImmediateResponse(event: SecurityEvent): Promise<void> {

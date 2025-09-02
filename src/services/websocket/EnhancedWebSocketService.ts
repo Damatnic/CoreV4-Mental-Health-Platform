@@ -7,6 +7,22 @@
 import { io, Socket } from 'socket.io-client';
 import { secureStorage } from '../security/SecureLocalStorage';
 
+// Connection state interface
+interface ConnectionState {
+  isConnected: boolean;
+  reconnectAttempts: number;
+  latency: number;
+  connectionQuality: 'excellent' | 'good' | 'fair' | 'poor';
+  lastSuccessfulMessage: Date;
+  lastError?: Error;
+  messagesQueued: number;
+  dataUsage: {
+    sent: number;
+    received: number;
+    session: number;
+  };
+}
+
 // Enhanced WebSocket Configuration
 const WS_CONFIG = {
   url: import.meta.env.VITE_WS_URL || 'ws://localhost:3002',
@@ -253,7 +269,19 @@ export interface NotificationOptions {
 export class EnhancedWebSocketService {
   private static instance: EnhancedWebSocketService;
   private socket: Socket | null = null;
-  private connectionState: ConnectionState;
+  private connectionState: ConnectionState = {
+    isConnected: false,
+    reconnectAttempts: 0,
+    latency: 0,
+    connectionQuality: 'poor',
+    lastSuccessfulMessage: new Date(),
+    messagesQueued: 0,
+    dataUsage: {
+      sent: 0,
+      received: 0,
+      session: 0,
+    },
+  };
   private eventHandlers: Map<string, Set<Function>> = new Map();
   private typingUsers: Map<string, TypingUser> = new Map();
   private messageQueue: QueuedMessage[] = [];
@@ -350,10 +378,7 @@ export class EnhancedWebSocketService {
     this.socket = io(WS_CONFIG.url, {
       ...WS_CONFIG,
       auth: WS_CONFIG.auth,
-      forceNew: false,
-      upgrade: true,
-      rememberUpgrade: true,
-      transports: ['websocket', 'polling']
+      forceNew: false
     });
 
     this.setupEventListeners();
@@ -440,13 +465,13 @@ export class EnhancedWebSocketService {
       this.processQueuedNotifications();
     });
 
-    this.socket.on(WSEventType.DISCONNECT, (reason) => {
+    this.socket.on(WSEventType.DISCONNECT, (reason: any) => {
       console.log('WebSocket disconnected:', reason);
       this.connectionState.isConnected = false;
       this.emit(WSEventType.DISCONNECT, { reason, timestamp: new Date() });
     });
 
-    this.socket.on(WSEventType.ERROR, (error) => {
+    this.socket.on(WSEventType.ERROR, (error: any) => {
       console.error('WebSocket error:', error);
       this.connectionState.lastError = error;
       this.emit(WSEventType.ERROR, { error, timestamp: new Date() });
@@ -467,12 +492,12 @@ export class EnhancedWebSocketService {
   private setupAuthenticationEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.AUTH_SUCCESS, (data) => {
+    this.socket.on(WSEventType.AUTH_SUCCESS, (data: any) => {
       console.log('WebSocket authentication successful');
       this.emit(WSEventType.AUTH_SUCCESS, data);
     });
 
-    this.socket.on(WSEventType.AUTH_FAILURE, (data) => {
+    this.socket.on(WSEventType.AUTH_FAILURE, (data: any) => {
       console.error('WebSocket authentication failed:', data);
       this.emit(WSEventType.AUTH_FAILURE, data);
       this.disconnect();

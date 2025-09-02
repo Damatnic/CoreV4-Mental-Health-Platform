@@ -563,7 +563,7 @@ export class CrisisScenarioTester {
           duration,
           errors: passed ? [] : [`Performance target missed: ${duration}ms > ${test.target}ms`],
           warnings: duration > test.target * 0.8 ? [`Close to performance limit: ${duration}ms`] : [],
-          details: { performanceTarget: test.target, actualDuration: duration }
+          details: {}
         });
       } catch (error) {
         this.testResults.push({
@@ -632,11 +632,11 @@ export class CrisisScenarioTester {
         
         this.testResults.push({
           scenarioId: `offline-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
-          passed,
+          passed: Boolean(passed),
           duration,
           errors: passed ? [] : [`Offline test failed: ${test.name}`],
           warnings: [],
-          details: { testType: 'offline' }
+          details: {}
         });
       } catch (error) {
         this.testResults.push({

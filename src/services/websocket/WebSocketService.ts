@@ -177,25 +177,25 @@ export class WebSocketService {
       });
     });
 
-    this.socket.on(WSEventType.DISCONNECT, (reason) => {
+    this.socket.on(WSEventType.DISCONNECT, (reason: any) => {
       console.log('WebSocket disconnected:', reason);
       this.connectionState.isConnected = false;
       this.emit(WSEventType.DISCONNECT, { reason, timestamp: new Date() });
     });
 
-    this.socket.on(WSEventType.ERROR, (error) => {
+    this.socket.on(WSEventType.ERROR, (error: any) => {
       console.error('WebSocket error:', error);
       this.connectionState.lastError = error;
       this.emit(WSEventType.ERROR, { error, timestamp: new Date() });
     });
 
     // Authentication events
-    this.socket.on(WSEventType.AUTH_SUCCESS, (data) => {
+    this.socket.on(WSEventType.AUTH_SUCCESS, (data: any) => {
       console.log('WebSocket authentication successful');
       this.emit(WSEventType.AUTH_SUCCESS, data);
     });
 
-    this.socket.on(WSEventType.AUTH_FAILURE, (data) => {
+    this.socket.on(WSEventType.AUTH_FAILURE, (data: any) => {
       console.error('WebSocket authentication failed:', data);
       this.emit(WSEventType.AUTH_FAILURE, data);
       this.disconnect();

@@ -413,6 +413,31 @@ export class MockWebSocketAdapter {
         break;
     }
   }
+
+  // End call functionality for testing
+  public endCall(): void {
+    console.log('📞 Ending mock crisis call session');
+    
+    // Clear all active sessions
+    for (const [sessionId, session] of this.activeSessions.entries()) {
+      console.log(`Ending session: ${sessionId}`);
+      // Emit session end event
+      this.emit('session:ended', {
+        sessionId,
+        counselorId: session.counselor.id,
+        timestamp: new Date()
+      });
+    }
+    
+    // Clear the sessions map
+    this.activeSessions.clear();
+    
+    // Emit call ended event
+    this.emit('call:ended', {
+      timestamp: new Date(),
+      reason: 'user_ended'
+    });
+  }
 }
 
 // Export singleton instance

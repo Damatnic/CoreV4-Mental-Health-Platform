@@ -80,8 +80,6 @@ export class SecureWebSocketClient {
         auth: {
           token: token
         },
-        transports: ['websocket'],
-        upgrade: true,
         timeout: 20000,
         forceNew: true
       });
@@ -105,7 +103,7 @@ export class SecureWebSocketClient {
           resolve();
         });
 
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', (error: any) => {
           console.error('❌ WebSocket connection failed:', error);
           this.isConnected = false;
           this.onConnectionChange?.(false);
@@ -130,7 +128,7 @@ export class SecureWebSocketClient {
     if (!this.socket) return;
 
     // Connection events
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', (reason: any) => {
       console.warn('🔌 WebSocket disconnected:', reason);
       this.isConnected = false;
       this.onConnectionChange?.(false);
@@ -144,7 +142,7 @@ export class SecureWebSocketClient {
       }
     });
 
-    this.socket.on('error', (error) => {
+    this.socket.on('error', (error: any) => {
       console.error('❌ WebSocket error:', error);
       this.onError?.(error);
     });
@@ -184,7 +182,7 @@ export class SecureWebSocketClient {
     });
 
     // Authentication errors
-    this.socket.on('auth:error', (error) => {
+    this.socket.on('auth:error', (error: any) => {
       console.error('🔐 Authentication error:', error);
       this.onError?.(error);
       

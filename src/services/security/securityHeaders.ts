@@ -79,7 +79,7 @@ class SecurityHeadersService {
           "'self'",
           "'strict-dynamic'",
           "https://cdn.jsdelivr.net", // For trusted CDNs only
-          (ctx: any) => `'nonce-${ctx.nonce}'`, // Dynamic nonce for inline scripts
+          "'unsafe-inline'", // Placeholder for dynamic nonce
         ],
         styleSrc: [
           "'self'",

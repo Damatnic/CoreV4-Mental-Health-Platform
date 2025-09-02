@@ -201,12 +201,12 @@ class SessionManagerService {
       await auditLogger.log({
         event: 'USER_LOGIN',
         userId: params.userId,
-        sessionId,
-        ipAddress: params.ipAddress,
         details: {
+          sessionId,
           loginMethod: params.loginMethod,
           securityLevel,
           mfaVerified: session.mfaVerified,
+          ipAddress: params.ipAddress,
         },
         severity: 'info',
       });
@@ -404,8 +404,8 @@ class SessionManagerService {
     await auditLogger.log({
       event: 'DATA_MODIFICATION',
       userId: session.userId,
-      sessionId,
       details: {
+        sessionId,
         action: 'session_renewed',
         expiresAt: session.expiresAt,
       },
@@ -440,8 +440,8 @@ class SessionManagerService {
     await auditLogger.log({
       event: 'USER_LOGOUT',
       userId: session.userId,
-      sessionId,
       details: {
+        sessionId,
         reason,
         duration: Date.now() - session.createdAt.getTime(),
       },
@@ -504,8 +504,8 @@ class SessionManagerService {
     await auditLogger.log({
       event: 'PERMISSION_GRANTED',
       userId: session.userId,
-      sessionId,
       details: {
+        sessionId,
         action: 'session_elevated',
         newLevel,
       },

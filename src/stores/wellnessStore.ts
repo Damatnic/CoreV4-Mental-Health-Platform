@@ -445,6 +445,7 @@ export const useWellnessStore = create<WellnessState>()(
       crisisEvents: [],
       moodPatterns: [],
       wellnessInsights: [],
+      insights: [],
       weeklyScore: 0,
       monthlyScore: 0,
       yearlyScore: 0,
