@@ -89,38 +89,21 @@ export function useFeatureFlag(
       }
 
       try {
-        // In production, fetch from server
-        if (process.env.NODE_ENV === 'production') {
-          const response = await fetch(`${endpoint}/${flagName}`, {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-User-Id': user?.id || '',
-              'X-User-Segment': getUserSegment(user)
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const value = data.value ?? data.enabled ?? data;
-            
-            // Cache the result
-            if (enableCache) {
-              flagCache.set(flagName, {
-                value,
-                timestamp: Date.now()
-              });
-            }
-            
-            if (mounted) setFlagValue(value);
-            return;
-          }
-        }
-
-        // Fall back to defaults
+        // DISABLED: Feature flag server calls to prevent console spam
+        // Use local defaults only for now
         const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
+        
+        // Cache the result
+        if (enableCache) {
+          flagCache.set(flagName, {
+            value,
+            timestamp: Date.now()
+          });
+        }
+        
         if (mounted) setFlagValue(value);
       } catch (error) {
-        console.error(`Failed to fetch feature flag ${flagName}:`, error);
+        // Silent fallback to prevent console spam
         const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
         if (mounted) setFlagValue(value);
       }
@@ -148,26 +131,10 @@ export function useFeatureFlags(): FeatureFlags {
 
     const fetchAllFlags = async () => {
       try {
-        if (process.env.NODE_ENV === 'production') {
-          const response = await fetch('/api/feature-flags', {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-User-Id': user?.id || '',
-              'X-User-Segment': getUserSegment(user)
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (mounted) setFlags({ ...DEFAULT_FLAGS, ...data });
-            return;
-          }
-        }
-
-        // Use defaults in development or on error
+        // DISABLED: Use local defaults only to prevent console spam
         if (mounted) setFlags(DEFAULT_FLAGS);
       } catch (error) {
-        console.error('Failed to fetch feature flags:', error);
+        // Silent fallback
         if (mounted) setFlags(DEFAULT_FLAGS);
       }
     };
