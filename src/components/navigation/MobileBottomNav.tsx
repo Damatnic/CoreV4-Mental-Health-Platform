@@ -1,5 +1,6 @@
 /**
  * Mobile Bottom Navigation Component
+ * Console-themed mobile navigation with PlayStation/Xbox-inspired design
  * Provides thumb-friendly navigation with haptic feedback and gesture support
  */
 
@@ -25,12 +26,17 @@ import {
   ChevronUp,
   BarChart3,
   Accessibility,
-  Bell
+  Bell,
+  Gamepad2,
+  Zap,
+  Power
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 import { useMobileFeatures, useTouchGestures } from '../../hooks/useMobileFeatures';
 import { initializeTouchOptimization } from '../../utils/mobile/touchOptimization';
-import { useAuth } from '../../contexts/AnonymousAuthContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useConsoleNavigation } from '../../hooks/useConsoleNavigation';
+import { ConsoleFocusable } from '../console/ConsoleFocusable';
 
 interface NavItem {
   id: string;
@@ -170,9 +176,12 @@ export function MobileBottomNav() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const vibrate = useVibration();
-  const { deviceInfo } = useMobileFeatures();
+  const { deviceInfo, isMobileDevice } = useMobileFeatures();
+  const { navigationMode, isPerformanceMode } = useConsoleNavigation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showCrisisActions, setShowCrisisActions] = useState(false);
+  const [consoleMode, setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
+  const [isConsoleStyleActive, setIsConsoleStyleActive] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
     const currentPath = location.pathname;
     const item = mainNavItems.find(item => item.path === currentPath);
@@ -182,44 +191,72 @@ export function MobileBottomNav() {
   const navRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // Enhanced touch optimization for navigation
+  // Enhanced console-themed touch optimization for navigation
   useEffect(() => {
     if (navRef.current) {
       const touchManager = initializeTouchOptimization(navRef.current, {
         enableSwipeGestures: true,
         enableVibration: true,
-        swipeThreshold: 30,
-        longPressDelay: 600
+        swipeThreshold: isMobileDevice ? 25 : 30, // More sensitive on mobile
+        longPressDelay: 500,
+        enableFastClick: true
       });
+
+      // Console-style haptic patterns
+      const consoleTapPattern = consoleMode === 'playstation' ? [25] : 
+                              consoleMode === 'xbox' ? [30] : [20];
+      const consoleSwipePattern = consoleMode === 'playstation' ? [40, 20, 40] : 
+                                consoleMode === 'xbox' ? [50, 30] : [35, 15, 35];
+      const consoleActivatePattern = consoleMode === 'playstation' ? [80, 40, 80, 40, 80] : 
+                                   consoleMode === 'xbox' ? [100, 50, 100] : [60, 30, 60, 30];
 
       touchManager.on('swipe', (gesture) => {
         if (gesture.direction === 'up') {
-          vibrate([30]);
+          vibrate(consoleSwipePattern);
           setIsDrawerOpen(true);
+          // Console power-up sound effect would go here
         } else if (gesture.direction === 'down' && isDrawerOpen) {
-          vibrate([30]);
+          vibrate(consoleSwipePattern);
           setIsDrawerOpen(false);
+        } else if (gesture.direction === 'left') {
+          // Cycle console modes
+          const modes: typeof consoleMode[] = ['playstation', 'xbox', 'switch'];
+          const currentIndex = modes.indexOf(consoleMode);
+          const nextMode = modes[(currentIndex + 1) % modes.length] || 'playstation';
+          setConsoleMode(nextMode);
+          vibrate(consoleTapPattern);
+        } else if (gesture.direction === 'right') {
+          // Toggle console style
+          setIsConsoleStyleActive(!isConsoleStyleActive);
+          vibrate([50, 25]);
         }
       });
 
       touchManager.on('longPress', () => {
-        vibrate([100, 50, 100]);
+        vibrate(consoleActivatePattern);
         setShowCrisisActions(true);
         setTimeout(() => setShowCrisisActions(false), 5000);
         
-        // Announce to screen reader
+        // Console-style announcement
         const announcement = document.createElement('div');
         announcement.setAttribute('aria-live', 'assertive');
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
-        announcement.textContent = 'Crisis actions menu opened';
+        announcement.textContent = 'Emergency console activated - Crisis actions menu opened';
         document.body.appendChild(announcement);
         setTimeout(() => document.body.removeChild(announcement), 1000);
       });
 
+      // Double-tap to toggle performance mode
+      touchManager.on('doubleTap', () => {
+        vibrate([25, 25]);
+        // Toggle console performance mode visually
+        document.body.classList.toggle('console-performance-mode');
+      });
+
       return () => touchManager.destroy();
     }
-  }, [isDrawerOpen, vibrate]);
+  }, [isDrawerOpen, vibrate, consoleMode, isConsoleStyleActive, isMobileDevice]);
 
   // Legacy touch gestures for fallback
   useTouchGestures(navRef, {
@@ -266,15 +303,38 @@ export function MobileBottomNav() {
       return;
     }
 
-    vibrate([30]);
+    // Console-style haptic feedback based on current console mode
+    const consoleNavigatePattern = consoleMode === 'playstation' ? [40, 20] : 
+                                 consoleMode === 'xbox' ? [50] : [30, 15];
+    vibrate(consoleNavigatePattern);
+    
     setActiveTab(item.id);
     navigate(item.path);
     setIsDrawerOpen(false);
+    
+    // Visual feedback for console navigation
+    if (isConsoleStyleActive && navRef.current) {
+      navRef.current.classList.add('console-navigation-active');
+      setTimeout(() => {
+        navRef.current?.classList.remove('console-navigation-active');
+      }, 200);
+    }
   };
 
   const handleMenuToggle = () => {
-    vibrate([40]);
+    // Console menu haptic feedback
+    const consoleMenuPattern = consoleMode === 'playstation' ? [60, 30, 60] : 
+                             consoleMode === 'xbox' ? [80, 40] : [45, 25, 45];
+    vibrate(consoleMenuPattern);
     setIsDrawerOpen(!isDrawerOpen);
+    
+    // Console-style menu animation
+    if (isConsoleStyleActive && navRef.current) {
+      navRef.current.classList.add('console-menu-toggle');
+      setTimeout(() => {
+        navRef.current?.classList.remove('console-menu-toggle');
+      }, 300);
+    }
   };
 
   // Don't show navigation on certain pages
@@ -400,15 +460,43 @@ export function MobileBottomNav() {
         )}
       </AnimatePresence>
 
-      {/* Bottom Navigation Bar */}
+      {/* Console-themed Bottom Navigation Bar */}
       <nav 
         ref={navRef}
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb"
+        className={`
+          fixed bottom-0 left-0 right-0 z-40 safe-area-pb transition-all duration-300
+          ${isConsoleStyleActive ? getConsoleNavStyle() : 'bg-white border-t border-gray-200'}
+          ${isPerformanceMode ? 'console-performance-nav' : ''}
+        `}
+        data-console-mode={consoleMode}
+        aria-label="Console Navigation"
       >
-        {/* Swipe Indicator */}
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+        {/* Console Gaming Indicator */}
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
           <AnimatePresence>
-            {!isDrawerOpen && (
+            {!isDrawerOpen && isConsoleStyleActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 0.7, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="flex flex-col items-center px-3 py-1 rounded-full backdrop-blur-sm"
+                style={{ backgroundColor: getConsoleAccentColor(0.1) }}
+              >
+                <div className="flex items-center space-x-1">
+                  {getConsoleIcon()}
+                  <span className="text-[8px] font-bold" style={{ color: getConsoleAccentColor() }}>
+                    {consoleMode.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-1 mt-1">
+                  <ChevronUp className="h-3 w-3" style={{ color: getConsoleAccentColor(0.8) }} />
+                  <span className="text-[8px] font-medium" style={{ color: getConsoleAccentColor(0.8) }}>
+                    Power Menu
+                  </span>
+                </div>
+              </motion.div>
+            )}
+            {!isDrawerOpen && !isConsoleStyleActive && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.5 }}
@@ -422,72 +510,140 @@ export function MobileBottomNav() {
         </div>
 
         <div className="flex items-center justify-around h-16">
-          {/* Main Navigation Items */}
+          {/* Console-themed Main Navigation Items */}
           {mainNavItems.map(item => {
             const isActive = activeTab === item.id;
             const isDisabled = item.requiresAuth && !isAuthenticated;
 
             return (
-              <button
+              <ConsoleFocusable
                 key={item.id}
-                onClick={() => handleNavClick(item)}
-                disabled={isDisabled}
-                className={`
-                  flex flex-col items-center justify-center flex-1 h-full
-                  transition-all duration-200 relative touch-target
-                  ${isActive ? 'text-primary-600' : 'text-gray-500'}
-                  ${isDisabled ? 'opacity-50' : 'active:bg-gray-50'}
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                  hover:bg-gray-50 active:scale-95
-                `}
-                aria-label={item.label}
-                aria-current={isActive ? 'page' : undefined}
+                id={`mobile-nav-${item.id}`}
+                group="mobile-navigation"
+                priority={isActive ? 100 : 50}
+                className="flex-1 h-full"
+                onActivate={() => handleNavClick(item)}
               >
-                <div className="relative">
-                  {React.cloneElement(item.icon as React.ReactElement, {
-                    className: `h-6 w-6 transition-transform ${isActive ? 'scale-110' : ''}`
-                  })}
-                  {item.badge && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </span>
+                <button
+                  onClick={() => handleNavClick(item)}
+                  disabled={isDisabled}
+                  className={`
+                    ${getConsoleButtonStyle(isActive)}
+                    ${isDisabled ? 'opacity-50' : ''}
+                  `}
+                  aria-label={`${item.label} - Console Navigation`}
+                  aria-current={isActive ? 'page' : undefined}
+                  data-console-button={consoleMode}
+                >
+                  <div className="relative">
+                    {React.cloneElement(item.icon as React.ReactElement, {
+                      className: `h-6 w-6 transition-all duration-200 ${
+                        isActive ? 'scale-110 drop-shadow-glow' : ''
+                      } ${!isPerformanceMode ? 'filter-none' : ''}`
+                    })}
+                    {item.badge && item.badge > 0 && (
+                      <span 
+                        className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-pulse"
+                        style={{ backgroundColor: getConsoleAccentColor() }}
+                      >
+                        {item.badge > 99 ? '99+' : item.badge}
+                      </span>
+                    )}
+                    {isConsoleStyleActive && isActive && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ 
+                          boxShadow: `0 0 20px ${getConsoleAccentColor(0.6)}`,
+                          background: `radial-gradient(circle, ${getConsoleAccentColor(0.1)} 0%, transparent 70%)`
+                        }}
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.3, 0.7, 0.3]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                      />
+                    )}
+                  </div>
+                  <span className={`text-[10px] mt-1 font-medium transition-all duration-200 ${
+                    isActive ? 'block opacity-100' : 'hidden opacity-0'
+                  }`}>
+                    {item.label}
+                  </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeConsoleTab"
+                      className="absolute top-0 left-0 right-0 h-0.5"
+                      style={{ backgroundColor: getConsoleAccentColor() }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                    />
                   )}
-                </div>
-                <span className={`text-[10px] mt-1 font-medium ${isActive ? 'block' : 'hidden'}`}>
-                  {item.label}
-                </span>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute top-0 left-0 right-0 h-0.5 bg-primary-600"
-                  />
-                )}
-              </button>
+                </button>
+              </ConsoleFocusable>
             );
           })}
 
-          {/* Menu Button */}
-          <button
-            onClick={handleMenuToggle}
-            className={`
-              flex flex-col items-center justify-center px-4 h-full
-              transition-all duration-200 touch-target
-              ${isDrawerOpen ? 'text-primary-600' : 'text-gray-500'}
-              active:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500
-              hover:bg-gray-50 active:scale-95
-            `}
-            aria-label="More options"
-            aria-expanded={isDrawerOpen}
+          {/* Console Menu Button */}
+          <ConsoleFocusable
+            id="mobile-nav-menu"
+            group="mobile-navigation"
+            priority={75}
+            className="px-4 h-full"
+            onActivate={handleMenuToggle}
           >
-            <Menu className={`h-6 w-6 transition-transform ${isDrawerOpen ? 'rotate-90' : ''}`} />
-            <span className={`text-[10px] mt-1 font-medium ${isDrawerOpen ? 'block' : 'hidden'}`}>
-              More
-            </span>
-          </button>
+            <button
+              onClick={handleMenuToggle}
+              className={`
+                ${getConsoleButtonStyle(isDrawerOpen)}
+                px-4
+              `}
+              aria-label="Console Menu - More options"
+              aria-expanded={isDrawerOpen}
+              data-console-menu={consoleMode}
+            >
+              <div className="relative">
+                {isConsoleStyleActive ? (
+                  <div className="relative">
+                    <Power className={`h-6 w-6 transition-all duration-300 ${
+                      isDrawerOpen ? 'rotate-180 scale-110' : ''
+                    }`} style={{ color: isDrawerOpen ? getConsoleAccentColor() : undefined }} />
+                    {isDrawerOpen && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ 
+                          boxShadow: `0 0 15px ${getConsoleAccentColor(0.8)}`
+                        }}
+                        animate={{
+                          scale: [1, 1.3, 1],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <Menu className={`h-6 w-6 transition-transform ${isDrawerOpen ? 'rotate-90' : ''}`} />
+                )}
+              </div>
+              <span className={`text-[10px] mt-1 font-medium transition-all duration-200 ${
+                isDrawerOpen ? 'block opacity-100' : 'hidden opacity-0'
+              }`}>
+                {isConsoleStyleActive ? 'Power' : 'More'}
+              </span>
+            </button>
+          </ConsoleFocusable>
         </div>
       </nav>
 
-      {/* Add padding to page content to account for navigation */}
+      {/* Console-themed Mobile Navigation Styles */}
       <style>{`
         .safe-area-pb {
           padding-bottom: env(safe-area-inset-bottom, 0);
@@ -495,6 +651,90 @@ export function MobileBottomNav() {
         
         body {
           padding-bottom: calc(64px + env(safe-area-inset-bottom, 0));
+        }
+        
+        /* Console Performance Optimizations */
+        .console-performance-nav {
+          will-change: transform;
+          transform: translateZ(0);
+        }
+        
+        .console-performance-mode * {
+          animation-duration: 0.1s !important;
+          transition-duration: 0.1s !important;
+        }
+        
+        /* Console Navigation Effects */
+        .console-navigation-active {
+          transform: scale(1.02);
+          transition: transform 0.2s ease-out;
+        }
+        
+        .console-menu-toggle {
+          animation: consoleMenuPulse 0.3s ease-out;
+        }
+        
+        @keyframes consoleMenuPulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        
+        /* Console Button Glow Effects */
+        .drop-shadow-glow {
+          filter: drop-shadow(0 0 8px currentColor);
+        }
+        
+        /* Touch Target Optimization for Console */
+        .touch-target {
+          min-width: 48px;
+          min-height: 48px;
+        }
+        
+        /* Console Theme Specific Styles */
+        [data-console-mode="playstation"] {
+          --console-primary: #3b82f6;
+          --console-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        [data-console-mode="xbox"] {
+          --console-primary: #22c55e;
+          --console-glow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        
+        [data-console-mode="switch"] {
+          --console-primary: #ef4444;
+          --console-glow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Console Focus Ring */
+        .console-focusable:focus-within {
+          box-shadow: var(--console-glow, 0 0 20px rgba(59, 130, 246, 0.3));
+          outline: 2px solid var(--console-primary, #3b82f6);
+          outline-offset: 2px;
+        }
+        
+        /* Mobile-specific Console Optimizations */
+        @media (max-width: 768px) {
+          .touch-target {
+            min-width: 56px;
+            min-height: 56px;
+          }
+          
+          .console-navigation-active {
+            transform: scale(1.01);
+          }
+        }
+        
+        /* Haptic Feedback Visual Indicators */
+        @keyframes hapticPulse {
+          0% { transform: scale(1); opacity: 0.7; }
+          50% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.7; }
+        }
+        
+        .haptic-active {
+          animation: hapticPulse 0.2s ease-out;
         }
       `}</style>
     </>

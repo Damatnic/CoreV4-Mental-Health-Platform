@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Line, Bar, Radar, Area } from 'recharts';
-import { useAuth } from '../../../contexts/AnonymousAuthContext';
+import { useAuth } from '../../../hooks/useAuth';
 import { logger, LogCategory } from '../../../services/logging/logger';
 
 interface TriggerPattern {

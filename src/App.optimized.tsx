@@ -22,7 +22,7 @@ import { performanceMonitor, memoryMonitor, frameRateMonitor } from './utils/per
 
 // Lazy load pages with preload support
 const HomePage = lazyWithPreload(() => import('./pages/HomePage'));
-const DashboardPage = lazyWithPreload(() => import('./pages/DashboardPage'));
+// DashboardPage removed - HomePage now serves as the dashboard
 const CrisisPage = lazyWithPreload(() => import('./pages/CrisisPage'));
 const WellnessPage = lazyWithPreload(() => import('./pages/WellnessPage'));
 const CommunityPage = lazyWithPreload(() => import('./pages/CommunityPage'));
@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
   
   // Preload other pages after initial render
   requestIdleCallback(() => {
-    (DashboardPage as any).preload();
+    (HomePage as any).preload();
     (WellnessPage as any).preload();
   });
 }
@@ -63,7 +63,7 @@ const queryClient = new QueryClient({
 });
 
 // Wrap pages with security and performance monitoring
-const SecureDashboard = withSecurity(DashboardPage, 'basic');
+const SecureDashboard = withSecurity(HomePage, 'basic');
 const SecureWellness = withSecurity(WellnessPage, 'elevated');
 const SecureProfessional = withSecurity(ProfessionalPage, 'maximum');
 const SecureCommunity = withSecurity(CommunityPage, 'basic');

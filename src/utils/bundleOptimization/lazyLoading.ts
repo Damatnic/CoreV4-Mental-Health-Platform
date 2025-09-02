@@ -291,7 +291,7 @@ export class ComponentPreloader {
 export const RouteComponents = {
   // Core routes (always loaded)
   Dashboard: createLazyComponent(
-    () => import('../../pages/DashboardPage'),
+    () => import('../../pages/HomePage'),
     'Dashboard'
   ),
   

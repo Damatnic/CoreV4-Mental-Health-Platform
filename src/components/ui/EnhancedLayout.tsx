@@ -14,7 +14,7 @@ import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
 import { FloatingCrisisButton, MobileCrisisButton } from '../navigation/FloatingCrisisButton';
 import { MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
-import { useAuth } from '../../contexts/AnonymousAuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
 import { toast } from 'react-hot-toast';
 
@@ -321,21 +321,56 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   };
 
   return (
-    <div className={`h-screen bg-gray-50 dark:bg-gray-900 flex ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''}`}>
-      {/* Crisis Banner - Always at top */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pink-500 to-red-600 text-white px-4 py-2">
-        <div className="flex items-center justify-center space-x-4 text-sm font-medium">
-          <span>🆘 NEED HELP NOW?</span>
+    <div className={`h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''} relative overflow-hidden`}>
+      {/* Console Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <motion.div
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, -150, 0],
+            y: [0, 100, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+          className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-gradient-to-r from-green-500/5 to-blue-500/5 rounded-full blur-3xl"
+        />
+      </div>
+
+      {/* Crisis Banner - Console Style */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-600 via-pink-600 to-red-600 text-white px-4 py-3 backdrop-blur-md shadow-console-depth">
+        <div className="flex items-center justify-center space-x-6 text-sm font-medium">
+          <motion.span 
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center space-x-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <span>🆘 NEED HELP NOW?</span>
+          </motion.span>
           <a 
             href="tel:988" 
-            className="flex items-center space-x-1 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition-all"
+            className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-console border border-white/20 hover:border-white/40 transition-all hover:scale-105"
           >
             <Phone className="h-4 w-4" />
             <span>Call 988</span>
           </a>
           <Link 
             to="/crisis" 
-            className="flex items-center space-x-1 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition-all"
+            className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-console border border-white/20 hover:border-white/40 transition-all hover:scale-105"
           >
             <MessageCircle className="h-4 w-4" />
             <span>Crisis Chat</span>
@@ -346,102 +381,174 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       {/* Skip Links */}
       <SkipLinks />
 
-      {/* Sidebar Navigation */}
+      {/* Console Sidebar Navigation - Mobile Enhanced */}
       <motion.aside
-        animate={{ width: isMobileMenuOpen ? 280 : 80 }}
-        className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 overflow-hidden"
-        style={{ marginTop: '48px' }} // Space for crisis banner
+        animate={{ 
+          width: isMobileMenuOpen ? 300 : 90,
+          x: window.innerWidth < 768 && !isMobileMenuOpen ? -90 : 0 // Hide on mobile when closed
+        }}
+        className="bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-r border-gray-700/50 flex-shrink-0 overflow-hidden backdrop-blur-console shadow-console-depth relative z-40 md:relative md:z-10"
+        style={{ marginTop: '56px' }} // Space for crisis banner
       >
-        <div className="p-4">
-          {/* Logo */}
-          <div className="flex items-center mb-8">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-6 h-6 text-white" />
+        {/* Sidebar glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+        
+        <div className="p-6 relative z-10">
+          {/* Console Logo */}
+          <motion.div 
+            className="flex items-center mb-10"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          >
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-console-lg flex items-center justify-center flex-shrink-0 shadow-console-glow">
+              <Sparkles className="w-7 h-7 text-white" />
             </div>
             <motion.div
               animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
-              className="ml-3 overflow-hidden"
+              className="ml-4 overflow-hidden"
             >
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                Wellness Suite
+              <h1 className="text-xl font-bold text-white mb-1">
+                Astral Core
               </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Your mental health toolkit</p>
+              <p className="text-sm text-gray-300">Mental Health Console</p>
             </motion.div>
-          </div>
+          </motion.div>
 
-          {/* Main Navigation */}
-          <nav className="space-y-2">
-            {navigation.map((item) => {
+          {/* Console Navigation */}
+          <nav className="space-y-3">
+            {navigation.map((item, index) => {
               const isActiveRoute = isActive(item.href);
               return (
-                <Link
+                <motion.div
                   key={item.name}
-                  to={item.href}
-                  className={`group flex items-center p-3 rounded-lg transition-all duration-200 ${
-                    isActiveRoute
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  <div className="flex-shrink-0">
-                    {item.icon}
-                  </div>
-                  <motion.span
-                    animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
-                    className="ml-3 font-medium overflow-hidden whitespace-nowrap"
+                  <Link
+                    to={item.href}
+                    className={`group flex items-center p-4 rounded-console-lg transition-all duration-300 relative overflow-hidden ${
+                      isActiveRoute
+                        ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-400/30 shadow-console-glow'
+                        : 'text-gray-300 hover:text-white hover:bg-gray-700/50 border border-gray-700/30 hover:border-gray-600/50'
+                    }`}
                   >
-                    {item.name}
-                  </motion.span>
-                </Link>
+                    {/* Console tile background effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    <div className={`flex-shrink-0 p-2 rounded-console ${isActiveRoute ? 'bg-blue-500/20' : 'bg-gray-700/50 group-hover:bg-gray-600/50'} transition-colors duration-300`}>
+                      {item.icon}
+                    </div>
+                    
+                    <motion.div
+                      animate={{ opacity: isMobileMenuOpen ? 1 : 0, x: isMobileMenuOpen ? 0 : -10 }}
+                      className="ml-4 overflow-hidden relative z-10"
+                    >
+                      <span className="font-medium text-sm">
+                        {item.name}
+                      </span>
+                      {isActiveRoute && (
+                        <div className="w-full h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 mt-1 rounded-full" />
+                      )}
+                    </motion.div>
+
+                    {/* Active indicator */}
+                    {isActiveRoute && (
+                      <motion.div
+                        layoutId="activeNav"
+                        className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500 rounded-r-full"
+                      />
+                    )}
+                  </Link>
+                </motion.div>
               );
             })}
           </nav>
 
-          {/* Wellness Tools - Show when expanded */}
+          {/* Console Quick Wellness - Show when expanded */}
           <motion.div
             animate={{ opacity: isMobileMenuOpen ? 1 : 0, height: isMobileMenuOpen ? 'auto' : 0 }}
             className="mt-8 overflow-hidden"
           >
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              Quick Wellness
-            </h3>
+            <div className="flex items-center mb-4">
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent flex-1" />
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mx-3">
+                Quick Actions
+              </h3>
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent flex-1" />
+            </div>
+            
             <div className="space-y-2">
               <Link
                 to="/wellness/breathing"
-                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-cyan-50 hover:text-cyan-700 dark:hover:bg-gray-700 transition-all duration-200"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-cyan-500/10 border border-gray-700/50 hover:border-cyan-400/30 transition-all duration-300"
               >
-                <Wind className="h-4 w-4" />
-                <span className="ml-3 text-sm">Breathing</span>
+                <div className="p-1.5 bg-cyan-500/20 rounded-console">
+                  <Wind className="h-4 w-4 text-cyan-400" />
+                </div>
+                <span className="ml-3 text-sm font-medium">Breathing</span>
+                <motion.div
+                  className="ml-auto opacity-0 group-hover:opacity-100"
+                  initial={false}
+                  animate={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                >
+                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
+                </motion.div>
               </Link>
+              
               <Link
                 to="/wellness/meditation"
-                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-gray-700 transition-all duration-200"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-indigo-500/10 border border-gray-700/50 hover:border-indigo-400/30 transition-all duration-300"
               >
-                <Timer className="h-4 w-4" />
-                <span className="ml-3 text-sm">Meditation</span>
+                <div className="p-1.5 bg-indigo-500/20 rounded-console">
+                  <Timer className="h-4 w-4 text-indigo-400" />
+                </div>
+                <span className="ml-3 text-sm font-medium">Meditation</span>
+                <motion.div
+                  className="ml-auto opacity-0 group-hover:opacity-100"
+                  initial={false}
+                  animate={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                >
+                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
+                </motion.div>
               </Link>
+              
               <Link
                 to="/wellness/journal"
-                className="group flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-700 dark:hover:bg-gray-700 transition-all duration-200"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-green-500/10 border border-gray-700/50 hover:border-green-400/30 transition-all duration-300"
               >
-                <BookOpen className="h-4 w-4" />
-                <span className="ml-3 text-sm">Journal</span>
+                <div className="p-1.5 bg-green-500/20 rounded-console">
+                  <BookOpen className="h-4 w-4 text-green-400" />
+                </div>
+                <span className="ml-3 text-sm font-medium">Journal</span>
+                <motion.div
+                  className="ml-auto opacity-0 group-hover:opacity-100"
+                  initial={false}
+                  animate={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                >
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                </motion.div>
               </Link>
             </div>
           </motion.div>
 
-          {/* Bottom Actions */}
+          {/* Console Bottom Actions */}
           <motion.div
             animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
-            className="absolute bottom-4 left-4 right-4"
+            className="absolute bottom-6 left-6 right-6"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="w-full flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                className="w-full flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-gray-700/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 group"
               >
-                <Search className="h-4 w-4" />
-                <span className="ml-3 text-sm">Search</span>
+                <div className="p-1.5 bg-gray-700/50 group-hover:bg-gray-600/50 rounded-console transition-colors">
+                  <Search className="h-4 w-4" />
+                </div>
+                <span className="ml-3 text-sm font-medium">Search Platform</span>
               </button>
               <UserMenu />
             </div>
@@ -449,56 +556,133 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
         </div>
       </motion.aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col" style={{ marginTop: '48px' }}>
-        {/* Top Bar - Mobile Actions */}
+      {/* Console Main Content Area */}
+      <div className="flex-1 flex flex-col relative z-10" style={{ marginTop: '56px' }}>
+        {/* Console Mobile Header - Enhanced Gaming Aesthetics */}
         <header 
           id="main-navigation"
-          className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 lg:hidden"
+          className="bg-gradient-to-r from-gray-800/95 via-gray-850/95 to-gray-800/95 backdrop-blur-console border-b border-gray-700/50 px-4 py-3 lg:hidden shadow-console-card relative overflow-hidden"
         >
-          <div className="flex justify-between items-center">
-            {/* Mobile Title */}
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-              Wellness Suite
-            </h1>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle sidebar"
-              aria-expanded={isMobileMenuOpen}
+          {/* Header gaming accent line */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-console-accent to-transparent opacity-30" />
+          
+          <div className="flex justify-between items-center relative z-10">
+            {/* Mobile Console Title - Gaming Style */}
+            <motion.div 
+              className="flex items-center space-x-3"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              {isMobileMenuOpen ? (
-                <ChevronLeft className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </button>
+              <div className="w-10 h-10 bg-gradient-to-r from-console-accent to-blue-500 rounded-console-lg flex items-center justify-center shadow-console-glow relative">
+                <Sparkles className="w-6 h-6 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-r from-console-accent/20 to-blue-500/20 rounded-console-lg blur-sm" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white tracking-wide">
+                  ASTRAL CORE
+                </h1>
+                <p className="text-xs text-console-accent font-medium tracking-wider">
+                  MENTAL HEALTH CONSOLE
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Console Menu Toggle - Gaming Button */}
+            <motion.button
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+              className="console-focusable group relative p-3 rounded-console-lg text-gray-300 hover:text-white bg-gray-700/30 hover:bg-gray-600/40 border border-gray-600/50 hover:border-console-accent/50 transition-all duration-300 shadow-console-card"
+              aria-label="Toggle console sidebar"
+              aria-expanded={isMobileMenuOpen}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {/* Button glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-console-accent/10 to-blue-500/10 rounded-console-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <motion.div
+                animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+                className="relative z-10"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </motion.div>
+            </motion.button>
           </div>
         </header>
 
-        {/* Breadcrumbs */}
-        <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-          <Breadcrumbs />
+        {/* Console Breadcrumbs - Mobile Optimized */}
+        <div className="bg-gradient-to-r from-gray-800/40 via-gray-850/50 to-gray-800/40 backdrop-blur-console px-4 md:px-6 py-3 border-b border-gray-700/30 relative overflow-hidden">
+          {/* Mobile breadcrumb accent */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-console-accent/30 to-transparent" />
+          
+          <div className="hidden md:block">
+            <Breadcrumbs />
+          </div>
+          <div className="block md:hidden">
+            <MobileBreadcrumbs />
+          </div>
         </div>
 
-        {/* Main Content */}
-        <main id="main-content" className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        {/* Console Main Content - Mobile Enhanced */}
+        <main id="main-content" className="flex-1 overflow-y-auto bg-transparent relative smooth-scroll">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: preferences.reducedMotion ? 0 : 0.3 }}
+            transition={{ duration: preferences.reducedMotion ? 0 : 0.4 }}
+            className="relative z-10 min-h-screen console-safe-area"
           >
             {children}
           </motion.div>
+          
+          {/* Mobile bottom padding for fixed nav */}
+          <div className="h-20 md:h-0" /> {/* Safe area for mobile navigation */}
         </main>
       </div>
 
       {/* Global Search */}
       <GlobalSearch />
+      
+      {/* Mobile Console Navigation Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+      
+      {/* Floating Crisis Button - Mobile Enhanced */}
+      <FloatingCrisisButton />
+      <MobileCrisisButton />
+      
+      {/* Console Mobile Safe Area Styles */}
+      <style jsx>{`
+        .console-safe-area {
+          padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        
+        @media (max-width: 768px) {
+          .console-safe-area {
+            padding-left: env(safe-area-inset-left, 0);
+            padding-right: env(safe-area-inset-right, 0);
+          }
+        }
+        
+        .backdrop-blur-console {
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+        }
+      `}</style>
     </div>
   );
 }

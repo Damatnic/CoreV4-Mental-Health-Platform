@@ -1,10 +1,10 @@
-import { CrisisInterventionSystem } from '../components/crisis/CrisisInterventionSystem';
+import { ConsoleCrisisSystem } from '../components/crisis/ConsoleCrisisSystem';
 import { CrisisErrorBoundary } from '../components/crisis/CrisisErrorBoundary';
 
 export function CrisisPage() {
   return (
     <CrisisErrorBoundary>
-      <CrisisInterventionSystem />
+      <ConsoleCrisisSystem />
     </CrisisErrorBoundary>
   );
 }

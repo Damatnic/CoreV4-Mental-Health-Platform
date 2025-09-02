@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../contexts/AnonymousAuthContext';
+import { useAuth } from './useAuth';
 import { 
   DashboardData,
   WellnessStatus,

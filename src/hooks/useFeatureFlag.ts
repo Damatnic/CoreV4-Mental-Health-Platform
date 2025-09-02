@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../contexts/AnonymousAuthContext';
+import { useAuth } from './useAuth';
 import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface FeatureFlags {

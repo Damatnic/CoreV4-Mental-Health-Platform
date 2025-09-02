@@ -135,8 +135,6 @@ export function useAnonymousAuth() {
   return context;
 }
 
-// Compatibility export for components expecting useAuth
-export const useAuth = useAnonymousAuth;
 
 // Generate a random session ID (never sent to server)
 function generateSessionId(): string {
