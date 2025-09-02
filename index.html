@@ -7,10 +7,11 @@
     <meta name="description" content="CoreV4 - Comprehensive mental health support platform with crisis intervention, wellness tracking, and community features" />
     <meta name="theme-color" content="#6366f1" />
     
-    <!-- SECURITY: Content Security Policy (Updated for development) -->
+    <!-- SECURITY: Content Security Policy (Development Mode - Allows Vite HMR) -->
+    <!-- Note: Production builds should use stricter CSP without localhost and unsafe-eval -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://cdn.jsdelivr.net https://fonts.googleapis.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: blob:;
