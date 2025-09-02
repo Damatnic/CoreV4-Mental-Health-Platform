@@ -13,11 +13,6 @@ export default defineConfig(({ command, mode }) => {
     react({
       // Keep automatic JSX runtime for React 18+ compatibility
       jsxRuntime: 'automatic',
-      // Fast refresh optimizations
-      plugins: [
-        // Enable React Fast Refresh optimizations
-        ['@swc/plugin-react-refresh', {}],
-      ],
       babel: isProduction ? {
         plugins: [
           ['babel-plugin-react-remove-properties', { properties: ['data-testid'] }],
@@ -134,14 +129,6 @@ export default defineConfig(({ command, mode }) => {
       overlay: true
     }
   },
-  worker: {
-    format: 'es',
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/workers/[name]-[hash].js'
-      }
-    }
-  },
   build: {
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     minify: isProduction ? 'terser' : false,
@@ -153,7 +140,7 @@ export default defineConfig(({ command, mode }) => {
         global_defs: {
           __DEV__: false,
         },
-        passes: 2, // Increase passes for better optimization
+        passes: 3, // Increase passes for better optimization
         // Enable safe optimizations for production
         inline: 3,
         reduce_vars: true,
@@ -171,10 +158,8 @@ export default defineConfig(({ command, mode }) => {
         // Performance optimizations
         arrows: true,
         booleans_as_integers: true,
-        drop_console: true,
         ecma: 2020,
         module: true,
-        passes: 3,
         unsafe_arrows: true,
         unsafe_comps: true,
         unsafe_math: true,
@@ -366,9 +351,6 @@ export default defineConfig(({ command, mode }) => {
     modulePreload: {
       polyfill: false // Modern browsers only
     },
-    
-    // Optimize for modern browsers
-    minify: isProduction ? 'terser' : false,
     
     // Aggressive compression in production
     ...(isProduction && {
