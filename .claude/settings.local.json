@@ -60,7 +60,18 @@
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C/**)",
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\components/**)",
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\components/**)",
-      "Bash(timeout 10s npm run dev)"
+      "Bash(timeout 10s npm run dev)",
+      "WebFetch(domain:reactjs.org)",
+      "WebFetch(domain:legacy.reactjs.org)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)",
+      "Read(H:\\h\\Astral Core\\CoreV4/**)"
     ],
     "deny": [],
     "ask": []

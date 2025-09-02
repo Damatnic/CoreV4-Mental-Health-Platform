@@ -686,13 +686,18 @@ class PerformanceMonitor {
     if (metrics.length === 0) return;
     
     try {
-      // In production, send to analytics endpoint
+      // In production, only log to console (no backend API available)
       if (process.env.NODE_ENV === 'production') {
-        await fetch('/api/analytics/performance', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ metrics }),
-        });
+        // Store metrics locally for potential future use
+        try {
+          const storedMetrics = localStorage.getItem('performance_metrics') || '[]';
+          const existingMetrics = JSON.parse(storedMetrics);
+          const updatedMetrics = [...existingMetrics, ...metrics].slice(-100); // Keep last 100 metrics
+          localStorage.setItem('performance_metrics', JSON.stringify(updatedMetrics));
+        } catch (localError) {
+          // Ignore localStorage errors
+          console.debug('[Performance] LocalStorage unavailable:', localError);
+        }
       }
       
       // Log in development
@@ -700,7 +705,7 @@ class PerformanceMonitor {
         console.log('[Performance Metrics]', metrics);
       }
     } catch (error) {
-      console.error('[Performance] Failed to send metrics:', error);
+      console.error('[Performance] Failed to process metrics:', error);
     }
   }
   

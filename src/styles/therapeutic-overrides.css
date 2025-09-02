@@ -8,14 +8,14 @@
 /* ===== Global Overrides ===== */
 
 /* Replace harsh colors with softer alternatives */
-.bg-red-50 { @apply bg-calm-peach/20 !important; }
-.bg-red-100 { @apply bg-calm-peach/30 !important; }
+.bg-red-50 { @apply bg-[#FFE5D9]/20 !important; }
+.bg-red-100 { @apply bg-[#FFE5D9]/30 !important; }
 .bg-red-500 { @apply bg-[#DFA4A0] !important; }
 .bg-red-600 { @apply bg-[#D4908B] !important; }
 .bg-red-700 { @apply bg-[#C97C76] !important; }
 .bg-red-900 { @apply bg-[#A8706C] !important; }
 
-.text-red-50 { @apply text-calm-peach !important; }
+.text-red-50 { @apply text-[#FFE5D9] !important; }
 .text-red-500 { @apply text-[#C97C76] !important; }
 .text-red-600 { @apply text-[#B86862] !important; }
 .text-red-700 { @apply text-[#A75A54] !important; }

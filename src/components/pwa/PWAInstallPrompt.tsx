@@ -44,7 +44,7 @@ const installBenefits = [
 
 export function PWAInstallPrompt() {
   const { isAppInstallable, installApp, deviceInfo } = useMobileFeatures();
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);

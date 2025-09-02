@@ -54,7 +54,7 @@ const navItems: NavItem[] = [
 
 export function MobileNavigation() {
   const location = useLocation();
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -240,7 +240,7 @@ export function MobileNavigation() {
       </nav>
 
       {/* Console Mobile Navigation Styles */}
-      <style jsx>{`
+      <style>{`
         .h-safe-area-bottom {
           height: env(safe-area-inset-bottom, 0);
           min-height: 0.5rem;

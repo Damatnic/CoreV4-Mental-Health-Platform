@@ -28,7 +28,7 @@ interface CrisisButtonProps {
 }
 
 function CrisisButton({ icon, label, sublabel, color, onClick, urgent, disabled }: CrisisButtonProps) {
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   
   const handleClick = () => {
     // Haptic feedback for mobile devices
@@ -71,7 +71,7 @@ function CrisisButton({ icon, label, sublabel, color, onClick, urgent, disabled 
 // Quick access floating action button for crisis
 function CrisisFloatingButton({ onClick }: { onClick: () => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const handleMainClick = () => {
@@ -185,7 +185,7 @@ export function MobileCrisisInterface() {
   const [activeView, setActiveView] = useState<'main' | 'chat' | 'resources' | 'safety'>('main');
   const [location, setLocation] = useState<GeolocationCoordinates | null>(null);
   const { isOnline } = useNetworkStatus();
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
 
   // Get location for emergency services
   useEffect(() => {
@@ -401,7 +401,7 @@ function QuickToolButton({
   disabled?: boolean;
   badge?: string | null;
 }) {
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   
   const handleClick = () => {
     if (!disabled) {

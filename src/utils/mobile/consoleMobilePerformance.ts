@@ -3,6 +3,8 @@
  * Optimizes console animations and effects for mobile gaming performance
  */
 
+import React from 'react';
+
 interface MobilePerformanceSettings {
   reduceMotion: boolean;
   enableHardwareAcceleration: boolean;
@@ -404,5 +406,3 @@ export function useConsoleMobilePerformance() {
   };
 }
 
-// Additional React import for the hook
-import React from 'react';

@@ -37,6 +37,7 @@ import { initializeTouchOptimization } from '../../utils/mobile/touchOptimizatio
 import { useAuth } from '../../hooks/useAuth';
 import { useConsoleNavigation } from '../../hooks/useConsoleNavigation';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
+import { getConsoleNavStyle, getConsoleAccentColor } from '../../utils/console';
 
 interface NavItem {
   id: string;
@@ -175,7 +176,7 @@ export function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   const { deviceInfo, isMobileDevice } = useMobileFeatures();
   const { navigationMode, isPerformanceMode } = useConsoleNavigation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -465,7 +466,7 @@ export function MobileBottomNav() {
         ref={navRef}
         className={`
           fixed bottom-0 left-0 right-0 z-40 safe-area-pb transition-all duration-300
-          ${isConsoleStyleActive ? getConsoleNavStyle() : 'bg-white border-t border-gray-200'}
+          ${isConsoleStyleActive ? getConsoleNavStyle(consoleMode) : 'bg-white border-t border-gray-200'}
           ${isPerformanceMode ? 'console-performance-nav' : ''}
         `}
         data-console-mode={consoleMode}
@@ -480,17 +481,17 @@ export function MobileBottomNav() {
                 animate={{ opacity: 0.7, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 className="flex flex-col items-center px-3 py-1 rounded-full backdrop-blur-sm"
-                style={{ backgroundColor: getConsoleAccentColor(0.1) }}
+                style={{ backgroundColor: getConsoleAccentColor(consoleMode, 0.1) }}
               >
                 <div className="flex items-center space-x-1">
-                  {getConsoleIcon()}
-                  <span className="text-[8px] font-bold" style={{ color: getConsoleAccentColor() }}>
+                  <div className="w-2 h-2 rounded-full bg-console-accent" />
+                  <span className="text-[8px] font-bold" style={{ color: getConsoleAccentColor(consoleMode) }}>
                     {consoleMode.toUpperCase()}
                   </span>
                 </div>
                 <div className="flex items-center space-x-1 mt-1">
-                  <ChevronUp className="h-3 w-3" style={{ color: getConsoleAccentColor(0.8) }} />
-                  <span className="text-[8px] font-medium" style={{ color: getConsoleAccentColor(0.8) }}>
+                  <ChevronUp className="h-3 w-3" style={{ color: getConsoleAccentColor(consoleMode, 0.8) }} />
+                  <span className="text-[8px] font-medium" style={{ color: getConsoleAccentColor(consoleMode, 0.8) }}>
                     Power Menu
                   </span>
                 </div>
@@ -528,7 +529,8 @@ export function MobileBottomNav() {
                   onClick={() => handleNavClick(item)}
                   disabled={isDisabled}
                   className={`
-                    ${getConsoleButtonStyle(isActive)}
+                    px-4 py-2 rounded-console transition-all duration-200
+                    ${isActive ? 'bg-console-accent/20 text-console-accent' : 'text-gray-400 hover:text-console-accent'}
                     ${isDisabled ? 'opacity-50' : ''}
                   `}
                   aria-label={`${item.label} - Console Navigation`}
@@ -544,7 +546,7 @@ export function MobileBottomNav() {
                     {item.badge && item.badge > 0 && (
                       <span 
                         className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-pulse"
-                        style={{ backgroundColor: getConsoleAccentColor() }}
+                        style={{ backgroundColor: getConsoleAccentColor(consoleMode) }}
                       >
                         {item.badge > 99 ? '99+' : item.badge}
                       </span>
@@ -553,8 +555,8 @@ export function MobileBottomNav() {
                       <motion.div
                         className="absolute inset-0 rounded-full"
                         style={{ 
-                          boxShadow: `0 0 20px ${getConsoleAccentColor(0.6)}`,
-                          background: `radial-gradient(circle, ${getConsoleAccentColor(0.1)} 0%, transparent 70%)`
+                          boxShadow: `0 0 20px ${getConsoleAccentColor(consoleMode, 0.6)}`,
+                          background: `radial-gradient(circle, ${getConsoleAccentColor(consoleMode, 0.1)} 0%, transparent 70%)`
                         }}
                         animate={{
                           scale: [1, 1.2, 1],
@@ -577,7 +579,7 @@ export function MobileBottomNav() {
                     <motion.div
                       layoutId="activeConsoleTab"
                       className="absolute top-0 left-0 right-0 h-0.5"
-                      style={{ backgroundColor: getConsoleAccentColor() }}
+                      style={{ backgroundColor: getConsoleAccentColor(consoleMode) }}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -599,8 +601,8 @@ export function MobileBottomNav() {
             <button
               onClick={handleMenuToggle}
               className={`
-                ${getConsoleButtonStyle(isDrawerOpen)}
-                px-4
+                px-4 py-2 rounded-console transition-all duration-200
+                ${isDrawerOpen ? 'bg-console-accent/20 text-console-accent' : 'text-gray-400 hover:text-console-accent'}
               `}
               aria-label="Console Menu - More options"
               aria-expanded={isDrawerOpen}
@@ -611,12 +613,12 @@ export function MobileBottomNav() {
                   <div className="relative">
                     <Power className={`h-6 w-6 transition-all duration-300 ${
                       isDrawerOpen ? 'rotate-180 scale-110' : ''
-                    }`} style={{ color: isDrawerOpen ? getConsoleAccentColor() : undefined }} />
+                    }`} style={{ color: isDrawerOpen ? getConsoleAccentColor(consoleMode) : undefined }} />
                     {isDrawerOpen && (
                       <motion.div
                         className="absolute inset-0 rounded-full"
                         style={{ 
-                          boxShadow: `0 0 15px ${getConsoleAccentColor(0.8)}`
+                          boxShadow: `0 0 15px ${getConsoleAccentColor(consoleMode, 0.8)}`
                         }}
                         animate={{
                           scale: [1, 1.3, 1],

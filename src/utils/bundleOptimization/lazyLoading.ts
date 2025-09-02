@@ -116,9 +116,9 @@ export const TherapistFinderLazy = createLazyComponent(
   'TherapistFinder'
 );
 
-export const AppointmentSchedulingLazy = createLazyComponent(
-  () => import('../../components/professional/AppointmentScheduling'),
-  'AppointmentScheduling'
+export const AppointmentBookingLazy = createLazyComponent(
+  () => import('../../components/professional/AppointmentBooking').then(m => ({ default: m.AppointmentBooking })),
+  'AppointmentBooking'
 );
 
 // Settings and administrative components (lowest priority)

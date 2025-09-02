@@ -74,7 +74,7 @@ export function ConsoleTile({
   const navigate = useNavigate();
   const { isMobileDevice, isSmallScreen, deviceInfo } = useMobileFeatures();
   const { isPerformanceMode } = useConsoleNavigation();
-  const vibrate = useVibration();
+  const { vibrate } = useVibration();
   const [isPressed, setIsPressed] = useState(false);
   const tileRef = useRef<HTMLDivElement>(null);
   

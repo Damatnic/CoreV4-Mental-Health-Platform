@@ -666,7 +666,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       <MobileCrisisButton />
       
       {/* Console Mobile Safe Area Styles */}
-      <style jsx>{`
+      <style>{`
         .console-safe-area {
           padding-bottom: env(safe-area-inset-bottom, 0);
         }
