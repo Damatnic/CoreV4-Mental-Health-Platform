@@ -54,7 +54,7 @@ const defaultPreferences: NavigationPreferences = {
 };
 
 // Create context
-const NavigationContext = createContext<NavigationContextState | undefined>(_undefined);
+const NavigationContext = createContext<NavigationContextState | undefined>(undefined);
 
 // Provider component
 export function NavigationProvider({ children }: { children: ReactNode }) {
@@ -63,7 +63,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const [preferences, _setPreferences] = useState<NavigationPreferences>(() => {
     // Load preferences from localStorage if available
     const saved = localStorage.getItem('navigationPreferences');
-    return saved ? { ...defaultPreferences, ...JSON.parse(_saved) } : defaultPreferences;
+    return saved ? { ...defaultPreferences, ...JSON.parse(saved) } : defaultPreferences;
   });
   const [isSearchOpen, _setSearchOpen] = useState(false);
   const [isMobileMenuOpen, _setMobileMenuOpen] = useState(false);
@@ -73,7 +73,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 
   // Update breadcrumbs based on current path
   useEffect(() => {
-    const pathSegments = location.pathname.split('/').filter(_Boolean);
+    const pathSegments = location.pathname.split('/').filter(Boolean);
     const newBreadcrumbs: Array<{ label: string; path: string }> = [
       { label: 'Home', path: '/' }
     ];
@@ -85,7 +85,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       newBreadcrumbs.push({ label, path: currentPath });
     });
 
-    setBreadcrumbs(_newBreadcrumbs);
+    setBreadcrumbs(newBreadcrumbs);
   }, [location]);
 
   // Save preferences to localStorage when they change
@@ -168,7 +168,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const quickActions = React.useMemo(() => {
     const actions = [];
     
-    if (_crisisDetected) {
+    if (crisisDetected) {
       actions.push(
         { label: 'Call Hotline', action: () => window.location.href = 'tel:988', icon: '📞' },
         { label: 'Text Support', action: () => window.location.href = 'sms:741741', icon: '💬' },
@@ -216,7 +216,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 
 // Hook to use navigation context
 export function useNavigation() {
-  const context = useContext(_NavigationContext);
+  const context = useContext(NavigationContext);
   if (!context) {
     throw new Error('useNavigation must be used within NavigationProvider');
   }

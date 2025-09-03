@@ -52,7 +52,7 @@ function SkipLinks() {
 function UserMenu() {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const { _preferences, favoriteRoutes } = useNavigation();
+  const { preferences, favoriteRoutes } = useNavigation();
 
   return (
     <div className="relative">
@@ -265,7 +265,7 @@ function _QuickAccessPanel() {
 // Main enhanced layout component
 function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   const location = useLocation();
-  const { mode, isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, _preferences, _crisisDetected } = useNavigation();
+  const { mode, isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, preferences, crisisDetected } = useNavigation();
   const [isInstallable, setIsInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
   const [_notificationCount] = useState(0);
@@ -332,7 +332,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   };
 
   return (
-    <div className={`h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex ${_preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''} relative overflow-hidden`}>
+    <div className={`h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''} relative overflow-hidden`}>
       {/* Console Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
@@ -676,7 +676,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: _preferences.reducedMotion ? 0 : 0.4 }}
+            transition={{ duration: preferences.reducedMotion ? 0 : 0.4 }}
             className="relative z-10 min-h-screen console-safe-area"
           >
             {children}

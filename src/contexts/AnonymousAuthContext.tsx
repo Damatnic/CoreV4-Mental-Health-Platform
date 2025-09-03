@@ -126,10 +126,10 @@ interface AnonymousAuthContextType {
   };
 }
 
-const AnonymousAuthContext = createContext<AnonymousAuthContextType | undefined>(_undefined);
+const AnonymousAuthContext = createContext<AnonymousAuthContextType | undefined>(undefined);
 
 export function useAnonymousAuth() {
-  const context = useContext(_AnonymousAuthContext);
+  const context = useContext(AnonymousAuthContext);
   if (!context) {
     throw new Error('useAnonymousAuth must be used within AnonymousAuthProvider');
   }
@@ -230,7 +230,7 @@ function getOrCreateAnonymousUser(): AnonymousUser {
     },
   };
   
-  secureStorage.setItem('anonymous_user', JSON.stringify(_newUser));
+  secureStorage.setItem('anonymous_user', JSON.stringify(newUser));
   return newUser;
 }
 
@@ -292,14 +292,14 @@ function migrateUserData(oldUser: unknown): AnonymousUser {
   };
   
   // Save migrated data
-  secureStorage.setItem('anonymous_user', JSON.stringify(_migratedUser));
+  secureStorage.setItem('anonymous_user', JSON.stringify(migratedUser));
   logger.info('✅ User data migration completed');
   
   return migratedUser;
 }
 
 export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
-  const [user, _setUser] = useState<AnonymousUser>(_getOrCreateAnonymousUser);
+  const [user, setUser] = useState<AnonymousUser>(getOrCreateAnonymousUser);
   const [sessionDuration, _setSessionDuration] = useState(0);
   
   // Update session duration every minute
@@ -437,14 +437,14 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       }
       
       // Restore user data
-      const _restoredUser = {
+      const restoredUser = {
         ...importedData.user,
         sessionStarted: new Date(importedData.user.sessionStarted),
         lastActive: new Date(importedData.user.lastActive || new Date()),
         id: generateSessionId(), // Generate new session ID for security
       };
       
-      setUser(_restoredUser);
+      setUser(restoredUser);
       
       // Restore related data if present
       if (importedData.wellnessData) {
@@ -464,7 +464,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   
   // Check if data is stale (older than retention period)
   const isDataStale = (): boolean => {
-    const __retentionDays   = user.preferences.privacy?.dataRetentionDays || 365;
+    const retentionDays = user.preferences.privacy?.dataRetentionDays || 365;
     const staleDate = new Date();
     staleDate.setDate(staleDate.getDate() - retentionDays);
     
@@ -509,7 +509,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         user.sessionStats.wellnessActivitiesCompleted > 0 ? 'Wellness Activities' : '',
         user.sessionStats.communityInteractions > 0 ? 'Community' : '',
         user.sessionStats.therapeuticContentAccessed > 0 ? 'Therapeutic Content' : '',
-      ].filter(_Boolean),
+      ].filter(Boolean),
       wellnessProgress: Math.min(
         (user.sessionStats.moodEntriesCount + 
          user.sessionStats.wellnessActivitiesCompleted + 

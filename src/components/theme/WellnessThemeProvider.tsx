@@ -9,10 +9,10 @@ interface ThemeContextType {
   applyComponentStyles: (component: string, variant?: string, size?: string) => string;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(_undefined);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const useWellnessTheme = () => {
-  const context = useContext(_ThemeContext);
+  const context = useContext(ThemeContext);
   if (!context) {
     throw new Error('useWellnessTheme must be used within a WellnessThemeProvider');
   }
@@ -21,20 +21,20 @@ export const useWellnessTheme = () => {
 
 interface WellnessThemeProviderProps {
   children: React.ReactNode;
-  _defaultTheme?: 'light' | 'dark';
+  defaultTheme?: 'light' | 'dark';
 }
 
 export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
   children,
-  _defaultTheme = 'light'
+  defaultTheme = 'light'
 }) => {
-  const [theme, _setTheme] = useState<'light' | 'dark'>(_defaultTheme);
+  const [theme, setTheme] = useState<'light' | 'dark'>(defaultTheme);
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const _savedTheme = localStorage.getItem('wellness-theme') as 'light' | 'dark' | null;
-    if (_savedTheme) {
-      setTheme(_savedTheme);
+    const savedTheme = localStorage.getItem('wellness-theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
   }, []);
 

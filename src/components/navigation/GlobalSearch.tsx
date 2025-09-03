@@ -53,8 +53,8 @@ const searchDatabase: SearchResult[] = [
 ];
 
 export function GlobalSearch() {
-  const __navigate   = useNavigate();
-  const { isSearchOpen, setSearchOpen, _preferences, addToRecent } = useNavigation();
+  const navigate = useNavigate();
+  const { isSearchOpen, setSearchOpen, preferences, addToRecent } = useNavigation();
   const [query, _setQuery] = useState('');
   const [results, _setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, _setSelectedIndex] = useState(0);
@@ -63,18 +63,18 @@ export function GlobalSearch() {
 
   // Load recent searches from localStorage
   useEffect(() => {
-    const _saved = localStorage.getItem('recentSearches');
-    if (_saved) {
-      setRecentSearches(JSON.parse(_saved));
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
     }
   }, []);
 
   // Save recent searches
   const saveRecentSearch = (searchTerm: string) => {
     if (searchTerm.trim()) {
-      const _updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
-      setRecentSearches(_updated);
-      localStorage.setItem('recentSearches', JSON.stringify(_updated));
+      const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
+      setRecentSearches(updated);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
     }
   };
 
@@ -86,9 +86,9 @@ export function GlobalSearch() {
     }
 
     const lowerQuery = searchQuery.toLowerCase();
-    const terms = lowerQuery.split(' ').filter(_Boolean);
+    const terms = lowerQuery.split(' ').filter(Boolean);
 
-    const _searchResults = searchDatabase
+    const searchResults = searchDatabase
       .map(item => {
         let score = 0;
         
@@ -98,19 +98,19 @@ export function GlobalSearch() {
         }
         
         // Title contains query
-        if (item.title.toLowerCase().includes(_lowerQuery)) {
+        if (item.title.toLowerCase().includes(lowerQuery)) {
           score += 50;
         }
         
         // Check each term
-        terms.forEach(_term => {
-          if (item.title.toLowerCase().includes(_term)) {
+        terms.forEach(term => {
+          if (item.title.toLowerCase().includes(term)) {
             score += 20;
           }
-          if (item.description?.toLowerCase().includes(_term)) {
+          if (item.description?.toLowerCase().includes(term)) {
             score += 10;
           }
-          if (item.keywords.some(k => k.includes(_term))) {
+          if (item.keywords.some(k => k.includes(term))) {
             score += 15;
           }
         });
@@ -119,7 +119,7 @@ export function GlobalSearch() {
         score += (item.priority || 0);
         
         // Category boost for crisis items when certain keywords are present
-        if (item.category === 'crisis' && ['help', 'emergency', 'crisis', 'suicide'].some(_word => lowerQuery.includes(_word))) {
+        if (item.category === 'crisis' && ['help', 'emergency', 'crisis', 'suicide'].some(word => lowerQuery.includes(word))) {
           score += 200;
         }
         
@@ -129,17 +129,17 @@ export function GlobalSearch() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);
 
-    setResults(_searchResults);
+    setResults(searchResults);
     setSelectedIndex(0);
   }, []);
 
   // Handle search input change
   useEffect(() => {
-    const _debounceTimer = setTimeout(() => {
+    const debounceTimer = setTimeout(() => {
       performSearch(query);
     }, 150);
 
-    return () => clearTimeout(_debounceTimer);
+    return () => clearTimeout(debounceTimer);
   }, [query, performSearch]);
 
   // Keyboard navigation
@@ -263,7 +263,7 @@ export function GlobalSearch() {
                     {results.map((result, index) => (
                       <button
                         key={result.id}
-                        onClick={() => handleResultClick(_result)}
+                        onClick={() => handleResultClick(result)}
                         onMouseEnter={() => setSelectedIndex(index)}
                         className={`w-full px-6 py-3 flex items-center hover:bg-gray-50 transition-colors ${
                           index === selectedIndex ? 'bg-gray-50' : ''
