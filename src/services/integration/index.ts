@@ -7,7 +7,7 @@
 import { dataIntegrationService, _IntegrationEvent } from './DataIntegrationService';
 import { realtimeSyncService, _RealtimeEvent } from './RealtimeSyncService';
 import { crisisIntegrationService, _CrisisEventType, _CrisisSeverity } from './CrisisIntegrationService';
-import { logger } from '../utils/logger';
+import { logger } from '../logging/logger';
 
 // Core integration services
 export { 

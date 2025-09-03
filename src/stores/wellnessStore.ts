@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { logger } from '../utils/logger';
 
 // Interfaces for wellness data
 export interface MoodEntry {
@@ -666,7 +667,6 @@ export const _useWellnessStore = create<WellnessState>()(
           get().calculateWellnessScores();
         } catch {
           logger.error('Failed to import data:');
-import { logger } from '../utils/logger';
         }
       })
     })),

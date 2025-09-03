@@ -1,6 +1,6 @@
 // Push Notification Service for Wellness Reminders
 import { openDB } from 'idb';
-import { logger } from '../utils/logger';
+import { logger } from '../logging/logger';
 
 interface NotificationSchedule {
   id: string;

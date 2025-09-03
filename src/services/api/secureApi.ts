@@ -10,7 +10,7 @@ import { fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
 import { securityMonitor } from '../security/securityMonitor';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../logging/logger';
 
 interface SecureRequestConfig {
   url: string;

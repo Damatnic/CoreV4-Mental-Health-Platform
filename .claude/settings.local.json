@@ -80,7 +80,8 @@
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\hooks/**)",
       "Bash(timeout 30 npx eslint . --ext .ts,.tsx,.js,.jsx --format compact)",
       "Bash(git checkout:*)",
-      "Read(\\/**)"
+      "Read(\\/**)",
+      "Read(H:\\/**)"
     ],
     "deny": [],
     "ask": []

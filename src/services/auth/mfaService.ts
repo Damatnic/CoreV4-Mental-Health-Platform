@@ -7,7 +7,7 @@
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
-import { logger } from '../utils/logger';
+import { logger } from '../logging/logger';
 
 export type MFAMethod = 'totp' | 'sms' | 'email' | 'biometric' | 'backup';
 

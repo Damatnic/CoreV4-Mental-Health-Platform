@@ -3,7 +3,7 @@
 
 import { apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
-import { logger } from '../utils/logger';
+import { logger } from '../logging/logger';
 import {
   Therapist,
   Appointment,
