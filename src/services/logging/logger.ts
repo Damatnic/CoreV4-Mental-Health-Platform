@@ -205,7 +205,7 @@ class Logger {
     if (!this.isDevelopment) {
       try {
         await this.sendToRemoteLogging(_entriesToFlush);
-      } catch (error) {
+      } catch {
         // Fallback to console if remote logging fails
         logger.error('[Logger] Failed to send logs to remote service');
       }

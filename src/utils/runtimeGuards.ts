@@ -18,7 +18,7 @@ export function safeAccess<T>(obj: unknown, path: string, defaultValue?: T): T |
     }
     
     return result !== undefined ? result : defaultValue;
-  } catch (_error) {
+  } catch {
     logger.warn('Safe access failed:', path, e);
     return defaultValue;
   }
@@ -35,7 +35,7 @@ export function safeCall<T extends (...args: unknown[]) => any>(
       return fn(...args);
     }
     return defaultValue;
-  } catch (error) {
+  } catch {
     logger.error('Safe call failed:', e);
     return defaultValue;
   }
@@ -50,7 +50,7 @@ export function initializeVariable<T>(
   try {
     const result = getter();
     return result !== undefined ? result : defaultValue;
-  } catch (_error) {
+  } catch {
     if (e instanceof ReferenceError && e.message.includes('before initialization')) {
       logger.warn(`Temporal dead zone detected for ${varName || 'variable'} })(), using default:`, defaultValue);
       return defaultValue;
@@ -99,7 +99,7 @@ export function setupRuntimeGuards() {
       // Keep only last 50 errors
       const _recentErrors = errorLog.slice(-50);
       localStorage.setItem('runtime_errors', JSON.stringify(_recentErrors));
-    } catch (error) {
+    } catch {
       logger.warn('Failed to log runtime error: ', e);
     }
     
@@ -127,7 +127,7 @@ export function setupRuntimeGuards() {
       // Keep only last 30 rejections
       const _recentRejections = rejectionLog.slice(-30);
       localStorage.setItem('promise_rejections', JSON.stringify(_recentRejections));
-    } catch (_error) {
+    } catch {
     logger.warn('Failed to log promise rejection:', e);
     }
     
@@ -179,7 +179,7 @@ export class MemoryLeakGuard {
       try {
         if (observer.disconnect) observer.disconnect();
         if (observer.unobserve) observer.unobserve();
-      } catch (_error) {
+      } catch {
     logger.warn('Failed to disconnect observer:', e);
       }
     });
@@ -190,7 +190,7 @@ export class MemoryLeakGuard {
       try {
         clearTimeout(_timerId);
         clearInterval(_timerId);
-      } catch (_error) {
+      } catch {
     logger.warn('Failed to clear timer:', e);
       }
     });
@@ -201,7 +201,7 @@ export class MemoryLeakGuard {
       events.forEach((listener, event) => {
         try {
           element.removeEventListener(event, listener);
-        } catch (_error) {
+        } catch {
     logger.warn('Failed to remove event listener:', e);
         }
       });

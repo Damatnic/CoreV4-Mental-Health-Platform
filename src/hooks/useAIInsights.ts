@@ -1116,8 +1116,8 @@ export function useAIInsights() {
   const queryClient = useQueryClient();
   const [selectedInsightCategory, _setSelectedInsightCategory] = useState<InsightCategory | 'all'>('all');
   const [insightTimeRange, _setInsightTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [crisisRiskPrediction, _setCrisisRiskPrediction] = useState<CrisisRiskPrediction | null>(null);
-  const [moodAnalysis, _setMoodAnalysis] = useState<MoodAnalysis | null>(null);
+  const [_crisisRiskPrediction, _setCrisisRiskPrediction] = useState<CrisisRiskPrediction | null>(null);
+  const [_moodAnalysis, _setMoodAnalysis] = useState<MoodAnalysis | null>(null);
 
   // Fetch AI insights dashboard
   const { data: insightsDashboard, isLoading, _error, refetch,  } = useQuery({
@@ -1384,7 +1384,7 @@ export function useAIInsights() {
   });
 
   // Filter insights by category
-  const _filteredInsights  = useMemo(() => {
+  const __filteredInsights   = useMemo(() => {
     if (!insightsDashboard?.insights) return [];
     if (selectedInsightCategory === 'all') return insightsDashboard.insights;
     return insightsDashboard.insights.filter(insight => insight.category === selectedInsightCategory);
@@ -1415,12 +1415,12 @@ export function useAIInsights() {
   });
 
   // Request insight refresh
-  const _requestRefresh  = useCallback(async () => {
+  const __requestRefresh   = useCallback(async () => {
     await refetch();
   }, [refetch]);
 
   // Get insight statistics
-  const _insightStats  = useMemo(() => {
+  const __insightStats   = useMemo(() => {
     if (!insightsDashboard) return null;
 
     const totalInsights = insightsDashboard.insights.length;

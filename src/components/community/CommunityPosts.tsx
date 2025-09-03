@@ -19,7 +19,7 @@ function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
   const queryClient = useQueryClient();
   const [showComments, _setShowComments] = useState(false);
   const [isLiked, _setIsLiked] = useState(post.isLiked);
-  const [likeCount, _setLikeCount] = useState(post.likes);
+  const [_likeCount, _setLikeCount] = useState(post.likes);
 
   const likeMutation = useMutation({
     mutationFn: () => isLiked ? communityService.unlikePost(post.id) : communityService.likePost(post.id),
@@ -202,7 +202,7 @@ interface CreatePostModalProps {
 
 function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModalProps) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<CreatePostDto>({
+  const [formData, _setFormData] = useState<CreatePostDto>({
     title: editPost?.title || '',
     content: editPost?.content || '',
     tags: editPost?.tags || [],
@@ -212,7 +212,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
     mood: editPost?.metadata?.mood || '',
     groupId,
   });
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, _setTagInput] = useState('');
 
   const mutation = useMutation({
     mutationFn: (data: CreatePostDto) => 
@@ -459,9 +459,9 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 export function CommunityPosts({ groupId }: { groupId?: string }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [__showCreateModal, setShowCreateModal] = useState(false);
-  const [__editingPost, setEditingPost] = useState<Post | null>(null);
-  const [selectedFilter, setSelectedFilter] = useState<'recent' | 'popular' | 'helpful'>('recent');
+  const [___showCreateModal, _setShowCreateModal] = useState(false);
+  const [___editingPost, _setEditingPost] = useState<Post | null>(null);
+  const [selectedFilter, _setSelectedFilter] = useState<'recent' | 'popular' | 'helpful'>('recent');
 
   // Fetch posts
   const { data, _isLoading, _error } = useQuery({
@@ -470,7 +470,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   });
 
   // Delete post mutation
-  const _deleteMutation  = useMutation({
+  const __deleteMutation   = useMutation({
     mutationFn: (_postId: string) => communityService.deletePost(_postId),
     onSuccess: () => {
       toast.success('Post deleted successfully');
@@ -482,7 +482,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   });
 
   // Report post mutation
-  const _reportMutation  = useMutation({
+  const __reportMutation   = useMutation({
     mutationFn: ({ _postId, reason }: { _postId: string; reason: string }) => 
       communityService.reportPost(_postId, reason),
     onSuccess: () => {

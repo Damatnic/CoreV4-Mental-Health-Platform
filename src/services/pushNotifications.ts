@@ -52,7 +52,7 @@ class PushNotificationService {
         await this.subscribeToNotifications();
         return true;
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to initialize push notifications:');
     }
 
@@ -104,7 +104,7 @@ class PushNotificationService {
       }
       
       return subscription;
-    } catch (error) {
+    } catch {
       logger.error('Failed to subscribe to push notifications:');
       return null;
     }
@@ -144,7 +144,7 @@ class PushNotificationService {
       if (!response.ok) {
         throw new Error('Failed to send subscription to server');
       }
-    } catch (error) {
+    } catch {
       logger.error('Error sending subscription to server:');
     }
   }
@@ -366,7 +366,7 @@ class PushNotificationService {
           action: 'taken'
         })
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to log medication:');
     }
   }
@@ -439,7 +439,7 @@ class PushNotificationService {
     try {
       const notifications = await this.registration.getNotifications({ tag });
       notifications.forEach(notification => notification.close());
-    } catch (error) {
+    } catch {
       logger.error('Failed to cancel notifications:');
     }
   }
@@ -458,7 +458,7 @@ class PushNotificationService {
         active: notifications.length,
         scheduled: activeSchedules.length
       };
-    } catch (error) {
+    } catch {
       logger.error('Failed to get notification stats:');
       return { active: 0, scheduled: 0 };
     }

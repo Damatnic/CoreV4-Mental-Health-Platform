@@ -109,7 +109,7 @@ class SecureStorageService {
         
         try {
           localStorage.setItem(_storageKey, JSON.stringify(storageItem));
-        } catch (_error) {
+        } catch {
           // Try IndexedDB as fallback for larger data
           await this.storeInIndexedDB(_storageKey, storageItem);
         }
@@ -117,7 +117,7 @@ class SecureStorageService {
 
       // Log storage event for audit
       this.logStorageEvent('SET', key, { encrypted, persistent });
-    } catch (error) {
+    } catch {
       logger.error(`Failed to store item ${key}:`, error);
       throw new Error(`Storage failed: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -183,7 +183,7 @@ class SecureStorageService {
 
       // Deserialize
       return JSON.parse(value);
-    } catch (error) {
+    } catch {
       logger.error(`Failed to retrieve item ${key}:`, error);
       return null;
     }
@@ -206,7 +206,7 @@ class SecureStorageService {
 
       // Log removal event
       this.logStorageEvent('REMOVE', key);
-    } catch (error) {
+    } catch {
       logger.error(`Failed to remove item ${key}:`, error);
     }
   }
@@ -234,7 +234,7 @@ class SecureStorageService {
 
       // Log clear event
       this.logStorageEvent('CLEAR', 'all');
-    } catch (error) {
+    } catch {
       logger.error('Failed to clear storage:');
     }
   }
@@ -352,7 +352,7 @@ class SecureStorageService {
         return decompressed;
       }
       return data; // Return as-is if API not available
-    } catch (error) {
+    } catch {
       logger.error('[SecureStorage] Decompression failed:');
       return ''; // Return empty string instead of throwing
     }
@@ -362,7 +362,7 @@ class SecureStorageService {
     try {
       // Basic base64 validation
       return btoa(atob(_str)) === str;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }

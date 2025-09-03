@@ -74,7 +74,7 @@ describe('useAuth Hook', () => {
             email: 'wrong@example.com',
             _password: 'wrongpass',
           });
-        } catch (error) {
+        } catch {
           expect(error.message).toContain('Invalid credentials');
         }
       });
@@ -230,7 +230,7 @@ describe('useAuth Hook', () => {
               email: 'test@example.com',
               _password: 'wrongpass',
             });
-          } catch (_error) {
+          } catch {
             // Expected to fail
           }
         });
@@ -243,7 +243,7 @@ describe('useAuth Hook', () => {
             email: 'test@example.com',
             _password: 'Test123!',
           });
-        } catch (error) {
+        } catch {
           expect(error.message).toContain('Too many attempts');
         }
       });
@@ -283,7 +283,7 @@ describe('useAuth Hook', () => {
             email: maliciousInput,
             _password: 'Test123!',
           });
-        } catch (_error) {
+        } catch {
           // Expected to fail validation
         }
       });
@@ -410,7 +410,7 @@ describe('useAuth Hook', () => {
             email: 'test@example.com',
             _password: 'Test123!',
           });
-        } catch (error) {
+        } catch {
           expect(error.message).toContain('Network error');
         }
       });

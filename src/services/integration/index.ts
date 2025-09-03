@@ -50,7 +50,7 @@ export const __initializeIntegration = async (userId: string, token: string) => 
         crisis: crisisStatus
       }
     };
-  } catch (error) {
+  } catch {
     logger.error('Failed to initialize integration services:');
     return {
       success: false,

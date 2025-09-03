@@ -120,7 +120,7 @@ export class HealthCheckService {
         this.performanceObserver.observe({ 
           entryTypes: ['navigation', 'resource', 'paint', 'largest-contentful-paint', 'layout-shift', 'first-input'] 
         });
-      } catch (error) {
+      } catch {
         logger.error('Failed to initialize performance observer:');
       }
     }
@@ -244,7 +244,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (error) {
+    } catch {
       return {
         name: 'API',
         status: HealthStatus.UNHEALTHY,
@@ -273,7 +273,7 @@ export class HealthCheckService {
           latency
         }
       };
-    } catch (error) {
+    } catch {
       return {
         name: 'WebSocket',
         status: HealthStatus.UNHEALTHY,
@@ -317,7 +317,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (_error) {
+    } catch {
       return {
         name: 'Database',
         status: HealthStatus.UNHEALTHY,
@@ -361,7 +361,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (_error) {
+    } catch {
       return {
         name: 'Cache',
         status: HealthStatus.DEGRADED,
@@ -423,7 +423,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (_error) {
+    } catch {
       return {
         name: 'Crisis System',
         status: HealthStatus.UNKNOWN,
@@ -449,7 +449,7 @@ export class HealthCheckService {
             signal: AbortSignal.timeout(3000)
           });
           results[integration] = response.ok;
-        } catch (_error) {
+        } catch {
           results[integration] = false;
         }
       });
@@ -471,7 +471,7 @@ export class HealthCheckService {
         lastChecked: new Date(),
         details: results
       };
-    } catch (_error) {
+    } catch {
       return {
         name: 'Integrations',
         status: HealthStatus.UNKNOWN,
@@ -645,7 +645,7 @@ export class HealthCheckService {
       }).catch(error => {
         logger.error('Failed to send _metrics:', error);
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to send _metrics:');
     }
   }

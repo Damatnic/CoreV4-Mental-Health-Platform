@@ -96,7 +96,7 @@ export class AdvancedAccessibilityService {
 
       logger.info('Advanced accessibility services initialized');
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to initialize accessibility services:', error as Error);
     }
   }
@@ -150,7 +150,7 @@ export class AdvancedAccessibilityService {
           calibration: null
         };
       }
-    } catch (error) {
+    } catch {
       logger.warn('Eye tracking not available', {
         category: LogCategory.ACCESSIBILITY,
         metadata: { error: error instanceof Error ? error.message : String(error) }
@@ -285,7 +285,7 @@ export class AdvancedAccessibilityService {
       logger.info('Voice navigation started');
       return true;
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to start voice navigation:', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
@@ -313,7 +313,7 @@ export class AdvancedAccessibilityService {
       logger.info('Eye tracking started');
       return true;
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to start eye tracking:', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
@@ -373,7 +373,7 @@ export class AdvancedAccessibilityService {
         await this.speak('Command not recognized. Try saying "emergency help", "navigate home", or "mood tracker".');
       }
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to process voice command:', error instanceof Error ? error : new Error(String(error)));
       await this.speak('Sorry, I couldn\'t process that command. Please try again.');
     }
@@ -453,7 +453,7 @@ export class AdvancedAccessibilityService {
         this.synthesis!.speak(_utterance);
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to speak text:', error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -469,7 +469,7 @@ export class AdvancedAccessibilityService {
         await this.speak('No readable content found on this page.');
       }
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to read page content:', error instanceof Error ? error : new Error(String(error)));
       await this.speak('Sorry, I couldn\'t read the page content.');
     }
@@ -544,7 +544,7 @@ export class AdvancedAccessibilityService {
       const recentUsage = usageLog.slice(-100);
       await secureStorage.setItem('voice_command_usage', recentUsage);
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to log command _usage:', error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -596,7 +596,7 @@ export class AdvancedAccessibilityService {
         return defaultProfile;
       }
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to load accessibility profile:', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
@@ -610,7 +610,7 @@ export class AdvancedAccessibilityService {
       await secureStorage.setItem('accessibility_profile', this.currentProfile);
       logger.info('Accessibility profile saved');
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to save accessibility profile:', error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -637,7 +637,7 @@ export class AdvancedAccessibilityService {
         await this.startEyeTracking();
       }
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to apply accessibility settings:', error instanceof Error ? error : new Error(String(error)));
     }
   }

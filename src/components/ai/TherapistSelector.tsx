@@ -146,8 +146,8 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
   selectedTherapist,
   _showDetailedView = true
 }) => {
-  const [__hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [filterSpecialty, setFilterSpecialty] = useState<string>('all');
+  const [___hoveredCard, _setHoveredCard] = useState<string | null>(null);
+  const [filterSpecialty, _setFilterSpecialty] = useState<string>('all');
 
   const specialties = [...new Set(therapists.map(t => t.specialty))];
   const filteredTherapists = filterSpecialty === 'all' 
@@ -323,7 +323,7 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
             These AI therapists are advanced conversational companions designed to provide personalized mental health support. 
             They combine evidence-based therapeutic approaches with AI technology to offer accessible, immediate help. 
             <strong className="text-white"> They complement but do not replace professional mental health treatment.</strong> 
-            If you're experiencing a mental health emergency, please contact emergency services or call 988.
+            If you&apos;re experiencing a mental health emergency, please contact emergency services or call 988.
           </p>
         </div>
       </motion.div>

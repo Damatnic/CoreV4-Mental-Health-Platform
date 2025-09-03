@@ -14,7 +14,7 @@ interface GroupCardProps {
 
 function GroupCard({ group, onJoin, onLeave, onManage }: GroupCardProps) {
   const { user } = useAuth();
-  const _isOwner  = user?.id === group.createdBy;
+  const isOwner = user?.id === group.createdBy;
   const isModerator = group.moderators.includes(user?.id || '');
 
   const getCategoryColor = (category: string) => {
@@ -163,8 +163,8 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
       onClose();
     },
-    onError: (_error: unknown) => {
-      toast._error(_error.message || 'Failed to create group');
+    onError: (error: unknown) => {
+      toast.error((error as Error).message || 'Failed to create group');
     },
   });
 
@@ -201,10 +201,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="input_fqa5tqfk0" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="group-name-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Group Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="group-name-input"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -217,10 +218,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Description */}
             <div>
-              <label htmlFor="input_qenpse6d2" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="group-description-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
+                id="group-description-input"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -233,10 +235,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Category */}
             <div>
-              <label htmlFor="input_dah5ie4o6" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="group-category-select" className="block text-sm font-medium text-gray-700 mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
+                id="group-category-select"
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as unknown }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -258,8 +261,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Privacy Settings</h3>
               
-              <label htmlFor="input_p7wmkvb4s" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="private-group-checkbox"
                   type="checkbox"
                   checked={formData.isPrivate}
                   onChange={(e) => setFormData(prev => ({ ...prev, isPrivate: e.target.checked }))}
@@ -271,8 +275,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label htmlFor="input_fbh7etuqq" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="require-approval-checkbox"
                   type="checkbox"
                   checked={formData.requiresApproval}
                   onChange={(e) => setFormData(prev => ({ ...prev, requiresApproval: e.target.checked }))}
@@ -289,8 +294,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Group Features</h3>
               
-              <label htmlFor="input_v2psv1ugk" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="allow-anonymous-checkbox"
                   type="checkbox"
                   checked={formData.settings?.allowAnonymous}
                   onChange={(e) => setFormData(prev => ({
@@ -305,8 +311,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label htmlFor="input_loauf68a6" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="auto-moderation-checkbox"
                   type="checkbox"
                   checked={formData.settings?.autoModeration}
                   onChange={(e) => setFormData(prev => ({
@@ -321,8 +328,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label htmlFor="input_fwcmv5fhd" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="crisis-support-checkbox"
                   type="checkbox"
                   checked={formData.settings?.crisisSupport}
                   onChange={(e) => setFormData(prev => ({
@@ -337,8 +345,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label htmlFor="input_e8xvahqxw" className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3">
                 <input
+                  id="peer-support-checkbox"
                   type="checkbox"
                   checked={formData.settings?.peerSupport}
                   onChange={(e) => setFormData(prev => ({
@@ -356,11 +365,12 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Guidelines */}
             <div>
-              <label htmlFor="input_nh2qm09pm" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="guideline-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Community Guidelines
               </label>
               <div className="flex items-center space-x-2 mb-2">
                 <input
+                  id="guideline-input"
                   type="text"
                   value={guidelineInput}
                   onChange={(e) => setGuidelineInput(e.target.value)}
@@ -419,12 +429,12 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 export function SupportGroups() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [__showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
-  const [searchQuery, _setSearchQuery] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch groups
-  const { data, _isLoading, _error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['groups', selectedCategory, searchQuery],
     queryFn: () => communityService.getGroups({
       category: selectedCategory === 'all' ? undefined : selectedCategory,
@@ -434,26 +444,26 @@ export function SupportGroups() {
   });
 
   // Join group mutation
-  const _joinMutation  = useMutation({
-    mutationFn: (_groupId: string) => communityService.joinGroup(_groupId),
+  const joinMutation = useMutation({
+    mutationFn: (groupId: string) => communityService.joinGroup(groupId),
     onSuccess: () => {
       toast.success('Successfully joined the group!');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
     onError: () => {
-      toast._error('Failed to join group');
+      toast.error('Failed to join group');
     },
   });
 
   // Leave group mutation
-  const _leaveMutation  = useMutation({
-    mutationFn: (_groupId: string) => communityService.leaveGroup(_groupId),
+  const leaveMutation = useMutation({
+    mutationFn: (groupId: string) => communityService.leaveGroup(groupId),
     onSuccess: () => {
       toast.success('You have left the group');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
     onError: () => {
-      toast._error('Failed to leave group');
+      toast.error('Failed to leave group');
     },
   });
 
@@ -473,7 +483,7 @@ export function SupportGroups() {
     { value: 'self-esteem', label: 'Self-Esteem', icon: TrendingUp },
   ];
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -481,7 +491,7 @@ export function SupportGroups() {
     );
   }
 
-  if (_error) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load support groups. Please try again later.</p>

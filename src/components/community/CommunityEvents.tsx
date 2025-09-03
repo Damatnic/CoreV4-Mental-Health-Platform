@@ -170,7 +170,7 @@ interface CreateEventModalProps {
 
 function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<CreateEventDto>({
+  const [formData, _setFormData] = useState<CreateEventDto>({
     title: '',
     description: '',
     type: 'workshop' as Event['type'],
@@ -184,7 +184,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
     groupId,
     tags: [],
   });
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, _setTagInput] = useState('');
 
   const mutation = useMutation({
     mutationFn: (data: CreateEventDto) => communityService.createEvent(data),
@@ -482,7 +482,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
 export function CommunityEvents() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [__showCreateModal, setShowCreateModal] = useState(false);
+  const [___showCreateModal, _setShowCreateModal] = useState(false);
   const [selectedType, _setSelectedType] = useState<string>('all');
   const [dateFilter, _setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
@@ -515,7 +515,7 @@ export function CommunityEvents() {
   });
 
   // Register for event mutation
-  const _registerMutation  = useMutation({
+  const __registerMutation   = useMutation({
     mutationFn: (_eventId: string) => communityService.registerForEvent(_eventId),
     onSuccess: () => {
       toast.success('Successfully registered for event!');
@@ -527,7 +527,7 @@ export function CommunityEvents() {
   });
 
   // Unregister from event mutation
-  const _unregisterMutation  = useMutation({
+  const __unregisterMutation   = useMutation({
     mutationFn: (_eventId: string) => communityService.unregisterFromEvent(_eventId),
     onSuccess: () => {
       toast.success('Registration cancelled');

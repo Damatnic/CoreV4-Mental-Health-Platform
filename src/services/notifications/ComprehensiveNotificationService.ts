@@ -139,7 +139,7 @@ export class ComprehensiveNotificationService {
         category: LogCategory.NOTIFICATIONS
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to initialize notification service:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -161,7 +161,7 @@ export class ComprehensiveNotificationService {
           });
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('Service worker registration failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -206,7 +206,7 @@ export class ComprehensiveNotificationService {
         
         await this.savePreferences();
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load notification preferences:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -221,7 +221,7 @@ export class ComprehensiveNotificationService {
         this.rules.set(rule.id, rule);
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to load notification rules:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -475,7 +475,7 @@ export class ComprehensiveNotificationService {
       // Send pending notifications
       await this.sendPendingNotifications();
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to process scheduled notifications:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -512,7 +512,7 @@ export class ComprehensiveNotificationService {
 
       return false;
 
-    } catch (error) {
+    } catch {
       logger.error('Error checking time-based rule:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -612,7 +612,7 @@ export class ComprehensiveNotificationService {
       });
       return notification.id;
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to create notification:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -628,7 +628,7 @@ export class ComprehensiveNotificationService {
       // For now, return true to allow notifications
       return true;
 
-    } catch (error) {
+    } catch {
       logger.error('Error checking notification conditions:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -678,7 +678,7 @@ export class ComprehensiveNotificationService {
         personalizedData
       };
 
-    } catch (error) {
+    } catch {
       logger.error('Error personalizing content:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -690,7 +690,7 @@ export class ComprehensiveNotificationService {
     try {
       const userProfile = await secureStorage.getItem('user_profile');
       return userProfile?.name || null;
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
@@ -703,7 +703,7 @@ export class ComprehensiveNotificationService {
         return `Last mood: ${latest.mood} (${latest.energy}/10 energy)`;
       }
       return null;
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
@@ -719,7 +719,7 @@ export class ComprehensiveNotificationService {
           weeklyStreak: 5
         }
       };
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
@@ -779,7 +779,7 @@ export class ComprehensiveNotificationService {
         metadata: { notificationId: notification.id }
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to send notification:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -819,7 +819,7 @@ export class ComprehensiveNotificationService {
 
       await this.saveNotifications();
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to handle notification click:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -871,7 +871,7 @@ export class ComprehensiveNotificationService {
         metadata: { action: action.action }
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to execute notification action:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });
@@ -935,7 +935,7 @@ export class ComprehensiveNotificationService {
         urgency: 'immediate'
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to trigger crisis notification:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.NOTIFICATIONS
       });

@@ -43,7 +43,7 @@ class SecureLocalStorage {
       // Get encryption key from environment (secure approach)
       this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
       this.isInitialized = true;
-    } catch (error) {
+    } catch {
       logger.error('🔒 SecureLocalStorage initialization failed:', error);
       // Fallback to a simple key to prevent app crashes
       this.encryptionKey = `fallback_emergency_key_${  Date.now()}`;
@@ -62,7 +62,7 @@ class SecureLocalStorage {
       const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
       logger.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
       return tempKey;
-    } catch (_error) {
+    } catch {
       // Fallback to browser crypto API or manual generation
       logger.warn('⚠️ CryptoJS random failed, using fallback method');
       
@@ -112,7 +112,7 @@ class SecureLocalStorage {
         padding: CryptoJS.pad.Pkcs7
       });
       return encrypted.toString();
-    } catch (error) {
+    } catch {
       logger.error('🔒 Encryption failed:', error);
       logger.warn('🔒 Storing data unencrypted due to encryption failure');
       return data; // Fallback to unencrypted to prevent app crashes
@@ -153,7 +153,7 @@ class SecureLocalStorage {
       }
       
       return result;
-    } catch (error) {
+    } catch {
       logger.error('🔒 Decryption failed:', error);
       // Return original data instead of throwing to prevent app crashes
       logger.warn('🔒 Returning data unencrypted due to decryption failure');
@@ -177,7 +177,7 @@ class SecureLocalStorage {
         // Store non-sensitive data normally
         localStorage.setItem(key, value);
       }
-    } catch (error) {
+    } catch {
       logger.error('🔒 SecureLocalStorage.setItem failed:', error);
       throw undefined;
     }
@@ -194,7 +194,7 @@ class SecureLocalStorage {
         if (encryptedValue) {
           try {
             return this.decrypt(encryptedValue);
-          } catch (_error) {
+          } catch {
             // If decryption fails (malformed data/wrong key), clear corrupted data
             logger.warn('🔒 Corrupted encrypted data detected, clearing:', key);
             localStorage.removeItem(`encrypted_${key}`);
@@ -212,7 +212,7 @@ class SecureLocalStorage {
             localStorage.removeItem(key); // Remove plain text version
             logger.info('Migrated plain text data to encrypted storage', 'SecureLocalStorage', { key, isPrivacySafe: true });
             return plainValue;
-          } catch (_error) {
+          } catch {
     logger.warn('🔒 Failed to encrypt during migration, returning plain value:', key);
             return plainValue;
           }
@@ -223,7 +223,7 @@ class SecureLocalStorage {
         // Get non-sensitive data normally
         return localStorage.getItem(key);
       }
-    } catch (error) {
+    } catch {
       logger.error('🔒 SecureLocalStorage.getItem failed:', error);
       return null;
     }
@@ -241,7 +241,7 @@ class SecureLocalStorage {
       } else {
         localStorage.removeItem(key);
       }
-    } catch (error) {
+    } catch {
       logger.error('🔒 SecureLocalStorage.removeItem failed:', error);
     }
   }
@@ -253,7 +253,7 @@ class SecureLocalStorage {
     try {
       localStorage.clear();
       logger.info('Cleared all localStorage data', 'SecureLocalStorage');
-    } catch (error) {
+    } catch {
       logger.error('🔒 SecureLocalStorage.clear failed:', error);
     }
   }
@@ -278,7 +278,7 @@ class SecureLocalStorage {
         total,
         percentage: Math.round((used / total) * 100)
       };
-    } catch (error) {
+    } catch {
       logger.error('🔒 Failed to get storage info:', error);
       return { used: 0, total: 0, percentage: 0 };
     }
@@ -305,7 +305,7 @@ class SecureLocalStorage {
           }
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('🔒 Failed to audit stored data:', error);
     }
 
@@ -328,7 +328,7 @@ class SecureLocalStorage {
         try {
           this.setItem(key, value); // This will encrypt it
           migrated++;
-        } catch (error) {
+        } catch {
           logger.error(`🔒 Failed to migrate ${key}:`, error);
         }
       }

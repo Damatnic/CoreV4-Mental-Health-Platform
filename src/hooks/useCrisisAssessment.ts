@@ -21,7 +21,7 @@ interface CrisisAssessmentHook {
 }
 
 export function useCrisisAssessment(): CrisisAssessmentHook {
-  const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(() => {
+  const [assessmentData, _setAssessmentData] = useState<AssessmentData | null>(() => {
     // Load from secure storage (crisis assessments are sensitive mental health data)
     const _stored = secureStorage.getItem('crisis_assessment');
     if (_stored) {
@@ -31,7 +31,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
           ...parsed,
           timestamp: parsed.timestamp ? new Date(parsed.timestamp) : null
         };
-      } catch (error) {
+      } catch {
         logger.error('Failed to parse _stored assessment', e as Error, {
           category: LogCategory.CRISIS
         });
@@ -40,7 +40,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
     return null;
   });
 
-  const [isAssessing, setIsAssessing] = useState(false);
+  const [isAssessing, _setIsAssessing] = useState(false);
   const [lastAssessment, _setLastAssessment] = useState<Date | null>(() => {
     const _stored = secureStorage.getItem('last_crisis_assessment');
     return _stored ? new Date(_stored) : null;

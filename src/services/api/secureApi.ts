@@ -132,7 +132,7 @@ class SecureAPIService {
         requestId,
       };
       
-    } catch (error) {
+    } catch {
       // Handle and log errors
       await this.handleRequestError(error, config, requestId);
       throw error;
@@ -240,7 +240,7 @@ class SecureAPIService {
       }
       
       return await response.json();
-    } catch (error) {
+    } catch {
       logger.error('Secure upload failed:');
       throw undefined;
     }
@@ -283,7 +283,7 @@ class SecureAPIService {
       }
       
       return data;
-    } catch (error) {
+    } catch {
       logger.error('Secure download failed:');
       throw undefined;
     }
@@ -568,7 +568,7 @@ class SecureAPIService {
         const data = await response.json();
         this.csrfToken = data.token;
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to get CSRF token:');
     }
   }

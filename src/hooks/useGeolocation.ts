@@ -15,7 +15,7 @@ interface GeolocationOptions {
 }
 
 export function useGeolocation(options: GeolocationOptions = {}): GeolocationState {
-  const [__state, setState] = useState<GeolocationState>({
+  const [___state, _setState] = useState<GeolocationState>({
     location: null,
     error: null,
     loading: true

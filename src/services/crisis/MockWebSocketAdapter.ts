@@ -297,14 +297,14 @@ export class MockWebSocketAdapter {
   }
 
   // Event emitter methods
-  public on(event: string, handler: Function): void {
+  public on(event: string, handler: (...args: unknown[]) => any): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler);
   }
 
-  public off(event: string, handler: Function): void {
+  public off(event: string, handler: (...args: unknown[]) => any): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.delete(handler);
@@ -317,7 +317,7 @@ export class MockWebSocketAdapter {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (error) {
+        } catch {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -333,7 +333,7 @@ export class MockWebSocketAdapter {
     // Return a mock socket object with limited functionality
     return {
       connected: this.isConnected,
-      emit: (event: string, data: unknown, callback?: Function) => {
+      emit: (event: string, data: unknown, callback?: (...args: unknown[]) => any) => {
         // Handle specific socket events
         switch (event) {
           case 'crisis:request-counselor':

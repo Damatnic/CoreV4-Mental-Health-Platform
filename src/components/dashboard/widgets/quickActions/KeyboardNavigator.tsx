@@ -14,8 +14,8 @@ export function KeyboardNavigator({
   onKeyPress,
   isActive
 }: KeyboardNavigatorProps) {
-  const [focusedIndex, setFocusedIndex] = useState(-1);
-  const [searchBuffer, setSearchBuffer] = useState('');
+  const [focusedIndex, _setFocusedIndex] = useState(-1);
+  const [searchBuffer, _setSearchBuffer] = useState('');
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

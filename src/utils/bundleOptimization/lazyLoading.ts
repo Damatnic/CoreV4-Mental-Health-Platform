@@ -34,7 +34,7 @@ export function createLazyComponent<T extends ComponentType<unknown>>(
       );
       
       return module;
-    } catch (error) {
+    } catch {
       logger.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, error);
       
       // Record error
@@ -246,7 +246,7 @@ export class ComponentPreloader {
       performanceMonitor.recordMetric(`preload_${name}`, loadTime, { preloaded: true });
       
       this.preloadedComponents.add(name);
-    } catch (_error) {
+    } catch {
     logger.warn(`Failed to preload component ${name}:`, error);
       performanceMonitor.recordMetric('preload_error', 1, { componentName: name });
     }

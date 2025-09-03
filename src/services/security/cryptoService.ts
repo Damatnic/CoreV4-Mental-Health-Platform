@@ -51,7 +51,7 @@ class CryptographyService {
         // Store the key securely (in production, use HSM or secure key storage)
         this.storeMasterKey(this.masterKey);
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to initialize master key', 'CryptoService', error);
       throw new Error('Cryptography initialization failed');
     }
@@ -108,7 +108,7 @@ class CryptographyService {
       
       // Convert to base64 for storage
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (error) {
+    } catch {
       logger.error('Encryption failed', 'CryptoService', error);
       throw new Error('Failed to encrypt data');
     }
@@ -156,7 +156,7 @@ class CryptographyService {
       // Decode the result
       const decoder = new TextDecoder();
       return decoder.decode(decryptedData);
-    } catch (error) {
+    } catch {
       logger.error('Decryption failed', 'CryptoService', error);
       throw new Error('Failed to decrypt data');
     }
@@ -200,7 +200,7 @@ class CryptographyService {
       combined.set(new Uint8Array(derivedBits), saltBytes.byteLength);
       
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (error) {
+    } catch {
       logger.error('Password hashing failed', 'CryptoService', error);
       throw new Error('Failed to hash password');
     }
@@ -228,7 +228,7 @@ class CryptographyService {
       
       // Compare hashes using constant-time comparison
       return this.constantTimeCompare(originalHash, newHash);
-    } catch (error) {
+    } catch {
       logger.error('Password verification failed', 'CryptoService', error);
       return false;
     }
@@ -296,7 +296,7 @@ class CryptographyService {
       this.derivedKeys.set(cacheKey, derivedKey);
       
       return derivedKey;
-    } catch (error) {
+    } catch {
       logger.error('Key derivation failed', 'CryptoService', error);
       throw new Error('Failed to derive key from password');
     }
@@ -344,7 +344,7 @@ class CryptographyService {
       );
       
       return this.arrayBufferToBase64(signature);
-    } catch (error) {
+    } catch {
       logger.error('Data signing failed', 'CryptoService', error);
       throw new Error('Failed to sign data');
     }
@@ -386,7 +386,7 @@ class CryptographyService {
         signatureBuffer,
         dataBuffer
       );
-    } catch (error) {
+    } catch {
       logger.error('Signature verification failed', 'CryptoService', error);
       return false;
     }

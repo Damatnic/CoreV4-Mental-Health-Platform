@@ -16,12 +16,12 @@ export function VoiceCommandInterface({
   onClose,
   supportedCommands = []
 }: VoiceCommandInterfaceProps) {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [isListening, _setIsListening] = useState(false);
+  const [transcript, _setTranscript] = useState('');
   const [interimTranscript, _setInterimTranscript] = useState('');
-  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [volume, setVolume] = useState(0);
+  const [status, _setStatus] = useState<'idle' | 'listening' | 'processing' | 'success' | 'error'>('idle');
+  const [errorMessage, _setErrorMessage] = useState('');
+  const [volume, _setVolume] = useState(0);
   
   const recognitionRef = useRef<unknown>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -132,7 +132,7 @@ export function VoiceCommandInterface({
       microphoneRef.current.connect(analyserRef.current);
       
       updateVolume();
-    } catch (error) {
+    } catch {
       logger.error('Error initializing audio analyzer:');
     }
   };
@@ -168,7 +168,7 @@ export function VoiceCommandInterface({
   };
 
   // Process recognized command
-  const _processCommand  = useCallback((command: string) => {
+  const __processCommand   = useCallback((command: string) => {
     setStatus('processing');
     const lowerCommand = command.toLowerCase();
     
@@ -382,7 +382,7 @@ export function VoiceCommandInterface({
                   key={index}
                   className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full"
                 >
-                  "{cmd}"
+                  &quot;{cmd}&quot;
                 </span>
               ))}
             </div>

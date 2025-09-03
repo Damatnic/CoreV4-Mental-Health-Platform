@@ -19,7 +19,7 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(_undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, _setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((message: string, _type: ToastType = 'info', duration = 5000) => {
     const id = Math.random().toString(36).substring(7);

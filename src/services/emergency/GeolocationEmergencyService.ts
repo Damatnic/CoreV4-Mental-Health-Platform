@@ -50,7 +50,7 @@ export class GeolocationEmergencyService {
         this.updatePermissionStatus(permission._state);
       });
 
-    } catch (error) {
+    } catch {
       logger.error('Geolocation initialization failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -155,7 +155,7 @@ export class GeolocationEmergencyService {
 
       return this.nearbyServices;
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to find nearby emergency services:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -300,7 +300,7 @@ export class GeolocationEmergencyService {
         action: 'location_shared'
       };
 
-    } catch (error) {
+    } catch {
       logger.error('Emergency response failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -376,7 +376,7 @@ export class GeolocationEmergencyService {
         action: 'call_initiated'
       };
 
-    } catch (error) {
+    } catch {
       logger.error('Emergency call initiation failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -429,7 +429,7 @@ export class GeolocationEmergencyService {
       });
       return true;
 
-    } catch (error) {
+    } catch {
       logger.error('Failed to share location:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });

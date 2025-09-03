@@ -54,7 +54,7 @@ import {
 export function AIInsightsDashboard() {
   const { insightsDashboard, filteredInsights, _isLoading, _error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, _dismissInsight, requestRefresh, insightStats, isMarkingActioned, _isDismissing,  } = useAIInsights();
 
-  const [expandedInsight, _setExpandedInsight] = useState<string | null>(null);
+  const [_expandedInsight, _setExpandedInsight] = useState<string | null>(null);
   const [activeTab, _setActiveTab] = useState<'insights' | 'patterns' | 'predictions' | 'recommendations' | 'progress'>('insights');
   const [showFilters, _setShowFilters] = useState(false);
 

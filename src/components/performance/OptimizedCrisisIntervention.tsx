@@ -54,14 +54,14 @@ export function OptimizedCrisisIntervention({
   onActivate,
   preloadResources = true,
 }: OptimizedCrisisInterventionProps) {
-  const [__isActive, setIsActive] = useState(false);
+  const [___isActive, _setIsActive] = useState(false);
   const [responseTime, _setResponseTime] = useState<number | null>(null);
   const activationTime = useRef<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Pre-cache DOM references
-  const ___buttonRef  = useRef<HTMLButtonElement>(null);
-  const ___resourcesRef  = useRef<HTMLDivElement>(null);
+  const ____buttonRef   = useRef<HTMLButtonElement>(null);
+  const ____resourcesRef   = useRef<HTMLDivElement>(null);
 
   // Optimized activation handler
   const handleActivation = useCallback(() => {
@@ -129,7 +129,7 @@ export function OptimizedCrisisIntervention({
   }, [handleActivation]);
 
   // Close handler
-  const _handleClose  = useCallback(() => {
+  const __handleClose   = useCallback(() => {
     setIsActive(false);
     if (modalRef.current) {
       modalRef.current.style.display = 'none';
@@ -138,7 +138,7 @@ export function OptimizedCrisisIntervention({
   }, []);
 
   // Call hotline (immediate action)
-  const _callHotline  = useCallback((number: string) => {
+  const __callHotline   = useCallback((number: string) => {
     performanceMonitor.measureStart('crisis-call-initiate');
     
     if (number === '988' || number.includes('800')) {
@@ -338,7 +338,7 @@ async function cacheOfflineCrisisData() {
       data: CRISIS_RESOURCES,
       timestamp: Date.now(),
     });
-  } catch (error) {
+  } catch {
     logger.error('Failed to cache crisis data:');
   }
 }

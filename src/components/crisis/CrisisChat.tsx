@@ -37,12 +37,12 @@ export function CrisisChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, _setIsConnected] = useState(false);
-  const [__counselorTyping, setCounselorTyping] = useState(false);
-  const [detectedCrisisLevel, _setDetectedCrisisLevel] = useState<string | null>(null);
-  const [__showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [counselorTyping, setCounselorTyping] = useState(false);
+  const [detectedCrisisLevel, setDetectedCrisisLevel] = useState<string | null>(null);
+  const [showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const _chatContainerRef  = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat with welcome message
   useEffect(() => {
@@ -65,8 +65,8 @@ export function CrisisChat() {
     const lowerText = text.toLowerCase();
     
     for (const crisis of CRISIS_KEYWORDS) {
-      for (const _keyword of crisis.keywords) {
-        if (lowerText.includes(_keyword)) {
+      for (const keyword of crisis.keywords) {
+        if (lowerText.includes(keyword)) {
           return crisis.level;
         }
       }
@@ -107,9 +107,9 @@ export function CrisisChat() {
     setMessages(prev => [...prev, userMessage]);
 
     // Check for crisis keywords
-    const crisisLevel = detectCrisisLevel(_inputMessage);
-    if (_crisisLevel) {
-      setDetectedCrisisLevel(_crisisLevel);
+    const crisisLevel = detectCrisisLevel(inputMessage);
+    if (crisisLevel) {
+      setDetectedCrisisLevel(crisisLevel);
       if (crisisLevel === 'critical') {
         setShowEmergencyPrompt(true);
       }
@@ -326,7 +326,7 @@ export function CrisisChat() {
               <h3 className="text-lg font-semibold text-gray-900">Immediate Support Available</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Based on what you've shared, I want to make sure you get the best support possible. 
+              Based on what you&apos;ve shared, I want to make sure you get the best support possible. 
               Would you like to speak with someone on the phone right now?
             </p>
             <div className="space-y-3">
@@ -346,7 +346,7 @@ export function CrisisChat() {
                 onClick={() => handleEmergencyResponse('dismiss')}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                I'm Okay For Now
+                I&apos;m Okay For Now
               </button>
             </div>
           </div>

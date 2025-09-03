@@ -9,7 +9,7 @@ interface NetworkStatus {
 }
 
 export function useNetworkStatus(): NetworkStatus {
-  const [status, setStatus] = useState<NetworkStatus>({
+  const [status, _setStatus] = useState<NetworkStatus>({
     isOnline: navigator.onLine,
     effectiveType: null,
     downlink: null,

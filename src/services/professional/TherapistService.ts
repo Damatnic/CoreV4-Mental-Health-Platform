@@ -251,7 +251,7 @@ export class TherapistService {
         verificationStatus,
         nextSteps
       };
-    } catch (error) {
+    } catch {
       logger.error('Onboarding failed:');
       throw undefined;
     }
@@ -326,7 +326,7 @@ export class TherapistService {
 
       await Promise.all(_uploads);
       return true;
-    } catch (error) {
+    } catch {
       logger.error('Document upload failed:');
       return false;
     }
@@ -439,7 +439,7 @@ export class TherapistService {
       await this.sendAppointmentConfirmation(_appointment);
       
       return appointment;
-    } catch (error) {
+    } catch {
       logger.error('Appointment booking failed:');
       throw undefined;
     }
@@ -582,7 +582,7 @@ export class TherapistService {
         reason,
         cancelledBy
       });
-    } catch (error) {
+    } catch {
       logger.error('Appointment cancellation failed:');
       throw undefined;
     }
@@ -647,7 +647,7 @@ export class TherapistService {
       });
       
       return this.activeVideoSession;
-    } catch (error) {
+    } catch {
       logger.error('Failed to start video session:');
       throw undefined;
     }
@@ -728,7 +728,7 @@ export class TherapistService {
       
       // Clean up
       this.activeVideoSession = null;
-    } catch (error) {
+    } catch {
       logger.error('Failed to end video session:');
       throw undefined;
     }

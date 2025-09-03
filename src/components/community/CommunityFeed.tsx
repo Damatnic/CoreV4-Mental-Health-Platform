@@ -78,7 +78,7 @@ export default function CommunityFeed({ _userId, _filters }: CommunityFeedProps)
               Community Features Coming Soon
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              We're building a supportive community space where you can share experiences, 
+              We&apos;re building a supportive community space where you can share experiences, 
               find encouragement, and connect with others on similar wellness journeys.
             </p>
             <div className="flex flex-wrap justify-center gap-2">

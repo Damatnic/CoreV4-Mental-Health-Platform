@@ -263,7 +263,7 @@ export function ProfessionalCareDashboard() {
                     widget={{
                       id: 'medications',
                       type: 'professional_care',
-                      title: "Today's Medications",
+                      title: "Today&apos;s Medications",
                       position: { x: 4, y: 0 },
                       size: { width: 4, height: 3 },
                       priority: 'high',

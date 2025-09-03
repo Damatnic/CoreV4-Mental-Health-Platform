@@ -43,8 +43,8 @@ interface Achievement {
 
 export function ConsoleUserStats() {
   const { user } = useAuth();
-  const [currentStreak, _setCurrentStreak] = useState(7);
-  const [totalSessions, _setTotalSessions] = useState(42);
+  const [_currentStreak, _setCurrentStreak] = useState(7);
+  const [_totalSessions, _setTotalSessions] = useState(42);
   const [wellnessLevel, _setWellnessLevel] = useState(15);
   
   // Mock user stats (in real app, this would come from user data)

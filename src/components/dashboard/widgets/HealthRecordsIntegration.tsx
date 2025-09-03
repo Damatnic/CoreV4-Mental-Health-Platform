@@ -139,8 +139,8 @@ export function HealthRecordsIntegration({
   onRefreshData
 }: HealthRecordsIntegrationProps) {
   const [activeTab, _setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
-  const [_selectedRecord, _setSelectedRecord] = useState<HealthRecord | null>(null);
-  const [_showDetails, _setShowDetails] = useState(false);
+  const [__selectedRecord, _setSelectedRecord] = useState<HealthRecord | null>(null);
+  const [__showDetails, _setShowDetails] = useState(false);
   const [searchQuery, _setSearchQuery] = useState('');
   const [filterType, _setFilterType] = useState<string>('all');
   const [showPrivateRecords, _setShowPrivateRecords] = useState(false);

@@ -68,7 +68,7 @@ export class PWAManager {
       const initTime = performanceMonitor.measureEnd('pwa_initialization');
       logger.info(`PWA _initialized successfully in ${initTime?.toFixed(2)}ms`);
       
-    } catch (error) {
+    } catch (_error) {
       logger.error('Failed to initialize PWA:');
       performanceMonitor.recordMetric('pwa_init_error', 1, { undefined: String(_undefined) });
       throw error;
@@ -149,7 +149,7 @@ export class PWAManager {
 
       performanceMonitor.recordMetric('service_worker_registered', 1);
 
-    } catch (error) {
+    } catch (_error) {
       logger.error('Service Worker registration failed:');
       performanceMonitor.recordMetric('service_worker_error', 1, { undefined: String(_undefined) });
     }
@@ -176,7 +176,7 @@ export class PWAManager {
         
         performanceMonitor.recordMetric('push_notifications_initialized', 1);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Push notifications initialization failed:');
       performanceMonitor.recordMetric('push_notifications_error', 1, { undefined: String(_undefined) });
     }
@@ -205,7 +205,7 @@ export class PWAManager {
       logger.info('Offline support _initialized');
       performanceMonitor.recordMetric('offline_support_initialized', 1);
       
-    } catch (error) {
+    } catch (_error) {
       logger.error('Offline support initialization failed:');
       performanceMonitor.recordMetric('offline_support_error', 1, { undefined: String(_undefined) });
     }
@@ -268,7 +268,7 @@ export class PWAManager {
       
       performanceMonitor.recordMetric('performance_optimizations_initialized', 1);
       
-    } catch (error) {
+    } catch (_error) {
       logger.error('Performance optimizations failed:');
       performanceMonitor.recordMetric('performance_optimizations_error', 1);
     }
@@ -400,7 +400,7 @@ export class PWAManager {
       
       return choice.outcome === 'accepted';
       
-    } catch (error) {
+    } catch (_error) {
       logger.error('Install failed:');
       performanceMonitor.recordMetric('install_error', 1, { undefined: String(_undefined) });
       return false;
@@ -475,7 +475,7 @@ export class PWAManager {
       if ('sync' in registration) {
         await (registration as unknown).sync.register('sync-data');
       }
-    } catch (error) {
+    } catch {
       logger.error('Background sync failed:');
     }
   }

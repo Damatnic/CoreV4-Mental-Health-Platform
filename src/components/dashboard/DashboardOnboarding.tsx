@@ -27,9 +27,9 @@ interface DashboardOnboardingProps {
 export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingProps) {
   const { user } = useAuth();
   const { trackEvent } = useAnalytics();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, _setCompletedSteps] = useState<Set<string>>(new Set());
-  const [showWelcome, _setShowWelcome] = useState(true);
+  const [currentStep, _setCurrentStep] = useState(0);
+  const [_completedSteps, _setCompletedSteps] = useState<Set<string>>(new Set());
+  const [_showWelcome, _setShowWelcome] = useState(true);
 
   const steps: OnboardingStep[] = [
     {

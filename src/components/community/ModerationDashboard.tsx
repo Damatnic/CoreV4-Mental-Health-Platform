@@ -263,7 +263,7 @@ export function ModerationDashboard() {
       if (action === 'escalate-crisis') {
         websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
       }
-    } catch (_error) {
+    } catch {
       // Error is caught but not needed for logging
       toast.error('Failed to complete moderation action');
     }

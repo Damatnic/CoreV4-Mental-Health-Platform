@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { WellnessToolsSuite } from '../components/wellness/WellnessToolsSuite';
 
 export function WellnessPage() {
-  const [___showFullSuite, setShowFullSuite] = useState(true); // Default to full suite
+  const [____showFullSuite, _setShowFullSuite] = useState(true); // Default to full suite
 
   // If full suite is active, render it
   if (_showFullSuite) {
@@ -155,7 +155,7 @@ export function WellnessPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: "Today's Score", value: "85/100", emoji: "🏆", color: "from-yellow-500/20 to-orange-500/20", border: "yellow-500/30" },
+              { label: "Today&apos;s Score", value: "85/100", emoji: "🏆", color: "from-yellow-500/20 to-orange-500/20", border: "yellow-500/30" },
               { label: "Streak", value: "7 days", emoji: "🔥", color: "from-red-500/20 to-pink-500/20", border: "red-500/30" },
               { label: "Meditation", value: "120 min", emoji: "🧘", color: "from-purple-500/20 to-violet-500/20", border: "purple-500/30" },
               { label: "Journal Entries", value: "24", emoji: "📝", color: "from-blue-500/20 to-cyan-500/20", border: "blue-500/30" }
@@ -211,7 +211,7 @@ export function WellnessPage() {
             </h3>
             <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Every step counts. These tools are here to support you on your path to better mental wellness. 
-              Take it one day at a time, and remember—you're stronger than you think.
+              Take it one day at a time, and remember—you&apos;re stronger than you think.
             </p>
           </div>
         </motion.div>

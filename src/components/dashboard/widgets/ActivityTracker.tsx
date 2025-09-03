@@ -40,17 +40,17 @@ export function ActivityTracker({
 
   const [selectedDate, _setSelectedDate] = useState(new Date());
   const [showRecommendations, _setShowRecommendations] = useState(false);
-  const [__editingActivity, setEditingActivity] = useState<string | null>(null);
-  const [completionNote, setCompletionNote] = useState('');
-  const [moodImpact, setMoodImpact] = useState<number>(0);
-  const [adaptedForLowEnergy, setAdaptedForLowEnergy] = useState(false);
+  const [___editingActivity, _setEditingActivity] = useState<string | null>(null);
+  const [completionNote, _setCompletionNote] = useState('');
+  const [moodImpact, _setMoodImpact] = useState<number>(0);
+  const [adaptedForLowEnergy, _setAdaptedForLowEnergy] = useState(false);
 
   // Generate daily schedule on mount and date change
   useEffect(() => {
     generateDailySchedule(_selectedDate);
   }, [selectedDate, generateDailySchedule]);
 
-  // Get today's activities
+  // Get today&apos;s activities
   const todayActivities = activities.filter(activity => {
     if (!activity.scheduledTime) return false;
     const activityDate = new Date(activity.scheduledTime);
@@ -130,7 +130,7 @@ export function ActivityTracker({
               <ActivityIcon className="h-5 w-5 text-primary-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Today's Activities</h3>
+              <h3 className="font-semibold text-gray-900">Today&apos;s Activities</h3>
               <p className="text-sm text-gray-600">
                 {completedCount} of {totalCount} completed
               </p>
@@ -428,7 +428,7 @@ export function ActivityTracker({
                 {rescheduleSuggestions.length > 0 && (
                   <div className="p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-xs text-yellow-800 mb-1">
-                      These activities don't match your current energy _level:
+                      These activities don&apos;t match your current energy _level:
                     </p>
                     {rescheduleSuggestions.slice(0, 2).map((activity) => (
                       <div key={activity.id} className="flex items-center justify-between text-xs mt-1">

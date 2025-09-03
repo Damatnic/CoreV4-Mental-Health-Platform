@@ -60,7 +60,7 @@ export function CrisisPreventionDashboard() {
   const { _user } = useAuth();
   const [activeView, _setActiveView] = useState<'overview' | 'patterns' | 'timeline' | 'prevention'>('overview');
   const [showSensitiveData, _setShowSensitiveData] = useState(true);
-  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [_selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   
   // State for pattern recognition data
   const [triggers, _setTriggers] = useState<TriggerPattern[]>([
@@ -819,7 +819,7 @@ export function CrisisPreventionDashboard() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-700 mt-4">
-                      You've successfully prevented {preventionMetrics.preventedCrises} potential crises 
+                      You&apos;ve successfully prevented {preventionMetrics.preventedCrises} potential crises 
                       through early intervention and proactive self-care. Keep up the great work!
                     </p>
                   </div>

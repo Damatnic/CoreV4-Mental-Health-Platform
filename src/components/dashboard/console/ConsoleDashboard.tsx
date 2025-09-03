@@ -159,7 +159,7 @@ export function ConsoleDashboard() {
           />
         </ConsoleGrid>
 
-        {/* Today's Wellness Section - Mobile Responsive */}
+        {/* Today&apos;s Wellness Section - Mobile Responsive */}
         <motion.div
           initial={{ opacity: 0, y: isSmallScreen ? 20 : 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,7 +186,7 @@ export function ConsoleDashboard() {
               ${isSmallScreen ? 'text-xl mb-4' : 'text-2xl mb-6'}
             `}>
               <span className={isSmallScreen ? 'mr-2' : 'mr-3'}>✨</span>
-              Today's Wellness Insights
+              Today&apos;s Wellness Insights
             </h2>
             
             <div className={`
@@ -248,7 +248,7 @@ export function ConsoleDashboard() {
                 <div className="text-4xl mb-3">
                   🌟
                 </div>
-                <div className="text-lg font-semibold text-white mb-2">You're Not Alone</div>
+                <div className="text-lg font-semibold text-white mb-2">You&apos;re Not Alone</div>
                 <div className="text-gray-300 text-sm">
                   Thousands of people are here to support you on your journey
                 </div>

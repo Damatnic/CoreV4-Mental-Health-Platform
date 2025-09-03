@@ -102,7 +102,7 @@ class MultiFactorAuthService {
         qrCodeUrl,
         backupCodes,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -141,7 +141,7 @@ class MultiFactorAuthService {
       }
 
       return isValid;
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -180,7 +180,7 @@ class MultiFactorAuthService {
         details: { method: 'sms' },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -216,7 +216,7 @@ class MultiFactorAuthService {
         details: { method: 'email' },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -257,7 +257,7 @@ class MultiFactorAuthService {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -306,7 +306,7 @@ class MultiFactorAuthService {
       });
 
       return challenge;
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
         _userId,
@@ -399,7 +399,7 @@ class MultiFactorAuthService {
       }
 
       return isValid;
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
         _userId,
@@ -423,7 +423,7 @@ class MultiFactorAuthService {
         details: { method },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
@@ -479,7 +479,7 @@ class MultiFactorAuthService {
       });
       
       return codes;
-    } catch (error) {
+    } catch {
       logger.error('Failed to generate recovery codes:');
       throw undefined;
     }

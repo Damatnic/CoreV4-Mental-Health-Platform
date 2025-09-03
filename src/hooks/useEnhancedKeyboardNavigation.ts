@@ -219,10 +219,10 @@ const viStyleShortcuts: EnhancedKeyboardShortcut[] = [
 
 export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboardShortcut[]) {
   const navigate = useNavigate();
-  const ___location  = useLocation();
+  const ____location   = useLocation();
   const { preferences, setSearchOpen, _mode } = useNavigation();
-  const [shortcuts, setShortcuts] = useState<EnhancedKeyboardShortcut[]>([]);
-  const [isGMode, setIsGMode] = useState(false);
+  const [shortcuts, _setShortcuts] = useState<EnhancedKeyboardShortcut[]>([]);
+  const [isGMode, _setIsGMode] = useState(false);
   const [viMode, _setViMode] = useState(false);
   const gModeTimeout = useRef<NodeJS.Timeout>();
   const lastKeyTime = useRef<number>(0);
@@ -378,12 +378,12 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
   }, [handleKeyPress, setSearchOpen]);
 
   // Quick navigation helpers
-  const _quickNavigate  = useCallback((path: string) => {
+  const __quickNavigate   = useCallback((path: string) => {
     navigate(path);
     announceAction(`Navigated to ${path}`);
   }, [navigate]);
 
-  const _focusElement  = useCallback((selector: string) => {
+  const __focusElement   = useCallback((selector: string) => {
     const element = document.querySelector(_selector) as HTMLElement;
     if (element) {
       element.focus();
@@ -416,7 +416,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
 
 // Hook for displaying keyboard shortcuts help
 export function useKeyboardShortcutsHelp() {
-  const [__isOpen, setIsOpen] = useState(false);
+  const [___isOpen, _setIsOpen] = useState(false);
   const { shortcuts } = useEnhancedKeyboardNavigation();
 
   useEffect(() => {

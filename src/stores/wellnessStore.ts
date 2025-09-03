@@ -664,7 +664,7 @@ export const _useWellnessStore = create<WellnessState>()(
           get().analyzeMoodPatterns();
           get().generateInsights();
           get().calculateWellnessScores();
-        } catch (error) {
+        } catch {
           logger.error('Failed to import data:');
 import { logger } from '../utils/logger';
         }

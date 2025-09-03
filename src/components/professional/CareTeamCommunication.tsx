@@ -122,13 +122,13 @@ export function CareTeamCommunication({
 }: CareTeamCommunicationProps) {
   const [activeTab, _setActiveTab] = useState<'messages' | 'team' | 'notifications'>('messages');
   const [selectedThread, _setSelectedThread] = useState<Thread | null>(null);
-  const [newMessage, setNewMessage] = useState('');
-  const [__showNewThread, setShowNewThread] = useState(false);
-  const [__showMemberForm, setShowMemberForm] = useState(false);
+  const [newMessage, _setNewMessage] = useState('');
+  const [___showNewThread, _setShowNewThread] = useState(false);
+  const [___showMemberForm, _setShowMemberForm] = useState(false);
   const [searchTerm, _setSearchTerm] = useState('');
   const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
   const [notifications, _setNotifications] = useState<Notification[]>([]);
-  const [__isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
+  const [___isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom of messages
@@ -562,7 +562,7 @@ export function CareTeamCommunication({
                       <span className="text-xs text-gray-500">2:30 PM</span>
                     </div>
                     <div className="bg-gray-100 rounded-lg p-3 text-sm text-gray-800">
-                      Patient showed significant improvement in anxiety levels during yesterday's session. 
+                      Patient showed significant improvement in anxiety levels during yesterday&apos;s session. 
                       Considering adjusting medication dosage. Thoughts?
                     </div>
                   </div>
@@ -575,7 +575,7 @@ export function CareTeamCommunication({
                       <span className="font-medium text-gray-900 text-sm">You</span>
                     </div>
                     <div className="bg-primary-500 text-white rounded-lg p-3 text-sm inline-block">
-                      Agreed. The CBT techniques seem to be working well. Let's schedule a review 
+                      Agreed. The CBT techniques seem to be working well. Let&apos;s schedule a review 
                       meeting to discuss medication adjustments.
                     </div>
                   </div>
@@ -684,7 +684,7 @@ export function CareTeamCommunication({
                   </label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {careTeam.filter(m => m.id !== currentUserId).map((member) => (
-                      <label htmlFor="input_l8o3yj2g7" key={member.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
+                      <label key={member.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"

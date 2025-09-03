@@ -22,9 +22,9 @@ export function AccessibilityCommandCenter({
   const { settings, updateSetting, _presets, applyPreset, resetToDefaults } = useAccessibilityStore();
   
   const [activeSection, _setActiveSection] = useState<string>('visual');
-  const [showPresetMenu, setShowPresetMenu] = useState(false);
-  const [customPresetName, _setCustomPresetName] = useState('');
-  const [showHelp, setShowHelp] = useState(false);
+  const [showPresetMenu, _setShowPresetMenu] = useState(false);
+  const [_customPresetName, _setCustomPresetName] = useState('');
+  const [showHelp, _setShowHelp] = useState(false);
   const [testMode, _setTestMode] = useState(false);
 
   // Accessibility sections configuration

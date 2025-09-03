@@ -98,13 +98,13 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [mfaEnabled, setMfaEnabled] = useState(false);
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
-  const [sessionExpiresAt, setSessionExpiresAt] = useState<Date | null>(null);
-  const [emergencyAccessEnabled, setEmergencyAccessEnabled] = useState(false);
-  const [mfaChallengeId, setMfaChallengeId] = useState<string | null>(null);
+  const [user, _setUser] = useState<User | null>(null);
+  const [loading, _setLoading] = useState(true);
+  const [mfaEnabled, _setMfaEnabled] = useState(false);
+  const [privacySettings, _setPrivacySettings] = useState<PrivacySettings | null>(null);
+  const [sessionExpiresAt, _setSessionExpiresAt] = useState<Date | null>(null);
+  const [emergencyAccessEnabled, _setEmergencyAccessEnabled] = useState(false);
+  const [mfaChallengeId, _setMfaChallengeId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for existing session
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('Auth check failed:');
       await authService.logout();
     } finally {
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const _emergencyKey = `emergency_access_${userId}`;
       const emergencyStatus = await secureStorage.getItem(_emergencyKey);
       setEmergencyAccessEnabled(!!emergencyStatus?.enabled);
-    } catch (error) {
+    } catch {
       logger.error('Failed to load user data:');
     }
   };
@@ -236,7 +236,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         success: false,
         error: 'Login failed',
       };
-    } catch (error) {
+    } catch {
       logger.error('Login failed:');
       return {
         success: false,
@@ -261,7 +261,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(result.data.user);
         setSessionExpiresAt(new Date(result.data.expiresAt));
       }
-    } catch (error) {
+    } catch {
       logger.error('Anonymous login failed:');
       throw undefined;
     } finally {
@@ -278,7 +278,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSessionExpiresAt(null);
       setEmergencyAccessEnabled(false);
       setMfaChallengeId(null);
-    } catch (error) {
+    } catch {
       logger.error('Logout failed:');
       // Force cleanup even if logout fails
       setUser(null);
@@ -322,7 +322,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           await login(email, password);
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('Registration failed:');
       throw undefined;
     } finally {
@@ -336,7 +336,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (result.success && result.data) {
         setUser(result.data);
       }
-    } catch (error) {
+    } catch {
       logger.error('Profile update failed:');
       throw undefined;
     }
@@ -351,7 +351,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       // Logout
       await logout();
-    } catch (error) {
+    } catch {
       logger.error('Account deletion failed:');
       throw undefined;
     }
@@ -367,7 +367,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userId: user.id,
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       logger.error('Password change failed:');
       throw undefined;
     }
@@ -376,7 +376,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const requestPasswordReset = async (email: string) => {
     try {
       await authService.requestPasswordReset({ email });
-    } catch (error) {
+    } catch {
       logger.error('Password reset request failed:');
       throw undefined;
     }
@@ -389,7 +389,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         _newPassword,
         confirmPassword: _newPassword,
       });
-    } catch (error) {
+    } catch {
       logger.error('Password reset confirmation failed:');
       throw undefined;
     }

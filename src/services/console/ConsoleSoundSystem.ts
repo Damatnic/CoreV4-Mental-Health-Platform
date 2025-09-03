@@ -192,7 +192,7 @@ export class ConsoleSoundSystem {
   private initializeAudio() {
     try {
       this.audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
-    } catch (_error) {
+    } catch {
       logger.warn('Audio context not supported:');
       this.soundEnabled = false;
     }
@@ -269,7 +269,7 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(soundConfig.haptic);
       }
 
-    } catch (_error) {
+    } catch {
       logger.warn(`Failed to play console sound "${String(_soundName)}":`, error);
     }
   }
@@ -382,7 +382,7 @@ export class ConsoleSoundSystem {
       if (scaledPattern.length > 0) {
         navigator.vibrate(_scaledPattern);
       }
-    } catch (_error) {
+    } catch {
       logger.warn('Haptic feedback failed:');
     }
   }
@@ -433,7 +433,7 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(validConfig.haptic);
       }
 
-    } catch (_error) {
+    } catch {
       logger.warn('Failed to play custom sound:');
     }
   }
@@ -476,7 +476,7 @@ export class ConsoleSoundSystem {
         try {
           source.stop();
           source.disconnect();
-        } catch (_error) {
+        } catch {
           // Source might already be stopped
         }
       });
@@ -529,7 +529,7 @@ export class ConsoleSoundSystem {
       // This would load a custom audio worklet for ultra-low latency
       // await this.audioContext.audioWorklet.addModule('/audio-worklet.js');
       logger.debug('Audio worklet would be set up here for ultra-low latency', 'ConsoleSoundSystem');
-    } catch (_error) {
+    } catch {
       logger.debug('Audio worklet not available', 'ConsoleSoundSystem');
     }
   }
@@ -544,7 +544,7 @@ export class ConsoleSoundSystem {
           const __audioBuffer = await this.createAudioBuffer(soundConfig);
           // Store the buffer for instant playback
           this.soundCache.set(String(_soundName), soundConfig);
-        } catch (_error) {
+        } catch {
           logger.warn(`Failed to pre-generate sound: ${String(_soundName)}`, error);
         }
       }

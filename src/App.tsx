@@ -36,7 +36,7 @@ if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
   // Preload crisis-related content during idle time
   (window as unknown).requestIdleCallback(() => {
     (WellnessPage as unknown).preload?.();
-    (AITherapyPage as unknown).preload?.(); // Preload AI Therapy as it's frequently accessed
+    (AITherapyPage as unknown).preload?.(); // Preload AI Therapy as it&apos;s frequently accessed
   }, { timeout: 2000 });
   
   // Preload frequently accessed pages
@@ -157,8 +157,8 @@ const RouteWrapper = memo(({
 RouteWrapper.displayName = 'RouteWrapper';
 
 function App() {
-  const [_showBoot, _setShowBoot] = useState(() => {
-    // Show boot sequence only on first visit or if user hasn't seen it in the last hour
+  const [__showBoot, _setShowBoot] = useState(() => {
+    // Show boot sequence only on first visit or if user hasn&apos;t seen it in the last hour
     const lastBoot = localStorage.getItem('console-last-boot');
     if (!lastBoot) return true;
     
@@ -167,7 +167,7 @@ function App() {
     return Date.now() - lastBootTime > oneHour;
   });
 
-  const [__isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
+  const [___isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
 
   const handleBootComplete = useCallback(() => {
     startPriorityTransition(() => {
@@ -182,7 +182,7 @@ function App() {
   }, [startPriorityTransition]);
 
   // Memoize the boot sequence props
-  const ___bootSequenceProps  = useMemo(() => ({
+  const ____bootSequenceProps   = useMemo(() => ({
     onBootComplete: handleBootComplete,
     skipBoot: import.meta.env.DEV
   }), [handleBootComplete]);
@@ -205,7 +205,7 @@ function App() {
 
   // CRITICAL: All hooks must be declared BEFORE any conditional returns
   // Memoize toast options to prevent unnecessary re-renders
-  const _toasterOptions  = useMemo(() => ({
+  const __toasterOptions   = useMemo(() => ({
     position: 'top-center' as const,
     toastOptions: {
       duration: 4000,

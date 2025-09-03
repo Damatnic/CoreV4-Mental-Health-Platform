@@ -59,11 +59,11 @@ export function BehavioralActivation({
 }: BehavioralActivationProps) {
   const { _activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = useActivityStore();
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showExperiment, setShowExperiment] = useState(false);
-  const [selectedActivities, setSelectedActivities] = useState<PleasantActivity[]>([]);
-  const [experimentNotes, setExperimentNotes] = useState('');
+  const [selectedDifficulty, _setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
+  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
+  const [showExperiment, _setShowExperiment] = useState(false);
+  const [selectedActivities, _setSelectedActivities] = useState<PleasantActivity[]>([]);
+  const [experimentNotes, _setExperimentNotes] = useState('');
 
   // Pleasant activities library
   const pleasantActivities = [
@@ -185,7 +185,7 @@ export function BehavioralActivation({
     } else if (currentMood <= 6) {
       return "You're doing great! Let's build on this momentum.";
     } else {
-      return "Fantastic mood! Let's keep it going with engaging _activities.";
+      return "Fantastic mood! Let&apos;s keep it going with engaging _activities.";
     }
   };
 

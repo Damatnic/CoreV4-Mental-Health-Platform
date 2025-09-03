@@ -172,7 +172,7 @@ class Logger {
         criticalErrors.shift();
       }
       localStorage.setItem('corev4_critical_errors', JSON.stringify(criticalErrors));
-    } catch (_error) {
+    } catch {
       // Fail silently if localStorage is full or unavailable
     }
   }
@@ -227,7 +227,7 @@ class Logger {
         crisisEvents.shift();
       }
       localStorage.setItem('corev4_crisis_events', JSON.stringify(crisisEvents));
-    } catch (_error) {
+    } catch {
       // Fail silently
     }
   }

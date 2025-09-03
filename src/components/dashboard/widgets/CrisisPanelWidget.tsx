@@ -168,13 +168,21 @@ export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
             <div
               key={hotline.id}
               className="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100"
-              onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => {
-                if (hotline.type === 'hotline') {
-                  window.location.href = `tel:${hotline.contact(e); } }} role="button" tabIndex={0}> {
+              onClick={() => {
                 if (hotline.type === 'hotline') {
                   window.location.href = `tel:${hotline.contact}`;
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  if (hotline.type === 'hotline') {
+                    window.location.href = `tel:${hotline.contact}`;
+                  }
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">

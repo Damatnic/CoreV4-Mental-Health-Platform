@@ -127,11 +127,11 @@ export function TherapySessionLogger({
 }: TherapySessionLoggerProps) {
   const [activeTab, _setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
   const [sessionTimer, _setSessionTimer] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [currentSession, setCurrentSession] = useState<TherapySession>(_session);
-  const [newNote, setNewNote] = useState('');
-  const [noteType, setNoteType] = useState<SessionNote['type']>('observation');
-  const [__showRiskAssessment, setShowRiskAssessment] = useState(false);
+  const [isTimerRunning, _setIsTimerRunning] = useState(false);
+  const [currentSession, _setCurrentSession] = useState<TherapySession>(_session);
+  const [newNote, _setNewNote] = useState('');
+  const [noteType, _setNoteType] = useState<SessionNote['type']>('observation');
+  const [___showRiskAssessment, _setShowRiskAssessment] = useState(false);
   const [audioEnabled, _setAudioEnabled] = useState(true);
   const [videoEnabled, _setVideoEnabled] = useState(true);
 

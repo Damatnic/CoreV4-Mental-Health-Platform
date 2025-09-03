@@ -22,10 +22,10 @@ interface CommunityFeedWidgetProps {
 export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetProps) {
   const navigate = useNavigate();
   const realtimeSync = useRealtimeSync();
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [__onlineUsers, setOnlineUsers] = useState(0);
+  const [posts, _setPosts] = useState<CommunityPost[]>([]);
+  const [___onlineUsers, _setOnlineUsers] = useState(0);
   const [typingUsers, _setTypingUsers] = useState<string[]>([]);
-  const [_loading, _setLoading] = useState(true);
+  const [__loading, _setLoading] = useState(true);
 
   useEffect(() => {
     // Load initial posts

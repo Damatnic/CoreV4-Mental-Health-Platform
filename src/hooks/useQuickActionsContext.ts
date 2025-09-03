@@ -184,9 +184,9 @@ export function useQuickActionsContext(): QuickActionsContext {
     }
   ];
 
-  const [actions, setActions] = useState<QuickAction[]>(_defaultActions);
-  const [customActions, setCustomActions] = useState<QuickAction[]>([]);
-  const [actionHistory, setActionHistory] = useState<string[]>([]);
+  const [actions, _setActions] = useState<QuickAction[]>(_defaultActions);
+  const [customActions, _setCustomActions] = useState<QuickAction[]>([]);
+  const [actionHistory, _setActionHistory] = useState<string[]>([]);
 
   // Load custom actions and history from localStorage
   useEffect(() => {
@@ -198,7 +198,7 @@ export function useQuickActionsContext(): QuickActionsContext {
         const parsed = JSON.parse(_savedCustomActions);
         setCustomActions(_parsed);
         setActions([...defaultActions, ...parsed]);
-      } catch (error) {
+      } catch {
         logger.error('Error loading custom actions:');
       }
     }
@@ -206,7 +206,7 @@ export function useQuickActionsContext(): QuickActionsContext {
     if (_savedHistory) {
       try {
         setActionHistory(JSON.parse(_savedHistory));
-      } catch (error) {
+      } catch {
         logger.error('Error loading action history:');
       }
     }

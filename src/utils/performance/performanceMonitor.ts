@@ -117,7 +117,7 @@ class PerformanceMonitor {
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
       const longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const longTask = entry as any; // PerformanceLongTaskTiming not in all TypeScript versions
+          const longTask = entry as unknown; // PerformanceLongTaskTiming not in all TypeScript versions
           this.recordMetric('long_task', longTask.duration, {
             name: longTask.name,
             startTime: longTask.startTime,
@@ -169,7 +169,7 @@ class PerformanceMonitor {
     if ('memory' in performance) {
       // Monitor memory usage every 10 seconds
       setInterval(() => {
-        const memory = (performance as any).memory;
+        const memory = (performance as unknown).memory;
         const usedMemoryMB = memory.usedJSHeapSize / 1048576;
         const totalMemoryMB = memory.totalJSHeapSize / 1048576;
         const limitMemoryMB = memory.jsHeapSizeLimit / 1048576;
@@ -444,7 +444,7 @@ class PerformanceMonitor {
    */
   private detectDeviceCapabilities(): void {
     // Check for low-end device indicators
-    const memory = (navigator as any).deviceMemory;
+    const memory = (navigator as unknown).deviceMemory;
     const cpuCores = navigator.hardwareConcurrency;
     
     this.isLowEndDevice = (
@@ -464,7 +464,7 @@ class PerformanceMonitor {
    * Detect network type for adaptive loading
    */
   private detectNetworkType(): void {
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const connection = (navigator as unknown).connection || (navigator as unknown).mozConnection || (navigator as unknown).webkitConnection;
     
     if (connection) {
       this.networkType = connection.effectiveType || 'unknown';
@@ -496,7 +496,7 @@ class PerformanceMonitor {
     
     // Record optimization activation
     this.recordMetric('low_end_optimizations', 1, {
-      memory: (navigator as any).deviceMemory,
+      memory: (navigator as unknown).deviceMemory,
       cores: navigator.hardwareConcurrency,
     });
   }
@@ -707,7 +707,7 @@ class PerformanceMonitor {
       if (process.env.NODE_ENV === 'development') {
         logger.info('Performance Metrics', 'PerformanceMonitor', metrics);
       }
-    } catch (error) {
+    } catch {
       logger.error('[Performance] Failed to process metrics:');
     }
   }
@@ -795,7 +795,7 @@ class PerformanceMonitor {
         this.recordMetric(label, measure.duration);
         return measure.duration;
       }
-    } catch (_error) {
+    } catch {
     logger.warn(`Failed to measure ${label}:`, error);
     }
     

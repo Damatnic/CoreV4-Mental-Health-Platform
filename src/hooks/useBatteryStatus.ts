@@ -9,7 +9,7 @@ interface BatteryStatus {
 }
 
 export function useBatteryStatus(): BatteryStatus {
-  const [batteryStatus, _setBatteryStatus] = useState<BatteryStatus>({
+  const [_batteryStatus, _setBatteryStatus] = useState<BatteryStatus>({
     level: null,
     charging: false,
     chargingTime: null,
@@ -62,7 +62,7 @@ export function useBatteryStatus(): BatteryStatus {
           battery.addEventListener('chargingtimechange', () => updateBatteryStatus(battery));
           battery.addEventListener('dischargingtimechange', () => updateBatteryStatus(battery));
         }
-      } catch (error) {
+      } catch {
         console.error('Battery API not available:');
       }
     };

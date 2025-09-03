@@ -46,7 +46,7 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [professionalAlerted, setProfessionalAlerted] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const _buttonRef  = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const { trackEvent } = useAnalytics();
 
@@ -64,7 +64,7 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
   };
 
   // Handle crisis button click with debouncing
-  const _handleCrisisClick  = useCallback(async () => {
+  const handleCrisisClick = useCallback(async () => {
     // Clear any existing debounce
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -109,7 +109,7 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
         setIsLoading(false);
       } catch (error) {
         logger.error('Crisis API error', 'CrisisButton', error);
-        setError('Network undefined - showing offline resources');
+        setError('Network error - showing offline resources');
         setResources({
           hotlines: OFFLINE_RESOURCES,
           localResources: [],

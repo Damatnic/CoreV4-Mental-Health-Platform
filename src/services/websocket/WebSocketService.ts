@@ -502,7 +502,7 @@ export class WebSocketService {
     for (const message of messages) {
       try {
         this.socket.emit(message.event, message.data);
-      } catch (error) {
+      } catch {
         logger.error('Failed to send queued message:');
         
         // Re-queue if not expired (24 hours) and under retry limit
@@ -519,7 +519,7 @@ export class WebSocketService {
   private saveQueuedMessages(): void {
     try {
       secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch (error) {
+    } catch {
       logger.error('Failed to save message queue:');
     }
   }
@@ -530,7 +530,7 @@ export class WebSocketService {
       if (_saved) {
         this.messageQueue = JSON.parse(_saved);
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
@@ -570,14 +570,14 @@ export class WebSocketService {
   }
 
   // Event emitter methods
-  public on(event: string, handler: Function): void {
+  public on(event: string, handler: (...args: unknown[]) => any): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler);
   }
 
-  public off(event: string, handler: Function): void {
+  public off(event: string, handler: (...args: unknown[]) => any): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.delete(handler);
@@ -590,7 +590,7 @@ export class WebSocketService {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (error) {
+        } catch {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -643,7 +643,7 @@ export class WebSocketService {
       }
       
       secureStorage.setItem('critical_events', JSON.stringify(_logs));
-    } catch (error) {
+    } catch {
       logger.error('Failed to log critical event:');
     }
   }

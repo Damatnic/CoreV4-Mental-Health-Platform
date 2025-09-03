@@ -26,7 +26,7 @@ interface ConsoleNavigationState {
 export function useConsoleNavigation() {
   const navigate = useNavigate();
   const { onFocus, onSelect, onBack } = useConsoleSound();
-  const _frameRateMonitorRef  = useRef<number>(60);
+  const __frameRateMonitorRef   = useRef<number>(60);
   const lastCleanupRef = useRef<number>(0);
   const interactionTimeoutRef = useRef<number | null>(null);
   const boundsCacheRef = useRef<Map<string, DOMRect>>(new Map());
@@ -38,7 +38,7 @@ export function useConsoleNavigation() {
     return (memory && memory <= 4) || (cores && cores <= 2);
   }, []);
   
-  const [state, setState] = useState<ConsoleNavigationState>({
+  const [state, _setState] = useState<ConsoleNavigationState>({
     currentFocusId: null,
     currentGroup: 'dashboard-tiles',
     navigationMode: 'mouse',
@@ -85,7 +85,7 @@ export function useConsoleNavigation() {
   }, [isLowEndDevice, state.navigationMode]);
 
   // Register a focusable element with performance optimizations
-  const _registerFocusable  = useCallback((focusable: ConsoleFocusable) => {
+  const __registerFocusable   = useCallback((focusable: ConsoleFocusable) => {
     const startTime = performance.now();
     
     // Cache element bounds for faster lookups
@@ -118,7 +118,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Unregister a focusable element with cleanup
-  const _unregisterFocusable  = useCallback((id: string) => {
+  const __unregisterFocusable   = useCallback((id: string) => {
     // Clean up cached bounds
     boundsCacheRef.current.delete(_id);
     
@@ -130,7 +130,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Get focusables in current group with memoization
-  const ___getCurrentGroupFocusables  = useCallback(() => {
+  const ____getCurrentGroupFocusables   = useCallback(() => {
     return state.focusables.filter(f => f.group === state.currentGroup);
   }, [state.focusables, state.currentGroup]);
   
@@ -192,7 +192,7 @@ export function useConsoleNavigation() {
             isPerformanceMode: state.isPerformanceMode
           });
         }
-      } catch (error) {
+      } catch (_error) {
         logger.warn('Error setting focus on element:');
         performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, undefined: String(_undefined) });
       }
@@ -336,7 +336,7 @@ export function useConsoleNavigation() {
           
           focusable.element.click();
           onSelect();
-        } catch (_error) {
+        } catch {
     logger.warn('Error activating element:');
         }
       }
@@ -471,7 +471,7 @@ export function useConsoleNavigation() {
       if (f.element && f.element.classList) {
         try {
           f.element.classList.remove('console-focused');
-        } catch (_error) {
+        } catch {
     logger.warn('Error removing focus styling:');
         }
       }
@@ -586,7 +586,7 @@ export function useConsoleNavigation() {
           // Update button states efficiently
           lastButtonStates = gamepad.buttons.map(b => b?.pressed || false);
         }
-      } catch (error) {
+      } catch (_error) {
         // Log gamepad errors for monitoring but don't break functionality
         performanceMonitor.recordMetric('gamepad_error', 1, {
           error: String(_error)
@@ -630,7 +630,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Performance metrics for the hook
-  const _getPerformanceMetrics  = useCallback(() => {
+  const __getPerformanceMetrics   = useCallback(() => {
     return {
       frameRate: state.frameRate,
       isPerformanceMode: state.isPerformanceMode,

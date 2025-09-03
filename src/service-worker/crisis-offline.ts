@@ -441,7 +441,7 @@ export async function syncOfflineData() {
         }
         await tx.done;
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to sync crisis data:');
     }
   }

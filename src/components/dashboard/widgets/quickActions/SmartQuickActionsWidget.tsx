@@ -39,10 +39,10 @@ export function SmartQuickActionsWidget({
   const { settings: accessibilitySettings } = useAccessibilityStore();
   const { _preferences, _updatePreference } = useUserPreferences(_userId);
   
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [voiceCommandActive, setVoiceCommandActive] = useState(false);
-  const [showCustomizationPanel, setShowCustomizationPanel] = useState(false);
+  const [searchQuery, _setSearchQuery] = useState('');
+  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
+  const [voiceCommandActive, _setVoiceCommandActive] = useState(false);
+  const [showCustomizationPanel, _setShowCustomizationPanel] = useState(false);
   const [actionHistory, _setActionHistory] = useState<string[]>([]);
   const [contextualActions, _setContextualActions] = useState<QuickAction[]>([]);
 
@@ -119,7 +119,7 @@ export function SmartQuickActionsWidget({
   }, [executeAction, onActionExecute, accessibilitySettings.screenReaderMode]);
 
   // Voice command handler
-  const _handleVoiceCommand  = useCallback((command: string) => {
+  const __handleVoiceCommand   = useCallback((command: string) => {
     const _matchedAction = actions.find(a => 
       a.label.toLowerCase().includes(command.toLowerCase()) ||
       a.voiceAlias?.some(alias => alias.toLowerCase() === command.toLowerCase())
@@ -131,7 +131,7 @@ export function SmartQuickActionsWidget({
   }, [actions, handleActionClick]);
 
   // Keyboard navigation handler
-  const _handleKeyboardNavigation  = useCallback((key: string) => {
+  const __handleKeyboardNavigation   = useCallback((key: string) => {
     // Handle keyboard shortcuts for actions
     const _actionWithShortcut = actions.find(a => a.keyboard === key);
     if (_actionWithShortcut) {

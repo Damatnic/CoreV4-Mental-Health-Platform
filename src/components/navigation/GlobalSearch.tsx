@@ -53,12 +53,12 @@ const searchDatabase: SearchResult[] = [
 ];
 
 export function GlobalSearch() {
-  const _navigate  = useNavigate();
+  const __navigate   = useNavigate();
   const { isSearchOpen, setSearchOpen, _preferences, addToRecent } = useNavigation();
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [query, _setQuery] = useState('');
+  const [results, _setResults] = useState<SearchResult[]>([]);
+  const [selectedIndex, _setSelectedIndex] = useState(0);
+  const [recentSearches, _setRecentSearches] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Load recent searches from localStorage
@@ -286,7 +286,7 @@ export function GlobalSearch() {
                   </div>
                 ) : (
                   <div className="px-6 py-8 text-center text-gray-500">
-                    No results found for "{query}"
+                    No results found for &quot;{query}&quot;
                   </div>
                 )
               ) : (

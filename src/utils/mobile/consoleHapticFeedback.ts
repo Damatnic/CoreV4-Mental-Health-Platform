@@ -81,7 +81,7 @@ class ConsoleHapticFeedbackSystem {
       if (_stored) {
         return { ...this.getDefaultSettings(), ...JSON.parse(_stored) };
       }
-    } catch (_error) {
+    } catch {
       logger.warn('Failed to load haptic settings:');
     }
     return this.getDefaultSettings();
@@ -100,7 +100,7 @@ class ConsoleHapticFeedbackSystem {
   private saveSettings(): void {
     try {
       localStorage.setItem('consoleHapticSettings', JSON.stringify(this.settings));
-    } catch (_error) {
+    } catch {
       logger.warn('Failed to save haptic settings:');
     }
   }
@@ -202,7 +202,7 @@ class ConsoleHapticFeedbackSystem {
   private executeHaptic(pattern: number[]): void {
     try {
       navigator.vibrate(pattern);
-    } catch (_error) {
+    } catch {
       logger.warn('Haptic feedback failed:');
     }
   }

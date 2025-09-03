@@ -107,8 +107,8 @@ export function EnhancedCrisisPanel({
   const { location, _error: _locationError } = useGeolocation();
   const { assessmentData, _updateAssessment } = useCrisisAssessment();
   
-  const [__isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showFullPlan, _setShowFullPlan] = useState(false);
+  const [___isOnline, _setIsOnline] = useState(navigator.onLine);
+  const [_showFullPlan, _setShowFullPlan] = useState(false);
   const [activeTab, _setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
   const [riskFactors, _setRiskFactors] = useState<RiskFactors>({
     moodPattern: 0,
@@ -120,7 +120,7 @@ export function EnhancedCrisisPanel({
     physicalSymptoms: 0
   });
   const [crisisLevel, _setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
-  const [pulseAnimation, _setPulseAnimation] = useState(false);
+  const [_pulseAnimation, _setPulseAnimation] = useState(false);
 
   // Calculate real-time risk assessment
   const calculateRiskLevel = useCallback((): CrisisLevel => {
@@ -241,7 +241,7 @@ export function EnhancedCrisisPanel({
   ], []);
 
   // Personalized coping strategies based on risk level
-  const _copingStrategies  = useMemo(() => {
+  const __copingStrategies   = useMemo(() => {
     const baseStrategies = data?.safetyPlan?.copingStrategiesText ? [data.safetyPlan.copingStrategiesText] : [];
     const additionalStrategies = crisisLevel.recommendations;
     return [...baseStrategies, ...additionalStrategies];
@@ -676,7 +676,7 @@ export function EnhancedCrisisPanel({
       <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
         <p className="text-sm text-gray-700">
           <span className="font-medium">Remember:</span> You are stronger than you know. 
-          Help is always available, and it's okay to reach out when you need support.
+          Help is always available, and it&apos;s okay to reach out when you need support.
         </p>
       </div>
     </div>

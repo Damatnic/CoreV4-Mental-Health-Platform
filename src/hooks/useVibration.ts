@@ -13,7 +13,7 @@ export function useVibration() {
       if (_hapticEnabled) {
         try {
           navigator.vibrate(_pattern);
-        } catch (error) {
+        } catch {
           console.error('Vibration failed:');
         }
       }

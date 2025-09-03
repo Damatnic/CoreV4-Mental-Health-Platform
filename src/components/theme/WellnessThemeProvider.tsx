@@ -28,7 +28,7 @@ export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
   children,
   _defaultTheme = 'light'
 }) => {
-  const [theme, setTheme] = useState<'light' | 'dark'>(_defaultTheme);
+  const [theme, _setTheme] = useState<'light' | 'dark'>(_defaultTheme);
 
   // Load theme from localStorage on mount
   useEffect(() => {

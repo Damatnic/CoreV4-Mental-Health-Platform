@@ -46,7 +46,7 @@ if (typeof Worker !== 'undefined') {
       new URL('../../workers/chartProcessor.worker.ts', import.meta.url),
       { type: 'module' }
     );
-  } catch (_error) {
+  } catch {
     logger.warn('Web Worker not available, falling back to main thread processing');
   }
 }
@@ -79,14 +79,14 @@ export function OptimizedChart({
   className = '',
 }: OptimizedChartProps) {
   const chartRef = useRef<unknown>(null);
-  const ___canvasRef  = useRef<HTMLCanvasElement>(null);
-  const [processedData, setProcessedData] = useState<ChartData | null>(null);
-  const [__isProcessing, setIsProcessing] = useState(false);
-  const [_error, setError] = useState<string | null>(null);
+  const ____canvasRef   = useRef<HTMLCanvasElement>(null);
+  const [processedData, _setProcessedData] = useState<ChartData | null>(null);
+  const [___isProcessing, _setIsProcessing] = useState(false);
+  const [_error, _setError] = useState<string | null>(null);
   
   // Use deferred value for non-critical updates
   const deferredData = useDeferredValue(_data);
-  const [_isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
+  const [__isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
 
   // Performance monitoring
   useEffect(() => {
@@ -125,7 +125,7 @@ export function OptimizedChart({
 
       performanceMonitor.measureEnd('chart-data-processing');
       return chartData;
-    } catch (error) {
+    } catch (_error) {
       performanceMonitor.measureEnd('chart-data-processing');
       throw _error;
     }
@@ -212,7 +212,7 @@ export function OptimizedChart({
           
           setIsProcessing(false);
         });
-      } catch (error) {
+      } catch (_error) {
         logger.error('Chart data processing _error');
         setError('Processing failed');
         setIsProcessing(false);
@@ -221,7 +221,7 @@ export function OptimizedChart({
         try {
           const _fallbackData = processDataOnMainThread(_deferredData);
           setProcessedData(_fallbackData);
-        } catch (error) {
+        } catch {
     logger.error('Fallback processing failed');
         }
       }
@@ -231,7 +231,7 @@ export function OptimizedChart({
   }, [deferredData, processDataWithWorker, processDataOnMainThread, startPrioritizedTransition, type, onDataProcessed]);
 
   // Optimized chart options
-  const _optimizedOptions  = useMemo<ChartOptions>(() => ({
+  const __optimizedOptions   = useMemo<ChartOptions>(() => ({
     ...options,
     responsive: true,
     maintainAspectRatio: false,
@@ -307,7 +307,7 @@ export function OptimizedChart({
   }, []);
 
   // Render appropriate chart component
-  const _ChartComponent  = useMemo(() => {
+  const ChartComponent = useMemo(() => {
     switch (_type) {
       case 'bar':
         return Bar;
@@ -330,7 +330,13 @@ export function OptimizedChart({
   }
 
   if (isProcessing || !processedData) {
-    return <LoadingFallbacks.Chart />;
+    return (
+      <div className={`flex items-center justify-center h-${height} ${className}`}>
+        <div className="animate-pulse">
+          <div className="h-64 w-full bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -361,7 +367,7 @@ export function MoodChart({
   const [insights, _setInsights] = useState<string[]>([]);
   const [wellnessScore, _setWellnessScore] = useState<number | null>(null);
 
-  const _handleDataProcessed  = useCallback((result: unknown) => {
+  const __handleDataProcessed   = useCallback((result: unknown) => {
     if (result.insights) {
       setInsights(result.insights);
     }

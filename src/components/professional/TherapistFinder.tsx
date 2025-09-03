@@ -148,7 +148,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
           {/* Call to Action */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 text-center mt-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Don't see what you're looking for?
+              Don&apos;t see what you&apos;re looking for?
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Our care coordinators can help you find the perfect therapist match

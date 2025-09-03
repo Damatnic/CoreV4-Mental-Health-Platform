@@ -36,10 +36,10 @@ declare module 'socket.io-client' {
     connect(): Socket;
     disconnect(): Socket;
     emit(event: string, ...args: unknown[]): Socket;
-    on(event: string, fn: Function): Socket;
-    once(event: string, fn: Function): Socket;
-    off(event?: string, fn?: Function): Socket;
-    removeListener(event: string, fn?: Function): Socket;
+    on(event: string, fn: (...args: unknown[]) => any): Socket;
+    once(event: string, fn: (...args: unknown[]) => any): Socket;
+    off(event?: string, fn?: (...args: unknown[]) => any): Socket;
+    removeListener(event: string, fn?: (...args: unknown[]) => any): Socket;
     removeAllListeners(event?: string): Socket;
     
     // Mental health app specific events

@@ -67,12 +67,12 @@ export const DailyActivityPlanner: React.FC = () => {
   const { moodEntries } = useWellnessStore();
   
   const [selectedDate, _setSelectedDate] = useState(new Date());
-  const [currentEnergyLevel, setCurrentEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');
+  const [currentEnergyLevel, _setCurrentEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');
   const [currentMood, _setCurrentMood] = useState(5);
-  const [showAddActivity, _setShowAddActivity] = useState(false);
-  const [editingActivity, _setEditingActivity] = useState<string | null>(null);
+  const [_showAddActivity, _setShowAddActivity] = useState(false);
+  const [_editingActivity, _setEditingActivity] = useState<string | null>(null);
   const [showRecommendations, _setShowRecommendations] = useState(false);
-  const [__adaptiveMode, setAdaptiveMode] = useState(false);
+  const [___adaptiveMode, _setAdaptiveMode] = useState(false);
   const [timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
   
   // Initialize time slots and load schedule

@@ -164,13 +164,13 @@ export function TreatmentPlanManager({
   isProvider = false
 }: TreatmentPlanManagerProps) {
   const [activeTab, _setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
-  const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
-  const [___editingGoal, setEditingGoal] = useState<string | null>(null);
-  const [_showGoalForm, _setShowGoalForm] = useState(false);
-  const [_showInterventionForm, _setShowInterventionForm] = useState(false);
+  const [currentPlan, _setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
+  const [____editingGoal, _setEditingGoal] = useState<string | null>(null);
+  const [__showGoalForm, _setShowGoalForm] = useState(false);
+  const [__showInterventionForm, _setShowInterventionForm] = useState(false);
   const [filterPriority, _setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [__searchTerm, _setSearchTerm] = useState('');
-  const [__showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
+  const [___searchTerm, _setSearchTerm] = useState('');
+  const [___showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
 
   // Create new treatment plan if none provided
   useEffect(() => {

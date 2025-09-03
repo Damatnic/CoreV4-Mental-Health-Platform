@@ -51,13 +51,13 @@ export function CrisisQuickActionsHub({
   const { assessmentData, _isAssessing, _updateAssessment } = useCrisisAssessment();
   const { location, _error: _locationError, loading } = useGeolocation();
   
-  const [__activeAction, setActiveAction] = useState<string | null>(null);
+  const [___activeAction, _setActiveAction] = useState<string | null>(null);
   const [showSafetyPlan, _setShowSafetyPlan] = useState(false);
-  const [__showGroundingExercise, setShowGroundingExercise] = useState(false);
-  const [__breathingActive, setBreathingActive] = useState(false);
-  const [__emergencyCallInProgress, setEmergencyCallInProgress] = useState(false);
-  const [__copiedToClipboard, setCopiedToClipboard] = useState<string | null>(null);
-  const [__offlineMode, setOfflineMode] = useState(!navigator.onLine);
+  const [___showGroundingExercise, _setShowGroundingExercise] = useState(false);
+  const [___breathingActive, _setBreathingActive] = useState(false);
+  const [___emergencyCallInProgress, _setEmergencyCallInProgress] = useState(false);
+  const [___copiedToClipboard, _setCopiedToClipboard] = useState<string | null>(null);
+  const [___offlineMode, _setOfflineMode] = useState(!navigator.onLine);
 
   // Emergency hotlines
   const emergencyHotlines = [
@@ -125,7 +125,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Handle text crisis line
-  const _handleCrisisText  = useCallback((number: string) => {
+  const __handleCrisisText   = useCallback((number: string) => {
     setActiveAction('texting');
     
     // Attempt to open SMS
@@ -140,7 +140,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Share location for emergency
-  const _shareEmergencyLocation  = useCallback(async () => {
+  const __shareEmergencyLocation   = useCallback(async () => {
     if (location) {
       const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
       const _message = `Emergency: I need help. My location: ${googleMapsUrl}`;
@@ -159,7 +159,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Start grounding exercise
-  const _startGroundingExercise  = useCallback(() => {
+  const __startGroundingExercise   = useCallback(() => {
     setShowGroundingExercise(true);
     setActiveAction('grounding');
     
@@ -169,7 +169,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Start breathing exercise
-  const _startBreathingExercise  = useCallback(() => {
+  const __startBreathingExercise   = useCallback(() => {
     setBreathingActive(true);
     setActiveAction('breathing');
     

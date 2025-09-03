@@ -99,7 +99,7 @@ export function TreatmentPlanProgress({
 }: TreatmentPlanProgressProps) {
   const [activeTab, _setActiveTab] = useState<'goals' | 'skills' | 'homework' | 'timeline'>('goals');
   const [selectedGoal, _setSelectedGoal] = useState<TreatmentGoal | null>(null);
-  const [__showGoalDetails, setShowGoalDetails] = useState(false);
+  const [___showGoalDetails, _setShowGoalDetails] = useState(false);
   const [expandedSkillType, _setExpandedSkillType] = useState<string | null>(null);
 
   // Calculate overall treatment progress

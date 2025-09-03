@@ -188,7 +188,7 @@ export class CleanupManager {
     this.cleanupFunctions.forEach(cleanup => {
       try {
         cleanup();
-      } catch (error) {
+      } catch {
         logger.error('Cleanup function error: ');
       }
     });
@@ -238,7 +238,7 @@ export class MemoryEfficientEventEmitter<T extends Record<string, any>> {
       eventListeners.forEach(listener => {
         try {
           listener(data);
-        } catch (error) {
+        } catch {
           logger.error(`Error in event listener for ${String(event)}:`, error);
         }
       });

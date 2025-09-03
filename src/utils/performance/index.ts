@@ -190,7 +190,7 @@ function setupPerformanceBudget() {
       });
       
       resourceObserver.observe({ entryTypes: ['resource'] });
-    } catch (_error) {
+    } catch {
       logger.warn('Resource timing not supported');
     }
   }

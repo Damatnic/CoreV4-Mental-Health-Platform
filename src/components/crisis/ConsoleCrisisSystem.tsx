@@ -49,10 +49,10 @@ const _CONSOLE_CRISIS_LEVELS: Record<string, CrisisLevel> = {
 export function ConsoleCrisisSystem() {
   const [currentCrisisLevel, _setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
   const [__showEmergencyDialog, _setShowEmergencyDialog] = useState(false);
-  const [userLocation, _setUserLocation] = useState<GeolocationPosition | null>(null);
+  const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
   const [activeTab, setActiveTab] = useState<'emergency' | 'resources' | 'safety' | 'chat'>('emergency');
-  const [responseTime, _setResponseTime] = useState(0);
-  const [pulseIntensity, _setPulseIntensity] = useState(1);
+  const [responseTime, setResponseTime] = useState(0);
+  const [pulseIntensity, setPulseIntensity] = useState(1);
 
   // Enhanced pulse effect for critical situations
   useEffect(() => {
@@ -94,7 +94,7 @@ export function ConsoleCrisisSystem() {
   }, [responseTime]);
 
   const handleCrisisText = useCallback((number: string, keyword: string) => {
-    const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(_keyword)}` : ''}`;
+    const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(keyword)}` : ''}`;
     window.location.href = smsUrl;
     
     logger.logCrisisIntervention('crisis_text_initiated', undefined, {

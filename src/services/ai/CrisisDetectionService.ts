@@ -116,7 +116,7 @@ export class CrisisDetectionService {
       
       return profile;
       
-    } catch (error) {
+    } catch {
       logger.error('Crisis detection analysis failed', error as Error, { 
         category: LogCategory.CRISIS,
         userId 

@@ -173,9 +173,11 @@ const dataProcessors = {
       let key: string;
       
       switch (interval) {
-        case "week": { const week = this.getWeekNumber(date);
+        case "week": {
+          const week = this.getWeekNumber(date);
           key = `${date.getFullYear()}-W${week}`;
           break;
+        }
         case 'month':
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
           break;
@@ -473,7 +475,7 @@ self.addEventListener('message', (event: MessageEvent<ProcessingRequest>) => {
     };
     
     self.postMessage(response);
-  } catch (error) {
+  } catch {
     self.postMessage({
       type: 'ERROR',
       error: error instanceof Error ? error.message : 'Processing error',

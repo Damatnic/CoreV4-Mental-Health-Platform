@@ -146,10 +146,10 @@ const mockExperience: ExperienceItem[] = [
 export function TherapistProfile({ therapistId, onBookAppointment, _onClose }: TherapistProfileProps) {
   const [therapist, _setTherapist] = useState<unknown>(null);
   const [activeTab, _setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
-  const [__selectedReview, _setSelectedReview] = useState<Review | null>(null);
+  const [___selectedReview, _setSelectedReview] = useState<Review | null>(null);
   const [isVideoPlaying, _setIsVideoPlaying] = useState(false);
   const [isMuted, _setIsMuted] = useState(true);
-  const [___loading, setLoading] = useState(true);
+  const [____loading, _setLoading] = useState(true);
 
   useEffect(() => {
     const loadTherapist = async () => {
@@ -166,7 +166,7 @@ export function TherapistProfile({ therapistId, onBookAppointment, _onClose }: T
           description: 'Dr. Chen is a compassionate and experienced clinical psychologist specializing in anxiety, trauma, and depression. With over 12 years of experience, she combines evidence-based therapeutic approaches with a warm, supportive style to help clients achieve lasting change.',
           longBio: `Dr. Sarah Chen brings over 12 years of dedicated experience in clinical psychology, with a particular focus on anxiety disorders, trauma recovery, and depression treatment. She earned her Ph.D. in Clinical Psychology from Stanford University and has since been committed to providing compassionate, evidence-based care.
 
-Dr. Chen's approach integrates cognitive-behavioral therapy (_CBT) with EMDR and mindfulness-based interventions, allowing her to tailor treatment to each client's unique needs. She believes in creating a safe, non-judgmental space where clients feel heard and supported as they work toward their goals.
+Dr. Chen&apos;s approach integrates cognitive-behavioral therapy (_CBT) with EMDR and mindfulness-based interventions, allowing her to tailor treatment to each client&apos;s unique needs. She believes in creating a safe, non-judgmental space where clients feel heard and supported as they work toward their goals.
 
 Her expertise in trauma-informed care has made her particularly effective in helping clients process difficult experiences and develop healthy coping strategies. Dr. Chen is fluent in English and Mandarin, and she values cultural sensitivity in her practice.
 
@@ -243,7 +243,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
         };
         
         setTherapist(_therapistData);
-      } catch (error) {
+      } catch {
         logger.error('Failed to load therapist:');
       } finally {
         setLoading(false);

@@ -96,7 +96,7 @@ function initializeReact() {
   const rootElement = document.getElementById('root');
   
   if (!rootElement) {
-    // If DOM isn't ready, wait and retry
+    // If DOM isn&apos;t ready, wait and retry
     if (document.readyState !== 'complete') {
       setTimeout(() => {
         initializeReact();
@@ -126,7 +126,7 @@ function initializeReact() {
         </EmergencyErrorBoundary>
       </React.StrictMode>
     );
-  } catch (error) {
+  } catch {
     logger.error('🚨 React initialization failed:');
     // Show emergency fallback
     rootElement.innerHTML = `

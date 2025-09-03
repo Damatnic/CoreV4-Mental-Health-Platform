@@ -60,10 +60,10 @@ const MOOD_LABELS = [
 const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodChange }) => {
   const [mood, _setMood] = useState(5);
   const [notes, _setNotes] = useState('');
-  const [showCrisisSupport, _setShowCrisisSupport] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [_debouncedMood, _setDebouncedMood] = useState(_mood);
+  const [_showCrisisSupport, _setShowCrisisSupport] = useState(false);
+  const [successMessage, _setSuccessMessage] = useState('');
+  const [errorMessage, _setErrorMessage] = useState('');
+  const [__debouncedMood, _setDebouncedMood] = useState(_mood);
 
   // Debounce mood changes for performance
   useDebounce(
@@ -145,7 +145,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       );
       
       return btoa(String.fromCharCode(...new Uint8Array(_encrypted)));
-    } catch (error) {
+    } catch {
       logger.error('Encryption failed:');
       return null;
     }
@@ -164,13 +164,13 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       }
       
       secureStorage.setItem('mood_data', btoa(JSON.stringify(_moodHistory)));
-    } catch (error) {
+    } catch {
       logger.error('Failed to store mood locally:');
     }
   };
 
   // Handle mood submission
-  const _handleSubmit  = useCallback(() => {
+  const __handleSubmit   = useCallback(() => {
     if (!submitMood.isPending) {
       submitMood.mutate({
         mood,
@@ -297,7 +297,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         {/* Notes Input */}
         <div className="mt-4">
           <textarea
-            placeholder="Add notes about how you're feeling (_optional)"
+            placeholder="Add notes about how You&apos;re feeling (_optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg resize-none"
@@ -336,7 +336,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
             <span className="font-semibold text-red-900">Crisis Support Available</span>
           </div>
           <p className="text-red-800 mb-3">
-            We notice you're going through a difficult time. Help is available:
+            We notice you&apos;re going through a difficult time. Help is available:
           </p>
           <div className="text-red-700 font-bold text-xl mb-3">988</div>
           <CrisisButton size="medium" />

@@ -415,7 +415,7 @@ class TouchOptimizationManager {
       listeners.forEach(_callback => {
         try {
           _callback(_gesture);
-        } catch (error) {
+        } catch {
           logger.error(`Error in gesture listener for ${gesture.type}:`, error);
         }
       });
@@ -427,7 +427,7 @@ class TouchOptimizationManager {
       genericListeners.forEach(_callback => {
         try {
           _callback(_gesture);
-        } catch (error) {
+        } catch {
           logger.error('Error in generic gesture listener:');
         }
       });
@@ -442,7 +442,7 @@ class TouchOptimizationManager {
     if ('vibrate' in navigator) {
       try {
         navigator.vibrate(_pattern);
-      } catch (_error) {
+      } catch {
     logger.warn('Vibration not supported or failed:');
       }
     }

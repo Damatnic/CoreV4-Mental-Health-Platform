@@ -79,7 +79,7 @@ export function AdvancedJournal({
     {
       id: '1',
       timestamp: new Date(),
-      content: "Today was a breakthrough day. I finally understood that my anxiety doesn't define me. The meditation session this morning really helped me see things from a different perspective.",
+      content: "Today was a breakthrough day. I finally understood that my anxiety doesn&apos;t define me. The meditation session this morning really helped me see things from a different perspective.",
       mood: 7,
       emotions: ['hopeful', 'calm', 'grateful'],
       tags: ['breakthrough', 'meditation', 'anxiety'],
@@ -103,7 +103,7 @@ export function AdvancedJournal({
     {
       id: '2',
       timestamp: new Date(Date.now() - 86400000),
-      content: "Struggled with motivation today, but I'm proud that I still managed to journal. Small wins count too.",
+      content: "Struggled with motivation today, but I&apos;m proud that I still managed to journal. Small wins count too.",
       mood: 5,
       emotions: ['tired', 'proud', 'determined'],
       tags: ['motivation', 'small-wins'],
@@ -219,7 +219,7 @@ export function AdvancedJournal({
   }, [filteredEntries]);
 
   // Get writing prompts based on current mood and patterns
-  const _writingPrompts  = useMemo(() => {
+  const __writingPrompts   = useMemo(() => {
     const prompts = [
       {
         category: 'reflection',
@@ -492,7 +492,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
       <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4">
         <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
           <Sparkles className="h-5 w-5 mr-2 text-yellow-600" />
-          Today's Writing Prompts
+          Today&apos;s Writing Prompts
         </h4>
         <div className="space-y-2">
           {writingPrompts.map((prompt, idx) => (

@@ -137,7 +137,7 @@ class AuthenticationService {
         success: true,
         data: response.data.user,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'REGISTRATION_FAILED',
         details: { error: error instanceof Error ? error.message : String(error), email: data.email } })(),
@@ -201,7 +201,7 @@ class AuthenticationService {
         success: true,
         data: _sessionData,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
         details: { error: error instanceof Error ? error.message : String(error), email: credentials.email } })(),
@@ -244,7 +244,7 @@ class AuthenticationService {
         clearTimeout(this.activityTimer);
         this.activityTimer = null;
       }
-    } catch (error) {
+    } catch {
       logger.error('Logout error: ');
       // Force clear session even if API call fails
       await this.clearSession();
@@ -275,7 +275,7 @@ class AuthenticationService {
       this.scheduleTokenRefresh();
 
       return newTokens;
-    } catch (error) {
+    } catch {
       logger.error('Token refresh failed:');
       // If refresh fails, user needs to re-authenticate
       await this.logout();
@@ -342,7 +342,7 @@ class AuthenticationService {
         success: true,
         data: this.currentSession.user,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'PROFILE_UPDATE_FAILED',
         userId: this.currentSession?.user.id,
@@ -372,7 +372,7 @@ class AuthenticationService {
         success: true,
         data: undefined,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'PASSWORD_RESET_FAILED',
         details: { error: error instanceof Error ? error.message : String(error) } })(),
@@ -416,7 +416,7 @@ class AuthenticationService {
         success: true,
         data: undefined,
       };
-    } catch (error) {
+    } catch {
       await auditLogger.log({
         event: 'PASSWORD_RESET_FAILED',
         details: { error: error instanceof Error ? error.message : String(error) } })(),
@@ -444,7 +444,7 @@ class AuthenticationService {
           await this.clearSession();
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load stored session:');
       await this.clearSession();
     }

@@ -92,9 +92,9 @@ export function MedicationManagement({
 }: MedicationManagementProps) {
   const [activeTab, _setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
   const [selectedMedication, _setSelectedMedication] = useState<Medication | null>(null);
-  const [__showDetails, setShowDetails] = useState(false);
-  const [_showSideEffectReport, _setShowSideEffectReport] = useState(false);
-  const [___timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  const [___showDetails, _setShowDetails] = useState(false);
+  const [__showSideEffectReport, _setShowSideEffectReport] = useState(false);
+  const [____timeOfDay, _setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
   // Get current time period
   useEffect(() => {

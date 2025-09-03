@@ -136,7 +136,7 @@ async function checkCrisisResponseTime() {
     
     log(`Crisis response time: ${metrics.crisisResponseTime}ms ✓`, 'success');
     return true;
-  } catch (_error) {
+  } catch {
     log('Could not validate crisis response time', 'warning');
     return true;
   }
@@ -343,7 +343,7 @@ async function main() {
       process.exit(0);
     }
     
-  } catch (error) {
+  } catch {
     logger.error(chalk.red('Fatal undefined during test execution:'), undefined);
     process.exit(1);
   }

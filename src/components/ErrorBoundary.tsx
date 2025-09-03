@@ -114,10 +114,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(errorReport),
           }).catch(() => {
-            // Fail silently - don't let monitoring failures affect crisis support
+            // Fail silently - don&apos;t let monitoring failures affect crisis support
           });
-        } catch (error) {
-          // Fail silently - don't let monitoring failures affect crisis support
+        } catch {
+          // Fail silently - don&apos;t let monitoring failures affect crisis support
           console.error('Monitoring error:', error);
         }
       }
@@ -134,7 +134,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           }
         });
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to report error', 'ErrorBoundary', error);
     }
   };
@@ -453,8 +453,8 @@ export const _setupGlobalErrorHandling = () => {
 
     try {
       localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(errorReport));
-    } catch (error) {
-      logger.error('Failed to store error report', 'ErrorBoundary', error);
+    } catch (err) {
+      logger.error('Failed to store error report', 'ErrorBoundary', err);
     }
   });
 
@@ -476,8 +476,8 @@ export const _setupGlobalErrorHandling = () => {
 
     try {
       localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(rejectionReport));
-    } catch (error) {
-      logger.error('Failed to store rejection report', 'ErrorBoundary', error);
+    } catch (err) {
+      logger.error('Failed to store rejection report', 'ErrorBoundary', err);
     }
   });
 

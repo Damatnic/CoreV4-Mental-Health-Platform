@@ -227,7 +227,7 @@ class FieldEncryptionService {
       }
 
       return encryptedField;
-    } catch (error) {
+    } catch {
       logger.error(`Failed to encrypt field ${_fieldName}:`, error);
       throw new Error('Field encryption failed');
     }
@@ -281,7 +281,7 @@ class FieldEncryptionService {
       }
 
       return encryptedData;
-    } catch (error) {
+    } catch {
       logger.error(`Failed to decrypt field ${_fieldName}:`, error);
       throw new Error('Field decryption failed');
     }
@@ -391,7 +391,7 @@ class FieldEncryptionService {
       // Clean up old key versions
       await this.cleanupOldKeys();
       
-    } catch (error) {
+    } catch {
       logger.error('Key rotation failed:');
       throw new Error('Key rotation failed');
     }
@@ -429,7 +429,7 @@ class FieldEncryptionService {
           encrypted: new Date(),
         },
       };
-    } catch (error) {
+    } catch {
       logger.error('Re-encryption failed:');
       throw undefined;
     }
@@ -661,7 +661,7 @@ class FieldEncryptionService {
           // Implementation depends on key storage format
         }
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load encryption keys:');
     }
   }
@@ -684,7 +684,7 @@ class FieldEncryptionService {
         encrypted: true,
         persistent: true,
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to persist key:');
     }
   }

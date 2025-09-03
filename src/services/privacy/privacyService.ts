@@ -161,7 +161,7 @@ class PrivacyService {
       });
 
       return consent;
-    } catch (error) {
+    } catch {
       logger.error('Failed to record consent:');
       throw undefined;
     }
@@ -209,7 +209,7 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to withdraw consent:');
       throw undefined;
     }
@@ -254,7 +254,7 @@ class PrivacyService {
 
       this.privacyCache.set(userId, defaults);
       return defaults;
-    } catch (error) {
+    } catch {
       logger.error('Failed to get privacy settings:');
       throw undefined;
     }
@@ -293,7 +293,7 @@ class PrivacyService {
       await this.applyPrivacySettings(userId, updated);
 
       return updated;
-    } catch (error) {
+    } catch {
       logger.error('Failed to update privacy settings:');
       throw undefined;
     }
@@ -334,7 +334,7 @@ class PrivacyService {
       });
 
       return request;
-    } catch (error) {
+    } catch {
       logger.error('Failed to create data access request:');
       throw undefined;
     }
@@ -374,7 +374,7 @@ class PrivacyService {
       });
 
       return request;
-    } catch (error) {
+    } catch {
       logger.error('Failed to create data portability request:');
       throw undefined;
     }
@@ -418,7 +418,7 @@ class PrivacyService {
       });
 
       return request;
-    } catch (error) {
+    } catch {
       logger.error('Failed to create data deletion request:');
       throw undefined;
     }
@@ -480,7 +480,7 @@ class PrivacyService {
       });
 
       return agreement;
-    } catch (error) {
+    } catch {
       logger.error('Failed to create data sharing agreement:');
       throw undefined;
     }
@@ -522,7 +522,7 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to revoke data sharing agreement:');
       throw undefined;
     }
@@ -552,7 +552,7 @@ class PrivacyService {
       }
 
       return relevantConsents.length > 0;
-    } catch (error) {
+    } catch {
       logger.error('Failed to check consent:');
       return false;
     }
@@ -591,7 +591,7 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
+    } catch {
       logger.error('Failed to anonymize user data:');
       throw undefined;
     }
@@ -680,7 +680,7 @@ class PrivacyService {
         
         // Notify user (in production, send email/notification)
         logger.info('Data access request completed:', request.id);
-      } catch (_error) {
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }
@@ -719,7 +719,7 @@ class PrivacyService {
         
         // Notify user
         logger.info('Data portability request completed:', request.id);
-      } catch (_error) {
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }
@@ -743,7 +743,7 @@ class PrivacyService {
         
         // Notify user
         logger.info('Data deletion request completed:', request.id);
-      } catch (_error) {
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }

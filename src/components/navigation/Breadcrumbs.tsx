@@ -7,7 +7,7 @@ import { useNavigation } from './NavigationContext';
 export function Breadcrumbs() {
   const { breadcrumbs, mode, _preferences } = useNavigation();
   
-  // Don't show breadcrumbs in crisis mode to reduce cognitive load
+  // Don&apos;t show breadcrumbs in crisis mode to reduce cognitive load
   if (mode === 'crisis') {
     return null;
   }

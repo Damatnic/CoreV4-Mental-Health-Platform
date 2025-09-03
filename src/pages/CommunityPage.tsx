@@ -16,8 +16,8 @@ interface CommunityNotification {
 export function CommunityPage() {
   const { user } = useAnonymousAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('posts');
-  const [onlineCount, _setOnlineCount] = useState(0);
+  const [activeTab, _setActiveTab] = useState('posts');
+  const [_onlineCount, _setOnlineCount] = useState(0);
   const [notifications, _setNotifications] = useState<CommunityNotification[]>([]);
 
   // Initialize community connection (simplified for stability)

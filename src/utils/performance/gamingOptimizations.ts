@@ -66,9 +66,9 @@ class GamePerformanceOptimizer {
   }
   
   private detectDeviceCapabilities(): void {
-    const memory = (navigator as any).deviceMemory;
+    const memory = (navigator as unknown).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    const connection = (navigator as any).connection;
+    const connection = (navigator as unknown).connection;
     
     // Determine performance level based on device capabilities
     if (memory <= 4 || cores <= 2 || connection?.effectiveType === '2g') {
@@ -341,7 +341,7 @@ class GamePerformanceOptimizer {
     // Monitor memory usage
     const checkMemory = () => {
       if ('memory' in performance) {
-        const memory = (performance as any).memory;
+        const memory = (performance as unknown).memory;
         const usedMB = memory.usedJSHeapSize / 1048576;
         this.metrics.memoryUsage = usedMB;
         

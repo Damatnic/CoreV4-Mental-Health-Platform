@@ -159,10 +159,10 @@ export function MedicationSmartReminders({
 }: SmartReminderProps) {
   const [reminders, _setReminders] = useState<SmartReminder[]>([]);
   const [activeTab, _setActiveTab] = useState<'overview' | 'configure' | '_insights' | 'history'>('overview');
-  const [_selectedMedication, _setSelectedMedication] = useState<string | null>(null);
+  const [__selectedMedication, _setSelectedMedication] = useState<string | null>(null);
   const [isLearningMode, _setIsLearningMode] = useState(true);
   const [aiInsights, _setAiInsights] = useState<AIInsight[]>([]);
-  const [reminderTest, setReminderTest] = useState<{ active: boolean; _type: string } | null>(null);
+  const [reminderTest, _setReminderTest] = useState<{ active: boolean; _type: string } | null>(null);
 
   useEffect(() => {
     generateInitialReminders();
@@ -468,9 +468,9 @@ export function MedicationSmartReminders({
               </div>
             </div>
 
-            {/* Today's Schedule */}
+            {/* Today&apos;s Schedule */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4">Today's Schedule</h2>
+              <h2 className="text-xl font-semibold mb-4">Today&apos;s Schedule</h2>
               <div className="space-y-3">
                 {medications.flatMap(med => 
                   med.schedule?.map((sched: unknown, idx: number) => {
@@ -616,7 +616,7 @@ export function MedicationSmartReminders({
                           <p className="text-sm text-gray-600">{feature.description}</p>
                         </div>
                       </div>
-                      <label htmlFor="input_7bhyx6g20" className="flex items-center">
+                      <label className="flex items-center">
                         <input
                           type="checkbox"
                           checked={feature.enabled}

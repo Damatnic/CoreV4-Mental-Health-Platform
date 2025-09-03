@@ -216,7 +216,7 @@ export class ResponsiveLayoutTester {
     
     try {
       passed = await testFn(_device);
-    } catch (error) {
+    } catch {
       error = e as Error;
       passed = false;
     }

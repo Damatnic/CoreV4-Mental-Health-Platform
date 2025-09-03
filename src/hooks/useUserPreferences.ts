@@ -114,9 +114,9 @@ const defaultPreferences: UserPreferences = {
 };
 
 export function useUserPreferences(userId: string) {
-  const [preferences, setPreferences] = useState<UserPreferences>(_defaultPreferences);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [preferences, _setPreferences] = useState<UserPreferences>(_defaultPreferences);
+  const [loading, _setLoading] = useState(true);
+  const [error, _setError] = useState<string | null>(null);
 
   // Load preferences from localStorage or API
   useEffect(() => {
@@ -137,7 +137,7 @@ export function useUserPreferences(userId: string) {
           // const data = await response.json();
           // setPreferences(_data);
         }
-      } catch (error) {
+      } catch {
         logger.error('Error loading preferences:', err);
         setError('Failed to load preferences');
       } finally {
@@ -162,7 +162,7 @@ export function useUserPreferences(userId: string) {
       // });
       
       return true;
-    } catch (error) {
+    } catch {
       logger.error('Error saving preferences:', err);
       setError('Failed to save preferences');
       return false;
@@ -170,7 +170,7 @@ export function useUserPreferences(userId: string) {
   }, [userId]);
 
   // Update a specific preference
-  const _updatePreference  = useCallback(async <K extends keyof UserPreferences>(
+  const __updatePreference   = useCallback(async <K extends keyof UserPreferences>(
     key: K,
     value: UserPreferences[K]
   ) => {
@@ -180,7 +180,7 @@ export function useUserPreferences(userId: string) {
   }, [preferences, savePreferences]);
 
   // Update nested preference
-  const _updateNestedPreference  = useCallback(async <
+  const __updateNestedPreference   = useCallback(async <
     K extends keyof UserPreferences,
     NK extends keyof UserPreferences[K]
   >(
@@ -200,13 +200,13 @@ export function useUserPreferences(userId: string) {
   }, [preferences, savePreferences]);
 
   // Reset to defaults
-  const _resetToDefaults  = useCallback(async () => {
+  const __resetToDefaults   = useCallback(async () => {
     setPreferences(_defaultPreferences);
     await savePreferences(_defaultPreferences);
   }, [savePreferences]);
 
   // Export preferences
-  const _exportPreferences  = useCallback(() => {
+  const __exportPreferences   = useCallback(() => {
     const _dataStr = JSON.stringify(preferences, null, 2);
     const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
     
@@ -219,7 +219,7 @@ export function useUserPreferences(userId: string) {
   }, [preferences, userId]);
 
   // Import preferences
-  const _importPreferences  = useCallback(async (file: File): Promise<boolean> => {
+  const __importPreferences   = useCallback(async (file: File): Promise<boolean> => {
     try {
       const _text = await file._text();
       const imported = JSON.parse(_text);
@@ -234,7 +234,7 @@ export function useUserPreferences(userId: string) {
       await savePreferences(_newPreferences);
       
       return true;
-    } catch (error) {
+    } catch {
       logger.error('Error importing preferences:', err);
       setError('Failed to import preferences');
 import { logger } from '../utils/logger';

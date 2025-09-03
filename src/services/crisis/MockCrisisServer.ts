@@ -289,7 +289,7 @@ export class MockCrisisServer {
     this.emergencyCallbacks.forEach(callback => {
       try {
         callback(action, { ...data, protocol });
-      } catch (error) {
+      } catch {
         logger.error('Emergency callback failed:');
       }
     });
@@ -465,7 +465,7 @@ export class MockCrisisSession {
     this.messageCallbacks.forEach(callback => {
       try {
         callback(_counselorMessage);
-      } catch (error) {
+      } catch {
         logger.error('Message callback failed:');
       }
     });

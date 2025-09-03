@@ -126,7 +126,7 @@ export class ApiService {
           try {
             await this.refreshAccessToken();
             return this.axiosInstance(_originalRequest);
-          } catch (_error) {
+          } catch {
             this.handleLogout();
             throw new ApiServiceError(
               ErrorCode.AUTHENTICATION_ERROR,
@@ -256,7 +256,7 @@ export class ApiService {
       // Use secure storage for sensitive authentication tokens
       this.accessToken = secureStorage.getItem('access_token');
       this.refreshToken = secureStorage.getItem('refresh_token');
-    } catch (error) {
+    } catch {
       logger.error('Failed to load tokens from secure storage:');
     }
   }
@@ -268,7 +268,7 @@ export class ApiService {
       secureStorage.setItem('refresh_token', refreshToken);
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
-    } catch (error) {
+    } catch {
       logger.error('Failed to save tokens to secure storage:');
     }
   }
@@ -280,7 +280,7 @@ export class ApiService {
       secureStorage.removeItem('refresh_token');
       this.accessToken = null;
       this.refreshToken = null;
-    } catch (error) {
+    } catch {
       logger.error('Failed to clear tokens from secure storage:');
     }
   }
@@ -325,7 +325,7 @@ export class ApiService {
         const _user = JSON.parse(_userStr);
         return _user.id;
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to get current _user ID:');
     }
     return null;
@@ -341,7 +341,7 @@ export class ApiService {
     for (let i = 0; i < attempts; i++) {
       try {
         return await requestFn();
-      } catch (error) {
+      } catch {
         lastError = error;
         
         // Don't retry for certain error types
@@ -385,7 +385,7 @@ export class ApiService {
       secureStorage.setItem('current_user', JSON.stringify(_user));
       
       return response.data;
-    } catch (error) {
+    } catch {
       throw this.handleApiError(error as AxiosError);
     }
   }
@@ -399,7 +399,7 @@ export class ApiService {
       );
       
       return response.data.data!;
-    } catch (error) {
+    } catch {
       throw this.handleApiError(error as AxiosError);
     }
   }
@@ -407,7 +407,7 @@ export class ApiService {
   public async logout(): Promise<void> {
     try {
       await this.axiosInstance.post('/auth/logout');
-    } catch (error) {
+    } catch {
       logger.error('Logout error: ');
     } finally {
       this.handleLogout();

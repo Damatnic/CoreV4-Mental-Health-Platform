@@ -59,9 +59,9 @@ export function CareTeamDashboard({
   onEditProvider,
   onAddProvider
 }: CareTeamDashboardProps) {
-  const [__selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
-  const [__showContactOptions, _setShowContactOptions] = useState<string | null>(null);
-  const [filterRole, setFilterRole] = useState<string>('all');
+  const [___selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
+  const [___showContactOptions, _setShowContactOptions] = useState<string | null>(null);
+  const [filterRole, _setFilterRole] = useState<string>('all');
 
   // Get provider icon based on _role
   const _getProviderIcon = (_role: string) => {
@@ -273,7 +273,7 @@ function ProviderCard({
   onViewDetails?: (provider: CareProvider) => void;
   onEdit?: (provider: CareProvider) => void;
 }) {
-  const [showActions, setShowActions] = useState(false);
+  const [showActions, _setShowActions] = useState(false);
 
   const _getProviderIcon = (_role: string) => {
     switch (_role) {

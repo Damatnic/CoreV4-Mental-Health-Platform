@@ -179,11 +179,11 @@ export function MobileBottomNav() {
   const { vibrate } = useVibration();
   const { _deviceInfo, isMobileDevice } = useMobileFeatures();
   const { _navigationMode, isPerformanceMode } = useConsoleNavigation();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [__showCrisisActions, setShowCrisisActions] = useState(false);
+  const [isDrawerOpen, _setIsDrawerOpen] = useState(false);
+  const [___showCrisisActions, _setShowCrisisActions] = useState(false);
   const [consoleMode, _setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
   const [isConsoleStyleActive, _setIsConsoleStyleActive] = useState(true);
-  const [__activeTab, setActiveTab] = useState(() => {
+  const [___activeTab, _setActiveTab] = useState(() => {
     const currentPath = location.pathname;
     const item = mainNavItems.find(item => item._path === currentPath);
     return item?.id || 'home';
@@ -338,7 +338,7 @@ export function MobileBottomNav() {
     }
   };
 
-  // Don't show navigation on certain pages
+  // Don&apos;t show navigation on certain pages
   const hideNavPaths = ['/auth/login', '/auth/register', '/onboarding'];
   if (hideNavPaths.some(_path => location.pathname.startsWith(_path))) {
     return null;

@@ -345,7 +345,7 @@ export class EnhancedWebSocketService {
         const preferences = JSON.parse(_prefs);
         logger.debug('Loaded _notification preferences', 'EnhancedWebSocket', preferences);
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load _notification preferences:');
     }
   }
@@ -905,7 +905,7 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('notification_history', JSON.stringify(_history));
-    } catch (error) {
+    } catch {
       logger.error('Failed to save _notification to history:');
     }
   }
@@ -969,7 +969,7 @@ export class EnhancedWebSocketService {
       try {
         this.socket.emit(message.event, message.data);
         this.connectionState.lastSuccessfulMessage = new Date();
-      } catch (error) {
+      } catch {
         logger.error('Failed to send queued message:');
         
         if (Date.now() - message.timestamp < 86400000 && message.retries < 3) {
@@ -986,7 +986,7 @@ export class EnhancedWebSocketService {
   private saveQueuedMessages(): void {
     try {
       secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch (error) {
+    } catch {
       logger.error('Failed to save message queue:');
     }
   }
@@ -998,7 +998,7 @@ export class EnhancedWebSocketService {
         this.messageQueue = JSON.parse(_saved);
         this.connectionState.messagesQueued = this.messageQueue.length;
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
@@ -1113,14 +1113,14 @@ export class EnhancedWebSocketService {
   }
 
   // Event emitter methods
-  public on(event: string, handler: Function): void {
+  public on(event: string, handler: (...args: unknown[]) => any): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler);
   }
 
-  public off(event: string, handler: Function): void {
+  public off(event: string, handler: (...args: unknown[]) => any): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.delete(handler);
@@ -1133,7 +1133,7 @@ export class EnhancedWebSocketService {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (error) {
+        } catch {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -1191,7 +1191,7 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('critical_events', JSON.stringify(_logs));
-    } catch (error) {
+    } catch {
       logger.error('Failed to log critical event:');
     }
   }

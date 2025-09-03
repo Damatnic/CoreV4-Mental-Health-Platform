@@ -160,7 +160,7 @@ class RealtimeSyncService extends EventEmitter {
           reject(_error);
         });
         
-      } catch (error) {
+      } catch (_error) {
         reject(_error);
       }
     });

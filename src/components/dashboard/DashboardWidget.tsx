@@ -33,7 +33,7 @@ export function DashboardWidget({
   transparent = false,
 }: DashboardWidgetProps) {
   const [isCollapsed, _setIsCollapsed] = useState(widget.isCollapsed || false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRefreshing, _setIsRefreshing] = useState(false);
   const [isExpanded, _setIsExpanded] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
 

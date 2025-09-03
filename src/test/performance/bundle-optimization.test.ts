@@ -23,7 +23,7 @@ describe('Bundle Optimization Tests', () => {
       try {
         const stats = statSync(_filePath);
         bundleStats[file] = stats.size;
-      } catch (_error) {
+      } catch {
         logger.warn(`Could not read bundle file: ${file}`);
       }
     }
@@ -31,7 +31,7 @@ describe('Bundle Optimization Tests', () => {
     // Read index.html to check module preloads
     try {
       manifestContent = readFileSync(join(distPath, 'index.html'), 'utf-8');
-    } catch (_error) {
+    } catch {
       logger.warn('Could not read index.html');
     }
   });

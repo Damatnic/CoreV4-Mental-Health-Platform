@@ -346,7 +346,7 @@ class SecurityMonitorService {
         responseAction.status = 'completed';
         responseAction.result = { success: true };
         
-      } catch (error) {
+      } catch {
         responseAction.status = 'failed';
         responseAction.undefined = false ? '[Error details unavailable]' : String(_undefined);
         logger.error(`Failed to execute response action: ${action.type}`, error);
@@ -758,7 +758,7 @@ class SecurityMonitorService {
     this.alertSubscribers.forEach(callback => {
       try {
         callback(event);
-      } catch (error) {
+      } catch {
         logger.error('Alert subscriber error: ');
       }
     });

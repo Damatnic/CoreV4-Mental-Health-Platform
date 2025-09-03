@@ -161,7 +161,7 @@ function getOrCreateAnonymousUser(): AnonymousUser {
       }
       
       return user;
-    } catch (error) {
+    } catch {
       logger.error('Failed to parse _stored user _data:');
       // Create new user if _data is corrupted
     }
@@ -299,7 +299,7 @@ function migrateUserData(oldUser: unknown): AnonymousUser {
 }
 
 export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AnonymousUser>(_getOrCreateAnonymousUser);
+  const [user, _setUser] = useState<AnonymousUser>(_getOrCreateAnonymousUser);
   const [sessionDuration, _setSessionDuration] = useState(0);
   
   // Update session duration every minute
@@ -420,7 +420,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       };
       
       return JSON.stringify(exportData, null, 2);
-    } catch (error) {
+    } catch {
       logger.error('Failed to export user _data:');
       throw new Error('Unable to export _data. Please try again.');
     }
@@ -456,7 +456,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       
       logger.info('✅ Successfully imported user data');
       return true;
-    } catch (error) {
+    } catch {
       logger.error('Failed to import user _data:');
       return false;
     }
@@ -464,7 +464,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   
   // Check if data is stale (older than retention period)
   const isDataStale = (): boolean => {
-    const _retentionDays  = user.preferences.privacy?.dataRetentionDays || 365;
+    const __retentionDays   = user.preferences.privacy?.dataRetentionDays || 365;
     const staleDate = new Date();
     staleDate.setDate(staleDate.getDate() - retentionDays);
     
@@ -493,7 +493,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       }
       
       return true;
-    } catch (error) {
+    } catch {
       logger.error('Data integrity validation failed:');
       return false;
     }
@@ -550,7 +550,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
 
 /**
  * Privacy Notice Component
- * Shows users that they're anonymous
+ * Shows users that they&apos;re anonymous
  */
 export function AnonymousNotice() {
   const { user, sessionDuration } = useAnonymousAuth();
@@ -565,11 +565,11 @@ export function AnonymousNotice() {
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">You're Completely Anonymous</h3>
+          <h3 className="font-semibold text-gray-900">You&apos;re Completely Anonymous</h3>
           <p className="text-sm text-gray-600 mt-1">
             {user.nickname ? `Hi ${user.nickname}! ` : ''}
             No registration required. No data collected. Your privacy is protected.
-            {sessionDuration > 0 && ` You've been here for ${sessionDuration} minute${sessionDuration !== 1 ? 's' : ''}.`}
+            {sessionDuration > 0 && ` you&apos;ve been here for ${sessionDuration} minute${sessionDuration !== 1 ? 's' : ''}.`}
           </p>
         </div>
       </div>

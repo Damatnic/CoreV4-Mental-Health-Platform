@@ -39,9 +39,9 @@ export function ActivityAnalytics({
   const { activityHistory, _activities, _goals, _habits, correlateActivitiesWithMood, _analyzeActivityEffectiveness, exportProgressReport } = useActivityStore();
 
   const [selectedPeriod, _setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [showInsights, _setShowInsights] = useState(true);
+  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
+  const [currentDate, _setCurrentDate] = useState(new Date());
+  const [_showInsights, _setShowInsights] = useState(true);
 
   // Get date range based on selected period
   const getDateRange = () => {
@@ -81,7 +81,7 @@ export function ActivityAnalytics({
   }, [activityHistory, selectedPeriod, selectedCategory, currentDate]);
 
   // Calculate statistics
-  const ___stats  = useMemo(() => {
+  const ____stats   = useMemo(() => {
     const completed = filteredActivities.filter(a => a.completed).length;
     const total = filteredActivities.length;
     const completionRate = total > 0 ? (completed / total) * 100 : 0;

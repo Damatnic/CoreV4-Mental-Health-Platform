@@ -63,12 +63,12 @@ interface Recommendation {
 export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
   const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, _calculateWellnessScores } = useWellnessStore();
   
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, _setSelectedCategory] = useState<string | null>(null);
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showGoalModal, _setShowGoalModal] = useState(false);
-  const [editingGoal, _setEditingGoal] = useState<string | null>(null);
+  const [_showGoalModal, _setShowGoalModal] = useState(false);
+  const [_editingGoal, _setEditingGoal] = useState<string | null>(null);
 
-  // Calculate today's metrics
+  // Calculate today&apos;s metrics
   const todayMetrics = useMemo(() => {
     const _today = new Date();
     _today.setHours(0, 0, 0, 0);
@@ -388,7 +388,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
       <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xl font-bold mb-1">Today's Wellness Score</h3>
+            <h3 className="text-2xl font-bold mb-1">Today&apos;s Wellness Score</h3>
             <p className="text-purple-100">Track your daily wellness metrics</p>
           </div>
           

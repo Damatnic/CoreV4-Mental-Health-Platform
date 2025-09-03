@@ -78,16 +78,16 @@ const getNextSevenDays = () => {
 };
 
 export function AppointmentBooking({ therapistId, onClose, onSuccess }: AppointmentBookingProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, _setCurrentStep] = useState(1);
   const [selectedDate, _setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [availableDays, _setAvailableDays] = useState<Date[]>([]);
-  const [timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [selectedTime, _setSelectedTime] = useState<string>('');
+  const [_availableDays, _setAvailableDays] = useState<Date[]>([]);
+  const [_timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
+  const [loading, _setLoading] = useState(false);
   const [therapist, _setTherapist] = useState<unknown>(null);
   
   // Form data
-  const [formData, setFormData] = useState({
+  const [formData, _setFormData] = useState({
     sessionType: 'initial',
     format: 'video',
     reason: '',
@@ -189,7 +189,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       });
       
       onSuccess(appointmentId.id);
-    } catch (error) {
+    } catch {
       logger.error('Booking failed:');
       // Handle undefined
     } finally {
@@ -410,7 +410,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     onChange={(e) => updateFormData('reason', e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Briefly describe what you'd like to discuss..."
+                    placeholder="Briefly describe what you&apos;d like to discuss..."
                   />
                 </div>
               </motion.div>
@@ -598,7 +598,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                       onChange={(e) => updateFormData('hasInsurance', !e.target.checked)}
                       className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                     />
-                    <label htmlFor="self-pay" className="font-medium">I'll pay out-of-pocket</label>
+                    <label htmlFor="self-pay" className="font-medium">I&apos;ll pay out-of-pocket</label>
                   </div>
 
                   {!formData.hasInsurance && (
@@ -681,7 +681,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     <div className="space-y-2">
                       <p className="font-medium text-yellow-800">Please Note:</p>
                       <ul className="text-sm text-yellow-700 space-y-1 ml-4 list-disc">
-                        <li>You'll receive a confirmation email within 5 minutes</li>
+                        <li>You&apos;ll receive a confirmation email within 5 minutes</li>
                         <li>Please arrive 10 minutes early (or join video call early)</li>
                         <li>Cancellations must be made 24 hours in advance</li>
                         <li>A secure video link will be sent before your session</li>

@@ -77,9 +77,9 @@ export function TherapySessionWidget({
 }: TherapySessionWidgetProps) {
   const [activeTab, _setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
   const [selectedSession, _setSelectedSession] = useState<TherapySession | null>(null);
-  const [__showPreparation, setShowPreparation] = useState(false);
-  const [preparationTopics, _setPreparationTopics] = useState<string[]>([]);
-  const [sessionQuestions, _setSessionQuestions] = useState<string[]>([]);
+  const [___showPreparation, _setShowPreparation] = useState(false);
+  const [_preparationTopics, _setPreparationTopics] = useState<string[]>([]);
+  const [_sessionQuestions, _setSessionQuestions] = useState<string[]>([]);
 
   // Get next upcoming session
   const nextSession = sessions
@@ -496,7 +496,7 @@ export function TherapySessionWidget({
                 <textarea
                   className="w-full p-3 border border-gray-300 rounded-lg text-sm"
                   rows={3}
-                  placeholder="Any questions you'd like to ask?"
+                  placeholder="Any questions you&apos;d like to ask?"
                   value={sessionQuestions.join('\n')}
                   onChange={(e) => setSessionQuestions(e.target.value.split('\n'))}
                 />

@@ -59,16 +59,16 @@ const NavigationContext = createContext<NavigationContextState | undefined>(_und
 // Provider component
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const [mode, setMode] = useState<NavigationMode>('normal');
-  const [preferences, setPreferences] = useState<NavigationPreferences>(() => {
+  const [mode, _setMode] = useState<NavigationMode>('normal');
+  const [preferences, _setPreferences] = useState<NavigationPreferences>(() => {
     // Load preferences from localStorage if available
     const saved = localStorage.getItem('navigationPreferences');
     return saved ? { ...defaultPreferences, ...JSON.parse(_saved) } : defaultPreferences;
   });
-  const [isSearchOpen, setSearchOpen] = useState(false);
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [crisisDetected, setCrisisDetected] = useState(false);
-  const [userRole, setUserRole] = useState<'patient' | 'caregiver' | 'professional' | 'guest'>('guest');
+  const [isSearchOpen, _setSearchOpen] = useState(false);
+  const [isMobileMenuOpen, _setMobileMenuOpen] = useState(false);
+  const [crisisDetected, _setCrisisDetected] = useState(false);
+  const [userRole, _setUserRole] = useState<'patient' | 'caregiver' | 'professional' | 'guest'>('guest');
   const [breadcrumbs, _setBreadcrumbs] = useState<Array<{ label: string; path: string }>>([]);
 
   // Update breadcrumbs based on current path

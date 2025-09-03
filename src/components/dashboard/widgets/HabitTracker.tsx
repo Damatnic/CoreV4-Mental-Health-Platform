@@ -44,11 +44,11 @@ export function HabitTracker({
 }: HabitTrackerProps) {
   const { habits, completeHabit, resetHabitStreak, pauseHabit, _updateHabit, stackHabits } = useActivityStore();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showStackingMode, setShowStackingMode] = useState(false);
-  const [selectedForStacking, setSelectedForStacking] = useState<string[]>([]);
-  const [expandedHabit, _setExpandedHabit] = useState<string | null>(null);
+  const [showStackingMode, _setShowStackingMode] = useState(false);
+  const [selectedForStacking, _setSelectedForStacking] = useState<string[]>([]);
+  const [_expandedHabit, _setExpandedHabit] = useState<string | null>(null);
 
   // Filter active habits
   const activeHabits = habits.filter(h => h.isActive);

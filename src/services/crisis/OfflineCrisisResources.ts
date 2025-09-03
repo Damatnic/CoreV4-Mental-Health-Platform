@@ -324,7 +324,7 @@ export class OfflineCrisisResourceManager {
       
       this.isInitialized = true;
       logger.info('Offline crisis resources initialized successfully', 'OfflineCrisisResources');
-    } catch (error) {
+    } catch {
       logger.error('Failed to initialize offline crisis resources:');
       // Even if loading fails, ensure critical resources are available
       this.resources = [...CRITICAL_OFFLINE_RESOURCES];
@@ -347,7 +347,7 @@ export class OfflineCrisisResourceManager {
         const _customContacts = JSON.parse(_savedContacts) as OfflineEmergencyContact[];
         this.emergencyContacts = [...this.emergencyContacts, ..._customContacts];
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load custom offline resources:');
     }
   }
@@ -359,7 +359,7 @@ export class OfflineCrisisResourceManager {
       if (_saved) {
         this.safetyPlans = JSON.parse(_saved);
       }
-    } catch (error) {
+    } catch {
       logger.error('Failed to load safety plans:');
       this.safetyPlans = [];
     }
@@ -449,7 +449,7 @@ export class OfflineCrisisResourceManager {
       
       const _customContacts = this.emergencyContacts.filter(c => c.id.startsWith('custom-'));
       secureStorage.setItem('offline_emergency_contacts', JSON.stringify(_customContacts));
-    } catch (error) {
+    } catch {
       logger.error('Failed to save custom resources:');
     }
   }
@@ -495,7 +495,7 @@ export class OfflineCrisisResourceManager {
   private saveSafetyPlans(): void {
     try {
       secureStorage.setItem('offline_safety_plans', JSON.stringify(this.safetyPlans));
-    } catch (error) {
+    } catch {
       logger.error('Failed to save safety plans:');
     }
   }
@@ -541,7 +541,7 @@ export class OfflineCrisisResourceManager {
       
       this.saveCustomResources();
       logger.info('Offline resource cache updated', 'OfflineCrisisResources');
-    } catch (error) {
+    } catch {
       logger.error('Failed to update resource cache:');
     }
   }

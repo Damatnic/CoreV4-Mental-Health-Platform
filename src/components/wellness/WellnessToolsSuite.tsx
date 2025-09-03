@@ -111,8 +111,8 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
 }) => {
   const [selectedTool, _setSelectedTool] = useState(_initialTool);
   const [sidebarCollapsed, _setSidebarCollapsed] = useState(_compactMode);
-  const [showTips, _setShowTips] = useState(true);
-  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [_showTips, _setShowTips] = useState(true);
+  const [currentTipIndex, _setCurrentTipIndex] = useState(0);
   const [theme, _setTheme] = useState<'light' | 'dark'>('light');
   
   // Get current tool component
@@ -296,7 +296,7 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
                   <span className="text-gray-600 dark:text-gray-400">Active Session</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
-                  Today's Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
+                  Today&apos;s Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
                   Streak: <span className="font-semibold text-orange-500">7 days</span>

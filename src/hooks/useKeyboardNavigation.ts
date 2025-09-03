@@ -93,7 +93,7 @@ const dashboardShortcuts: KeyboardShortcut[] = [
 ];
 
 export function useKeyboardNavigation(customShortcuts?: KeyboardShortcut[]) {
-  const ___navigate  = useNavigate();
+  const ____navigate   = useNavigate();
   const shortcuts = useRef<KeyboardShortcut[]>([...dashboardShortcuts, ...(customShortcuts || [])]);
 
   const handleKeyPress = useCallback((_event: KeyboardEvent) => {
@@ -265,7 +265,7 @@ export function useScreenReaderAnnouncement() {
     };
   }, []);
 
-  const _announce  = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const __announce   = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
     if (announcementRef.current) {
       announcementRef.current.setAttribute('aria-live', priority);
       announcementRef.current.textContent = '';
@@ -304,8 +304,8 @@ export function useReducedMotion() {
 export function useAccessibility() {
   const keyboard = useKeyboardNavigation();
   const focus = useFocusManagement();
-  const _screenReader  = useScreenReaderAnnouncement();
-  const _reducedMotion  = useReducedMotion();
+  const __screenReader   = useScreenReaderAnnouncement();
+  const __reducedMotion   = useReducedMotion();
 
   return {
     keyboard,

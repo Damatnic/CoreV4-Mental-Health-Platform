@@ -48,7 +48,7 @@ export function useFeatureFlag(
     fallbackValue = false, endpoint = '/api/feature-flags' } = config;
 
   const { user } = useAuth();
-  const [__flagValue, setFlagValue] = useState<unknown>(() => {
+  const [___flagValue, _setFlagValue] = useState<unknown>(() => {
     // Check cache first
     if (_enableCache) {
       const cached = flagCache.get(_flagName);
@@ -62,7 +62,7 @@ export function useFeatureFlag(
     if (override !== null) {
       try {
         return JSON.parse(_override);
-      } catch (_error) {
+      } catch {
         return override;
       }
     }
@@ -98,7 +98,7 @@ export function useFeatureFlag(
         }
         
         if (_mounted) setFlagValue(_value);
-      } catch (_error) {
+      } catch {
         // Silent fallback to prevent console spam
         const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
         if (_mounted) setFlagValue(_value);
@@ -119,7 +119,7 @@ export function useFeatureFlag(
  * Hook to get all feature flags
  */
 export function useFeatureFlags(): FeatureFlags {
-  const [flags, setFlags] = useState<FeatureFlags>(_DEFAULT_FLAGS);
+  const [flags, _setFlags] = useState<FeatureFlags>(_DEFAULT_FLAGS);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -129,7 +129,7 @@ export function useFeatureFlags(): FeatureFlags {
       try {
         // DISABLED: Use local defaults only to prevent console spam
         if (_mounted) setFlags(_DEFAULT_FLAGS);
-      } catch (_error) {
+      } catch {
         // Silent fallback
         if (_mounted) setFlags(_DEFAULT_FLAGS);
       }
@@ -149,7 +149,7 @@ export function useFeatureFlags(): FeatureFlags {
  * Hook to override feature flags (for testing)
  */
 export function useFeatureFlagOverride() {
-  const _setOverride  = useCallback((flagName: string, _value: unknown) => {
+  const __setOverride   = useCallback((flagName: string, _value: unknown) => {
     secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(_value));
     // Clear cache to force refresh
     flagCache.delete(_flagName);
@@ -157,13 +157,13 @@ export function useFeatureFlagOverride() {
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
-  const _clearOverride  = useCallback((flagName: string) => {
+  const __clearOverride   = useCallback((flagName: string) => {
     secureStorage.removeItem(`feature_flag_${flagName}`);
     flagCache.delete(_flagName);
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
-  const _clearAllOverrides  = useCallback(() => {
+  const __clearAllOverrides   = useCallback(() => {
     const keys = Object.keys(_localStorage);
     keys.forEach(key => {
       if (key.startsWith('feature_flag_')) {

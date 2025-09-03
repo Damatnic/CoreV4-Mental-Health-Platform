@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '../utils/logger';
 import { 
   Users, Phone, MessageCircle, Video, CheckCircle, 
   Clock, MapPin, Star, _AlertCircle, Plus, Edit2,
@@ -65,9 +64,9 @@ interface CrisisBuddy {
 export function CrisisSupportNetwork() {
   const { _user } = useAuth();
   const [activeTab, _setActiveTab] = useState<'contacts' | 'groups' | 'buddy' | 'professional'>('contacts');
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [__showAddContact, setShowAddContact] = useState(false);
-  const [selectedContact, _setSelectedContact] = useState<SupportContact | null>(null);
+  const [isOnline, _setIsOnline] = useState(navigator.onLine);
+  const [___showAddContact, _setShowAddContact] = useState(false);
+  const [_selectedContact, _setSelectedContact] = useState<SupportContact | null>(null);
   
   // Support contacts state
   const [supportContacts, _setSupportContacts] = useState<SupportContact[]>([
@@ -221,7 +220,7 @@ export function CrisisSupportNetwork() {
   }, []);
 
   // Check-in with crisis buddy
-  const _handleBuddyCheckIn  = useCallback(() => {
+  const __handleBuddyCheckIn   = useCallback(() => {
     if (_crisisBuddy) {
       setCrisisBuddy(prev => prev ? { ...prev, lastCheckIn: new Date() } : null);
       logger.info('Crisis buddy check-in completed', {
@@ -232,7 +231,7 @@ export function CrisisSupportNetwork() {
   }, [crisisBuddy]);
 
   // Join support group
-  const _handleJoinGroup  = useCallback((group: SupportGroup) => {
+  const __handleJoinGroup   = useCallback((group: SupportGroup) => {
     if (group.isOnline && group.joinUrl) {
       window.open(group.joinUrl, '_blank');
     } else {

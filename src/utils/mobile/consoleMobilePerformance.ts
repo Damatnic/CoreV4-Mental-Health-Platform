@@ -54,7 +54,7 @@ class ConsoleMobilePerformance {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       return !!gl;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }
@@ -107,7 +107,7 @@ class ConsoleMobilePerformance {
         });
         
         this.performanceObserver.observe({ entryTypes: ['measure', 'navigation'] });
-      } catch (_error) {
+      } catch {
         console.warn('Performance Observer not supported:');
       }
     }

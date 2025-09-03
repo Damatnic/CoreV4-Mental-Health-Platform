@@ -292,7 +292,7 @@ export class CrisisScenarioTester {
       result.details.offlineResourcesAvailable = offlineTest.available;
 
       result.passed = result.errors.length === 0;
-    } catch (error) {
+    } catch {
       result.errors.push(`Test execution failed: ${error}`);
       result.passed = false;
     }
@@ -348,7 +348,7 @@ export class CrisisScenarioTester {
         responseTime,
         sessionCreated
       };
-    } catch (error) {
+    } catch {
       logger.error('Crisis chat simulation test failed:');
       return {
         counselorAssigned: false,
@@ -387,7 +387,7 @@ export class CrisisScenarioTester {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       this.mockServer.endSession(session.sessionId);
-    } catch (error) {
+    } catch {
       logger.error('Emergency protocol test failed:');
     }
 
@@ -461,7 +461,7 @@ export class CrisisScenarioTester {
           warnings: [],
           details: {}
         });
-      } catch (_error) {
+      } catch {
         this.testResults.push({
           scenarioId: `integration-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -481,7 +481,7 @@ export class CrisisScenarioTester {
       const __session = await mockWebSocketAdapter.createCrisisSession('medium');
       mockWebSocketAdapter.endCall();
       return true;
-    } catch (error) {
+    } catch {
       logger.error('WebSocket integration test failed:');
       return false;
     }
@@ -509,7 +509,7 @@ export class CrisisScenarioTester {
       const testLink = document.createElement('a');
       testLink.href = 'tel:988';
       return testLink.href === 'tel:988';
-    } catch (_error) {
+    } catch {
       return false;
     }
   }
@@ -566,7 +566,7 @@ export class CrisisScenarioTester {
           warnings: duration > test.target * 0.8 ? [`Close to performance limit: ${duration}ms`] : [],
           details: {}
         });
-      } catch (_error) {
+      } catch {
         this.testResults.push({
           scenarioId: `performance-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -618,7 +618,7 @@ export class CrisisScenarioTester {
               emergencyContacts: ['988']
             });
             return plan && plan.id && plan.isActive;
-          } catch (_error) {
+          } catch {
             return false;
           }
         }
@@ -639,7 +639,7 @@ export class CrisisScenarioTester {
           warnings: [],
           details: {}
         });
-      } catch (_error) {
+      } catch {
         this.testResults.push({
           scenarioId: `offline-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
