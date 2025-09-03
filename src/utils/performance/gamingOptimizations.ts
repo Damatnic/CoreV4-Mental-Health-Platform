@@ -96,7 +96,7 @@ class GamePerformanceOptimizer {
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
       const longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const longTask = entry as any;
+          const longTask = entry as PerformanceEntry;
           if (longTask.duration > 16.67) { // Longer than one frame at 60fps
             this.handleLongTask(longTask);
           }
@@ -111,8 +111,8 @@ class GamePerformanceOptimizer {
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('layout-shift')) {
       const layoutShiftObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const layoutShift = entry as any;
-          if (layoutShift.value > 0.1) { // Significant layout shift
+          const layoutShift = entry as PerformanceEntry & { value?: number };
+          if (layoutShift.value && layoutShift.value > 0.1) { // Significant layout shift
             this.optimizeLayoutStability();
           }
         }
@@ -288,7 +288,7 @@ class GamePerformanceOptimizer {
     });
   }
   
-  private handleLongTask(task: any): void {
+  private handleLongTask(task: PerformanceEntry): void {
     logger.warn(`[Gaming Performance] Long task detected: ${task.duration}ms`);
     
     // If we're in crisis mode, this is critical
@@ -367,7 +367,7 @@ class GamePerformanceOptimizer {
     
     // Force garbage collection if available (development only)
     if ('gc' in window && process.env.NODE_ENV === 'development') {
-      (window as any).gc();
+      (window as unknown).gc();
     }
     
     // Clean up performance entries

@@ -281,7 +281,7 @@ export class ComprehensiveNotificationService {
         },
         conditions: [],
         content: {
-          title: 'Self-Care Time 🧘‍♀️',
+          title: 'Self-Care Time 🧘♀️',
           body: 'You\'ve worked hard today. Take some time for yourself with a relaxing activity.',
           icon: '/icons/self-care.png',
           actions: [
@@ -690,7 +690,7 @@ export class ComprehensiveNotificationService {
     try {
       const userProfile = await secureStorage.getItem('user_profile');
       return userProfile?.name || null;
-    } catch {
+    } catch (_error) {
       return null;
     }
   }
@@ -703,7 +703,7 @@ export class ComprehensiveNotificationService {
         return `Last mood: ${latest.mood} (${latest.energy}/10 energy)`;
       }
       return null;
-    } catch {
+    } catch (_error) {
       return null;
     }
   }
@@ -719,7 +719,7 @@ export class ComprehensiveNotificationService {
           weeklyStreak: 5
         }
       };
-    } catch {
+    } catch (_error) {
       return null;
     }
   }
@@ -1006,4 +1006,4 @@ export class ComprehensiveNotificationService {
   }
 }
 
-export const comprehensiveNotificationService = new ComprehensiveNotificationService();
+export const _comprehensiveNotificationService = new ComprehensiveNotificationService();

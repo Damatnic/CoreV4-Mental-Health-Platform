@@ -148,7 +148,7 @@ export function ConsoleDashboard() {
 
           {/* Professionals */}
           <ConsoleTile
-            title="👨‍⚕️ Professionals"
+            title="👨⚕️ Professionals"
             description="Licensed therapists & counselors"
             icon={<Stethoscope className="h-6 w-6 text-white" />}
             gradient="professional"
@@ -248,7 +248,7 @@ export function ConsoleDashboard() {
                 <div className="text-4xl mb-3">
                   🌟
                 </div>
-                <div className="text-lg font-semibold text-white mb-2">You&apos;re Not Alone</div>
+                <div className="text-lg font-semibold text-white mb-2">You're Not Alone</div>
                 <div className="text-gray-300 text-sm">
                   Thousands of people are here to support you on your journey
                 </div>

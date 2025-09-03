@@ -158,8 +158,8 @@ class TouchOptimizationManager {
   private handleMultiTouchStart(touches: Touch[], timestamp: number): void {
     if (touches.length === 2 && touches[0] && touches[1]) {
       // Initialize pinch/zoom gesture
-      const _distance = this.calculateDistance(touches[0], touches[1]);
-      const _angle = this.calculateAngle(touches[0], touches[1]);
+      const __distance = this.calculateDistance(touches[0], touches[1]);
+      const __angle = this.calculateAngle(touches[0], touches[1]);
       
       const gesture: TouchGesture = {
         type: 'pinch',
@@ -427,7 +427,7 @@ class TouchOptimizationManager {
       genericListeners.forEach(_callback => {
         try {
           _callback(_gesture);
-        } catch (_error) {
+        } catch (error) {
           logger.error('Error in generic gesture listener:');
         }
       });
@@ -624,7 +624,7 @@ export type { TouchGesture, TouchOptimizationOptions, TouchPoint };
 export { TouchOptimizationManager };
 
 // Additional mobile optimization utilities
-export const _MobileOptimizationUtils = {
+export const __MobileOptimizationUtils = {
   // Prevent zoom on double-tap
   preventDoubleTapZoom(element: HTMLElement): void {
     element.addEventListener('touchend', (event) => {

@@ -10,7 +10,7 @@ interface WellnessStatusWidgetProps {
 }
 
 export function WellnessStatusWidget({ data, error }: WellnessStatusWidgetProps) {
-  const navigate = useNavigate();
+  const _navigate  = useNavigate();
 
   if (_error) {
     return (

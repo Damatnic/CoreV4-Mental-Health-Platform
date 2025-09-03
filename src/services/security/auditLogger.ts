@@ -164,7 +164,7 @@ class AuditLoggerService {
       if (entry.severity === 'critical') {
         this.notifyCriticalEvent(_entry);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to log audit event:');
       // Audit logging should never throw - fail silently but log to console
     }
@@ -236,7 +236,7 @@ class AuditLoggerService {
       const limit = filters.limit || 100;
       
       return filteredLogs.slice(offset, offset + limit);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to query audit logs:');
       return [];
     }
@@ -258,7 +258,7 @@ class AuditLoggerService {
       } else {
         return this.convertToCSV(_logs);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to export audit logs:');
       throw new Error('Export failed');
     }
@@ -281,7 +281,7 @@ class AuditLoggerService {
         dataToVerify,
         log.signature
       );
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to verify log integrity:');
       return false;
     }
@@ -315,7 +315,7 @@ class AuditLoggerService {
     
     const logs = await this.query({ startDate, endDate: now });
     
-    const stats = {
+    const __stats = {
       totalEvents: logs.length,
       byEvent: {} as Record<string, number>,
       bySeverity: {} as Record<string, number>,
@@ -381,7 +381,7 @@ class AuditLoggerService {
           log => new Date(log.timestamp) > recentDate
         );
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load stored audit logs:');
     }
   }
@@ -407,7 +407,7 @@ class AuditLoggerService {
       
       // Clear memory buffer of persisted logs
       this.logs = [];
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to persist audit logs:');
     }
   }
@@ -448,7 +448,7 @@ class AuditLoggerService {
           compress: true,
         });
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to cleanup old audit logs:');
     }
   }
@@ -545,4 +545,4 @@ class AuditLoggerService {
   }
 }
 
-export const auditLogger = AuditLoggerService.getInstance();
+export const _auditLogger = AuditLoggerService.getInstance();

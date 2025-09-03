@@ -26,7 +26,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Emma Chen',
     specialty: 'Anxiety & Depression',
     description: 'Warm, empathetic specialist in cognitive behavioral therapy and mindfulness. Known for her gentle approach to anxiety management.',
-    avatar: '👩‍⚕️',
+    avatar: '👩⚕️',
     personality: 'Gentle, understanding, with a deeply calming presence',
     experience: '12+ years in clinical psychology',
     approach: 'CBT, Mindfulness-Based Therapy, EMDR',
@@ -40,7 +40,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Marcus Johnson',
     specialty: 'Trauma & PTSD Recovery',
     description: 'Experienced trauma specialist with expertise in EMDR and somatic therapy. Compassionate approach to healing complex trauma.',
-    avatar: '👨‍⚕️',
+    avatar: '👨⚕️',
     personality: 'Strong, supportive, and deeply empathetic with trauma survivors',
     experience: '15+ years in trauma-informed therapy',
     approach: 'EMDR, Somatic Therapy, Trauma-Informed CBT',
@@ -54,7 +54,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Sofia Rodriguez',
     specialty: 'Relationships & Family Dynamics',
     description: 'Expert in couples therapy and family systems. Specializes in communication, attachment, and relationship repair.',
-    avatar: '👩‍🦰',
+    avatar: '👩🦰',
     personality: 'Insightful, patient, excellent at reading interpersonal dynamics',
     experience: '10+ years in couples & family therapy',
     approach: 'Gottman Method, EFT, Family Systems Therapy',
@@ -68,7 +68,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Alex Thompson',
     specialty: 'Life Transitions & Personal Growth',
     description: 'Specializes in major life changes, career transitions, and personal development. Combines therapy with life coaching.',
-    avatar: '🧑‍⚕️',
+    avatar: '🧑⚕️',
     personality: 'Motivating, practical, forward-thinking growth mindset',
     experience: '8+ years in positive psychology & coaching',
     approach: 'Positive Psychology, ACT, Solution-Focused Therapy',
@@ -82,7 +82,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Maya Patel',
     specialty: 'Stress & Burnout Recovery',
     description: 'Expert in workplace stress, burnout prevention, and work-life balance. Helps high-achievers find sustainable success.',
-    avatar: '👩‍💼',
+    avatar: '👩💼',
     personality: 'Practical, energetic, results-oriented with compassion',
     experience: '11+ years in occupational psychology',
     approach: 'Stress Management, Resilience Training, Mindfulness',
@@ -96,7 +96,7 @@ const therapists: Therapist[] = [
     name: 'Dr. James Wilson',
     specialty: 'Addiction & Recovery Support',
     description: 'Compassionate addiction specialist focused on sustainable recovery, relapse prevention, and family healing.',
-    avatar: '👨‍🔬',
+    avatar: '👨🔬',
     personality: 'Non-judgmental, hopeful, steadfast in recovery support',
     experience: '18+ years in addiction medicine',
     approach: '12-Step Integration, Motivational Interviewing, Harm Reduction',
@@ -110,7 +110,7 @@ const therapists: Therapist[] = [
     name: 'Dr. Sarah Kim',
     specialty: 'Youth & Adolescent Mental Health',
     description: 'Specializes in teen and young adult mental health. Expert in identity development, social anxiety, and family dynamics.',
-    avatar: '👩‍🎓',
+    avatar: '👩🎓',
     personality: 'Relatable, understanding, speaks the language of young people',
     experience: '9+ years in adolescent psychology',
     approach: 'DBT for Teens, Family Therapy, Identity Development',
@@ -124,7 +124,7 @@ const therapists: Therapist[] = [
     name: 'Dr. David Brown',
     specialty: 'Men\'s Mental Health & Masculinity',
     description: 'Focuses on men\'s unique mental health challenges, emotional expression, and redefining healthy masculinity.',
-    avatar: '👨‍🦲',
+    avatar: '👨🦲',
     personality: 'Direct, authentic, creates safe space for vulnerability',
     experience: '13+ years specializing in men\'s issues',
     approach: 'Masculine Psychology, Emotion-Focused Therapy, CBT',
@@ -146,7 +146,7 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
   selectedTherapist,
   _showDetailedView = true
 }) => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [__hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [filterSpecialty, setFilterSpecialty] = useState<string>('all');
 
   const specialties = [...new Set(therapists.map(t => t.specialty))];
@@ -323,7 +323,7 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
             These AI therapists are advanced conversational companions designed to provide personalized mental health support. 
             They combine evidence-based therapeutic approaches with AI technology to offer accessible, immediate help. 
             <strong className="text-white"> They complement but do not replace professional mental health treatment.</strong> 
-            If you&apos;re experiencing a mental health emergency, please contact emergency services or call 988.
+            If you're experiencing a mental health emergency, please contact emergency services or call 988.
           </p>
         </div>
       </motion.div>

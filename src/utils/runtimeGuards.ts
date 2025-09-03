@@ -35,7 +35,7 @@ export function safeCall<T extends (...args: unknown[]) => any>(
       return fn(...args);
     }
     return defaultValue;
-  } catch (_error) {
+  } catch (error) {
     logger.error('Safe call failed:', e);
     return defaultValue;
   }
@@ -50,9 +50,9 @@ export function initializeVariable<T>(
   try {
     const result = getter();
     return result !== undefined ? result : defaultValue;
-  } catch {
+  } catch (_error) {
     if (e instanceof ReferenceError && e.message.includes('before initialization')) {
-      logger.warn(`Temporal dead zone detected for ${varName || 'variable'}, using default:`, defaultValue);
+      logger.warn(`Temporal dead zone detected for ${varName || 'variable'} })(), using default:`, defaultValue);
       return defaultValue;
     }
     throw e; // Re-throw other errors
@@ -99,7 +99,7 @@ export function setupRuntimeGuards() {
       // Keep only last 50 errors
       const _recentErrors = errorLog.slice(-50);
       localStorage.setItem('runtime_errors', JSON.stringify(_recentErrors));
-    } catch (_error) {
+    } catch (error) {
       logger.warn('Failed to log runtime error: ', e);
     }
     

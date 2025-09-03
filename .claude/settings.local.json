@@ -77,7 +77,8 @@
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C/**)",
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src/**)",
       "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\components/**)",
-      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\hooks/**)"
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\hooks/**)",
+      "Bash(timeout 30 npx eslint . --ext .ts,.tsx,.js,.jsx --format compact)"
     ],
     "deny": [],
     "ask": []

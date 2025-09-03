@@ -160,7 +160,7 @@ class RealtimeSyncService extends EventEmitter {
           reject(_error);
         });
         
-      } catch (_error) {
+      } catch (error) {
         reject(_error);
       }
     });
@@ -674,7 +674,7 @@ class RealtimeSyncService extends EventEmitter {
 }
 
 // Export singleton instance
-export const _realtimeSyncService = RealtimeSyncService.getInstance();
+export const __realtimeSyncService = RealtimeSyncService.getInstance();
 
 // Export React hook
 export function useRealtimeSync() {

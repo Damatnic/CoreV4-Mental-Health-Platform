@@ -31,12 +31,26 @@ interface ProcessingResponse {
   processingTime: number;
 }
 
+interface ProcessingOptions {
+  interval?: 'day' | 'week' | 'month';
+  smoothing?: boolean;
+  sampling?: number;
+  trendLine?: boolean;
+}
+
+interface Patterns {
+  weeklyPattern: { day: number; average: number }[];
+  monthlyPattern: unknown[];
+  peaks: unknown[];
+  troughs: unknown[];
+}
+
 // Utility functions for data processing
 const dataProcessors = {
   /**
    * Process mood data for visualization
    */
-  processMoodData(data: ChartDataPoint[], options: any = {}) {
+  processMoodData(data: ChartDataPoint[], options: ProcessingOptions = {}) {
     const startTime = performance.now();
     
     // Group by interval
@@ -66,14 +80,14 @@ const dataProcessors = {
   /**
    * Aggregate wellness metrics
    */
-  aggregateWellness(data: ChartDataPoint[], _options: any = {}) {
+  aggregateWellness(data: ChartDataPoint[], _options: ProcessingOptions = {}) {
     const startTime = performance.now();
     
     // Calculate rolling averages
     const rollingAvg = this.calculateRollingAverage(data, 7);
     
     // Identify patterns
-    const patterns = this.identifyPatterns(data);
+    const _patterns = this.identifyPatterns(data);
     
     // Calculate wellness score
     const wellnessScore = this.calculateWellnessScore(data);
@@ -90,7 +104,7 @@ const dataProcessors = {
   /**
    * Calculate trend lines and predictions
    */
-  calculateTrends(data: ChartDataPoint[], _options: any = {}) {
+  calculateTrends(data: ChartDataPoint[], _options: ProcessingOptions = {}) {
     const startTime = performance.now();
     
     // Linear regression for trend line
@@ -122,7 +136,7 @@ const dataProcessors = {
   /**
    * Sample large datasets for performance
    */
-  sampleData(data: ChartDataPoint[], options: any = {}) {
+  sampleData(data: ChartDataPoint[], options: ProcessingOptions = {}) {
     const targetSize = options.sampling || 100;
     
     if (data.length <= targetSize) {
@@ -159,8 +173,7 @@ const dataProcessors = {
       let key: string;
       
       switch (interval) {
-        case 'week':
-          const week = this.getWeekNumber(date);
+        case "week": { const week = this.getWeekNumber(date);
           key = `${date.getFullYear()}-W${week}`;
           break;
         case 'month':
@@ -187,7 +200,7 @@ const dataProcessors = {
     return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
   },
 
-  applySmoothing(data: any[], windowSize: number) {
+  applySmoothing(data: ChartDataPoint[], windowSize: number) {
     const smoothed = [];
     
     for (let i = 0; i < data.length; i++) {
@@ -246,7 +259,7 @@ const dataProcessors = {
   },
 
   identifyPatterns(data: ChartDataPoint[]) {
-    const patterns = {
+    const _patterns = {
       weeklyPattern: this.findWeeklyPattern(data),
       monthlyPattern: this.findMonthlyPattern(data),
       peaks: this.findPeaks(data),
@@ -321,7 +334,7 @@ const dataProcessors = {
     return Math.min(100, Math.max(0, (avgMood * 10 * consistency * trendScore)));
   },
 
-  generateInsights(patterns: any, wellnessScore: number) {
+  generateInsights(patterns: Patterns, wellnessScore: number) {
     const insights = [];
     
     if (wellnessScore > 70) {
@@ -333,7 +346,7 @@ const dataProcessors = {
     }
     
     // Weekly pattern insights
-    const bestDay = patterns.weeklyPattern.reduce((best: any, current: any) => 
+    const bestDay = patterns.weeklyPattern.reduce((best, current) => 
       current.average > best.average ? current : best
     );
     insights.push(`You tend to feel best on ${this.getDayName(bestDay.day)}s.`);

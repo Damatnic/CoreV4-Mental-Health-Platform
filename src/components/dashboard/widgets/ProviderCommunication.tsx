@@ -103,13 +103,13 @@ export function ProviderCommunication({
   _onMarkAsRead,
   onArchiveThread
 }: ProviderCommunicationProps) {
-  const [activeTab, setActiveTab] = useState<'messages' | 'appointments' | 'documents' | 'secure'>('messages');
-  const [selectedThread, setSelectedThread] = useState<CommunicationThread | null>(null);
-  const [_composeMode, setComposeMode] = useState(false);
+  const [activeTab, _setActiveTab] = useState<'messages' | 'appointments' | 'documents' | 'secure'>('messages');
+  const [selectedThread, _setSelectedThread] = useState<CommunicationThread | null>(null);
+  const [_composeMode, _setComposeMode] = useState(false);
   const [messageContent, setMessageContent] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [_showUploadModal, setShowUploadModal] = useState(false);
+  const [searchQuery, _setSearchQuery] = useState('');
+  const [filterCategory, _setFilterCategory] = useState<string>('all');
+  const [_showUploadModal, _setShowUploadModal] = useState(false);
 
   // Get unread message count
   const unreadCount = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);

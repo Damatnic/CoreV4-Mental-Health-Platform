@@ -178,7 +178,7 @@ class MinimalMentalHealthServer {
         
         logger.info('✅ Server ready for mental health platform deployment');
       });
-    } catch (error) {
+    } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
       logger.error('❌ Failed to start server:', error);
       process.exit(1);
     }

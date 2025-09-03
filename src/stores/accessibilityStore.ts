@@ -192,7 +192,7 @@ const defaultPresets: AccessibilityPreset[] = [
   }
 ];
 
-export const _useAccessibilityStore = create<AccessibilityStore>()(
+export const __useAccessibilityStore = create<AccessibilityStore>()(
   persist(
     (set, get) => ({
       settings: defaultSettings,

@@ -61,19 +61,12 @@ interface Recommendation {
 }
 
 export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
-  const { 
-    wellnessMetrics, 
-    wellnessGoals, 
-    moodEntries,
-    weeklyScore,
-    monthlyScore,
-    _calculateWellnessScores 
-  } = useWellnessStore();
+  const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, _calculateWellnessScores } = useWellnessStore();
   
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showGoalModal, setShowGoalModal] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showGoalModal, _setShowGoalModal] = useState(false);
+  const [editingGoal, _setEditingGoal] = useState<string | null>(null);
 
   // Calculate today's metrics
   const todayMetrics = useMemo(() => {
@@ -294,7 +287,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
         });
       } else if (percentage >= 100 && metric.streak && metric.streak >= 7) {
         recs.push({ metric: metric.title,
-          message: `Great job! You&apos;re on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
+          message: `Great job! You're on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
           priority: 'low' as Priority,
           action: () => onViewDetails?.(metric.id)
         });

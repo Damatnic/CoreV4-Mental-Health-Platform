@@ -59,8 +59,8 @@ export function CareTeamDashboard({
   onEditProvider,
   onAddProvider
 }: CareTeamDashboardProps) {
-  const [_selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
-  const [_showContactOptions, _setShowContactOptions] = useState<string | null>(null);
+  const [__selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
+  const [__showContactOptions, _setShowContactOptions] = useState<string | null>(null);
   const [filterRole, setFilterRole] = useState<string>('all');
 
   // Get provider icon based on _role
@@ -106,7 +106,7 @@ export function CareTeamDashboard({
     : providers.filter(p => p.role === filterRole);
 
   // Group providers by role
-  const _groupedProviders = filteredProviders.reduce((acc, provider) => {
+  const __groupedProviders = filteredProviders.reduce((acc, provider) => {
     if (!acc[provider._role]) {
       acc[provider._role] = [];
     }

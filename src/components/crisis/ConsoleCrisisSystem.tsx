@@ -48,11 +48,11 @@ const _CONSOLE_CRISIS_LEVELS: Record<string, CrisisLevel> = {
 
 export function ConsoleCrisisSystem() {
   const [currentCrisisLevel, _setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
-  const [_showEmergencyDialog, _setShowEmergencyDialog] = useState(false);
-  const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
+  const [__showEmergencyDialog, _setShowEmergencyDialog] = useState(false);
+  const [userLocation, _setUserLocation] = useState<GeolocationPosition | null>(null);
   const [activeTab, setActiveTab] = useState<'emergency' | 'resources' | 'safety' | 'chat'>('emergency');
-  const [responseTime, setResponseTime] = useState(0);
-  const [pulseIntensity, setPulseIntensity] = useState(1);
+  const [responseTime, _setResponseTime] = useState(0);
+  const [pulseIntensity, _setPulseIntensity] = useState(1);
 
   // Enhanced pulse effect for critical situations
   useEffect(() => {

@@ -101,7 +101,7 @@ export type Milestone = z.infer<typeof MilestoneSchema>;
 export type Challenge = z.infer<typeof ChallengeSchema>;
 
 // Achievement definitions
-const _ACHIEVEMENTS = {
+const __ACHIEVEMENTS = {
   // Community Achievements
   FIRST_POST: {
     id: 'first-post',
@@ -206,6 +206,24 @@ const _ACHIEVEMENTS = {
     points: 500,
   },
 };
+
+interface KudosEntry {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  message: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt?: string;
+  [key: string]: unknown;
+}
 
 class GamificationService {
   private apiClient = axios.create({
@@ -381,14 +399,14 @@ class GamificationService {
     toast.success('Kudos sent! You are making someone\'s day better 💝');
   }
 
-  async getKudosHistory(userId?: string): Promise<any[]> {
+  async getKudosHistory(userId?: string): Promise<KudosEntry[]> {
     const response = await this.apiClient.get(`/gamification/kudos/${userId || 'me'}`);
     return response.data;
   }
 
   // =============== Badges & Titles ===============
 
-  async getBadges(userId?: string): Promise<any[]> {
+  async getBadges(userId?: string): Promise<Badge[]> {
     const response = await this.apiClient.get(`/gamification/badges/${userId || 'me'}`);
     return response.data;
   }
@@ -491,4 +509,4 @@ class GamificationService {
 }
 
 // Export singleton instance
-export const _gamificationService = new GamificationService();
+export const __gamificationService = new GamificationService();

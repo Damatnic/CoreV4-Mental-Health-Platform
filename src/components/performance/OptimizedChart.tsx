@@ -79,14 +79,14 @@ export function OptimizedChart({
   className = '',
 }: OptimizedChartProps) {
   const chartRef = useRef<unknown>(null);
-  const _canvasRef = useRef<HTMLCanvasElement>(null);
+  const ___canvasRef  = useRef<HTMLCanvasElement>(null);
   const [processedData, setProcessedData] = useState<ChartData | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [__isProcessing, setIsProcessing] = useState(false);
   const [_error, setError] = useState<string | null>(null);
   
   // Use deferred value for non-critical updates
   const deferredData = useDeferredValue(_data);
-  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
+  const [_isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
 
   // Performance monitoring
   useEffect(() => {
@@ -125,7 +125,7 @@ export function OptimizedChart({
 
       performanceMonitor.measureEnd('chart-data-processing');
       return chartData;
-    } catch (_error) {
+    } catch (error) {
       performanceMonitor.measureEnd('chart-data-processing');
       throw _error;
     }
@@ -212,7 +212,7 @@ export function OptimizedChart({
           
           setIsProcessing(false);
         });
-      } catch (_error) {
+      } catch (error) {
         logger.error('Chart data processing _error');
         setError('Processing failed');
         setIsProcessing(false);
@@ -221,7 +221,7 @@ export function OptimizedChart({
         try {
           const _fallbackData = processDataOnMainThread(_deferredData);
           setProcessedData(_fallbackData);
-        } catch (_error) {
+        } catch (error) {
     logger.error('Fallback processing failed');
         }
       }
@@ -231,7 +231,7 @@ export function OptimizedChart({
   }, [deferredData, processDataWithWorker, processDataOnMainThread, startPrioritizedTransition, type, onDataProcessed]);
 
   // Optimized chart options
-  const optimizedOptions = useMemo<ChartOptions>(() => ({
+  const _optimizedOptions  = useMemo<ChartOptions>(() => ({
     ...options,
     responsive: true,
     maintainAspectRatio: false,
@@ -307,7 +307,7 @@ export function OptimizedChart({
   }, []);
 
   // Render appropriate chart component
-  const ChartComponent = useMemo(() => {
+  const _ChartComponent  = useMemo(() => {
     switch (_type) {
       case 'bar':
         return Bar;
@@ -358,10 +358,10 @@ export function MoodChart({
   showInsights = true,
   ...props 
 }: unknown) {
-  const [insights, setInsights] = useState<string[]>([]);
-  const [wellnessScore, setWellnessScore] = useState<number | null>(null);
+  const [insights, _setInsights] = useState<string[]>([]);
+  const [wellnessScore, _setWellnessScore] = useState<number | null>(null);
 
-  const handleDataProcessed = useCallback((result: unknown) => {
+  const _handleDataProcessed  = useCallback((result: unknown) => {
     if (result.insights) {
       setInsights(result.insights);
     }

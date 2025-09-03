@@ -333,7 +333,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                   Location Type
                 </legend>
                 <div className="flex items-center space-x-4">
-                  <label className="flex items-center">
+                  <label className="flex items-center" htmlFor="location-online">
                     <input
                       type="radio"
                       name="location-type"
@@ -344,7 +344,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                     />
                     <span className="ml-2 text-sm text-gray-700">Online</span>
                   </label>
-                  <label className="flex items-center">
+                  <label className="flex items-center" htmlFor="location-online">
                     <input
                       type="radio"
                       name="location-type"
@@ -482,9 +482,9 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
 export function CommunityEvents() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [__showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedType, _setSelectedType] = useState<string>('all');
+  const [dateFilter, _setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
   // Calculate date range based on filter
   const getDateRange = () => {
@@ -515,7 +515,7 @@ export function CommunityEvents() {
   });
 
   // Register for event mutation
-  const registerMutation = useMutation({
+  const _registerMutation  = useMutation({
     mutationFn: (_eventId: string) => communityService.registerForEvent(_eventId),
     onSuccess: () => {
       toast.success('Successfully registered for event!');
@@ -527,7 +527,7 @@ export function CommunityEvents() {
   });
 
   // Unregister from event mutation
-  const unregisterMutation = useMutation({
+  const _unregisterMutation  = useMutation({
     mutationFn: (_eventId: string) => communityService.unregisterFromEvent(_eventId),
     onSuccess: () => {
       toast.success('Registration cancelled');

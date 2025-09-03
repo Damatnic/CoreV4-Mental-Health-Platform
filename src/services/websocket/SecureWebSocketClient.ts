@@ -113,7 +113,7 @@ export class SecureWebSocketClient {
         });
       });
 
-    } catch (_error) {
+    } catch (error) {
       logger.error('❌ WebSocket connection error: ');
       this.isConnected = false;
       this.onConnectionChange?.(false);
@@ -205,7 +205,7 @@ export class SecureWebSocketClient {
       this.disconnect();
       await new Promise(resolve => setTimeout(resolve, 2000));
       await this.connect();
-    } catch (_error) {
+    } catch (error) {
       logger.error('❌ Failed to handle auth error: ');
       this.onError?.(_undefined);
     }
@@ -250,7 +250,7 @@ export class SecureWebSocketClient {
     setTimeout(async () => {
       try {
         await this.connect();
-      } catch (_error) {
+      } catch (error) {
         logger.error('❌ Reconnection failed:');
       }
     }, delay);
@@ -390,4 +390,4 @@ export class SecureWebSocketClient {
 }
 
 // Export singleton instance
-export const _secureWebSocket = SecureWebSocketClient.getInstance();
+export const __secureWebSocket = SecureWebSocketClient.getInstance();

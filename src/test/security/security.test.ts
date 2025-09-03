@@ -447,7 +447,7 @@ describe('Security Testing Suite', () => {
       
       // Make multiple rapid requests
       const responses = await page.evaluate(async () => {
-        const results = [];
+        const __results = [];
         for (let i = 0; i < 100; i++) {
           const res = await fetch('/api/data');
           results.push(res.status);

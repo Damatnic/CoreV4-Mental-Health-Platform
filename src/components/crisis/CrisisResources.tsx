@@ -80,12 +80,12 @@ interface CrisisResourcesProps {
 }
 
 export function CrisisResources({ location }: CrisisResourcesProps) {
-  const [resources, setResources] = useState<Resource[]>(_MOCK_RESOURCES);
-  const [filteredResources, setFilteredResources] = useState<Resource[]>(_MOCK_RESOURCES);
+  const [resources, _setResources] = useState<Resource[]>(_MOCK_RESOURCES);
+  const [filteredResources, _setFilteredResources] = useState<Resource[]>(_MOCK_RESOURCES);
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, _setShowMap] = useState(false);
 
   // Filter resources based on type and search _query
   useEffect(() => {
@@ -118,13 +118,13 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
     try {
       // In production, this would make an API call to fetch real resources
       // For now, we'll simulate with mock data and calculated distances
-      const _resourcesWithDistance = MOCK_RESOURCES.map(resource => ({
+      const resourcesWithDistance = MOCK_RESOURCES.map(resource => ({
         ...resource,
         distance: calculateDistance(lat, lng, resource.lat || 0, resource.lng || 0)
       }));
-      setResources(_resourcesWithDistance);
-    } catch (_error) {
-      logger.error('Error fetching resources:');
+      setResources(resourcesWithDistance);
+    } catch (error) {
+      logger.error('Error fetching resources', 'CrisisResources', error);
     } finally {
       setIsLoading(false);
     }

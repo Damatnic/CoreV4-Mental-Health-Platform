@@ -125,15 +125,15 @@ export function TherapySessionLogger({
   readOnly = false,
   isProvider = false
 }: TherapySessionLoggerProps) {
-  const [activeTab, setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
-  const [sessionTimer, setSessionTimer] = useState(0);
+  const [activeTab, _setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
+  const [sessionTimer, _setSessionTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [currentSession, setCurrentSession] = useState<TherapySession>(_session);
   const [newNote, setNewNote] = useState('');
   const [noteType, setNoteType] = useState<SessionNote['type']>('observation');
-  const [showRiskAssessment, setShowRiskAssessment] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [videoEnabled, setVideoEnabled] = useState(true);
+  const [__showRiskAssessment, setShowRiskAssessment] = useState(false);
+  const [audioEnabled, _setAudioEnabled] = useState(true);
+  const [videoEnabled, _setVideoEnabled] = useState(true);
 
   // _Timer effect
   useEffect(() => {
@@ -234,7 +234,7 @@ export function TherapySessionLogger({
   };
 
   // Get progress color
-  const _getProgressColor = (progress: number) => {
+  const __getProgressColor = (progress: number) => {
     if (progress >= 80) return 'text-green-600 bg-green-100';
     if (progress >= 60) return 'text-blue-600 bg-blue-100';
     if (progress >= 40) return 'text-yellow-600 bg-yellow-100';
@@ -753,11 +753,11 @@ export function TherapySessionLogger({
                   />
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2 text-sm">
-                      <label className="flex items-center space-x-1">
+                      <label htmlFor="input_xx89sx5da" className="flex items-center space-x-1">
                         <input type="checkbox" className="rounded" />
                         <span>Mark as important</span>
                       </label>
-                      <label className="flex items-center space-x-1">
+                      <label htmlFor="input_t00kg3agu" className="flex items-center space-x-1">
                         <input type="checkbox" className="rounded" />
                         <span>Private note</span>
                       </label>
@@ -1082,7 +1082,7 @@ export function TherapySessionLogger({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Suicidal Ideation</label>
+                    <label htmlFor="input_hatnuoz6v" className="text-sm font-medium text-gray-700">Suicidal Ideation</label>
                     <div className={`mt-1 p-2 rounded text-sm ${
                       currentSession.outcome.riskAssessment.suicidalIdeation === 'none' ? 'bg-green-100 text-green-800' :
                       currentSession.outcome.riskAssessment.suicidalIdeation === 'passive' ? 'bg-yellow-100 text-yellow-800' :
@@ -1092,7 +1092,7 @@ export function TherapySessionLogger({
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Self Harm</label>
+                    <label htmlFor="input_hxbmg0gky" className="text-sm font-medium text-gray-700">Self Harm</label>
                     <div className={`mt-1 p-2 rounded text-sm ${
                       currentSession.outcome.riskAssessment.selfHarm === 'none' ? 'bg-green-100 text-green-800' :
                       currentSession.outcome.riskAssessment.selfHarm === 'thoughts' ? 'bg-yellow-100 text-yellow-800' :
@@ -1105,7 +1105,7 @@ export function TherapySessionLogger({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Substance Use</label>
+                    <label htmlFor="input_r1ckq4fx9" className="text-sm font-medium text-gray-700">Substance Use</label>
                     <div className={`mt-1 p-2 rounded text-sm ${
                       currentSession.outcome.riskAssessment.substanceUse === 'none' ? 'bg-green-100 text-green-800' :
                       currentSession.outcome.riskAssessment.substanceUse === 'mild_concern' ? 'bg-yellow-100 text-yellow-800' :
@@ -1115,7 +1115,7 @@ export function TherapySessionLogger({
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Overall Risk</label>
+                    <label htmlFor="input_zmcbortqk" className="text-sm font-medium text-gray-700">Overall Risk</label>
                     <div className={`mt-1 p-2 rounded text-sm ${
                       currentSession.outcome.riskAssessment.overallRisk === 'low' ? 'bg-green-100 text-green-800' :
                       currentSession.outcome.riskAssessment.overallRisk === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
@@ -1128,7 +1128,7 @@ export function TherapySessionLogger({
 
                 {currentSession.outcome.riskAssessment.interventionsNeeded && currentSession.outcome.riskAssessment.interventionsNeeded.length > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">Interventions Needed</label>
+                    <label htmlFor="input_03tn8jd4w" className="text-sm font-medium text-gray-700 mb-2 block">Interventions Needed</label>
                     <div className="space-y-1">
                       {currentSession.outcome.riskAssessment.interventionsNeeded.map((intervention, index) => (
                         <div key={index} className="p-2 bg-orange-50 rounded text-sm">

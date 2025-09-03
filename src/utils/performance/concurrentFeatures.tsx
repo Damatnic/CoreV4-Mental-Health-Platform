@@ -32,7 +32,7 @@ export enum UpdatePriority {
 export function usePrioritizedTransition(priority: UpdatePriority = UpdatePriority.MEDIUM) {
   const [isPending, startTransition] = useTransition();
   
-  const prioritizedTransition = useCallback((callback: () => void) => {
+  const _prioritizedTransition  = useCallback((callback: () => void) => {
     if (priority === UpdatePriority.CRISIS) {
       // Crisis updates run immediately
       callback();
@@ -55,7 +55,7 @@ export function usePrioritizedDeferredValue<T>(
   value: T,
   priority: UpdatePriority = UpdatePriority.MEDIUM
 ): T {
-  const deferred = useDeferredValue(_value);
+  const _deferred  = useDeferredValue(_value);
   
   // For crisis priority, return immediate value
   if (priority === UpdatePriority.CRISIS) {

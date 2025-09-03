@@ -15,7 +15,7 @@ interface EmergencyContact {
 
 export function EmergencyContacts() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [__showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState<EmergencyContact | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -251,7 +251,10 @@ export function EmergencyContacts() {
           <div className="flex items-center justify-center min-h-screen px-4">
             <div
               className="fixed inset-0 bg-black opacity-50"
-              onClick={() => {
+              onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => {
+                setShowAddForm(false);
+                setEditingContact(null);
+                setFormData({ name: '', phone: '', relationship: '', notes: '' (e); } }} role="button" tabIndex={0}> {
                 setShowAddForm(false);
                 setEditingContact(null);
                 setFormData({ name: '', phone: '', relationship: '', notes: '' });
@@ -263,10 +266,11 @@ export function EmergencyContacts() {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Name *
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -275,10 +279,11 @@ export function EmergencyContacts() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-700 mb-1">
                     Phone Number *
                   </label>
                   <input
+                    id="contact-phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -287,10 +292,11 @@ export function EmergencyContacts() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="contact-relationship" className="block text-sm font-medium text-gray-700 mb-1">
                     Relationship
                   </label>
                   <input
+                    id="contact-relationship"
                     type="text"
                     value={formData.relationship}
                     onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
@@ -299,10 +305,11 @@ export function EmergencyContacts() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="contact-notes" className="block text-sm font-medium text-gray-700 mb-1">
                     Notes
                   </label>
                   <textarea
+                    id="contact-notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

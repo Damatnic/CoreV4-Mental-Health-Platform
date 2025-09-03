@@ -289,7 +289,7 @@ export class MockCrisisServer {
     this.emergencyCallbacks.forEach(callback => {
       try {
         callback(action, { ...data, protocol });
-      } catch (_error) {
+      } catch (error) {
         logger.error('Emergency callback failed:');
       }
     });
@@ -465,7 +465,7 @@ export class MockCrisisSession {
     this.messageCallbacks.forEach(callback => {
       try {
         callback(_counselorMessage);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Message callback failed:');
       }
     });
@@ -723,4 +723,4 @@ class CrisisMessageAnalyzer {
 }
 
 // Export singleton instance
-export const _mockCrisisServer = MockCrisisServer.getInstance();
+export const __mockCrisisServer = MockCrisisServer.getInstance();

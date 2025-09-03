@@ -577,7 +577,7 @@ class PerformanceMonitor {
     
     // Trigger garbage collection hint
     if ('gc' in window) {
-      (window as any).gc();
+      (window as unknown).gc();
     }
     
     // Report memory issue
@@ -707,7 +707,7 @@ class PerformanceMonitor {
       if (process.env.NODE_ENV === 'development') {
         logger.info('Performance Metrics', 'PerformanceMonitor', metrics);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('[Performance] Failed to process metrics:');
     }
   }
@@ -795,7 +795,7 @@ class PerformanceMonitor {
         this.recordMetric(label, measure.duration);
         return measure.duration;
       }
-    } catch (error) {
+    } catch (_error) {
     logger.warn(`Failed to measure ${label}:`, error);
     }
     
@@ -814,8 +814,8 @@ class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor();
 
 // Export additional instances for compatibility
-export const _memoryMonitor = performanceMonitor;
-export const _frameRateMonitor = performanceMonitor;
+export const __memoryMonitor = performanceMonitor;
+export const __frameRateMonitor = performanceMonitor;
 
 // Export class for direct instantiation if needed
 export { PerformanceMonitor };

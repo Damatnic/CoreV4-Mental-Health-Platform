@@ -45,8 +45,8 @@ const _DEFAULT_SAFETY_PLAN: SafetyPlanData = {
 
 export function SafetyPlan() {
   const [safetyPlan, setSafetyPlan] = useState<SafetyPlanData>(_DEFAULT_SAFETY_PLAN);
-  const [activeSection, setActiveSection] = useState<string>('warningSignals');
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeSection, _setActiveSection] = useState<string>('warningSignals');
+  const [isEditing, _setIsEditing] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
 
@@ -98,13 +98,13 @@ export function SafetyPlan() {
           text: 'I created a safety plan for crisis situations',
           url: window.location.href
         });
-      } catch (_error) {
-        logger.error('Error sharing');
+      } catch (error) {
+        logger.error('Error sharing safety plan', 'SafetyPlan', error);
       }
     } else {
       // Fallback: Copy to clipboard
-      const _planText = generatePlainTextPlan();
-      navigator.clipboard.writeText(_planText);
+      const planText = generatePlainTextPlan();
+      navigator.clipboard.writeText(planText);
       toast.success('Safety plan copied to clipboard!');
     }
   };
@@ -352,7 +352,7 @@ export function SafetyPlan() {
           {activeSection === 'warningSignals' && (
             <SectionEditor
               title="Warning Signals"
-              description="Early signs that I&apos;m beginning to feel unwell"
+              description="Early signs that I'm beginning to feel unwell"
               items={safetyPlan.warningSignals}
               onUpdate={(items: string[]) => handleUpdateSection('warningSignals', items)}
               isEditing={isEditing}

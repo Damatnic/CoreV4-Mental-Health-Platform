@@ -73,15 +73,15 @@ interface BreathingSession {
 }
 
 export const BreathingExercises: React.FC = () => {
-  const [selectedPattern, setSelectedPattern] = useState<keyof typeof BREATHING_PATTERNS>('4-7-8');
+  const [selectedPattern, _setSelectedPattern] = useState<keyof typeof BREATHING_PATTERNS>('4-7-8');
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'holdIn' | 'exhale' | 'holdOut'>('inhale');
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [cycleCount, setCycleCount] = useState(0);
+  const [_timeRemaining, setTimeRemaining] = useState(0);
+  const [__cycleCount, setCycleCount] = useState(0);
   const [sessionDuration, setSessionDuration] = useState(0);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
-  const [customDuration, setCustomDuration] = useState(5); // minutes
+  const [soundEnabled, _setSoundEnabled] = useState(true);
+  const [showSettings, _setShowSettings] = useState(false);
+  const [customDuration, _setCustomDuration] = useState(5); // minutes
   const [sessions, setSessions] = useState<BreathingSession[]>([]);
   const [stressLevelBefore, setStressLevelBefore] = useState<number | null>(null);
   
@@ -463,7 +463,7 @@ export const BreathingExercises: React.FC = () => {
               className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700"
             >
               <div className="max-w-md mx-auto">
-                <label className="block mb-4">
+                <label htmlFor="input_2expfw0n5" className="block mb-4">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Session Duration (_minutes)
                   </span>
@@ -484,7 +484,7 @@ export const BreathingExercises: React.FC = () => {
                 </label>
 
                 {!isActive && (
-                  <label className="block">
+                  <label htmlFor="input_g70crnqyn" className="block">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                       Pre-session Stress Level
                     </span>

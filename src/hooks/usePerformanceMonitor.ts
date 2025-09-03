@@ -28,15 +28,12 @@ interface PerformanceMonitorConfig {
 }
 
 export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
-  const {
-    enableLogging = process.env.NODE_ENV === 'development',
-    bufferSize = 100
-  } = config;
+  const { enableLogging = process.env.NODE_ENV === 'development', bufferSize = 100 } = config;
 
   const metricsBuffer = useRef<PerformanceMetric[]>([]);
 
   // Record metrics locally only - never sent anywhere
-  const recordMetric = useCallback((name: string, value: number, metadata?: Record<string, any>) => {
+  const _recordMetric  = useCallback((name: string, value: number, metadata?: Record<string, any>) => {
     const _metric: PerformanceMetric = {
       name,
       value,
@@ -59,7 +56,7 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
   }, [enableLogging, bufferSize]);
 
   // No-op flush - we never send data anywhere
-  const flushMetrics = useCallback(async () => {
+  const _flushMetrics  = useCallback(async () => {
     // Clear local buffer without sending
     metricsBuffer.current = [];
     

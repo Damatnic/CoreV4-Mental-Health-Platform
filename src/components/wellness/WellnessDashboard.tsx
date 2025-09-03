@@ -141,19 +141,7 @@ interface WellnessGoal {
 
 export const WellnessDashboard: React.FC = () => {
   // Use Zustand store for state management
-  const {
-    moodEntries,
-    wellnessMetrics,
-    wellnessGoals,
-    wellnessInsights,
-    weeklyScore,
-    _monthlyScore,
-    addWellnessGoal,
-    _updateGoalProgress,
-    calculateWellnessScores,
-    generateInsights,
-    exportData
-  } = useWellnessStore();
+  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = useWellnessStore();
 
   const [wellnessData, setWellnessData] = useState<WellnessData[]>([]);
   const [todayData, setTodayData] = useState<WellnessData>({
@@ -162,10 +150,10 @@ export const WellnessDashboard: React.FC = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof WELLNESS_CATEGORIES | 'all'>('all');
   const [habitStreaks, setHabitStreaks] = useState<HabitStreak[]>([]);
-  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [__showAddGoal, setShowAddGoal] = useState(false);
   const [newGoal, setNewGoal] = useState<Partial<WellnessGoal & { description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }>>({});
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [showExportOptions, setShowExportOptions] = useState(false);
+  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [showExportOptions, _setShowExportOptions] = useState(false);
 
   // Load saved data and calculate scores on mount
   useEffect(() => {
@@ -265,7 +253,7 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Add sleep data
-  const _addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
+  const __addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
     setTodayData({
       ...todayData,
       sleep: { hours, quality }
@@ -273,7 +261,7 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Add exercise data
-  const _addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
+  const __addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
     const calories = EXERCISE_TYPES[type].calories * duration;
     const exercises = todayData.exercise || [];
     exercises.push({ type, duration, calories });
@@ -293,7 +281,7 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Save day's data
-  const _saveDayData = () => {
+  const __saveDayData = () => {
     const _updatedData = [...wellnessData, todayData];
     setWellnessData(_updatedData);
     secureStorage.setItem('wellnessData', JSON.stringify(_updatedData));
@@ -956,10 +944,11 @@ export const WellnessDashboard: React.FC = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="goal-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Category
                   </label>
                   <select
+                    id="goal-category"
                     value={newGoal.category || ''}
                     onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value as keyof typeof WELLNESS_CATEGORIES })}
                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
@@ -972,10 +961,11 @@ export const WellnessDashboard: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="goal-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Goal Title
                   </label>
                   <input
+                    id="goal-title"
                     type="text"
                     placeholder="e.g., Meditate daily"
                     value={newGoal.title || ''}
@@ -986,10 +976,11 @@ export const WellnessDashboard: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="goal-target" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Target
                     </label>
                     <input
+                      id="goal-target"
                       type="number"
                       placeholder="30"
                       value={newGoal.target || ''}
@@ -999,10 +990,11 @@ export const WellnessDashboard: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="goal-unit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Unit
                     </label>
                     <input
+                      id="goal-unit"
                       type="text"
                       placeholder="days"
                       value={newGoal.unit || ''}
@@ -1013,10 +1005,11 @@ export const WellnessDashboard: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Deadline (_optional)
+                  <label htmlFor="goal-deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Deadline (optional)
                   </label>
                   <input
+                    id="goal-deadline"
                     type="date"
                     value={newGoal.deadline ? formatDate(newGoal.deadline, 'yyyy-MM-dd') : ''}
                     onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value ? new Date(e.target.value) : undefined })}

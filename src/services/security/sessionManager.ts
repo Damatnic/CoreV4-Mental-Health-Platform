@@ -219,7 +219,7 @@ class SessionManagerService {
         _userId: params._userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
-        },
+        } })(),
         severity: 'warning',
       });
       throw error;
@@ -360,7 +360,7 @@ class SessionManagerService {
         isValid: true,
         riskScore,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Session validation error: ');
       return {
         isValid: false,
@@ -735,7 +735,7 @@ class SessionManagerService {
           }
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load sessions:');
     }
   }
@@ -753,7 +753,7 @@ class SessionManagerService {
         encrypted: true,
         expires: new Date(Date.now() + 24 * 3600000), // 24 hours
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to persist sessions:');
     }
   }
@@ -804,4 +804,4 @@ class SessionManagerService {
   }
 }
 
-export const sessionManager = SessionManagerService.getInstance();
+export const _sessionManager = SessionManagerService.getInstance();

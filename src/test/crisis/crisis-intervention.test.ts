@@ -61,7 +61,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         writable: true
       });
       
-      const _mockTel = vi.fn();
+      const __mockTel = vi.fn();
       window.location.href = 'tel:988';
       
       testUtils.triggerCrisis();
@@ -149,7 +149,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       expect(_stored).toBeTruthy();
       
       // Verify data is encrypted (should not be plain JSON)
-      const parsed = JSON.parse(stored!);
+      const _parsed = JSON.parse(stored!);
       expect(_parsed).toHaveProperty('moodScore');
       expect(_parsed).toHaveProperty('timestamp');
     });
@@ -164,7 +164,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       await waitFor(() => {
         expect(result.current.lastAssessment).toBeTruthy();
-        const hoursSince = (Date.now() - result.current.lastAssessment!.getTime()) / (1000 * 60 * 60);
+        const _hoursSince = (Date.now() - result.current.lastAssessment!.getTime()) / (1000 * 60 * 60);
         expect(_hoursSince).toBeGreaterThan(24);
       });
     });
@@ -172,7 +172,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
 
   describe('Emergency Contact Functionality', () => {
     it('should quickly access and display emergency contacts', async () => {
-      const emergencyContacts = [
+      const _emergencyContacts = [
         { name: 'Mom', phone: '555-0101', relationship: 'Parent' },
         { name: 'Therapist Dr. Smith', phone: '555-0102', type: 'Professional' }
       ];
@@ -229,7 +229,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
     it('should display safety plan within 200ms during crisis', async () => {
       const startTime = performance.now();
       
-      const safetyPlan = {
+      const _safetyPlan = {
         warningSignals: ['Feeling hopeless', 'Isolation'],
         copingStrategies: ['Deep breathing', 'Call a friend'],
         safeEnvironment: ['Remove sharp objects', 'Go to public space'],
@@ -242,7 +242,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(() => {
-        const safetyPlanElement = screen.getByTestId('safety-plan');
+        const _safetyPlanElement = screen.getByTestId('safety-plan');
         expect(_safetyPlanElement).toBeInTheDocument();
         
         const loadTime = performance.now() - startTime;
@@ -254,7 +254,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(() => {
-        const createPlanButton = screen.getByRole('button', { name: /create.*safety.*plan/i });
+        const _createPlanButton = screen.getByRole('button', { name: /create.*safety.*plan/i });
         expect(_createPlanButton).toBeInTheDocument();
       });
       
@@ -324,10 +324,10 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       await waitFor(() => {
         // Crisis mode - only essential features
         const features = container.querySelectorAll('[data-feature]');
-        const essentialFeatures = ['crisis-hotline', 'safety-plan', 'emergency-contacts', 'crisis-chat'];
+        const _essentialFeatures = ['crisis-hotline', 'safety-plan', 'emergency-contacts', 'crisis-chat'];
         
         features.forEach(feature => {
-          const featureName = feature.getAttribute('data-feature');
+          const _featureName = feature.getAttribute('data-feature');
           expect(_essentialFeatures).toContain(_featureName);
         });
         
@@ -435,7 +435,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(() => {
-        const crisisUI = screen.getByTestId('crisis-intervention-ui');
+        const _crisisUI = screen.getByTestId('crisis-intervention-ui');
         expect(_crisisUI).toBeInTheDocument();
         
         const loadTime = performance.now() - startTime;
@@ -461,7 +461,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       }
       
       // Ensure no significant performance degradation
-      const avgTime = times.reduce((a, b) => a + b) / times.length;
+      const _avgTime = times.reduce((a, b) => a + b) / times.length;
       expect(_avgTime).toBeLessThan(200);
       expect(Math.max(...times)).toBeLessThan(250);
     });

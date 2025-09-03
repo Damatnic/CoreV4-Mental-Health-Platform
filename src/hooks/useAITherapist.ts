@@ -34,8 +34,8 @@ interface UseAITherapistOptions {
 
 export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAITherapistOptions) => {
   const [session, setSession] = useState<TherapySession | null>(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [__isTyping, setIsTyping] = useState(false);
+  const [__isConnected, setIsConnected] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Initialize or load session
@@ -84,7 +84,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
 
       setSession(_existingSession);
       setIsConnected(true);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to initialize therapy session:');
       setIsConnected(false);
     }
@@ -113,7 +113,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     };
   };
 
-  const sendMessage = useCallback(async (text: string) => {
+  const _sendMessage  = useCallback(async (text: string) => {
     if (!session || !text.trim()) return;
 
     const _userMessage: TherapistMessage = {
@@ -162,7 +162,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
         setIsTyping(false);
       }, typingDelay);
 
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to generate therapist response:');
       
       // Add undefined recovery message
@@ -470,7 +470,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   };
 
   const selectTechniques = (therapist: Therapist, message: string, length: number): string[] => {
-    const _availableTechniques = therapist.approach.split(', ');
+    const __availableTechniques = therapist.approach.split(', ');
     const selectedTechniques: string[] = [];
     const lowerMessage = message.toLowerCase();
     
@@ -534,12 +534,12 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     
     try {
       localStorage.setItem(`therapy-session-${session.id}`, JSON.stringify(session));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to save therapy session:');
     }
   }, [session]);
 
-  const endSession = useCallback(async () => {
+  const _endSession  = useCallback(async () => {
     if (!session) return;
 
     // Generate session _summary
@@ -557,7 +557,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     setIsConnected(false);
   }, [session, therapist]);
 
-  const clearSession = useCallback(() => {
+  const _clearSession  = useCallback(() => {
     if (session) {
       localStorage.removeItem(`therapy-session-${session.id}`);
     }

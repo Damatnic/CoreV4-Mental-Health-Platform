@@ -109,11 +109,11 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
   showNavigation = true,
   compactMode = false
 }) => {
-  const [selectedTool, setSelectedTool] = useState(_initialTool);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(_compactMode);
-  const [showTips, setShowTips] = useState(true);
+  const [selectedTool, _setSelectedTool] = useState(_initialTool);
+  const [sidebarCollapsed, _setSidebarCollapsed] = useState(_compactMode);
+  const [showTips, _setShowTips] = useState(true);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, _setTheme] = useState<'light' | 'dark'>('light');
   
   // Get current tool component
   const currentToolData = WELLNESS_TOOLS.find(tool => tool.id === selectedTool) || WELLNESS_TOOLS[0];
@@ -296,7 +296,7 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
                   <span className="text-gray-600 dark:text-gray-400">Active Session</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
-                  Today&apos;s Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
+                  Today's Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
                   Streak: <span className="font-semibold text-orange-500">7 days</span>

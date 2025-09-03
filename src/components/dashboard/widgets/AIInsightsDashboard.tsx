@@ -52,26 +52,11 @@ import {
 } from '../../../types/ai-insights';
 
 export function AIInsightsDashboard() {
-  const {
-    insightsDashboard,
-    filteredInsights,
-    _isLoading,
-    _error,
-    selectedInsightCategory,
-    setSelectedInsightCategory,
-    insightTimeRange,
-    setInsightTimeRange,
-    markInsightActioned,
-    _dismissInsight,
-    requestRefresh,
-    insightStats,
-    isMarkingActioned,
-    _isDismissing,
-  } = useAIInsights();
+  const { insightsDashboard, filteredInsights, _isLoading, _error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, _dismissInsight, requestRefresh, insightStats, isMarkingActioned, _isDismissing,  } = useAIInsights();
 
-  const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'insights' | 'patterns' | 'predictions' | 'recommendations' | 'progress'>('insights');
-  const [showFilters, setShowFilters] = useState(false);
+  const [expandedInsight, _setExpandedInsight] = useState<string | null>(null);
+  const [activeTab, _setActiveTab] = useState<'insights' | 'patterns' | 'predictions' | 'recommendations' | 'progress'>('insights');
+  const [showFilters, _setShowFilters] = useState(false);
 
   // Category icons and colors
   const categoryConfig: Record<InsightCategory | 'all', { icon: React.ElementType; _color: string; bgColor: string }> = {

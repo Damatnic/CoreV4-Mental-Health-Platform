@@ -235,7 +235,7 @@ export class TherapistService {
       const therapist = await this.createTherapistAccount(data);
       
       // Step 2: Upload documents
-      const _documentsUploaded = await this.uploadVerificationDocuments(
+      const __documentsUploaded = await this.uploadVerificationDocuments(
         therapist.id,
         data.documents
       );
@@ -251,7 +251,7 @@ export class TherapistService {
         verificationStatus,
         nextSteps
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Onboarding failed:');
       throw undefined;
     }
@@ -326,7 +326,7 @@ export class TherapistService {
 
       await Promise.all(_uploads);
       return true;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Document upload failed:');
       return false;
     }
@@ -439,7 +439,7 @@ export class TherapistService {
       await this.sendAppointmentConfirmation(_appointment);
       
       return appointment;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Appointment booking failed:');
       throw undefined;
     }
@@ -521,7 +521,7 @@ export class TherapistService {
     // Handle self-pay
     if (method === 'self-pay') {
       // In production, process payment via Stripe/PayPal
-      const _paymentIntent = await this.createPaymentIntent(_amount, request);
+      const __paymentIntent = await this.createPaymentIntent(_amount, request);
       
       return {
         _amount,
@@ -582,7 +582,7 @@ export class TherapistService {
         reason,
         cancelledBy
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Appointment cancellation failed:');
       throw undefined;
     }
@@ -647,7 +647,7 @@ export class TherapistService {
       });
       
       return this.activeVideoSession;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to start video session:');
       throw undefined;
     }
@@ -728,7 +728,7 @@ export class TherapistService {
       
       // Clean up
       this.activeVideoSession = null;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to end video session:');
       throw undefined;
     }
@@ -826,4 +826,4 @@ export class TherapistService {
 }
 
 // Export singleton instance
-export const therapistService = TherapistService.getInstance();
+export const _therapistService = TherapistService.getInstance();

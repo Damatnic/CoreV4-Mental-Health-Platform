@@ -97,10 +97,10 @@ export function TreatmentPlanProgress({
   onAddGoal,
   _onViewDetails
 }: TreatmentPlanProgressProps) {
-  const [activeTab, setActiveTab] = useState<'goals' | 'skills' | 'homework' | 'timeline'>('goals');
-  const [selectedGoal, setSelectedGoal] = useState<TreatmentGoal | null>(null);
-  const [showGoalDetails, setShowGoalDetails] = useState(false);
-  const [expandedSkillType, setExpandedSkillType] = useState<string | null>(null);
+  const [activeTab, _setActiveTab] = useState<'goals' | 'skills' | 'homework' | 'timeline'>('goals');
+  const [selectedGoal, _setSelectedGoal] = useState<TreatmentGoal | null>(null);
+  const [__showGoalDetails, setShowGoalDetails] = useState(false);
+  const [expandedSkillType, _setExpandedSkillType] = useState<string | null>(null);
 
   // Calculate overall treatment progress
   const calculateOverallProgress = () => {

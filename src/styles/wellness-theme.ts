@@ -213,17 +213,17 @@ export const wellnessTheme = {
 };
 
 // Helper function to get gradient class
-export const _getGradientClass = (type: keyof typeof wellnessTheme.gradients) => {
+export const __getGradientClass = (type: keyof typeof wellnessTheme.gradients) => {
   return `bg-gradient-to-r ${wellnessTheme.gradients[type]}`;
 };
 
 // Helper function to get tool gradient
-export const _getToolGradient = (tool: keyof typeof wellnessTheme.gradients.tools) => {
+export const __getToolGradient = (tool: keyof typeof wellnessTheme.gradients.tools) => {
   return `bg-gradient-to-r ${wellnessTheme.gradients.tools[tool]}`;
 };
 
 // Helper function to apply component styles
-export const _getComponentStyles = (
+export const __getComponentStyles = (
   component: keyof typeof wellnessTheme.components,
   variant?: string,
   size?: string

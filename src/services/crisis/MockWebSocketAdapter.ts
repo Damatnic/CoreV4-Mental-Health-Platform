@@ -317,7 +317,7 @@ export class MockWebSocketAdapter {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (_error) {
+        } catch (error) {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -442,4 +442,4 @@ export class MockWebSocketAdapter {
 }
 
 // Export singleton instance
-export const _mockWebSocketAdapter = MockWebSocketAdapter.getInstance();
+export const __mockWebSocketAdapter = MockWebSocketAdapter.getInstance();

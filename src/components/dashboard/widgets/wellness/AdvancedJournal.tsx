@@ -67,12 +67,12 @@ export function AdvancedJournal({
   onExport,
   _onSearch 
 }: AdvancedJournalProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
-  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
+  const [searchQuery, _setSearchQuery] = useState('');
+  const [selectedTags, _setSelectedTags] = useState<string[]>([]);
+  const [selectedEmotions, _setSelectedEmotions] = useState<string[]>([]);
+  const [dateFilter, _setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [showFilters, _setShowFilters] = useState(false);
+  const [selectedEntry, _setSelectedEntry] = useState<string | null>(null);
 
   // Mock journal entries if none provided
   const mockEntries: JournalEntry[] = [
@@ -219,7 +219,7 @@ export function AdvancedJournal({
   }, [filteredEntries]);
 
   // Get writing prompts based on current mood and patterns
-  const writingPrompts = useMemo(() => {
+  const _writingPrompts  = useMemo(() => {
     const prompts = [
       {
         category: 'reflection',
@@ -407,7 +407,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
               <div className="p-4 bg-gray-50 rounded-lg space-y-3">
                 {/* Date filter */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Time Period</label>
+                  <label htmlFor="input_lsd9ubn8q" className="text-sm font-medium text-gray-700 mb-2 block">Time Period</label>
                   <div className="flex space-x-2">
                     {(['all', 'today', 'week', 'month'] as const).map(period => (
                       <button
@@ -428,7 +428,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                 {/* Tags filter */}
                 {allTags.length > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">Tags</label>
+                    <label htmlFor="input_3sny0mu0n" className="text-sm font-medium text-gray-700 mb-2 block">Tags</label>
                     <div className="flex flex-wrap gap-2">
                       {allTags.map(tag => (
                         <button
@@ -457,7 +457,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                 {/* Emotions filter */}
                 {allEmotions.length > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">Emotions</label>
+                    <label htmlFor="input_8c2r6d1vh" className="text-sm font-medium text-gray-700 mb-2 block">Emotions</label>
                     <div className="flex flex-wrap gap-2">
                       {allEmotions.map(emotion => (
                         <button
@@ -492,7 +492,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
       <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4">
         <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
           <Sparkles className="h-5 w-5 mr-2 text-yellow-600" />
-          Today&apos;s Writing Prompts
+          Today's Writing Prompts
         </h4>
         <div className="space-y-2">
           {writingPrompts.map((prompt, idx) => (

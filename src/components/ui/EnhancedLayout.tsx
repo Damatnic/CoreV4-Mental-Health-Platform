@@ -74,7 +74,7 @@ function UserMenu() {
             {/* Backdrop */}
             <div 
               className="fixed inset-0 z-30"
-              onClick={() => setIsOpen(false)}
+              onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => setIsOpen(false)(e); } }} role="button" tabIndex={0}> setIsOpen(false)}
             />
             
             {/* Dropdown */}
@@ -189,7 +189,7 @@ function _QuickAccessPanel() {
           <>
             <div 
               className="fixed inset-0 z-30"
-              onClick={() => setIsOpen(false)}
+              onClick={() = role="button" tabIndex={0}> setIsOpen(false)}
             />
             
             <motion.div
@@ -246,18 +246,10 @@ function _QuickAccessPanel() {
 // Main enhanced layout component
 function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   const location = useLocation();
-  const { 
-    mode, 
-    _isSearchOpen, 
-    setSearchOpen, 
-    isMobileMenuOpen, 
-    setMobileMenuOpen,
-    _preferences,
-    _crisisDetected 
-  } = useNavigation();
-  const [isInstallable, setIsInstallable] = useState(false);
+  const { mode, _isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, _preferences, _crisisDetected } = useNavigation();
+  const [__isInstallable, setIsInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
-  const [notificationCount] = useState(0);
+  const [_notificationCount] = useState(0);
 
   // Enhanced keyboard navigation
   useEnhancedKeyboardNavigation();
@@ -278,7 +270,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       { name: '🏠 Home', href: '/', icon: <Home className="h-5 w-5" /> },
       { name: '🧘 Wellness Tools', href: '/wellness', icon: <Heart className="h-5 w-5" /> },
       { name: '💬 Community Support', href: '/community', icon: <Users className="h-5 w-5" /> },
-      { name: '👨‍⚕️ Find Professionals', href: '/professional', icon: <Stethoscope className="h-5 w-5" /> },
+      { name: '👨⚕️ Find Professionals', href: '/professional', icon: <Stethoscope className="h-5 w-5" /> },
       { name: '⚙️ My Settings', href: '/settings', icon: <Settings className="h-5 w-5" /> },
     ];
   };
@@ -307,7 +299,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     };
   }, []);
 
-  const _handleInstallClick = async () => {
+  const __handleInstallClick = async () => {
     if (!deferredPrompt) return;
     
     deferredPrompt.prompt();

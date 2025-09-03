@@ -32,9 +32,9 @@ export function DashboardWidget({
   noPadding = false,
   transparent = false,
 }: DashboardWidgetProps) {
-  const [isCollapsed, setIsCollapsed] = useState(widget.isCollapsed || false);
+  const [isCollapsed, _setIsCollapsed] = useState(widget.isCollapsed || false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, _setIsExpanded] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
 
   // Auto-refresh functionality

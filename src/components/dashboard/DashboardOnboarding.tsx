@@ -28,8 +28,8 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
   const { user } = useAuth();
   const { trackEvent } = useAnalytics();
   const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [completedSteps, _setCompletedSteps] = useState<Set<string>>(new Set());
+  const [showWelcome, _setShowWelcome] = useState(true);
 
   const steps: OnboardingStep[] = [
     {

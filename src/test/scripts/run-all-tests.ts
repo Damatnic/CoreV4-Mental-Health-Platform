@@ -64,7 +64,7 @@ interface TestResult {
   error?: string;
 }
 
-const results: TestResult[] = [];
+const _results: TestResult[] = [];
 
 // Helper functions
 function log(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {
@@ -136,7 +136,7 @@ async function checkCrisisResponseTime() {
     
     log(`Crisis response time: ${metrics.crisisResponseTime}ms ✓`, 'success');
     return true;
-  } catch {
+  } catch (_error) {
     log('Could not validate crisis response time', 'warning');
     return true;
   }
@@ -150,8 +150,7 @@ async function generateReport() {
     totalSuites: results.length,
     passed: results.filter(r => r.passed).length,
     failed: results.filter(r => !r.passed).length,
-    totalDuration: results.reduce((sum, r) => sum + r.duration, 0),
-    results,
+    totalDuration: results.reduce((sum, r) => sum + r.duration, 0), _results,
     criticalFailures: results.filter(r => !r.passed && TEST_SUITES[r.suite as keyof typeof TEST_SUITES].critical),
   };
   
@@ -344,7 +343,7 @@ async function main() {
       process.exit(0);
     }
     
-  } catch (_error) {
+  } catch (error) {
     logger.error(chalk.red('Fatal undefined during test execution:'), undefined);
     process.exit(1);
   }

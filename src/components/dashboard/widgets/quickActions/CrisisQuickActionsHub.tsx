@@ -49,15 +49,15 @@ export function CrisisQuickActionsHub({
   safetyPlan
 }: CrisisQuickActionsHubProps) {
   const { assessmentData, _isAssessing, _updateAssessment } = useCrisisAssessment();
-  const { location, error: _locationError, loading } = useGeolocation();
+  const { location, _error: _locationError, loading } = useGeolocation();
   
-  const [activeAction, setActiveAction] = useState<string | null>(null);
-  const [showSafetyPlan, setShowSafetyPlan] = useState(false);
-  const [showGroundingExercise, setShowGroundingExercise] = useState(false);
-  const [breathingActive, setBreathingActive] = useState(false);
-  const [emergencyCallInProgress, setEmergencyCallInProgress] = useState(false);
-  const [copiedToClipboard, setCopiedToClipboard] = useState<string | null>(null);
-  const [offlineMode, setOfflineMode] = useState(!navigator.onLine);
+  const [__activeAction, setActiveAction] = useState<string | null>(null);
+  const [showSafetyPlan, _setShowSafetyPlan] = useState(false);
+  const [__showGroundingExercise, setShowGroundingExercise] = useState(false);
+  const [__breathingActive, setBreathingActive] = useState(false);
+  const [__emergencyCallInProgress, setEmergencyCallInProgress] = useState(false);
+  const [__copiedToClipboard, setCopiedToClipboard] = useState<string | null>(null);
+  const [__offlineMode, setOfflineMode] = useState(!navigator.onLine);
 
   // Emergency hotlines
   const emergencyHotlines = [
@@ -125,7 +125,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Handle text crisis line
-  const handleCrisisText = useCallback((number: string) => {
+  const _handleCrisisText  = useCallback((number: string) => {
     setActiveAction('texting');
     
     // Attempt to open SMS
@@ -140,7 +140,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Share location for emergency
-  const shareEmergencyLocation = useCallback(async () => {
+  const _shareEmergencyLocation  = useCallback(async () => {
     if (location) {
       const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
       const _message = `Emergency: I need help. My location: ${googleMapsUrl}`;
@@ -159,7 +159,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Start grounding exercise
-  const startGroundingExercise = useCallback(() => {
+  const _startGroundingExercise  = useCallback(() => {
     setShowGroundingExercise(true);
     setActiveAction('grounding');
     
@@ -169,7 +169,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Start breathing exercise
-  const startBreathingExercise = useCallback(() => {
+  const _startBreathingExercise  = useCallback(() => {
     setBreathingActive(true);
     setActiveAction('breathing');
     
@@ -468,7 +468,7 @@ export function CrisisQuickActionsHub({
 
 // Grounding Exercise Modal Component
 function GroundingExerciseModal({ onClose, onComplete }: { onClose: () => void; onComplete: () => void }) {
-  const [step, setStep] = useState(0);
+  const [step, _setStep] = useState(0);
   const steps = [
     { sense: 'See', count: 5, instruction: 'Name 5 things you can see around you' },
     { sense: 'Touch', count: 4, instruction: 'Name 4 things you can touch' },
@@ -541,9 +541,9 @@ function GroundingExerciseModal({ onClose, onComplete }: { onClose: () => void; 
 
 // Breathing Exercise Overlay Component
 function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void; onComplete: () => void }) {
-  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-  const [count, setCount] = useState(0);
-  const [cycles, setCycles] = useState(0);
+  const [phase, _setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [count, _setCount] = useState(0);
+  const [cycles, _setCycles] = useState(0);
 
   useEffect(() => {
     const phases = {

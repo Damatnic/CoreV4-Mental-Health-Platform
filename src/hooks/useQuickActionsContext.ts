@@ -198,7 +198,7 @@ export function useQuickActionsContext(): QuickActionsContext {
         const parsed = JSON.parse(_savedCustomActions);
         setCustomActions(_parsed);
         setActions([...defaultActions, ...parsed]);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Error loading custom actions:');
       }
     }
@@ -206,7 +206,7 @@ export function useQuickActionsContext(): QuickActionsContext {
     if (_savedHistory) {
       try {
         setActionHistory(JSON.parse(_savedHistory));
-      } catch (_error) {
+      } catch (error) {
         logger.error('Error loading action history:');
       }
     }

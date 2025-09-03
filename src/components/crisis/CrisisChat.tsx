@@ -37,12 +37,12 @@ export function CrisisChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [counselorTyping, setCounselorTyping] = useState(false);
-  const [detectedCrisisLevel, setDetectedCrisisLevel] = useState<string | null>(null);
-  const [showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
+  const [isConnected, _setIsConnected] = useState(false);
+  const [__counselorTyping, setCounselorTyping] = useState(false);
+  const [detectedCrisisLevel, _setDetectedCrisisLevel] = useState<string | null>(null);
+  const [__showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const _chatContainerRef  = useRef<HTMLDivElement>(null);
 
   // Initialize chat with welcome message
   useEffect(() => {
@@ -85,7 +85,7 @@ export function CrisisChat() {
       
       const connectMessage: Message = {
         id: `msg-${Date.now()}`,
-        text: "You&apos;re now connected with a crisis counselor. How can I support you today?",
+        text: "You're now connected with a crisis counselor. How can I support you today?",
         sender: 'counselor',
         timestamp: new Date()
       };
@@ -131,20 +131,20 @@ export function CrisisChat() {
     let responseText = '';
 
     if (crisisLevel === 'critical') {
-      responseText = "I&apos;m very concerned about what you&apos;ve shared. Your life has value and meaning. Would you like me to connect you with the 988 Suicide & Crisis Lifeline right now? They have trained counselors available 24/7. You can also call 988 directly or text HOME to 741741.";
+      responseText = "I'm very concerned about what you've shared. Your life has value and meaning. Would you like me to connect you with the 988 Suicide & Crisis Lifeline right now? They have trained counselors available 24/7. You can also call 988 directly or text HOME to 741741.";
     } else if (crisisLevel === 'high') {
-      responseText = "I hear that you&apos;re going through a really difficult time. You don&apos;t have to face this alone. Let&apos;s talk about what&apos;s happening and explore some ways to help you feel safer. What&apos;s been the hardest part for you?";
+      responseText = "I hear that you're going through a really difficult time. You don't have to face this alone. Let's talk about what's happening and explore some ways to help you feel safer. What's been the hardest part for you?";
     } else if (crisisLevel === 'medium') {
-      responseText = "It sounds like you&apos;re feeling overwhelmed right now. That&apos;s completely understandable. Would you like to try some coping strategies together, or would you prefer to talk more about what&apos;s causing these feelings?";
+      responseText = "It sounds like you're feeling overwhelmed right now. That's completely understandable. Would you like to try some coping strategies together, or would you prefer to talk more about what's causing these feelings?";
     } else {
       // Context-aware responses based on keywords
       const lower = userMessage.toLowerCase();
       if (lower.includes('help')) {
-        responseText = "I&apos;m here to help you. Can you tell me more about what you&apos;re experiencing right now?";
+        responseText = "I'm here to help you. Can you tell me more about what you're experiencing right now?";
       } else if (lower.includes('alone')) {
-        responseText = "You&apos;re not alone. I&apos;m here with you, and there are people who care about you. Let&apos;s talk about building your support network.";
+        responseText = "You're not alone. I'm here with you, and there are people who care about you. Let's talk about building your support network.";
       } else if (lower.includes('scared') || lower.includes('afraid')) {
-        responseText = "It&apos;s okay to feel scared. You&apos;re safe here. Can you tell me what&apos;s making you feel afraid?";
+        responseText = "It's okay to feel scared. You're safe here. Can you tell me what's making you feel afraid?";
       } else {
         responseText = "Thank you for sharing that with me. How long have you been feeling this way?";
       }
@@ -168,7 +168,7 @@ export function CrisisChat() {
     } else if (action === 'continue') {
       const message: Message = {
         id: `msg-${Date.now()}`,
-        text: "I&apos;m staying here with you. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let&apos;s focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
+        text: "I'm staying here with you. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let's focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
         sender: 'counselor',
         timestamp: new Date()
       };
@@ -326,7 +326,7 @@ export function CrisisChat() {
               <h3 className="text-lg font-semibold text-gray-900">Immediate Support Available</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Based on what you&apos;ve shared, I want to make sure you get the best support possible. 
+              Based on what you've shared, I want to make sure you get the best support possible. 
               Would you like to speak with someone on the phone right now?
             </p>
             <div className="space-y-3">
@@ -346,7 +346,7 @@ export function CrisisChat() {
                 onClick={() => handleEmergencyResponse('dismiss')}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                I&apos;m Okay For Now
+                I'm Okay For Now
               </button>
             </div>
           </div>

@@ -20,8 +20,8 @@ export const VoiceNavigation: React.FC = () => {
   const navigate = useNavigate();
   const { settings } = useAccessibilityStore();
   const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<unknown>(null);
-  const [confidence, setConfidence] = useState(0);
+  const [recognition, _setRecognition] = useState<unknown>(null);
+  const [confidence, _setConfidence] = useState(0);
   
   // Voice commands with crisis-focused priority
   // Announce actions using speech synthesis
@@ -176,8 +176,8 @@ export const VoiceNavigation: React.FC = () => {
         setTimeout(() => {
           try {
             recognitionInstance.start();
-          } catch (_error) {
-    logger.warn('Voice recognition restart failed:');
+          } catch (error) {
+    logger.warn('Voice recognition restart failed', 'VoiceNavigation', error);
           }
         }, 1000);
       }
@@ -186,7 +186,7 @@ export const VoiceNavigation: React.FC = () => {
     recognitionInstance.onerror = (event: unknown) => {
       logger.warn('Voice recognition error:', event.error);
       if (event.error === 'no-speech' || event.error === 'audio-capture') {
-        // These are expected errors, don&apos;t show to user
+        // These are expected errors, don't show to user
         return;
       }
       setIsListening(false);
@@ -200,7 +200,7 @@ export const VoiceNavigation: React.FC = () => {
   }, [settings.voiceNavigation, navigate, commands, announceAction]);
 
   // Start/stop voice recognition
-  const toggleVoiceRecognition = useCallback(() => {
+  const _toggleVoiceRecognition  = useCallback(() => {
     if (!recognition) return;
 
     if (isListening) {
@@ -210,8 +210,8 @@ export const VoiceNavigation: React.FC = () => {
       try {
         recognition.start();
         announceAction('Voice navigation started. Say "crisis help" for emergency assistance.');
-      } catch (_error) {
-        logger.error('Failed to start voice recognition:');
+      } catch (error) {
+        logger.error('Failed to start voice recognition', 'VoiceNavigation', error);
       }
     }
   }, [recognition, isListening, announceAction]);
@@ -265,11 +265,11 @@ export const VoiceNavigation: React.FC = () => {
           <h3 className="font-semibold text-sm mb-2">Voice Commands</h3>
           <div className="space-y-1 text-xs">
             <div className="text-red-600 font-medium">Crisis Commands:</div>
-            <div>&quot;crisis help&quot;, &quot;emergency&quot;, &quot;help me now&quot;</div>
+            <div>{"\"crisis help\", \"emergency\", \"help me now\""}</div>
             <div className="text-blue-600 font-medium mt-2">Navigation:</div>
-            <div>&quot;dashboard&quot;, &quot;wellness&quot;, &quot;community&quot;</div>
+            <div>{"\"dashboard\", \"wellness\", \"community\""}</div>
             <div className="text-gray-600 font-medium mt-2">Accessibility:</div>
-            <div>&quot;high contrast&quot;, &quot;larger text&quot;, &quot;stop voice&quot;</div>
+            <div>{"\"high contrast\", \"larger text\", \"stop voice\""}</div>
           </div>
         </div>
       </div>

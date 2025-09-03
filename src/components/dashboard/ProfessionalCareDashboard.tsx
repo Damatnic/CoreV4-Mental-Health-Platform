@@ -16,8 +16,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 export function ProfessionalCareDashboard() {
   const { user } = useAuth();
-  const [activeView, setActiveView] = useState<'overview' | 'therapy' | 'team' | 'medication' | 'treatment' | 'communication' | 'records'>('overview');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeView, _setActiveView] = useState<'overview' | 'therapy' | 'team' | 'medication' | 'treatment' | 'communication' | 'records'>('overview');
+  const [isCollapsed, _setIsCollapsed] = useState(false);
 
   // Mock data for demonstration
   const mockTherapySessions = [

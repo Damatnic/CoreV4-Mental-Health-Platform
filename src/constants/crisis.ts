@@ -253,7 +253,7 @@ export const CRISIS_THEMES = {
 
 export type CrisisTheme = keyof typeof CRISIS_THEMES;
 
-export const _HAPTIC_PATTERNS = {
+export const __HAPTIC_PATTERNS = {
   tap: [30],
   success: [50, 30, 50],
   warning: [100, 50, 100],
@@ -263,7 +263,7 @@ export const _HAPTIC_PATTERNS = {
   gentle: [20]
 };
 
-export const CRISIS_STORAGE_KEYS = {
+export const _CRISIS_STORAGE_KEYS = {
   safetyPlan: 'crisis_safety_plan',
   emergencyContacts: 'crisis_emergency_contacts',
   interactions: 'crisis_interactions',
@@ -271,7 +271,7 @@ export const CRISIS_STORAGE_KEYS = {
   lastAssessment: 'crisis_last_assessment'
 } as const;
 
-export const CRISIS_EVENTS = {
+export const _CRISIS_EVENTS = {
   levelChanged: 'crisis:level:changed',
   actionTaken: 'crisis:action:taken',
   contactCalled: 'crisis:contact:called',

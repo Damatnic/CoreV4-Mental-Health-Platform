@@ -157,11 +157,11 @@ export function MedicationSmartReminders({
   medications, 
   _onUpdateReminders 
 }: SmartReminderProps) {
-  const [reminders, setReminders] = useState<SmartReminder[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'configure' | '_insights' | 'history'>('overview');
-  const [_selectedMedication, setSelectedMedication] = useState<string | null>(null);
-  const [isLearningMode, setIsLearningMode] = useState(true);
-  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
+  const [reminders, _setReminders] = useState<SmartReminder[]>([]);
+  const [activeTab, _setActiveTab] = useState<'overview' | 'configure' | '_insights' | 'history'>('overview');
+  const [_selectedMedication, _setSelectedMedication] = useState<string | null>(null);
+  const [isLearningMode, _setIsLearningMode] = useState(true);
+  const [aiInsights, _setAiInsights] = useState<AIInsight[]>([]);
   const [reminderTest, setReminderTest] = useState<{ active: boolean; _type: string } | null>(null);
 
   useEffect(() => {
@@ -616,7 +616,7 @@ export function MedicationSmartReminders({
                           <p className="text-sm text-gray-600">{feature.description}</p>
                         </div>
                       </div>
-                      <label className="flex items-center">
+                      <label htmlFor="input_7bhyx6g20" className="flex items-center">
                         <input
                           type="checkbox"
                           checked={feature.enabled}

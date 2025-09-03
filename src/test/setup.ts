@@ -244,7 +244,7 @@ expect.extend({
 });
 
 // Test utilities for mental health features
-export const _testUtils = {
+export const __testUtils = {
   // Simulate crisis trigger
   triggerCrisis: () => {
     const _event = new CustomEvent('crisis-detected', {

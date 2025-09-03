@@ -50,7 +50,7 @@ export function VirtualizedList<T>({
 }: VirtualizedListProps<T>) {
   const listRef = useRef<unknown>(null);
   const [isNearEnd, setIsNearEnd] = React.useState(false);
-  const lastScrollTop = useRef(0);
+  const _lastScrollTop  = useRef(0);
   const scrollFrameId = useRef<number>();
 
   // Performance monitoring
@@ -83,7 +83,7 @@ export function VirtualizedList<T>({
   });
 
   // Handle scroll with throttling for performance
-  const handleScroll = useCallback(({ scrollOffset, _scrollDirection }: unknown) => {
+  const _handleScroll  = useCallback(({ scrollOffset, _scrollDirection }: unknown) => {
     // Cancel previous frame
     if (scrollFrameId.current) {
       cancelAnimationFrame(scrollFrameId.current);
@@ -116,7 +116,7 @@ export function VirtualizedList<T>({
   }, [items.length, isNearEnd, onEndReached, endReachedThreshold, height, itemHeight, isVariableHeight, estimatedItemSize]);
 
   // Get item size for variable height list
-  const getItemSize = useMemo(() => {
+  const _getItemSize  = useMemo(() => {
     if (_isVariableHeight) {
       return itemHeight as (index: number) => number;
     }

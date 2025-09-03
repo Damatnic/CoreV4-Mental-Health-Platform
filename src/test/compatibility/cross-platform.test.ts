@@ -130,7 +130,7 @@ describe('Cross-Platform Compatibility Tests', () => {
 
             render(<App />);
             
-            const enableNotifications = await screen.findByRole('button', { 
+            const _enableNotifications = await screen.findByRole('button', { 
               name: /enable.*notifications/i 
             });
             fireEvent.click(_enableNotifications);
@@ -142,7 +142,7 @@ describe('Cross-Platform Compatibility Tests', () => {
         });
 
         it('should handle local storage for wellness data', () => {
-          const testData = {
+          const _testData = {
             mood: 7,
             journal: 'Feeling better today',
             timestamp: Date.now()
@@ -158,7 +158,7 @@ describe('Cross-Platform Compatibility Tests', () => {
         });
 
         it('should support WebP images with fallback', async () => {
-          const supportsWebP = browser.features.webp;
+          const _supportsWebP = browser.features.webp;
           
           const { container } = render(<App />);
           
@@ -315,7 +315,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       render(<App />);
       
       await waitFor(() => {
-        const installButton = screen.queryByRole('button', { name: /install/i });
+        const _installButton = screen.queryByRole('button', { name: /install/i });
         if (_installButton) {
           fireEvent.click(_installButton);
           expect(installEvent.prompt).toHaveBeenCalled();
@@ -340,7 +340,7 @@ describe('Cross-Platform Compatibility Tests', () => {
     });
 
     it('should sync data when coming back online', async () => {
-      const _mockSync = vi.fn();
+      const __mockSync = vi.fn();
       
       // Start offline
       Object.defineProperty(navigator, 'onLine', {
@@ -351,7 +351,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       render(<App />);
       
       // Make changes while offline
-      const moodButton = await screen.findByRole('button', { name: /track.*mood/i });
+      const _moodButton = await screen.findByRole('button', { name: /track.*mood/i });
       fireEvent.click(_moodButton);
 
       // Come back online
@@ -437,7 +437,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       
       render(<App />);
       
-      const voiceButton = await screen.findByRole('button', { name: /voice/i });
+      const _voiceButton = await screen.findByRole('button', { name: /voice/i });
       fireEvent.click(_voiceButton);
       
       expect(mockSpeechRecognition.prototype.start).toHaveBeenCalled();
@@ -523,7 +523,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       for (const [feature, supported] of Object.entries(_features)) {
         if (!supported) {
           // Should show fallback for unsupported features
-          const fallbackElement = await screen.findByTestId(`fallback-${feature.toLowerCase().replace(' ', '-')}`);
+          const _fallbackElement = await screen.findByTestId(`fallback-${feature.toLowerCase().replace(' ', '-')}`);
           expect(_fallbackElement).toBeInTheDocument();
         }
       }

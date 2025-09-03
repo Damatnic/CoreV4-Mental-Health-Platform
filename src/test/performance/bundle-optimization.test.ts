@@ -23,7 +23,7 @@ describe('Bundle Optimization Tests', () => {
       try {
         const stats = statSync(_filePath);
         bundleStats[file] = stats.size;
-      } catch {
+      } catch (_error) {
         logger.warn(`Could not read bundle file: ${file}`);
       }
     }
@@ -31,7 +31,7 @@ describe('Bundle Optimization Tests', () => {
     // Read index.html to check module preloads
     try {
       manifestContent = readFileSync(join(distPath, 'index.html'), 'utf-8');
-    } catch {
+    } catch (_error) {
       logger.warn('Could not read index.html');
     }
   });
@@ -147,7 +147,7 @@ describe('Bundle Optimization Tests', () => {
     });
 
     it('should NOT preload heavy lazy chunks', () => {
-      const _lazyChunks = [
+      const __lazyChunks = [
         'charts-chartjs', // Should be lazy loaded
         'ai-features',    // Should be lazy loaded
         'professional'    // Should be lazy loaded

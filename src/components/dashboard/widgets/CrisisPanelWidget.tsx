@@ -11,7 +11,7 @@ interface CrisisPanelWidgetProps {
 
 export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
   const navigate = useNavigate();
-  const [showAllContacts, setShowAllContacts] = useState(false);
+  const [showAllContacts, _setShowAllContacts] = useState(false);
 
   if (_error) {
     return (
@@ -168,7 +168,9 @@ export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
             <div
               key={hotline.id}
               className="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
+              onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => {
+                if (hotline.type === 'hotline') {
+                  window.location.href = `tel:${hotline.contact(e); } }} role="button" tabIndex={0}> {
                 if (hotline.type === 'hotline') {
                   window.location.href = `tel:${hotline.contact}`;
                 }

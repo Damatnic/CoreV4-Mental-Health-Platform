@@ -508,7 +508,7 @@ class DataIntegrationService extends EventEmitter {
    */
   private syncBidirectional(mapping: DataMapping, data: unknown) {
     // Implement bidirectional sync logic
-    const _reverseMapping = {
+    const __reverseMapping = {
       source: mapping.target,
       target: mapping.source,
       transform: mapping.transform // May need reverse transform
@@ -696,7 +696,7 @@ class DataIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const _dataIntegrationService = DataIntegrationService.getInstance();
+export const __dataIntegrationService = DataIntegrationService.getInstance();
 
 // Export hook for React components
 export function useDataIntegration() {

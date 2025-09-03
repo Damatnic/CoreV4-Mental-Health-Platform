@@ -31,7 +31,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="input_zxjmgyhev" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Location
               </label>
               <input 
@@ -42,7 +42,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="input_r5wdkdb2r" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Specialty
               </label>
               <select className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -54,7 +54,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="input_clgv4mdnc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Insurance
               </label>
               <select className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -83,7 +83,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl text-white">👩‍⚕️</span>
+                  <span className="text-2xl text-white">👩⚕️</span>
                 </div>
                 <div className="flex-1">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Dr. Sarah Johnson</h4>
@@ -115,7 +115,7 @@ export default function TherapistFinder({ location, _specialty, _insuranceAccept
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl text-white">👨‍⚕️</span>
+                  <span className="text-2xl text-white">👨⚕️</span>
                 </div>
                 <div className="flex-1">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Dr. Michael Chen</h4>

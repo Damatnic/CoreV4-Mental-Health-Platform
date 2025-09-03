@@ -144,6 +144,41 @@ export interface CreateEventDto {
   tags: string[];
 }
 
+interface EventAttendee {
+  userId: string;
+  name: string;
+  avatar?: string;
+  joinedAt: string;
+  [key: string]: unknown;
+}
+
+interface UserAchievement {
+  id: string;
+  name: string;
+  description: string;
+  unlockedAt: string;
+  [key: string]: unknown;
+}
+
+interface LeaderboardEntry {
+  userId: string;
+  username: string;
+  avatar?: string;
+  score: number;
+  rank: number;
+  [key: string]: unknown;
+}
+
+interface ModerationItem {
+  id: string;
+  type: string;
+  content: string;
+  reportedAt: string;
+  reportedBy: string;
+  status: string;
+  [key: string]: unknown;
+}
+
 // Community Service Class
 class CommunityService {
   private apiClient = axios.create({
@@ -395,7 +430,7 @@ class CommunityService {
     await this.apiClient.delete(`/community/events/${eventId}/register`);
   }
 
-  async getEventAttendees(eventId: string): Promise<any[]> {
+  async getEventAttendees(eventId: string): Promise<EventAttendee[]> {
     const response = await this.apiClient.get(`/community/events/${eventId}/attendees`);
     return response.data;
   }
@@ -433,12 +468,12 @@ class CommunityService {
 
   // =============== Achievements & Gamification ===============
 
-  async getUserAchievements(userId: string): Promise<any[]> {
+  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
     const response = await this.apiClient.get(`/community/users/${userId}/achievements`);
     return response.data;
   }
 
-  async getLeaderboard(type: 'helpful' | 'supportive' | 'active', period: 'week' | 'month' | 'all'): Promise<any[]> {
+  async getLeaderboard(type: 'helpful' | 'supportive' | 'active', period: 'week' | 'month' | 'all'): Promise<LeaderboardEntry[]> {
     const response = await this.apiClient.get('/community/leaderboard', {
       params: { type, period },
     });
@@ -451,7 +486,7 @@ class CommunityService {
 
   // =============== Moderation ===============
 
-  async getModerationQueue(): Promise<any[]> {
+  async getModerationQueue(): Promise<ModerationItem[]> {
     const response = await this.apiClient.get('/community/moderation/queue');
     return response.data;
   }
@@ -496,4 +531,4 @@ class CommunityService {
 }
 
 // Export singleton instance
-export const communityService = new CommunityService();
+export const _communityService = new CommunityService();

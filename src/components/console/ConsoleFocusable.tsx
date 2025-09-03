@@ -67,7 +67,7 @@ export function ConsoleFocusable({
     <div
       ref={elementRef}
       className={`console-focusable ${className}`}
-      tabIndex={0}
+      
       data-console-id={id}
       data-console-group={group}
     >

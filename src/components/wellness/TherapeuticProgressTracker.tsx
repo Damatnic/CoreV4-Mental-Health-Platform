@@ -91,11 +91,11 @@ const METRIC_CATEGORIES = {
 
 export const TherapeuticProgressTracker: React.FC = () => {
   const [metrics, setMetrics] = useState<TherapeuticMetric[]>([]);
-  const [sessions, setSessions] = useState<TherapySession[]>([]);
+  const [sessions, _setSessions] = useState<TherapySession[]>([]);
   const [insights, setInsights] = useState<ProgressInsight[]>([]);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof METRIC_CATEGORIES | 'all'>('all');
-  const [showAddMetric, setShowAddMetric] = useState(false);
+  const [__showAddMetric, setShowAddMetric] = useState(false);
   const [newMetric, setNewMetric] = useState<Partial<TherapeuticMetric>>({
     category: 'mood',
     value: 5
@@ -125,16 +125,16 @@ export const TherapeuticProgressTracker: React.FC = () => {
         const parsed = JSON.parse(_savedSessions);
         setSessions(parsed.map((s: unknown) => ({ ...s, date: new Date(s.date) })));
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load progress _data:');
     }
   };
 
-  const _saveProgressData = () => {
+  const __saveProgressData = () => {
     try {
       secureStorage.setItem('therapeuticMetrics', JSON.stringify(_metrics));
       secureStorage.setItem('therapySessions', JSON.stringify(_sessions));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to save progress _data:');
     }
   };
@@ -639,7 +639,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
               
               {/* Category Selection */}
               <div className="mb-4">
-                <label className="block text-sm text-gray-300 mb-2">Category</label>
+                <label htmlFor="input_5owziky10" className="block text-sm text-gray-300 mb-2">Category</label>
                 <select
                   value={newMetric.category}
                   onChange={(e) => setNewMetric({ ...newMetric, category: e.target.value as unknown })}
@@ -653,7 +653,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
               
               {/* Value Slider */}
               <div className="mb-4">
-                <label className="block text-sm text-gray-300 mb-2">
+                <label htmlFor="input_tz8imeo3q" className="block text-sm text-gray-300 mb-2">
                   How are you feeling? ({newMetric.value}/10)
                 </label>
                 <div className="flex items-center space-x-3">
@@ -674,7 +674,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
               
               {/* Notes */}
               <div className="mb-4">
-                <label className="block text-sm text-gray-300 mb-2">Notes (_optional)</label>
+                <label htmlFor="input_ve38pm9h7" className="block text-sm text-gray-300 mb-2">Notes (_optional)</label>
                 <textarea
                   value={newMetric.notes || ''}
                   onChange={(e) => setNewMetric({ ...newMetric, notes: e.target.value })}

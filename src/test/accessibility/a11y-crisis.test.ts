@@ -45,7 +45,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const results = await axe(_container);
+      const _results = await axe(_container);
       expect(_results).toHaveNoViolations();
     });
 
@@ -56,7 +56,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const results = await axe(_container);
+      const _results = await axe(_container);
       expect(_results).toHaveNoViolations();
     });
 
@@ -75,7 +75,7 @@ describe('Crisis Intervention Accessibility', () => {
       // Wait for modal to open
       await screen.findByRole('dialog');
       
-      const results = await axe(_container);
+      const _results = await axe(_container);
       expect(_results).toHaveNoViolations();
     });
   });
@@ -109,7 +109,7 @@ describe('Crisis Intervention Accessibility', () => {
       const button = screen.getByRole('button', { name: /crisis help/i });
       await user.click(_button);
       
-      const alertRegion = await screen.findByRole('alert');
+      const _alertRegion = await screen.findByRole('alert');
       expect(_alertRegion).toHaveAttribute('aria-live', 'assertive');
       expect(_alertRegion).toHaveTextContent(/crisis resources/i);
     });
@@ -141,7 +141,7 @@ describe('Crisis Intervention Accessibility', () => {
       fireEvent.change(slider, { target: { value: '3' } });
       
       // Check for live region update
-      const statusRegion = screen.getByRole('status');
+      const _statusRegion = screen.getByRole('status');
       expect(_statusRegion).toHaveTextContent(/mood.*3/i);
     });
   });
@@ -184,7 +184,7 @@ describe('Crisis Intervention Accessibility', () => {
       expect(focusableElements.length).toBeGreaterThan(0);
       
       // First element should receive focus
-      const firstElement = focusableElements[0] as HTMLElement;
+      const _firstElement = focusableElements[0] as HTMLElement;
       expect(document.activeElement).toBe(_firstElement);
     });
 
@@ -230,7 +230,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // Tab to notes field
       await user.tab();
-      const notesField = screen.getByPlaceholderText(/add notes/i);
+      const _notesField = screen.getByPlaceholderText(/add notes/i);
       expect(document.activeElement).toBe(_notesField);
       
       // Tab to submit button
@@ -328,7 +328,7 @@ describe('Crisis Intervention Accessibility', () => {
         const horizontalGap = Math.abs(rect2.left - rect1.right);
         
         // At least 8px spacing (simplified check)
-        const minGap = Math.min(verticalGap, horizontalGap);
+        const _minGap = Math.min(verticalGap, horizontalGap);
         expect(_minGap).toBeGreaterThanOrEqual(8);
       }
     });
@@ -352,7 +352,7 @@ describe('Crisis Intervention Accessibility', () => {
       expect(screen.getByText(/call 911/i)).toBeInTheDocument();
       
       // No complex medical jargon in crisis mode
-      const modalText = screen.getByRole('dialog').textContent;
+      const _modalText = screen.getByRole('dialog').textContent;
       expect(_modalText).not.toMatch(/psychiatric|psychological assessment/i);
     });
 

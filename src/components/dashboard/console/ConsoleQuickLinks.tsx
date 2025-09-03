@@ -29,7 +29,7 @@ interface QuickLink {
 }
 
 export function ConsoleQuickLinks() {
-  const navigate = useNavigate();
+  const _navigate  = useNavigate();
   const quickLinks: QuickLink[] = [
     // Emergency (Highest Priority)
     {

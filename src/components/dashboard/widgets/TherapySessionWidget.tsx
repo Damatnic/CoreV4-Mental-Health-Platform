@@ -75,11 +75,11 @@ export function TherapySessionWidget({
   onCompleteHomework,
   _onAddNote
 }: TherapySessionWidgetProps) {
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
-  const [selectedSession, setSelectedSession] = useState<TherapySession | null>(null);
-  const [showPreparation, setShowPreparation] = useState(false);
-  const [preparationTopics, setPreparationTopics] = useState<string[]>([]);
-  const [sessionQuestions, setSessionQuestions] = useState<string[]>([]);
+  const [activeTab, _setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
+  const [selectedSession, _setSelectedSession] = useState<TherapySession | null>(null);
+  const [__showPreparation, setShowPreparation] = useState(false);
+  const [preparationTopics, _setPreparationTopics] = useState<string[]>([]);
+  const [sessionQuestions, _setSessionQuestions] = useState<string[]>([]);
 
   // Get next upcoming session
   const nextSession = sessions
@@ -128,7 +128,7 @@ export function TherapySessionWidget({
   };
 
   // Session status color
-  const _getStatusColor = (_status: string) => {
+  const __getStatusColor = (_status: string) => {
     switch (_status) {
       case 'confirmed': return 'text-green-600 bg-green-50';
       case 'scheduled': return 'text-blue-600 bg-blue-50';

@@ -274,7 +274,7 @@ export class CrisisDetectionService {
     
     // Analyze usage patterns over time
     const hourlyUsage = this.groupByHour(timestamps);
-    const _dailyUsage = this.groupByDay(timestamps);
+    const __dailyUsage = this.groupByDay(timestamps);
 
     // Unusual late-night activity patterns
     const lateNightActivity = hourlyUsage.slice(0, 6).reduce((sum, count) => sum + count, 0);
@@ -575,4 +575,4 @@ interface SocialData {
   isolationIndicators: number;
 }
 
-export const _crisisDetectionService = CrisisDetectionService.getInstance();
+export const __crisisDetectionService = CrisisDetectionService.getInstance();

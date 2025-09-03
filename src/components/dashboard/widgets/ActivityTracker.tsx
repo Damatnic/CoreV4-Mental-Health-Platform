@@ -36,20 +36,11 @@ export function ActivityTracker({
   energyLevel = 'medium',
   currentMood = 5 
 }: ActivityTrackerProps) {
-  const {
-    activities,
-    _dailySchedule,
-    completeActivity,
-    rescheduleActivity,
-    getActivityRecommendations,
-    suggestReschedule,
-    adaptScheduleForBadDay,
-    generateDailySchedule
-  } = useActivityStore();
+  const { activities, _dailySchedule, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<string | null>(null);
+  const [selectedDate, _setSelectedDate] = useState(new Date());
+  const [showRecommendations, _setShowRecommendations] = useState(false);
+  const [__editingActivity, setEditingActivity] = useState<string | null>(null);
   const [completionNote, setCompletionNote] = useState('');
   const [moodImpact, setMoodImpact] = useState<number>(0);
   const [adaptedForLowEnergy, setAdaptedForLowEnergy] = useState(false);
@@ -343,7 +334,7 @@ export function ActivityTracker({
                         >
                           <div className="space-y-3">
                             <div>
-                              <label className="text-sm font-medium text-gray-700">
+                              <label htmlFor="input_f82cs5rn4" className="text-sm font-medium text-gray-700">
                                 How did this activity affect your mood?
                               </label>
                               <div className="flex items-center space-x-2 mt-1">
@@ -370,7 +361,7 @@ export function ActivityTracker({
                             </div>
 
                             <div>
-                              <label className="text-sm font-medium text-gray-700">
+                              <label htmlFor="input_ta4ro3h5v" className="text-sm font-medium text-gray-700">
                                 Notes (_optional)
                               </label>
                               <textarea

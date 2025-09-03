@@ -403,7 +403,7 @@ class SecurityHeadersService {
           }),
         });
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to report CSP violation:');
     }
   }

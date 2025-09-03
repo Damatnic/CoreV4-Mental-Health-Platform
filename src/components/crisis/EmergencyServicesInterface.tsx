@@ -28,16 +28,16 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
   onEmergencyTriggered,
   className = ''
 }) => {
-  const [nearbyServices, setNearbyServices] = useState<EmergencyServiceProvider[]>([]);
-  const [currentLocation, setCurrentLocation] = useState<LocationCoordinates | null>(null);
+  const [__nearbyServices, setNearbyServices] = useState<EmergencyServiceProvider[]>([]);
+  const [__currentLocation, setCurrentLocation] = useState<LocationCoordinates | null>(null);
   const [permissionStatus, setPermissionStatus] = useState<GeolocationPermission>({
     granted: false,
     accuracy: 'denied',
     timestamp: 0
   });
-  const [isLoadingServices, setIsLoadingServices] = useState(false);
+  const [_isLoadingServices, setIsLoadingServices] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
-  const [emergencyTriggered, setEmergencyTriggered] = useState<string | null>(null);
+  const [__emergencyTriggered, setEmergencyTriggered] = useState<string | null>(null);
 
   useEffect(() => {
     initializeEmergencyServices();
@@ -52,15 +52,15 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       setPermissionStatus(permission);
       
       // Get current _location if available
-      const _location = geolocationEmergencyService.getCurrentLocation();
-      setCurrentLocation(_location);
+      const location = geolocationEmergencyService.getCurrentLocation();
+      setCurrentLocation(location);
       
-      // Load nearby _services
-      const _services = await geolocationEmergencyService.findNearbyEmergencyServices();
-      setNearbyServices(_services);
+      // Load nearby services
+      const services = await geolocationEmergencyService.findNearbyEmergencyServices();
+      setNearbyServices(services);
       
-    } catch (_error) {
-      logger.error('Failed to initialize emergency _services:');
+    } catch (error) {
+      logger.error('Failed to initialize emergency services', 'EmergencyServicesInterface', error);
     } finally {
       setIsLoadingServices(false);
     }
@@ -73,15 +73,15 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       setPermissionStatus(permission);
       
       if (permission.granted) {
-        const _location = geolocationEmergencyService.getCurrentLocation();
-        setCurrentLocation(_location);
+        const location = geolocationEmergencyService.getCurrentLocation();
+        setCurrentLocation(location);
         
-        // Refresh nearby _services with new _location
-        const _services = await geolocationEmergencyService.findNearbyEmergencyServices();
-        setNearbyServices(_services);
+        // Refresh nearby services with new location
+        const services = await geolocationEmergencyService.findNearbyEmergencyServices();
+        setNearbyServices(services);
       }
-    } catch (_error) {
-      logger.error('Location permission request failed:');
+    } catch (error) {
+      logger.error('Location permission request failed', 'EmergencyServicesInterface', error);
     } finally {
       setIsRequestingLocation(false);
     }
@@ -98,23 +98,23 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       );
       
       if (response.success) {
-        onEmergencyTriggered?.(_service);
+        onEmergencyTriggered?.(service);
         
         // For critical situations, auto-initiate call
         if (crisisProfile.riskLevel === 'critical' || service.phone === '911') {
-          window._location.href = `tel:${service.phone}`;
+          window.location.href = `tel:${service.phone}`;
         }
       }
       
-    } catch (_error) {
-      logger.error('Emergency response failed:');
+    } catch (error) {
+      logger.error('Emergency response failed', 'EmergencyServicesInterface', error);
     } finally {
       setTimeout(() => setEmergencyTriggered(null), 3000);
     }
   };
 
-  const getServiceIcon = (_type: EmergencyServiceProvider['type']) => {
-    switch (_type) {
+  const getServiceIcon = (type: EmergencyServiceProvider['type']) => {
+    switch (type) {
       case 'crisis_center': return MessageCircle;
       case 'hospital': return Shield;
       case 'ems': case 'police': case 'fire': return Phone;

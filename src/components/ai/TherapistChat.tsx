@@ -22,7 +22,7 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
 }) => {
   const { session, isTyping, isConnected, sendMessage, endSession: _endSession } = useAITherapist({ therapist, sessionId });
   const [inputText, setInputText] = useState('');
-  const [showSessionInfo, setShowSessionInfo] = useState(false);
+  const [showSessionInfo, _setShowSessionInfo] = useState(false);
   const messagesEndRef = useRef<unknown>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -264,10 +264,10 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
         {/* Helpful suggestions */}
         <div className="mt-3 flex flex-wrap gap-2">
           {[
-            "I&apos;m feeling anxious about...",
-            "I&apos;ve been struggling with...",
+            "I'm feeling anxious about...",
+            "I've been struggling with...",
             "Can you help me understand...",
-            "I&apos;m worried about..."
+            "I'm worried about..."
           ].map(suggestion => (
             <button
               key={suggestion}

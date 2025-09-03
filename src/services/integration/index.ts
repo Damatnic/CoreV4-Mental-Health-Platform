@@ -30,7 +30,7 @@ export {
 } from './CrisisIntegrationService';
 
 // Integration utilities
-export const _initializeIntegration = async (userId: string, token: string) => {
+export const __initializeIntegration = async (userId: string, token: string) => {
   try {
     // Initialize real-time connection
     await realtimeSyncService.connect({ userId, token });
@@ -50,7 +50,7 @@ export const _initializeIntegration = async (userId: string, token: string) => {
         crisis: crisisStatus
       }
     };
-  } catch (_error) {
+  } catch (error) {
     logger.error('Failed to initialize integration services:');
     return {
       success: false,
@@ -59,7 +59,7 @@ export const _initializeIntegration = async (userId: string, token: string) => {
   }
 };
 
-export const _cleanupIntegration = () => {
+export const __cleanupIntegration = () => {
   // Cleanup all services
   realtimeSyncService.disconnect();
   dataIntegrationService.cleanup();

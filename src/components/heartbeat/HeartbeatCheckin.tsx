@@ -26,11 +26,11 @@ interface HeartbeatState {
 }
 
 const HeartbeatCheckin: React.FC = () => {
-  const [partners, setPartners] = useState<Partner[]>([
+  const [partners, _setPartners] = useState<Partner[]>([
     {
       id: 'partner-1',
       name: 'Sarah',
-      avatar: '👩‍🦰',
+      avatar: '👩🦰',
       status: 'online',
       lastCheckin: new Date(),
       isHolding: false
@@ -38,7 +38,7 @@ const HeartbeatCheckin: React.FC = () => {
     {
       id: 'partner-2', 
       name: 'Alex',
-      avatar: '🧑‍🦱',
+      avatar: '🧑🦱',
       status: 'away',
       lastCheckin: new Date(Date.now() - 300000), // 5 minutes ago
       isHolding: false
@@ -55,8 +55,8 @@ const HeartbeatCheckin: React.FC = () => {
   });
 
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [__showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [soundEnabled, _setSoundEnabled] = useState(true);
   
   const { vibrate } = useVibration();
   const holdTimerRef = useRef<NodeJS.Timeout>();
@@ -254,7 +254,7 @@ const HeartbeatCheckin: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Check-in Alert</h3>
             </div>
             <p className="text-gray-300 mb-4">
-              We haven&apos;t heard from your partner in a while. This could be normal, but let&apos;s make sure they&apos;re okay.
+              We haven't heard from your partner in a while. This could be normal, but let's make sure they're okay.
             </p>
             <div className="flex space-x-3">
               <button className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-red-600 transition-colors">

@@ -8,12 +8,17 @@ import { CommunityEvents } from '../components/community/CommunityEvents';
 import { useAnonymousAuth } from '../contexts/AnonymousAuthContext';
 import { toast } from 'react-hot-toast';
 
+interface CommunityNotification {
+  content: string;
+  [key: string]: unknown;
+}
+
 export function CommunityPage() {
   const { user } = useAnonymousAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('posts');
-  const [onlineCount, setOnlineCount] = useState(0);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [onlineCount, _setOnlineCount] = useState(0);
+  const [notifications, _setNotifications] = useState<CommunityNotification[]>([]);
 
   // Initialize community connection (simplified for stability)
   useEffect(() => {
@@ -37,7 +42,7 @@ export function CommunityPage() {
     { id: 'events', label: 'Events', icon: Calendar, path: '/community/events' },
   ];
 
-  const stats = [
+  const __stats = [
     { label: 'Online Now', value: onlineCount, icon: Activity, color: 'text-green-600' },
     { label: 'Active Groups', value: 24, icon: Users, color: 'text-blue-600' },
     { label: 'Upcoming Events', value: 8, icon: Calendar, color: 'text-purple-600' },

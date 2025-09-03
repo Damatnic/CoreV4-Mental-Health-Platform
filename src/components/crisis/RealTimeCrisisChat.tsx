@@ -64,15 +64,15 @@ interface CrisisProtocol {
 }
 
 export function RealTimeCrisisChat() {
-  const [_currentRoom, _setCurrentRoom] = useState<ChatRoom | null>(null);
+  const [__currentRoom, _setCurrentRoom] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
-  const [availableSupport, setAvailableSupport] = useState<ChatParticipant[]>([]);
-  const [_chatType, _setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
+  const [isConnected, _setIsConnected] = useState(false);
+  const [availableSupport, _setAvailableSupport] = useState<ChatParticipant[]>([]);
+  const [__chatType, _setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
   const [isTyping, setIsTyping] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [_chatSettings, _setChatSettings] = useState({
+  const [soundEnabled, _setSoundEnabled] = useState(true);
+  const [__chatSettings, _setChatSettings] = useState({
     notifications: true,
     readReceipts: true,
     autoConnect: true,
@@ -80,8 +80,8 @@ export function RealTimeCrisisChat() {
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const _inputRef  = useRef<HTMLInputElement>(null);
+  const _chatContainerRef  = useRef<HTMLDivElement>(null);
 
   // Initialize crisis chat connection
   useEffect(() => {
@@ -98,7 +98,7 @@ export function RealTimeCrisisChat() {
   }, [messages]);
 
   // Handle typing indicators
-  const handleTyping = useCallback(() => {
+  const _handleTyping  = useCallback(() => {
     if (!isTyping) {
       setIsTyping(true);
       // Send typing indicator to other participants
@@ -132,8 +132,8 @@ export function RealTimeCrisisChat() {
         'info'
       );
 
-    } catch (_error) {
-      logger.error('Failed to initialize crisis chat:');
+    } catch (error) {
+      logger.error('Failed to initialize crisis chat', 'RealTimeCrisisChat', error);
       addSystemMessage(
         'Having trouble connecting to chat. Emergency hotlines are still available: 988',
         'crisis-alert'
@@ -295,7 +295,7 @@ export function RealTimeCrisisChat() {
           senderId: professional.id,
           senderName: professional.name,
           senderRole: 'professional',
-          content: `Hi, I&apos;m ${professional.name}, a ${professional.credentials}. I&apos;m here to help and support you through this difficult time. You&apos;re not alone.`,
+          content: `Hi, I'm ${professional.name}, a ${professional.credentials}. I'm here to help and support you through this difficult time. You're not alone.`,
           timestamp: new Date(),
           type: 'text',
           encrypted: true,
@@ -383,7 +383,7 @@ Professional counselors are joining this chat now. You matter and help is here.`
     // Implementation for requesting response from supporters
   };
 
-  const _sendTypingIndicator = (_typing: boolean) => {
+  const __sendTypingIndicator = (_typing: boolean) => {
     // Implementation for sending typing indicators
   };
 

@@ -279,7 +279,7 @@ test.describe('Crisis Intervention E2E', () => {
     
     // Collect performance metrics
     const metrics = await page.evaluate(() => {
-      const navigation = performance.getEntriesByType('navigation')[0] as any;
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       return {
         domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
         loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
@@ -293,7 +293,7 @@ test.describe('Crisis Intervention E2E', () => {
     // Measure crisis button interaction
     const interactionMetrics = await page.evaluate(async () => {
       const start = performance.now();
-      (document.querySelector('button:has-text("Crisis Help")') as any)?.click();
+      (document.querySelector('button:has-text("Crisis Help")') as HTMLButtonElement)?.click();
       await new Promise(resolve => setTimeout(resolve, 100));
       const end = performance.now();
       return end - start;

@@ -29,7 +29,7 @@ export default function Profile({ _userId, editable = true }: ProfileProps) {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label htmlFor="input_ee0csb8it" className="block text-sm font-medium mb-1">Email</label>
               <input 
                 type="email" 
                 className="w-full p-2 border rounded" 
@@ -39,7 +39,7 @@ export default function Profile({ _userId, editable = true }: ProfileProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Display Name</label>
+              <label htmlFor="input_af94jm08p" className="block text-sm font-medium mb-1">Display Name</label>
               <input 
                 type="text" 
                 className="w-full p-2 border rounded" 
@@ -49,7 +49,7 @@ export default function Profile({ _userId, editable = true }: ProfileProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Bio</label>
+              <label htmlFor="input_hlogbwf7o" className="block text-sm font-medium mb-1">Bio</label>
               <textarea 
                 className="w-full p-2 border rounded" 
                 rows={3}
@@ -59,7 +59,7 @@ export default function Profile({ _userId, editable = true }: ProfileProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Goals</label>
+              <label htmlFor="input_7efygxqy4" className="block text-sm font-medium mb-1">Goals</label>
               <div className="space-y-2">
                 <div className="p-2 bg-blue-50 rounded">Improve daily mood tracking</div>
                 <div className="p-2 bg-green-50 rounded">Practice mindfulness daily</div>

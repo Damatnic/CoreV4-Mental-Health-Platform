@@ -695,7 +695,7 @@ class RateLimiterService {
           this.blockedIPs.set(_ip, new Date(blockUntil as string));
         });
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load blocked IPs:');
     }
   }
@@ -708,10 +708,10 @@ class RateLimiterService {
         data[_ip] = blockUntil.toISOString();
       });
       secureStorage.setItem('blocked_ips', JSON.stringify(_data));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to persist blocked IPs:');
     }
   }
 }
 
-export const rateLimiter = RateLimiterService.getInstance();
+export const _rateLimiter = RateLimiterService.getInstance();

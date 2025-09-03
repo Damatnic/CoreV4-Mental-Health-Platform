@@ -40,23 +40,29 @@ interface BehavioralActivationProps {
   onStartExperiment?: (_experiment: unknown) => void;
 }
 
+interface PleasantActivity {
+  id: string;
+  title: string;
+  category: string;
+  icon: React.ComponentType;
+  _difficulty: string;
+  energyLevel: string;
+  duration: number;
+  moodImpact: number;
+}
+
 export function BehavioralActivation({
   currentMood = 5,
   energyLevel = 'medium',
   onScheduleActivity,
   onStartExperiment
 }: BehavioralActivationProps) {
-  const {
-    _activities,
-    addActivity,
-    getActivityRecommendations,
-    adaptScheduleForBadDay
-  } = useActivityStore();
+  const { _activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = useActivityStore();
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showExperiment, setShowExperiment] = useState(false);
-  const [selectedActivities, setSelectedActivities] = useState<any[]>([]);
+  const [selectedActivities, setSelectedActivities] = useState<PleasantActivity[]>([]);
   const [experimentNotes, setExperimentNotes] = useState('');
 
   // Pleasant activities library
@@ -184,7 +190,7 @@ export function BehavioralActivation({
   };
 
   // Get activity recommendations
-  const _recommendations = getActivityRecommendations(energyLevel, currentMood);
+  const __recommendations = getActivityRecommendations(energyLevel, currentMood);
 
   return (
     <div className="h-full flex flex-col">
@@ -301,7 +307,7 @@ export function BehavioralActivation({
             </p>
             
             <div className="mb-3">
-              <label className="text-sm font-medium text-blue-800">Hypothesis/Notes</label>
+              <label htmlFor="input_jxp6xsdof" className="text-sm font-medium text-blue-800">Hypothesis/Notes</label>
               <textarea
                 value={experimentNotes}
                 onChange={(e) => setExperimentNotes(e.target.value)}

@@ -14,7 +14,7 @@ interface GroupCardProps {
 
 function GroupCard({ group, onJoin, onLeave, onManage }: GroupCardProps) {
   const { user } = useAuth();
-  const isOwner = user?.id === group.createdBy;
+  const _isOwner  = user?.id === group.createdBy;
   const isModerator = group.moderators.includes(user?.id || '');
 
   const getCategoryColor = (category: string) => {
@@ -201,7 +201,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="input_fqa5tqfk0" className="block text-sm font-medium text-gray-700 mb-1">
                 Group Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -217,7 +217,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="input_qenpse6d2" className="block text-sm font-medium text-gray-700 mb-1">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -233,7 +233,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="input_dah5ie4o6" className="block text-sm font-medium text-gray-700 mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -258,7 +258,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Privacy Settings</h3>
               
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_p7wmkvb4s" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.isPrivate}
@@ -271,7 +271,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_fbh7etuqq" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.requiresApproval}
@@ -289,7 +289,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Group Features</h3>
               
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_v2psv1ugk" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.settings?.allowAnonymous}
@@ -305,7 +305,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_loauf68a6" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.settings?.autoModeration}
@@ -321,7 +321,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_fwcmv5fhd" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.settings?.crisisSupport}
@@ -337,7 +337,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="input_e8xvahqxw" className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.settings?.peerSupport}
@@ -356,7 +356,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
             {/* Guidelines */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="input_nh2qm09pm" className="block text-sm font-medium text-gray-700 mb-1">
                 Community Guidelines
               </label>
               <div className="flex items-center space-x-2 mb-2">
@@ -419,9 +419,9 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 export function SupportGroups() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [__showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
+  const [searchQuery, _setSearchQuery] = useState('');
 
   // Fetch groups
   const { data, _isLoading, _error } = useQuery({
@@ -434,7 +434,7 @@ export function SupportGroups() {
   });
 
   // Join group mutation
-  const joinMutation = useMutation({
+  const _joinMutation  = useMutation({
     mutationFn: (_groupId: string) => communityService.joinGroup(_groupId),
     onSuccess: () => {
       toast.success('Successfully joined the group!');
@@ -446,7 +446,7 @@ export function SupportGroups() {
   });
 
   // Leave group mutation
-  const leaveMutation = useMutation({
+  const _leaveMutation  = useMutation({
     mutationFn: (_groupId: string) => communityService.leaveGroup(_groupId),
     onSuccess: () => {
       toast.success('You have left the group');

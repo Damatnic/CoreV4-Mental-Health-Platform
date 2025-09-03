@@ -49,11 +49,11 @@ interface PerformanceStats {
 
 export function PerformanceDashboard() {
   const { deviceInfo } = useMobileFeatures();
-  const [stats, setStats] = useState<PerformanceStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(5000); // 5 seconds
-  const [showDetails, setShowDetails] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [stats, _setStats] = useState<PerformanceStats | null>(null);
+  const [_isLoading, setIsLoading] = useState(true);
+  const [refreshInterval, _setRefreshInterval] = useState(5000); // 5 seconds
+  const [showDetails, _setShowDetails] = useState(false);
+  const [selectedMetric, _setSelectedMetric] = useState<string | null>(null);
 
   const refreshStats = useCallback(async () => {
     try {
@@ -83,7 +83,7 @@ export function PerformanceDashboard() {
       };
       
       setStats(_newStats);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to refresh performance stats:');
     }
   }, [deviceInfo]);
@@ -100,7 +100,7 @@ export function PerformanceDashboard() {
         
         performanceMonitor.recordMetric('dashboard_load_complete', Date.now());
         setIsLoading(false);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to initialize performance monitoring:');
         setIsLoading(false);
       }
@@ -411,13 +411,13 @@ export function PerformanceDashboard() {
             </div>
             <div className="text-sm text-red-600">Response Time</div>
             <div className="text-xs text-red-500 mt-1">
-              Target: &lt;200ms
+              Target: <200ms
             </div>
           </div>
           
           <div className="text-center">
             <div className="text-2xl font-bold text-red-700">
-              &lt;50ms
+              <50ms
             </div>
             <div className="text-sm text-red-600">988 Access</div>
             <div className="text-xs text-red-500 mt-1">
@@ -427,7 +427,7 @@ export function PerformanceDashboard() {
           
           <div className="text-center">
             <div className="text-2xl font-bold text-red-700">
-              &lt;100ms
+              <100ms
             </div>
             <div className="text-sm text-red-600">Safety Plan</div>
             <div className="text-xs text-red-500 mt-1">
@@ -437,7 +437,7 @@ export function PerformanceDashboard() {
           
           <div className="text-center">
             <div className="text-2xl font-bold text-red-700">
-              &lt;50ms
+              <50ms
             </div>
             <div className="text-sm text-red-600">Emergency Contacts</div>
             <div className="text-xs text-red-500 mt-1">

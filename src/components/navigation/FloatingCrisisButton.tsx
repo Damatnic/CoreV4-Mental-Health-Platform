@@ -18,8 +18,8 @@ export function FloatingCrisisButton() {
   const location = useLocation();
   const { crisisDetected, setCrisisDetected, mode } = useNavigation();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [pulseAnimation, setPulseAnimation] = useState(true);
-  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [pulseAnimation, _setPulseAnimation] = useState(true);
+  const [position, _setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
 
   // Hide on crisis page itself
@@ -201,7 +201,7 @@ export function FloatingCrisisButton() {
               {/* Safety message */}
               <div className="mt-3 p-2 bg-amber-50 rounded-lg">
                 <p className="text-xs text-amber-800 text-center">
-                  You&apos;re not alone. Help is available 24/7.
+                  You're not alone. Help is available 24/7.
                 </p>
               </div>
             </div>
@@ -244,7 +244,7 @@ export function FloatingCrisisButton() {
 // Simplified crisis button for mobile
 export function MobileCrisisButton() {
   const location = useLocation();
-  const [showQuickActions, setShowQuickActions] = useState(false);
+  const [__showQuickActions, setShowQuickActions] = useState(false);
   
   if (location.pathname === '/crisis') {
     return null;

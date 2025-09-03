@@ -146,7 +146,7 @@ export class SecurityValidationService {
 // Auto-validate on module load
 try {
   SecurityValidationService.validateAndLog();
-} catch (_error) {
+} catch (error) {
   logger.error('Security validation failed:');
   if (import.meta.env.PROD) {
     // Prevent insecure production deployments

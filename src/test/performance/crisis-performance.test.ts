@@ -270,7 +270,7 @@ describe('Crisis Response Performance', () => {
       
       // Get initial listener count
       const getListenerCount = () => {
-        const events = (window as unknown).getEventListeners?.(_document) || {};
+        const _events = (window as unknown).getEventListeners?.(_document) || {};
         return Object.values(_events).reduce((sum: number, arr: unknown) => sum + arr.length, 0);
       };
       
@@ -280,7 +280,7 @@ describe('Crisis Response Performance', () => {
       unmount();
       
       // Check that listeners were removed
-      const finalListeners = getListenerCount();
+      const _finalListeners = getListenerCount();
       
       if (initialListeners > 0) {
         expect(_finalListeners).toBeLessThanOrEqual(_initialListeners);
@@ -338,7 +338,7 @@ describe('Crisis Response Performance', () => {
       );
       
       // Initial render without history
-      const initialComponents = screen.queryByTestId('mood-history-chart');
+      const _initialComponents = screen.queryByTestId('mood-history-chart');
       expect(_initialComponents).not.toBeInTheDocument();
       
       // Re-render with history
@@ -513,7 +513,7 @@ describe('Crisis Response Performance', () => {
       
       // Test crisis button
       monitor.mark('crisis-test-start');
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
       await user.click(_crisisButton);
       await waitFor(() => screen.getByText('988'));
       performanceMetrics.crisisResponse = monitor.measure('crisis-test', 'crisis-test-start');

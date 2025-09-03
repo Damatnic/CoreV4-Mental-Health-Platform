@@ -610,4 +610,4 @@ interface RecommendationContext {
   recentActivity?: string;
 }
 
-export const _wellnessRecommendationService = WellnessRecommendationService.getInstance();
+export const __wellnessRecommendationService = WellnessRecommendationService.getInstance();

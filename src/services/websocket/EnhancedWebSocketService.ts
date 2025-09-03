@@ -345,7 +345,7 @@ export class EnhancedWebSocketService {
         const preferences = JSON.parse(_prefs);
         logger.debug('Loaded _notification preferences', 'EnhancedWebSocket', preferences);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load _notification preferences:');
     }
   }
@@ -524,7 +524,7 @@ export class EnhancedWebSocketService {
 
     this.socket.on(WSEventType.CRISIS_INTERVENTION, (data: unknown) => {
       this.showNotification('Professional Support', 'A crisis counselor is joining your session', {
-        icon: '👨‍⚕️',
+        icon: '👨⚕️',
         _priority: 'high',
         requireInteraction: true
       });
@@ -673,7 +673,7 @@ export class EnhancedWebSocketService {
 
     this.socket.on(WSEventType.THERAPIST_SESSION_START, (_data: unknown) => {
       this.showNotification('Therapy Session Starting', 'Your therapist is ready', {
-        icon: '👨‍⚕️',
+        icon: '👨⚕️',
         _priority: 'high',
         requireInteraction: true,
         actions: [{ _action: 'join', title: 'Join Session' }]
@@ -733,15 +733,7 @@ export class EnhancedWebSocketService {
 
   // Enhanced notification handling
   private showNotification(title: string, message: string, options: NotificationOptions = {}): void {
-    const {
-      icon = '🔔',
-      _priority = 'normal',
-      actions = [],
-      requireInteraction = false,
-      _celebrationEffect = false,
-      soundType = 'gentle',
-      vibrationPattern
-    } = options;
+    const { icon = '🔔', _priority = 'normal', actions = [], requireInteraction = false, _celebrationEffect = false, soundType = 'gentle', vibrationPattern } = options;
 
     if (!this.shouldShowNotification(_priority)) return;
 
@@ -913,7 +905,7 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('notification_history', JSON.stringify(_history));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to save _notification to history:');
     }
   }
@@ -977,7 +969,7 @@ export class EnhancedWebSocketService {
       try {
         this.socket.emit(message.event, message.data);
         this.connectionState.lastSuccessfulMessage = new Date();
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to send queued message:');
         
         if (Date.now() - message.timestamp < 86400000 && message.retries < 3) {
@@ -994,7 +986,7 @@ export class EnhancedWebSocketService {
   private saveQueuedMessages(): void {
     try {
       secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to save message queue:');
     }
   }
@@ -1006,7 +998,7 @@ export class EnhancedWebSocketService {
         this.messageQueue = JSON.parse(_saved);
         this.connectionState.messagesQueued = this.messageQueue.length;
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
@@ -1141,7 +1133,7 @@ export class EnhancedWebSocketService {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (_error) {
+        } catch (error) {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -1199,11 +1191,11 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('critical_events', JSON.stringify(_logs));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to log critical event:');
     }
   }
 }
 
 // Export singleton instance
-export const _enhancedWsService = EnhancedWebSocketService.getInstance();
+export const __enhancedWsService = EnhancedWebSocketService.getInstance();

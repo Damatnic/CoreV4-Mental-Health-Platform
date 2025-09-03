@@ -502,7 +502,7 @@ export class WebSocketService {
     for (const message of messages) {
       try {
         this.socket.emit(message.event, message.data);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to send queued message:');
         
         // Re-queue if not expired (24 hours) and under retry limit
@@ -519,7 +519,7 @@ export class WebSocketService {
   private saveQueuedMessages(): void {
     try {
       secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to save message queue:');
     }
   }
@@ -530,7 +530,7 @@ export class WebSocketService {
       if (_saved) {
         this.messageQueue = JSON.parse(_saved);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
@@ -590,7 +590,7 @@ export class WebSocketService {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (_error) {
+        } catch (error) {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -643,11 +643,11 @@ export class WebSocketService {
       }
       
       secureStorage.setItem('critical_events', JSON.stringify(_logs));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to log critical event:');
     }
   }
 }
 
 // Export singleton instance
-export const wsService = WebSocketService.getInstance();
+export const _wsService = WebSocketService.getInstance();

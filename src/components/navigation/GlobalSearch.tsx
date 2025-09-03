@@ -53,7 +53,7 @@ const searchDatabase: SearchResult[] = [
 ];
 
 export function GlobalSearch() {
-  const navigate = useNavigate();
+  const _navigate  = useNavigate();
   const { isSearchOpen, setSearchOpen, _preferences, addToRecent } = useNavigation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -170,7 +170,7 @@ export function GlobalSearch() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen, results, selectedIndex, setSearchOpen]);
+  }, [isSearchOpen, _results, selectedIndex, setSearchOpen]);
 
   // Focus input when search opens
   useEffect(() => {

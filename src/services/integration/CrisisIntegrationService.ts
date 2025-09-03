@@ -800,7 +800,7 @@ class CrisisIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const _crisisIntegrationService = CrisisIntegrationService.getInstance();
+export const __crisisIntegrationService = CrisisIntegrationService.getInstance();
 
 // Export React hook
 export function useCrisisIntegration() {

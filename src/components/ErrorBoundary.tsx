@@ -94,7 +94,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   private reportError = async (error: Error, errorInfo: ErrorInfo) => {
     try {
       // Store error in localStorage for analysis
-      const _errorReport = {
+      const errorReport = {
         errorId: this.state.errorId,
         message: error.message,
         stack: error.stack,
@@ -104,7 +104,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         userAgent: navigator.userAgent
       };
 
-      localStorage.setItem(`error_${this.state.errorId}`, JSON.stringify(_errorReport));
+      localStorage.setItem(`error_${this.state.errorId}`, JSON.stringify(errorReport));
 
       // Send to monitoring service in production
       if (import.meta.env.PROD) {
@@ -112,12 +112,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           fetch('/api/monitoring/crisis-error', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(_errorReport),
+            body: JSON.stringify(errorReport),
           }).catch(() => {
             // Fail silently - don't let monitoring failures affect crisis support
           });
-        } catch {
-          // Fail silently
+        } catch (error) {
+          // Fail silently - don't let monitoring failures affect crisis support
+          console.error('Monitoring error:', error);
         }
       }
 
@@ -133,8 +134,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           }
         });
       }
-    } catch (_error) {
-      logger.error('Failed to report error');
+    } catch (error) {
+      logger.error('Failed to report error', 'ErrorBoundary', error);
     }
   };
 
@@ -185,7 +186,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       </div>
       
       <p className="text-red-700 mb-4">
-        Even though there&apos;s a technical issue, your safety is our priority. 
+        Even though there{"'"}s a technical issue, your safety is our priority. 
         These resources are always available:
       </p>
       
@@ -255,7 +256,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </h3>
               <p className="text-gray-700 mb-3">
                 A component on this page encountered an unexpected error. 
-                This doesn&apos;t affect the safety and crisis support features of the application.
+                This doesn{"'"}t affect the safety and crisis support features of the application.
               </p>
               
               {import.meta.env.DEV && error && (
@@ -325,7 +326,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 text-center">
-                If you&apos;re experiencing a mental health emergency, please contact emergency services immediately. 
+                If you{"'"}re experiencing a mental health emergency, please contact emergency services immediately. 
                 Technical issues never prevent access to crisis support resources.
               </p>
             </div>
@@ -427,7 +428,7 @@ export function useErrorBoundary() {
 }
 
 // Global error handler for uncaught errors
-export const setupGlobalErrorHandling = () => {
+export const _setupGlobalErrorHandling = () => {
   // Handle uncaught JavaScript errors
   window.addEventListener('error', (event) => {
     logger.error('🚨 UNCAUGHT ERROR:', {
@@ -440,7 +441,7 @@ export const setupGlobalErrorHandling = () => {
     });
 
     // Store error for analysis
-    const _errorReport = {
+    const errorReport = {
       type: 'uncaught_error',
       message: event.message,
       source: event.filename,
@@ -451,9 +452,9 @@ export const setupGlobalErrorHandling = () => {
     };
 
     try {
-      localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(_errorReport));
-    } catch (_error) {
-      logger.error('Failed to store error report');
+      localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(errorReport));
+    } catch (error) {
+      logger.error('Failed to store error report', 'ErrorBoundary', error);
     }
   });
 
@@ -466,7 +467,7 @@ export const setupGlobalErrorHandling = () => {
     });
 
     // Store rejection for analysis
-    const _rejectionReport = {
+    const rejectionReport = {
       type: 'unhandled_rejection',
       reason: event.reason?.toString(),
       stack: event.reason?.stack,
@@ -474,9 +475,9 @@ export const setupGlobalErrorHandling = () => {
     };
 
     try {
-      localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(_rejectionReport));
-    } catch (_error) {
-      logger.error('Failed to store rejection report');
+      localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(rejectionReport));
+    } catch (error) {
+      logger.error('Failed to store rejection report', 'ErrorBoundary', error);
     }
   });
 

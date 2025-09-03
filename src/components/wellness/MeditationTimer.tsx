@@ -98,20 +98,20 @@ interface MeditationStreak {
 }
 
 export const MeditationTimer: React.FC = () => {
-  const [selectedType, setSelectedType] = useState<keyof typeof MEDITATION_TYPES>('mindfulness');
+  const [selectedType, _setSelectedType] = useState<keyof typeof MEDITATION_TYPES>('mindfulness');
   const [duration, setDuration] = useState(10); // minutes
   const [timeRemaining, setTimeRemaining] = useState(0); // seconds
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [ambientSound, setAmbientSound] = useState<keyof typeof AMBIENT_SOUNDS>('none');
-  const [bellInterval, setBellInterval] = useState<keyof typeof BELL_INTERVALS>('start_end');
-  const [volume, setVolume] = useState(50);
-  const [showSettings, setShowSettings] = useState(false);
+  const [ambientSound, _setAmbientSound] = useState<keyof typeof AMBIENT_SOUNDS>('none');
+  const [bellInterval, _setBellInterval] = useState<keyof typeof BELL_INTERVALS>('start_end');
+  const [volume, _setVolume] = useState(50);
+  const [showSettings, _setShowSettings] = useState(false);
   const [sessions, setSessions] = useState<MeditationSession[]>([]);
   const [streak, setStreak] = useState<MeditationStreak>({ current: 0, longest: 0, lastSessionDate: null });
-  const [showStats, setShowStats] = useState(false);
-  const [customMessage, setCustomMessage] = useState('');
-  const [preparationTime, setPreparationTime] = useState(10); // seconds
+  const [showStats, _setShowStats] = useState(false);
+  const [customMessage, _setCustomMessage] = useState('');
+  const [preparationTime, _setPreparationTime] = useState(10); // seconds
   const [isPreparing, setIsPreparing] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -332,7 +332,7 @@ export const MeditationTimer: React.FC = () => {
     const newStreak = { ...streak };
     
     if (streak.lastSessionDate === today) {
-      // Already meditated today, don&apos;t change streak
+      // Already meditated today, don't change streak
     } else if (streak.lastSessionDate === yesterday) {
       // Continuing streak
       newStreak.current += 1;
@@ -599,7 +599,7 @@ export const MeditationTimer: React.FC = () => {
           {/* Duration Slider */}
           {!isActive && !isPreparing && (
             <div className="mb-6">
-              <label className="flex items-center justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="input_bn2mjhgvt" className="flex items-center justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <span>Duration</span>
                 <span className="text-lg">{duration} minutes</span>
               </label>
@@ -682,7 +682,7 @@ export const MeditationTimer: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 {/* Ambient Sound */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <label htmlFor="input_o6sdain3o" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Ambient Sound
                   </label>
                   <select
@@ -699,7 +699,7 @@ export const MeditationTimer: React.FC = () => {
 
                 {/* Bell Interval */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <label htmlFor="input_h1utea24z" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Bell Interval
                   </label>
                   <select
@@ -716,7 +716,7 @@ export const MeditationTimer: React.FC = () => {
 
                 {/* Volume */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <label htmlFor="input_74lxh2fpk" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Volume: {volume}%
                   </label>
                   <input
@@ -731,7 +731,7 @@ export const MeditationTimer: React.FC = () => {
 
                 {/* Preparation Time */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <label htmlFor="input_gkyv95pvz" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Preparation Time: {preparationTime}s
                   </label>
                   <input
@@ -747,7 +747,7 @@ export const MeditationTimer: React.FC = () => {
 
                 {/* Custom Message */}
                 <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <label htmlFor="input_ppmdzvirf" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Meditation Intention (_optional)
                   </label>
                   <input

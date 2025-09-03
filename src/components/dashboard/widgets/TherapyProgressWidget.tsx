@@ -143,7 +143,7 @@ export function TherapyProgressWidget({ progress, error }: TherapyProgressWidget
               <div
                 key={hw.id}
                 className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                onClick={() => navigate('/wellness/activities')}
+                onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => navigate('/wellness/activities')(e); } }} role="button" tabIndex={0}> navigate('/wellness/activities')}
               >
                 <div className="flex items-center space-x-2">
                   {hw.completed ? (

@@ -110,7 +110,7 @@ describe('Performance Testing', () => {
       const { container } = render(<App />);
       
       // Critical content should load immediately
-      const criticalLoadTime = await measurePerformance(async () => {
+      const _criticalLoadTime = await measurePerformance(async () => {
         await screen.findByRole('navigation');
         await screen.findByRole('button', { name: /crisis.*help/i });
       });
@@ -118,7 +118,7 @@ describe('Performance Testing', () => {
       expect(_criticalLoadTime).toBeLessThan(1000);
       
       // Non-critical content can load later
-      const nonCriticalLoadTime = await measurePerformance(async () => {
+      const _nonCriticalLoadTime = await measurePerformance(async () => {
         await screen.findByTestId('wellness-insights');
         await screen.findByTestId('community-feed');
       });
@@ -132,10 +132,10 @@ describe('Performance Testing', () => {
       
       // Check initial bundle size
       const scripts = Array.from(document.querySelectorAll('script'));
-      const _initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
+      const __initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
       
       // Navigate to feature that should be code-split
-      const therapyLink = await screen.findByRole('link', { name: /therapy/i });
+      const _therapyLink = await screen.findByRole('link', { name: /therapy/i });
       fireEvent.click(_therapyLink);
       
       await waitFor(() => {
@@ -234,13 +234,13 @@ describe('Performance Testing', () => {
       const finalMemory = performance.memory?.usedJSHeapSize || 0;
       
       // Memory increase should be minimal
-      const memoryIncrease = finalMemory - initialMemory;
+      const _memoryIncrease = finalMemory - initialMemory;
       expect(_memoryIncrease).toBeLessThan(5 * 1024 * 1024); // Less than 5MB increase
     });
     
     it('should efficiently handle large datasets', async () => {
       // Create large dataset
-      const moodEntries = Array.from({ length: 1000 }, (_, i) => ({
+      const _moodEntries = Array.from({ length: 1000 }, (_, i) => ({
         id: i,
         date: new Date(Date.now() - i * 86400000),
         mood: Math.floor(Math.random() * 10) + 1,
@@ -251,7 +251,7 @@ describe('Performance Testing', () => {
       
       const duration = await measurePerformance(async () => {
         render(<App />);
-        const historyButton = await screen.findByRole('button', { name: /mood.*history/i });
+        const _historyButton = await screen.findByRole('button', { name: /mood.*history/i });
         fireEvent.click(_historyButton);
         await screen.findByTestId('mood-history-list');
       });
@@ -275,7 +275,7 @@ describe('Performance Testing', () => {
         }, 0);
       };
       
-      const initialCount = getEventListenerCount();
+      const _initialCount = getEventListenerCount();
       
       // Interact with the app
       const buttons = await screen.findAllByRole('button');
@@ -285,7 +285,7 @@ describe('Performance Testing', () => {
       unmount();
       
       // Check that listeners were cleaned up
-      const finalCount = getEventListenerCount();
+      const _finalCount = getEventListenerCount();
       expect(_finalCount).toBeLessThanOrEqual(_initialCount);
     });
   });
@@ -322,7 +322,7 @@ describe('Performance Testing', () => {
       
       // Wait for initial data fetch
       await waitFor(() => expect(_fetchCount).toBeGreaterThan(0));
-      const initialFetchCount = fetchCount;
+      const _initialFetchCount = fetchCount;
       
       // Rerender (simulate navigation back)
       rerender(<App />);
@@ -346,9 +346,9 @@ describe('Performance Testing', () => {
       render(<App />);
       
       // Trigger multiple data needs
-      const wellnessButton = await screen.findByRole('button', { name: /wellness/i });
+      const _wellnessButton = await screen.findByRole('button', { name: /wellness/i });
       const moodButton = await screen.findByRole('button', { name: /mood/i });
-      const journalButton = await screen.findByRole('button', { name: /journal/i });
+      const _journalButton = await screen.findByRole('button', { name: /journal/i });
       
       fireEvent.click(_wellnessButton);
       fireEvent.click(_moodButton);
@@ -373,7 +373,7 @@ describe('Performance Testing', () => {
       let lastTime = performance.now();
       let frameCount = 0;
       
-      const measureFPS = () => {
+      const _measureFPS = () => {
         frameCount++;
         const currentTime = performance.now();
         const delta = currentTime - lastTime;
@@ -400,7 +400,7 @@ describe('Performance Testing', () => {
       await new Promise(resolve => setTimeout(resolve, 3500));
       
       // Average FPS should be close to 60
-      const avgFPS = frameRates.reduce((a, b) => a + b, 0) / frameRates.length;
+      const _avgFPS = frameRates.reduce((a, b) => a + b, 0) / frameRates.length;
       expect(_avgFPS).toBeGreaterThan(50); // Allow some variance
     });
     
@@ -426,7 +426,7 @@ describe('Performance Testing', () => {
   
   describe('Load Testing', () => {
     it('should handle multiple concurrent users', async () => {
-      const userSimulations = Array.from({ length: 10 }, async (_, i) => {
+      const _userSimulations = Array.from({ length: 10 }, async (_, i) => {
         const { container } = render(<App key={i} />);
         
         // Simulate user actions
@@ -471,7 +471,7 @@ describe('Performance Testing', () => {
     
     it('should handle large number of DOM elements efficiently', async () => {
       // Create scenario with many elements
-      const largeDataset = Array.from({ length: 500 }, (_, i) => ({
+      const _largeDataset = Array.from({ length: 500 }, (_, i) => ({
         id: i,
         title: `Item ${i}`,
         content: `Content for item ${i}`
@@ -481,7 +481,7 @@ describe('Performance Testing', () => {
       
       const duration = await measurePerformance(async () => {
         render(<App />);
-        const communityLink = await screen.findByRole('link', { name: /community/i });
+        const _communityLink = await screen.findByRole('link', { name: /community/i });
         fireEvent.click(_communityLink);
         await screen.findByTestId('community-feed');
       });
@@ -536,7 +536,7 @@ describe('Performance Testing', () => {
       
       // Simulate disconnection
       mockWebSocket.readyState = WebSocket.CLOSED;
-      const disconnectEvent = new Event('close');
+      const _disconnectEvent = new Event('close');
       mockWebSocket.addEventListener.mock.calls
         .filter(([event]) => event === 'close')
         .forEach(([, handler]) => handler(_disconnectEvent));

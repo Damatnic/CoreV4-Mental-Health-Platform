@@ -140,7 +140,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'REGISTRATION_FAILED',
-        details: { error: error instanceof Error ? error.message : String(error), email: data.email },
+        details: { error: error instanceof Error ? error.message : String(error), email: data.email } })(),
         severity: 'warning',
       });
       throw error;
@@ -204,7 +204,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
-        details: { error: error instanceof Error ? error.message : String(error), email: credentials.email },
+        details: { error: error instanceof Error ? error.message : String(error), email: credentials.email } })(),
         severity: 'warning',
       });
       throw error;
@@ -244,7 +244,7 @@ class AuthenticationService {
         clearTimeout(this.activityTimer);
         this.activityTimer = null;
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Logout error: ');
       // Force clear session even if API call fails
       await this.clearSession();
@@ -275,7 +275,7 @@ class AuthenticationService {
       this.scheduleTokenRefresh();
 
       return newTokens;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Token refresh failed:');
       // If refresh fails, user needs to re-authenticate
       await this.logout();
@@ -346,7 +346,7 @@ class AuthenticationService {
       await auditLogger.log({
         event: 'PROFILE_UPDATE_FAILED',
         userId: this.currentSession?.user.id,
-        details: { error: error instanceof Error ? error.message : String(error) },
+        details: { error: error instanceof Error ? error.message : String(error) } })(),
         severity: 'error',
       });
       throw error;
@@ -375,7 +375,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'PASSWORD_RESET_FAILED',
-        details: { error: error instanceof Error ? error.message : String(error) },
+        details: { error: error instanceof Error ? error.message : String(error) } })(),
         severity: 'warning',
       });
       throw error;
@@ -419,7 +419,7 @@ class AuthenticationService {
     } catch (error) {
       await auditLogger.log({
         event: 'PASSWORD_RESET_FAILED',
-        details: { error: error instanceof Error ? error.message : String(error) },
+        details: { error: error instanceof Error ? error.message : String(error) } })(),
         severity: 'error',
       });
       throw error;
@@ -444,7 +444,7 @@ class AuthenticationService {
           await this.clearSession();
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load stored session:');
       await this.clearSession();
     }
@@ -708,4 +708,4 @@ class AuthenticationService {
   }
 }
 
-export const authService = AuthenticationService.getInstance();
+export const _authService = AuthenticationService.getInstance();

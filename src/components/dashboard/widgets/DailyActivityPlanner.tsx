@@ -62,30 +62,18 @@ const CATEGORY_COLORS = {
 };
 
 export const DailyActivityPlanner: React.FC = () => {
-  const {
-    activities,
-    _dailySchedule,
-    addActivity,
-    _updateActivity,
-    deleteActivity,
-    completeActivity,
-    rescheduleActivity,
-    getActivityRecommendations,
-    suggestReschedule,
-    adaptScheduleForBadDay,
-    generateDailySchedule
-  } = useActivityStore();
+  const { activities, _dailySchedule, addActivity, _updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
   
   const { moodEntries } = useWellnessStore();
   
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, _setSelectedDate] = useState(new Date());
   const [currentEnergyLevel, setCurrentEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');
-  const [currentMood, setCurrentMood] = useState(5);
-  const [showAddActivity, setShowAddActivity] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<string | null>(null);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [adaptiveMode, setAdaptiveMode] = useState(false);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [currentMood, _setCurrentMood] = useState(5);
+  const [showAddActivity, _setShowAddActivity] = useState(false);
+  const [editingActivity, _setEditingActivity] = useState<string | null>(null);
+  const [showRecommendations, _setShowRecommendations] = useState(false);
+  const [__adaptiveMode, setAdaptiveMode] = useState(false);
+  const [timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
   
   // Initialize time slots and load schedule
   useEffect(() => {
@@ -113,7 +101,7 @@ export const DailyActivityPlanner: React.FC = () => {
     
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const _time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         slots.push({ time });
       }
     }
@@ -125,7 +113,7 @@ export const DailyActivityPlanner: React.FC = () => {
     
     dayActivities.forEach(activity => {
       if (activity.scheduledTime) {
-        const time = format(new Date(activity.scheduledTime), 'HH:mm');
+        const _time = format(new Date(activity.scheduledTime), 'HH:mm');
         const slotIndex = slots.findIndex(slot => slot.time === time);
         if (slotIndex !== -1 && slots[slotIndex]) {
           slots[slotIndex]!.activity = {
@@ -194,7 +182,7 @@ export const DailyActivityPlanner: React.FC = () => {
   };
   
   // Reschedule activity
-  const _handleReschedule = (_activityId: string, newTime: string) => {
+  const __handleReschedule = (_activityId: string, newTime: string) => {
     const timeParts = newTime.split(':').map(_Number);
     const hours = timeParts[0] ?? 9;
     const minutes = timeParts[1] ?? 0;

@@ -50,7 +50,7 @@ export function useNavigatorOnLine() {
  * Hook to detect slow network connections
  */
 export function useNetworkQuality() {
-  const [quality, setQuality] = useState<'fast' | 'slow' | 'offline'>('fast');
+  const [__quality, setQuality] = useState<'fast' | 'slow' | 'offline'>('fast');
   const isOnline = useNavigatorOnLine();
 
   useEffect(() => {

@@ -59,9 +59,9 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
   const { moodEntries, moodPatterns, _analyzeMoodPatterns, wellnessInsights } = useWellnessStore();
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
   const [chartType, setChartType] = useState<ChartType>('line');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedFactors, setSelectedFactors] = useState<string[]>(['mood', 'stress', 'energy']);
+  const [selectedDate, _setSelectedDate] = useState(new Date());
+  const [showFilters, _setShowFilters] = useState(false);
+  const [selectedFactors, _setSelectedFactors] = useState<string[]>(['mood', 'stress', 'energy']);
 
   // Calculate date range based on selected time range
   const dateRange = useMemo(() => {
@@ -518,7 +518,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
           >
             <div className="p-4 bg-gray-50 rounded-lg space-y-3">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Factors to Display</label>
+                <label htmlFor="input_j8q7wvae1" className="text-sm font-medium text-gray-700 mb-2 block">Factors to Display</label>
                 <div className="flex flex-wrap gap-2">
                   {['mood', 'stress', 'energy', 'anxiety', 'sleep', 'social'].map(factor => (
                     <button
@@ -700,7 +700,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
                     <div
                       key={idx}
                       className="flex items-center justify-between p-3 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors"
-                      onClick={() => onTriggerIdentified?.(trigger.trigger)}
+                      onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => onTriggerIdentified?.(trigger.trigger)(e); } }} role="button" tabIndex={0}> onTriggerIdentified?.(trigger.trigger)}
                     >
                       <div className="flex items-center space-x-3">
                         <AlertCircle className="h-4 w-4 text-orange-500" />

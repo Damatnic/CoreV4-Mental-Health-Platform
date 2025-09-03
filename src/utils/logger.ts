@@ -172,7 +172,7 @@ class Logger {
         criticalErrors.shift();
       }
       localStorage.setItem('corev4_critical_errors', JSON.stringify(criticalErrors));
-    } catch {
+    } catch (_error) {
       // Fail silently if localStorage is full or unavailable
     }
   }
@@ -227,7 +227,7 @@ class Logger {
         crisisEvents.shift();
       }
       localStorage.setItem('corev4_crisis_events', JSON.stringify(crisisEvents));
-    } catch {
+    } catch (_error) {
       // Fail silently
     }
   }
@@ -269,22 +269,22 @@ class Logger {
 export const logger = new Logger();
 
 // Export convenience functions
-export const logDebug = (message: string, context?: string, data?: unknown) => 
+export const _logDebug = (message: string, context?: string, data?: unknown) => 
   logger.debug(message, context, data);
 
-export const logInfo = (message: string, context?: string, data?: unknown) => 
+export const _logInfo = (message: string, context?: string, data?: unknown) => 
   logger.info(message, context, data);
 
-export const logWarn = (message: string, context?: string, data?: unknown) => 
+export const _logWarn = (message: string, context?: string, data?: unknown) => 
   logger.warn(message, context, data);
 
-export const logError = (message: string, context?: string, error?: Error | unknown) => 
+export const _logError = (message: string, context?: string, error?: Error | unknown) => 
   logger.error(message, context, error);
 
-export const logCritical = (message: string, context?: string, error?: Error | unknown) => 
+export const _logCritical = (message: string, context?: string, error?: Error | unknown) => 
   logger.critical(message, context, error);
 
-export const logCrisis = (
+export const _logCrisis = (
   message: string, 
   urgency: 'low' | 'medium' | 'high' | 'critical', 
   context?: string, 

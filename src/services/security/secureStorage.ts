@@ -66,12 +66,7 @@ class SecureStorageService {
     options: StorageOptions = {}
   ): Promise<void> {
     try {
-      const {
-        persistent = true,
-        expires,
-        encrypted = true,
-        compress = false,
-      } = options;
+      const { persistent = true, expires, encrypted = true, compress = false,  } = options;
 
       // Validate storage quota
       await this.checkStorageQuota();
@@ -114,7 +109,7 @@ class SecureStorageService {
         
         try {
           localStorage.setItem(_storageKey, JSON.stringify(storageItem));
-        } catch {
+        } catch (_error) {
           // Try IndexedDB as fallback for larger data
           await this.storeInIndexedDB(_storageKey, storageItem);
         }
@@ -239,7 +234,7 @@ class SecureStorageService {
 
       // Log clear event
       this.logStorageEvent('CLEAR', 'all');
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to clear storage:');
     }
   }
@@ -357,7 +352,7 @@ class SecureStorageService {
         return decompressed;
       }
       return data; // Return as-is if API not available
-    } catch (_error) {
+    } catch (error) {
       logger.error('[SecureStorage] Decompression failed:');
       return ''; // Return empty string instead of throwing
     }
@@ -367,7 +362,7 @@ class SecureStorageService {
     try {
       // Basic base64 validation
       return btoa(atob(_str)) === str;
-    } catch {
+    } catch (_error) {
       return false;
     }
   }
@@ -389,7 +384,7 @@ class SecureStorageService {
   private async cleanupExpiredItems(): Promise<void> {
     const keys = await this.getAllKeys();
     for (const key of keys) {
-      const _item = await this.getItem(key);
+      const __item = await this.getItem(key);
       // getItem automatically removes expired items
     }
   }

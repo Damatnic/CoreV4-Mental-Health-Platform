@@ -29,7 +29,7 @@ const LOCALSTORAGE_PATTERNS = [
 ];
 
 // Import statement to add
-const SECURE_STORAGE_IMPORT = "import { secureStorage } from '../services/security/SecureLocalStorage';";
+const _SECURE_STORAGE_IMPORT = "import { secureStorage } from '../services/security/SecureLocalStorage';";
 
 function findTSXFiles(dir, filesList = []) {
   const files = fs.readdirSync(dir);
@@ -170,6 +170,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const ___dirname = dirname(__filename);
 
 main();

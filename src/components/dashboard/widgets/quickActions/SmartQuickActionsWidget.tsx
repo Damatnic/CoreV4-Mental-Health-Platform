@@ -43,8 +43,8 @@ export function SmartQuickActionsWidget({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [voiceCommandActive, setVoiceCommandActive] = useState(false);
   const [showCustomizationPanel, setShowCustomizationPanel] = useState(false);
-  const [actionHistory, setActionHistory] = useState<string[]>([]);
-  const [contextualActions, setContextualActions] = useState<QuickAction[]>([]);
+  const [actionHistory, _setActionHistory] = useState<string[]>([]);
+  const [contextualActions, _setContextualActions] = useState<QuickAction[]>([]);
 
   // Action recommendation engine
   const recommendationEngine = useMemo(() => 
@@ -119,7 +119,7 @@ export function SmartQuickActionsWidget({
   }, [executeAction, onActionExecute, accessibilitySettings.screenReaderMode]);
 
   // Voice command handler
-  const handleVoiceCommand = useCallback((command: string) => {
+  const _handleVoiceCommand  = useCallback((command: string) => {
     const _matchedAction = actions.find(a => 
       a.label.toLowerCase().includes(command.toLowerCase()) ||
       a.voiceAlias?.some(alias => alias.toLowerCase() === command.toLowerCase())
@@ -131,7 +131,7 @@ export function SmartQuickActionsWidget({
   }, [actions, handleActionClick]);
 
   // Keyboard navigation handler
-  const handleKeyboardNavigation = useCallback((key: string) => {
+  const _handleKeyboardNavigation  = useCallback((key: string) => {
     // Handle keyboard shortcuts for actions
     const _actionWithShortcut = actions.find(a => a.keyboard === key);
     if (_actionWithShortcut) {

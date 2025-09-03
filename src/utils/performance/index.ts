@@ -190,7 +190,7 @@ function setupPerformanceBudget() {
       });
       
       resourceObserver.observe({ entryTypes: ['resource'] });
-    } catch {
+    } catch (_error) {
       logger.warn('Resource timing not supported');
     }
   }
@@ -199,7 +199,7 @@ function setupPerformanceBudget() {
 /**
  * Performance optimization presets for different scenarios
  */
-export const _PerformancePresets = {
+export const __PerformancePresets = {
   // For crisis intervention - maximum performance
   crisis: {
     priority: UpdatePriority.CRISIS,

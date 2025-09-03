@@ -120,15 +120,15 @@ export function CareTeamCommunication({
   _onUpdatePermissions,
   isProvider = false
 }: CareTeamCommunicationProps) {
-  const [activeTab, setActiveTab] = useState<'messages' | 'team' | 'notifications'>('messages');
-  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+  const [activeTab, _setActiveTab] = useState<'messages' | 'team' | 'notifications'>('messages');
+  const [selectedThread, _setSelectedThread] = useState<Thread | null>(null);
   const [newMessage, setNewMessage] = useState('');
-  const [showNewThread, setShowNewThread] = useState(false);
-  const [showMemberForm, setShowMemberForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
+  const [__showNewThread, setShowNewThread] = useState(false);
+  const [__showMemberForm, setShowMemberForm] = useState(false);
+  const [searchTerm, _setSearchTerm] = useState('');
+  const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
   const [notifications, _setNotifications] = useState<Notification[]>([]);
-  const [_isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
+  const [__isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom of messages
@@ -575,7 +575,7 @@ export function CareTeamCommunication({
                       <span className="font-medium text-gray-900 text-sm">You</span>
                     </div>
                     <div className="bg-primary-500 text-white rounded-lg p-3 text-sm inline-block">
-                      Agreed. The CBT techniques seem to be working well. Let&apos;s schedule a review 
+                      Agreed. The CBT techniques seem to be working well. Let's schedule a review 
                       meeting to discuss medication adjustments.
                     </div>
                   </div>
@@ -668,7 +668,7 @@ export function CareTeamCommunication({
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_wbhut9szt" className="block text-sm font-medium text-gray-700 mb-2">
                     Thread Name
                   </label>
                   <input
@@ -679,12 +679,12 @@ export function CareTeamCommunication({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_f66fbzob4" className="block text-sm font-medium text-gray-700 mb-2">
                     Select Participants
                   </label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {careTeam.filter(m => m.id !== currentUserId).map((member) => (
-                      <label key={member.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
+                      <label htmlFor="input_l8o3yj2g7" key={member.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
@@ -701,7 +701,7 @@ export function CareTeamCommunication({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_lm0uxskje" className="block text-sm font-medium text-gray-700 mb-2">
                     Priority
                   </label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
@@ -753,7 +753,7 @@ export function CareTeamCommunication({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="input_f9pnenla3" className="block text-sm font-medium text-gray-700 mb-2">
                       First Name
                     </label>
                     <input
@@ -762,7 +762,7 @@ export function CareTeamCommunication({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="input_epswy96ac" className="block text-sm font-medium text-gray-700 mb-2">
                       Last Name
                     </label>
                     <input
@@ -773,7 +773,7 @@ export function CareTeamCommunication({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_l59pomll3" className="block text-sm font-medium text-gray-700 mb-2">
                     Role
                   </label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
@@ -791,7 +791,7 @@ export function CareTeamCommunication({
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="input_8tifv7i8p" className="block text-sm font-medium text-gray-700 mb-2">
                       Email
                     </label>
                     <input
@@ -800,7 +800,7 @@ export function CareTeamCommunication({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="input_x4lxbmwiu" className="block text-sm font-medium text-gray-700 mb-2">
                       Phone
                     </label>
                     <input
@@ -811,7 +811,7 @@ export function CareTeamCommunication({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_ccgls7yvv" className="block text-sm font-medium text-gray-700 mb-2">
                     Organization
                   </label>
                   <input
@@ -821,7 +821,7 @@ export function CareTeamCommunication({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="input_uralfzbz5" className="block text-sm font-medium text-gray-700 mb-2">
                     Permissions
                   </label>
                   <div className="space-y-2">

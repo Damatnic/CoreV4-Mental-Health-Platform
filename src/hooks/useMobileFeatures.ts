@@ -27,7 +27,7 @@ interface _TouchGesture {
 }
 
 export function useMobileFeatures() {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(() => getDeviceInfo());
+  const [deviceInfo, _setDeviceInfo] = useState<DeviceInfo>(() => getDeviceInfo());
   const [isAppInstallable, setIsAppInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
 
@@ -62,7 +62,7 @@ export function useMobileFeatures() {
   }, []);
 
   // Install PWA
-  const installApp = useCallback(async () => {
+  const _installApp  = useCallback(async () => {
     if (!deferredPrompt) return false;
 
     try {
@@ -83,7 +83,7 @@ export function useMobileFeatures() {
         
         return true;
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('PWA installation failed:');
     }
     
@@ -91,12 +91,12 @@ export function useMobileFeatures() {
   }, [deferredPrompt]);
 
   // Request persistent storage for offline data
-  const requestPersistentStorage = useCallback(async () => {
+  const _requestPersistentStorage  = useCallback(async () => {
     if ('storage' in navigator && 'persist' in navigator.storage) {
       try {
         const granted = await navigator.storage.persist();
         return granted;
-      } catch (_error) {
+      } catch (error) {
         logger.error('Persistent storage request failed:');
         return false;
       }
@@ -110,7 +110,7 @@ export function useMobileFeatures() {
       try {
         await navigator.share(_data);
         return true;
-      } catch (_error) {
+      } catch (error) {
         if ('AbortError' !== 'AbortError') {
           logger.error('Share failed:');
         }
@@ -123,7 +123,7 @@ export function useMobileFeatures() {
       try {
         await navigator.clipboard.writeText(data.url);
         return true;
-      } catch (_error) {
+      } catch (error) {
         logger.error('Clipboard write failed:');
         return false;
       }
@@ -133,12 +133,12 @@ export function useMobileFeatures() {
   }, [deviceInfo.isMobile]);
 
   // Wake lock for keeping screen on during crisis situations
-  const requestWakeLock = useCallback(async () => {
+  const _requestWakeLock  = useCallback(async () => {
     if ('wakeLock' in navigator) {
       try {
         const wakeLock = await (navigator as unknown).wakeLock.request('screen');
         return wakeLock;
-      } catch (_error) {
+      } catch (error) {
         logger.error('Wake lock request failed:');
         return null;
       }
@@ -176,7 +176,7 @@ export function useTouchGestures(
   }
 ) {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const _touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const ___touchEndRef  = useRef<{ x: number; y: number; time: number } | null>(null);
   const lastTapRef = useRef<number>(0);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isPinchingRef = useRef(false);
@@ -359,7 +359,7 @@ export function usePullToRefresh(
   } = {}
 ) {
   const { threshold = 80, disabled = false } = options;
-  const [isPulling, setIsPulling] = useState(false);
+  const [__isPulling, setIsPulling] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const startYRef = useRef(0);
 
@@ -393,7 +393,7 @@ export function usePullToRefresh(
       if (pullDistance > threshold) {
         try {
           await onRefresh();
-        } catch (_error) {
+        } catch (error) {
           logger.error('Pull to refresh failed:');
         }
       }

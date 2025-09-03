@@ -86,12 +86,18 @@ interface SecurityMetrics {
   threatScore: number; // 0-100
 }
 
+interface PlaybookAction {
+  type: string;
+  target: string;
+  duration?: number;
+}
+
 class SecurityMonitorService {
   private static instance: SecurityMonitorService;
   private events: Map<string, SecurityEvent> = new Map();
   private incidents: Map<string, IncidentResponse> = new Map();
   private threatIndicators: ThreatIndicator[] = [];
-  private baselineMetrics: Map<string, any> = new Map();
+  private baselineMetrics: Map<string, unknown> = new Map();
   private anomalyThresholds: Map<string, number> = new Map();
   private alertSubscribers: Set<(event: SecurityEvent) => void> = new Set();
   private monitoringActive: boolean = true;
@@ -592,8 +598,8 @@ class SecurityMonitorService {
     return Array.from(_users);
   }
 
-  private getPlaybook(severity: string, eventType: SecurityEventType): unknown[] {
-    const playbooks: Record<string, any[]> = {
+  private getPlaybook(severity: string, eventType: SecurityEventType): PlaybookAction[] {
+    const playbooks: Record<string, PlaybookAction[]> = {
       'critical:data_breach': [
         { type: 'snapshot_system', target: 'all' },
         { type: 'quarantine_data', target: 'affected' },
@@ -752,7 +758,7 @@ class SecurityMonitorService {
     this.alertSubscribers.forEach(callback => {
       try {
         callback(event);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Alert subscriber error: ');
       }
     });
@@ -790,4 +796,4 @@ class SecurityMonitorService {
   }
 }
 
-export const securityMonitor = SecurityMonitorService.getInstance();
+export const _securityMonitor = SecurityMonitorService.getInstance();

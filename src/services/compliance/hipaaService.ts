@@ -4,7 +4,7 @@
  * Manages PHI (Protected Health Information) access and security
  */
 
-import { auditLogger } from '../security/auditLogger';
+import { auditLogger, AuditLogEntry } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
 import { privacyService } from '../privacy/privacyService';
@@ -218,7 +218,7 @@ class HIPAAComplianceService {
         details: {
           error: error instanceof Error ? error.message : String(error),
           _context: 'PHI access request',
-        },
+        } })(),
         severity: 'error',
       });
       throw error;
@@ -262,7 +262,7 @@ class HIPAAComplianceService {
       });
 
       return disclosure;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to record PHI disclosure:');
       throw undefined;
     }
@@ -330,7 +330,7 @@ class HIPAAComplianceService {
         violations,
         recommendations,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('PHI validation error: ');
       return {
         compliant: false,
@@ -380,7 +380,7 @@ class HIPAAComplianceService {
       this.initiateBreachResponse(breach);
 
       return breach;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to report breach:');
       throw undefined;
     }
@@ -393,7 +393,7 @@ class HIPAAComplianceService {
     patientId: string,
     startDate?: Date,
     endDate?: Date
-  ): Promise<any[]> {
+  ): Promise<(AuditLogEntry | PHIDisclosure)[]> {
     try {
       // Query audit logs for PHI access
       const logs = await auditLogger.query({
@@ -407,7 +407,7 @@ class HIPAAComplianceService {
       const disclosures = await this.getDisclosures(patientId, startDate, endDate);
 
       return [...logs, ...disclosures];
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to get PHI access log:');
       return [];
     }
@@ -504,7 +504,7 @@ class HIPAAComplianceService {
         findings,
         recommendations,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Risk assessment failed:');
       return {
         overallRisk: 'high',
@@ -736,4 +736,4 @@ class HIPAAComplianceService {
   }
 }
 
-export const hipaaService = HIPAAComplianceService.getInstance();
+export const _hipaaService = HIPAAComplianceService.getInstance();

@@ -138,12 +138,12 @@ export function HealthRecordsIntegration({
   _onUpdatePrivacy,
   onRefreshData
 }: HealthRecordsIntegrationProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
-  const [_selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
-  const [_showDetails, setShowDetails] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [showPrivateRecords, setShowPrivateRecords] = useState(false);
+  const [activeTab, _setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
+  const [_selectedRecord, _setSelectedRecord] = useState<HealthRecord | null>(null);
+  const [_showDetails, _setShowDetails] = useState(false);
+  const [searchQuery, _setSearchQuery] = useState('');
+  const [filterType, _setFilterType] = useState<string>('all');
+  const [showPrivateRecords, _setShowPrivateRecords] = useState(false);
 
   // Calculate health metrics
   const calculateHealthMetrics = () => {

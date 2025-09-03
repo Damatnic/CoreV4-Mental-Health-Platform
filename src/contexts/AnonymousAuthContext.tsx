@@ -161,7 +161,7 @@ function getOrCreateAnonymousUser(): AnonymousUser {
       }
       
       return user;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to parse _stored user _data:');
       // Create new user if _data is corrupted
     }
@@ -300,7 +300,7 @@ function migrateUserData(oldUser: unknown): AnonymousUser {
 
 export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AnonymousUser>(_getOrCreateAnonymousUser);
-  const [sessionDuration, setSessionDuration] = useState(0);
+  const [sessionDuration, _setSessionDuration] = useState(0);
   
   // Update session duration every minute
   useEffect(() => {
@@ -420,7 +420,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       };
       
       return JSON.stringify(exportData, null, 2);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to export user _data:');
       throw new Error('Unable to export _data. Please try again.');
     }
@@ -456,7 +456,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       
       logger.info('✅ Successfully imported user data');
       return true;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to import user _data:');
       return false;
     }
@@ -464,7 +464,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   
   // Check if data is stale (older than retention period)
   const isDataStale = (): boolean => {
-    const retentionDays = user.preferences.privacy?.dataRetentionDays || 365;
+    const _retentionDays  = user.preferences.privacy?.dataRetentionDays || 365;
     const staleDate = new Date();
     staleDate.setDate(staleDate.getDate() - retentionDays);
     
@@ -493,7 +493,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       }
       
       return true;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Data integrity validation failed:');
       return false;
     }

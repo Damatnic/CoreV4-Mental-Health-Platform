@@ -58,12 +58,12 @@ const MOOD_LABELS = [
 ];
 
 const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodChange }) => {
-  const [mood, setMood] = useState(5);
-  const [notes, setNotes] = useState('');
-  const [showCrisisSupport, setShowCrisisSupport] = useState(false);
+  const [mood, _setMood] = useState(5);
+  const [notes, _setNotes] = useState('');
+  const [showCrisisSupport, _setShowCrisisSupport] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [_debouncedMood, setDebouncedMood] = useState(_mood);
+  const [_debouncedMood, _setDebouncedMood] = useState(_mood);
 
   // Debounce mood changes for performance
   useDebounce(
@@ -145,7 +145,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       );
       
       return btoa(String.fromCharCode(...new Uint8Array(_encrypted)));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Encryption failed:');
       return null;
     }
@@ -164,13 +164,13 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       }
       
       secureStorage.setItem('mood_data', btoa(JSON.stringify(_moodHistory)));
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to store mood locally:');
     }
   };
 
   // Handle mood submission
-  const handleSubmit = useCallback(() => {
+  const _handleSubmit  = useCallback(() => {
     if (!submitMood.isPending) {
       submitMood.mutate({
         mood,

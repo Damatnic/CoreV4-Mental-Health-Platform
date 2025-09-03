@@ -9,7 +9,7 @@ export function ConsoleWelcomeBar() {
   const getWelcomeMessage = () => {
     const hour = new Date().getHours();
     const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-    const userName = user?.name || user?.nickname || 'friend';
+    const _userName  = user?.name || user?.nickname || 'friend';
     
     return {
       greeting: `Good ${timeOfDay}`,

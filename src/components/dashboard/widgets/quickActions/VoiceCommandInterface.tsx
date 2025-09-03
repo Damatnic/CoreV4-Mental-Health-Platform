@@ -18,7 +18,7 @@ export function VoiceCommandInterface({
 }: VoiceCommandInterfaceProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [interimTranscript, setInterimTranscript] = useState('');
+  const [interimTranscript, _setInterimTranscript] = useState('');
   const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [volume, setVolume] = useState(0);
@@ -132,7 +132,7 @@ export function VoiceCommandInterface({
       microphoneRef.current.connect(analyserRef.current);
       
       updateVolume();
-    } catch (_error) {
+    } catch (error) {
       logger.error('Error initializing audio analyzer:');
     }
   };
@@ -168,7 +168,7 @@ export function VoiceCommandInterface({
   };
 
   // Process recognized command
-  const processCommand = useCallback((command: string) => {
+  const _processCommand  = useCallback((command: string) => {
     setStatus('processing');
     const lowerCommand = command.toLowerCase();
     

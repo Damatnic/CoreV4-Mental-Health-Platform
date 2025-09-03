@@ -51,8 +51,8 @@ class CryptographyService {
         // Store the key securely (in production, use HSM or secure key storage)
         this.storeMasterKey(this.masterKey);
       }
-    } catch (_error) {
-      logger.error('Failed to initialize master key:');
+    } catch (error) {
+      logger.error('Failed to initialize master key', 'CryptoService', error);
       throw new Error('Cryptography initialization failed');
     }
   }
@@ -74,17 +74,24 @@ class CryptographyService {
       const encodedData = encoder.encode(data);
       
       // Prepare additional authenticated data if provided
-      const aad = additionalData ? encoder.encode(_additionalData) : undefined;
+      const aad = additionalData ? encoder.encode(additionalData) : undefined;
       
       // Encrypt the data
-      const encryptParams: unknown = {
+      interface EncryptParams {
+        name: string;
+        iv: Uint8Array;
+        tagLength: number;
+        additionalData?: Uint8Array;
+      }
+      
+      const encryptParams: EncryptParams = {
         name: this.ALGORITHM,
         iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       
       // Only add additionalData if it exists
-      if (_aad) {
+      if (aad) {
         encryptParams.additionalData = aad;
       }
       
@@ -97,12 +104,12 @@ class CryptographyService {
       // Combine IV and encrypted data
       const combined = new Uint8Array(iv.length + encryptedData.byteLength);
       combined.set(iv, 0);
-      combined.set(new Uint8Array(_encryptedData), iv.length);
+      combined.set(new Uint8Array(encryptedData), iv.length);
       
       // Convert to base64 for storage
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (_error) {
-      logger.error('Encryption failed:');
+    } catch (error) {
+      logger.error('Encryption failed', 'CryptoService', error);
       throw new Error('Failed to encrypt data');
     }
   }
@@ -140,7 +147,7 @@ class CryptographyService {
         decryptParams.additionalData = aad;
       }
       
-      const _decryptedData = await crypto.subtle.decrypt(
+      const __decryptedData = await crypto.subtle.decrypt(
         decryptParams,
         this.masterKey!,
         ciphertext
@@ -148,9 +155,9 @@ class CryptographyService {
 
       // Decode the result
       const decoder = new TextDecoder();
-      return decoder.decode(_decryptedData);
-    } catch (_error) {
-      logger.error('Decryption failed:');
+      return decoder.decode(decryptedData);
+    } catch (error) {
+      logger.error('Decryption failed', 'CryptoService', error);
       throw new Error('Failed to decrypt data');
     }
   }
@@ -162,14 +169,14 @@ class CryptographyService {
     try {
       // Generate or use provided salt
       const saltBytes = salt 
-        ? this.base64ToArrayBuffer(_salt)
+        ? this.base64ToArrayBuffer(salt)
         : crypto.getRandomValues(new Uint8Array(this.SALT_LENGTH));
       
       // Import password as key
       const encoder = new TextEncoder();
       const passwordKey = await crypto.subtle.importKey(
         'raw',
-        encoder.encode(_password),
+        encoder.encode(password),
         'PBKDF2',
         false,
         ['deriveBits']
@@ -181,7 +188,7 @@ class CryptographyService {
           name: 'PBKDF2',
           salt: saltBytes,
           iterations: this.PBKDF2_ITERATIONS,
-          _hash: 'SHA-256',
+          hash: 'SHA-256',
         },
         passwordKey,
         256
@@ -190,12 +197,12 @@ class CryptographyService {
       // Combine salt and hash
       const combined = new Uint8Array(saltBytes.byteLength + derivedBits.byteLength);
       combined.set(new Uint8Array(saltBytes), 0);
-      combined.set(new Uint8Array(_derivedBits), saltBytes.byteLength);
+      combined.set(new Uint8Array(derivedBits), saltBytes.byteLength);
       
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (_error) {
-      logger.error('Password hashing failed:');
-      throw new Error('Failed to _hash password');
+    } catch (error) {
+      logger.error('Password hashing failed', 'CryptoService', error);
+      throw new Error('Failed to hash password');
     }
   }
 
@@ -212,17 +219,17 @@ class CryptographyService {
       
       // Hash the provided password with the same salt
       const saltBase64 = this.arrayBufferToBase64(salt._buffer);
-      const _newHashWithSalt = await this.hashPassword(password, saltBase64);
+      const newHashWithSalt = await this.hashPassword(password, saltBase64);
       
-      // Extract the _hash part from the new result
-      const _newCombined = this.base64ToArrayBuffer(_newHashWithSalt);
-      const newCombinedArray = new Uint8Array(_newCombined);
+      // Extract the hash part from the new result
+      const newCombined = this.base64ToArrayBuffer(newHashWithSalt);
+      const newCombinedArray = new Uint8Array(newCombined);
       const newHash = newCombinedArray.slice(this.SALT_LENGTH);
       
       // Compare hashes using constant-time comparison
       return this.constantTimeCompare(originalHash, newHash);
-    } catch (_error) {
-      logger.error('Password verification failed:');
+    } catch (error) {
+      logger.error('Password verification failed', 'CryptoService', error);
       return false;
     }
   }
@@ -230,9 +237,9 @@ class CryptographyService {
   /**
    * Generate a secure random token
    */
-  generateSecureToken(_length: number = 32): string {
-    const bytes = crypto.getRandomValues(new Uint8Array(_length));
-    return this.arrayBufferToBase64(bytes._buffer);
+  generateSecureToken(length: number = 32): string {
+    const bytes = crypto.getRandomValues(new Uint8Array(length));
+    return this.arrayBufferToBase64(bytes.buffer);
   }
 
   /**
@@ -253,8 +260,8 @@ class CryptographyService {
     const cacheKey = `${password}_${salt}_${usage.join(',')}`;
     
     // Check cache
-    if (this.derivedKeys.has(_cacheKey)) {
-      return this.derivedKeys.get(_cacheKey)!;
+    if (this.derivedKeys.has(cacheKey)) {
+      return this.derivedKeys.get(cacheKey)!;
     }
 
     try {
@@ -262,7 +269,7 @@ class CryptographyService {
       const encoder = new TextEncoder();
       const passwordKey = await crypto.subtle.importKey(
         'raw',
-        encoder.encode(_password),
+        encoder.encode(password),
         'PBKDF2',
         false,
         ['deriveKey']
@@ -272,14 +279,14 @@ class CryptographyService {
       const derivedKey = await crypto.subtle.deriveKey(
         {
           name: 'PBKDF2',
-          salt: encoder.encode(_salt),
+          salt: encoder.encode(salt),
           iterations: this.PBKDF2_ITERATIONS,
-          _hash: 'SHA-256',
+          hash: 'SHA-256',
         },
         passwordKey,
         {
           name: this.ALGORITHM,
-          _length: this.KEY_LENGTH,
+          length: this.KEY_LENGTH,
         },
         false,
         usage
@@ -289,8 +296,8 @@ class CryptographyService {
       this.derivedKeys.set(cacheKey, derivedKey);
       
       return derivedKey;
-    } catch (_error) {
-      logger.error('Key derivation failed:');
+    } catch (error) {
+      logger.error('Key derivation failed', 'CryptoService', error);
       throw new Error('Failed to derive key from password');
     }
   }
@@ -301,8 +308,8 @@ class CryptographyService {
   async sha256(data: string): Promise<string> {
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    const _hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    return this.arrayBufferToBase64(_hashBuffer);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    return this.arrayBufferToBase64(hashBuffer);
   }
 
   /**
@@ -324,21 +331,21 @@ class CryptographyService {
         await crypto.subtle.exportKey('raw', signingKey),
         {
           name: 'HMAC',
-          _hash: 'SHA-256',
+          hash: 'SHA-256',
         },
         false,
         ['sign']
       );
       
-      const _signature = await crypto.subtle.sign(
+      const __signature = await crypto.subtle.sign(
         'HMAC',
         hmacKey,
         dataBuffer
       );
       
-      return this.arrayBufferToBase64(_signature);
-    } catch (_error) {
-      logger.error('Data signing failed:');
+      return this.arrayBufferToBase64(signature);
+    } catch (error) {
+      logger.error('Data signing failed', 'CryptoService', error);
       throw new Error('Failed to sign data');
     }
   }
@@ -348,7 +355,7 @@ class CryptographyService {
    */
   async verifySignature(
     data: string,
-    _signature: string,
+    signature: string,
     key?: CryptoKey
   ): Promise<boolean> {
     try {
@@ -359,7 +366,7 @@ class CryptographyService {
 
       const encoder = new TextEncoder();
       const dataBuffer = encoder.encode(data);
-      const signatureBuffer = this.base64ToArrayBuffer(_signature);
+      const signatureBuffer = this.base64ToArrayBuffer(signature);
       
       // Generate HMAC key if needed
       const hmacKey = await crypto.subtle.importKey(
@@ -367,7 +374,7 @@ class CryptographyService {
         await crypto.subtle.exportKey('raw', verifyKey),
         {
           name: 'HMAC',
-          _hash: 'SHA-256',
+          hash: 'SHA-256',
         },
         false,
         ['verify']
@@ -379,8 +386,8 @@ class CryptographyService {
         signatureBuffer,
         dataBuffer
       );
-    } catch (_error) {
-      logger.error('Signature verification failed:');
+    } catch (error) {
+      logger.error('Signature verification failed', 'CryptoService', error);
       return false;
     }
   }
@@ -473,4 +480,4 @@ class CryptographyService {
   }
 }
 
-export const cryptoService = CryptographyService.getInstance();
+export const _cryptoService = CryptographyService.getInstance();

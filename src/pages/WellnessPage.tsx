@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { WellnessToolsSuite } from '../components/wellness/WellnessToolsSuite';
 
 export function WellnessPage() {
-  const [_showFullSuite, setShowFullSuite] = useState(true); // Default to full suite
+  const [___showFullSuite, setShowFullSuite] = useState(true); // Default to full suite
 
   // If full suite is active, render it
   if (_showFullSuite) {
@@ -211,7 +211,7 @@ export function WellnessPage() {
             </h3>
             <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Every step counts. These tools are here to support you on your path to better mental wellness. 
-              Take it one day at a time, and remember—you&apos;re stronger than you think.
+              Take it one day at a time, and remember—you're stronger than you think.
             </p>
           </div>
         </motion.div>

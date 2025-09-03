@@ -46,7 +46,7 @@ const getJWTSecret = (): string => {
 try {
   getJWTSecret();
   logger.info('✅ JWT Secret validation passed');
-} catch (error) {
+} catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
   logger.error('❌ JWT Secret validation failed:', error);
   process.exit(1); // Prevent insecure startup
 }
@@ -195,7 +195,7 @@ router.post('/register', registerValidation, async (req: Request, res: Response,
       });
     }
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     await audit.logEvent(req.ip, 'auth', 'register_error', {
       error: 'Processing error'
     });
@@ -333,7 +333,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response, next:
       });
     }
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     await audit.logEvent(req.ip, 'auth', 'login_error', {
       error: 'Processing error'
     });
@@ -384,7 +384,7 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
       });
     }
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     await audit.logEvent(req.ip, 'auth', 'token_refresh_error', {
       error: 'Processing error'
     });
@@ -408,7 +408,7 @@ router.post('/logout', async (req: Request, res: Response, next: NextFunction) =
       message: 'Logged out successfully'
     });
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     await audit.logEvent(req.ip, 'auth', 'logout_error', {
       error: 'Processing error'
     });

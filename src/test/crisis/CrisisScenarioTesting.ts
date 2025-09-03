@@ -348,7 +348,7 @@ export class CrisisScenarioTester {
         responseTime,
         sessionCreated
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Crisis chat simulation test failed:');
       return {
         counselorAssigned: false,
@@ -387,7 +387,7 @@ export class CrisisScenarioTester {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       this.mockServer.endSession(session.sessionId);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Emergency protocol test failed:');
     }
 
@@ -461,7 +461,7 @@ export class CrisisScenarioTester {
           warnings: [],
           details: {}
         });
-      } catch {
+      } catch (_error) {
         this.testResults.push({
           scenarioId: `integration-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -478,10 +478,10 @@ export class CrisisScenarioTester {
   private async testWebSocketIntegration(): Promise<boolean> {
     try {
       await mockWebSocketAdapter.connect('test-user', 'test-token');
-      const _session = await mockWebSocketAdapter.createCrisisSession('medium');
+      const __session = await mockWebSocketAdapter.createCrisisSession('medium');
       mockWebSocketAdapter.endCall();
       return true;
-    } catch (_error) {
+    } catch (error) {
       logger.error('WebSocket integration test failed:');
       return false;
     }
@@ -509,7 +509,7 @@ export class CrisisScenarioTester {
       const testLink = document.createElement('a');
       testLink.href = 'tel:988';
       return testLink.href === 'tel:988';
-    } catch {
+    } catch (_error) {
       return false;
     }
   }
@@ -566,7 +566,7 @@ export class CrisisScenarioTester {
           warnings: duration > test.target * 0.8 ? [`Close to performance limit: ${duration}ms`] : [],
           details: {}
         });
-      } catch {
+      } catch (_error) {
         this.testResults.push({
           scenarioId: `performance-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -618,7 +618,7 @@ export class CrisisScenarioTester {
               emergencyContacts: ['988']
             });
             return plan && plan.id && plan.isActive;
-          } catch {
+          } catch (_error) {
             return false;
           }
         }
@@ -639,7 +639,7 @@ export class CrisisScenarioTester {
           warnings: [],
           details: {}
         });
-      } catch {
+      } catch (_error) {
         this.testResults.push({
           scenarioId: `offline-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -711,7 +711,7 @@ export const crisisScenarioTester = new CrisisScenarioTester();
 export async function runCrisisSystemTests(): Promise<void> {
   logger.crisis('CRISIS SYSTEM TESTING - This validates life-safety systems', 'high', 'CrisisScenarioTesting');
   
-  const _results = await crisisScenarioTester.runAllScenarios();
+  const __results = await crisisScenarioTester.runAllScenarios();
   const report = crisisScenarioTester.generateReport();
   
   logger.info('CRISIS SYSTEM TEST REPORT:', 'CrisisScenarioTesting');

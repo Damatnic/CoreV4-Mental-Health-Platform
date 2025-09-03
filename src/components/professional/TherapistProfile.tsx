@@ -144,12 +144,12 @@ const mockExperience: ExperienceItem[] = [
 ];
 
 export function TherapistProfile({ therapistId, onBookAppointment, _onClose }: TherapistProfileProps) {
-  const [therapist, setTherapist] = useState<unknown>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
-  const [_selectedReview, _setSelectedReview] = useState<Review | null>(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [_loading, setLoading] = useState(true);
+  const [therapist, _setTherapist] = useState<unknown>(null);
+  const [activeTab, _setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
+  const [__selectedReview, _setSelectedReview] = useState<Review | null>(null);
+  const [isVideoPlaying, _setIsVideoPlaying] = useState(false);
+  const [isMuted, _setIsMuted] = useState(true);
+  const [___loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTherapist = async () => {
@@ -243,7 +243,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
         };
         
         setTherapist(_therapistData);
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to load therapist:');
       } finally {
         setLoading(false);

@@ -180,10 +180,10 @@ export function MobileBottomNav() {
   const { _deviceInfo, isMobileDevice } = useMobileFeatures();
   const { _navigationMode, isPerformanceMode } = useConsoleNavigation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [showCrisisActions, setShowCrisisActions] = useState(false);
-  const [consoleMode, setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
-  const [isConsoleStyleActive, setIsConsoleStyleActive] = useState(true);
-  const [activeTab, setActiveTab] = useState(() => {
+  const [__showCrisisActions, setShowCrisisActions] = useState(false);
+  const [consoleMode, _setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
+  const [isConsoleStyleActive, _setIsConsoleStyleActive] = useState(true);
+  const [__activeTab, setActiveTab] = useState(() => {
     const currentPath = location.pathname;
     const item = mainNavItems.find(item => item._path === currentPath);
     return item?.id || 'home';

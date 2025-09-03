@@ -9,8 +9,8 @@ interface ConsoleBootSequenceProps {
 }
 
 export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: ConsoleBootSequenceProps) {
-  const [bootStage, setBootStage] = useState(0);
-  const [showSkip, setShowSkip] = useState(false);
+  const [bootStage, _setBootStage] = useState(0);
+  const [showSkip, _setShowSkip] = useState(false);
   const { playSound } = useConsoleSound();
 
   // Boot sequence stages - wrapped in useMemo to prevent recreating on every render

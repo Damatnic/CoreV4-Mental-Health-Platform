@@ -46,8 +46,8 @@ interface TestReport {
 }
 
 export function CrisisDemonstrationHub() {
-  const [activeDemo, setActiveDemo] = useState<string>('overview');
-  const [_systemStatus, setSystemStatus] = useState<SystemStatus>({
+  const [_activeDemo, setActiveDemo] = useState<string>('overview');
+  const [_systemStatus, _setSystemStatus] = useState<SystemStatus>({
     crisisChat: 'offline',
     emergencyServices: 'inactive',
     offlineResources: 'unavailable',
@@ -55,7 +55,7 @@ export function CrisisDemonstrationHub() {
     assessmentAlgorithm: 'operational'
   });
   const [isRunningTests, setIsRunningTests] = useState(false);
-  const [testResults, setTestResults] = useState<TestReport | null>(null);
+  const [testResults, _setTestResults] = useState<TestReport | null>(null);
   const [demoStats, setDemoStats] = useState<DemoStats>({
     totalTests: 0,
     passedTests: 0,
@@ -63,7 +63,7 @@ export function CrisisDemonstrationHub() {
     emergencyProtocolsActive: 0,
     activeResources: 0
   });
-  const [simulatedScenario, setSimulatedScenario] = useState<CrisisTestScenario | null>(null);
+  const [simulatedScenario, _setSimulatedScenario] = useState<CrisisTestScenario | null>(null);
 
   // Initialize demonstration systems
   useEffect(() => {
@@ -93,8 +93,8 @@ export function CrisisDemonstrationHub() {
       }));
       
       toast.success('Crisis demonstration systems initialized');
-    } catch (_error) {
-      logger.error('Demo initialization failed:');
+    } catch (error) {
+      logger.error('Demo initialization failed', 'CrisisDemonstrationHub', error);
       toast.error('Some demo systems failed to initialize');
     }
   };
@@ -107,7 +107,7 @@ export function CrisisDemonstrationHub() {
 
   // Load demonstration statistics
   const loadDemoStats = () => {
-    const _stats = mockWebSocketAdapter.getServerStats();
+    const __stats = mockWebSocketAdapter.getServerStats();
     const offlineStats = offlineCrisisResources.getConnectionStatus();
     
     setDemoStats({
@@ -125,7 +125,7 @@ export function CrisisDemonstrationHub() {
     toast.loading('Running comprehensive crisis system tests...');
     
     try {
-      const _results = await crisisScenarioTester.runAllScenarios();
+      const __results = await crisisScenarioTester.runAllScenarios();
       const report = crisisScenarioTester.generateReport();
       
       setTestResults(report);
@@ -142,10 +142,10 @@ export function CrisisDemonstrationHub() {
       } else {
         toast.error(`${report.failedTests} tests failed - Review required`);
       }
-    } catch (_error) {
+    } catch (error) {
       toast.dismiss();
       toast.error('Test execution failed');
-      logger.error('Test failed:');
+      logger.error('Test failed', 'CrisisDemonstrationHub', error);
     } finally {
       setIsRunningTests(false);
     }

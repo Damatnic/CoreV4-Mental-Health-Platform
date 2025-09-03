@@ -47,25 +47,25 @@ export function EnhancedCrisisChat() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [counselorInfo, setCounselorInfo] = useState<CounselorInfo | null>(null);
-  const [counselorTyping, setCounselorTyping] = useState(false);
-  const [detectedCrisisLevel, setDetectedCrisisLevel] = useState<'low' | 'medium' | 'high' | 'critical' | null>(null);
-  const [showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
+  const [__counselorTyping, setCounselorTyping] = useState(false);
+  const [detectedCrisisLevel, _setDetectedCrisisLevel] = useState<'low' | 'medium' | 'high' | 'critical' | null>(null);
+  const [__showEmergencyPrompt, setShowEmergencyPrompt] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [estimatedWaitTime, setEstimatedWaitTime] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const _chatContainerRef  = useRef<HTMLDivElement>(null);
   const roomId = useRef<string>(`crisis-${Date.now()}`);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize WebSocket connection
   useEffect(() => {
-    if (_user) {
+    if (user) {
       initializeWebSocket();
     }
 
     return () => {
-      if (_isConnected) {
+      if (isConnected) {
         mockWebSocketAdapter.leaveRoom(roomId.current);
       }
     };
@@ -89,8 +89,8 @@ export function EnhancedCrisisChat() {
         type: 'system',
       };
       setMessages([welcomeMessage]);
-    } catch (_error) {
-      logger.error('Failed to connect to chat service:');
+    } catch (error) {
+      logger.error('Failed to connect to chat service', 'EnhancedCrisisChat', error);
       setConnectionStatus('disconnected');
       toast.error('Unable to connect to chat service. Please check your connection.');
     }
@@ -151,7 +151,7 @@ export function EnhancedCrisisChat() {
   }, [user]);
 
   const handleCounselorAssigned = useCallback((counselor: CounselorInfo) => {
-    setCounselorInfo(_counselor);
+    setCounselorInfo(counselor);
     setQueuePosition(null);
     setEstimatedWaitTime(null);
     setIsConnected(true);
@@ -162,7 +162,7 @@ export function EnhancedCrisisChat() {
       roomId: roomId.current,
       userId: 'system',
       username: 'System',
-      content: `You&apos;re now connected with ${counselor.name}, ${counselor.credentials}. They specialize in ${counselor.specialties.join(', ')}.`,
+      content: `You're now connected with ${counselor.name}, ${counselor.credentials}. They specialize in ${counselor.specialties.join(', ')}.`,
       timestamp: new Date(),
       type: 'system',
     };
@@ -228,8 +228,8 @@ export function EnhancedCrisisChat() {
     const lowerText = text.toLowerCase();
     
     for (const crisis of CRISIS_KEYWORDS) {
-      for (const _keyword of crisis.keywords) {
-        if (lowerText.includes(_keyword)) {
+      for (const keyword of crisis.keywords) {
+        if (lowerText.includes(keyword)) {
           return crisis.level as 'low' | 'medium' | 'high' | 'critical';
         }
       }
@@ -265,8 +265,8 @@ export function EnhancedCrisisChat() {
         type: 'system',
       };
       setMessages(prev => [...prev, queueMessage]);
-    } catch (_error) {
-      logger.error('Failed to connect to counselor:');
+    } catch (error) {
+      logger.error('Failed to connect to counselor', 'EnhancedCrisisChat', error);
       setIsConnecting(false);
       toast.error('Failed to connect. Please try again.');
     }
@@ -277,9 +277,9 @@ export function EnhancedCrisisChat() {
     if (!inputMessage.trim() || !isConnected) return;
 
     // Check for crisis keywords
-    const crisisLevel = detectCrisisLevel(_inputMessage);
-    if (_crisisLevel) {
-      setDetectedCrisisLevel(_crisisLevel);
+    const crisisLevel = detectCrisisLevel(inputMessage);
+    if (crisisLevel) {
+      setDetectedCrisisLevel(crisisLevel);
       if (crisisLevel === 'critical') {
         setShowEmergencyPrompt(true);
         // Immediately escalate to crisis team
@@ -355,7 +355,7 @@ export function EnhancedCrisisChat() {
         roomId: roomId.current,
         userId: counselorInfo?.id || 'counselor',
         username: counselorInfo?.name || 'Crisis Counselor',
-        content: "I&apos;m staying here with you. Your safety is my top priority. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let&apos;s focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
+        content: "I'm staying here with you. Your safety is my top priority. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let's focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
         timestamp: new Date(),
         type: 'text',
       };
@@ -453,7 +453,7 @@ export function EnhancedCrisisChat() {
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  {message.metadata?.edited && ' (_edited)'}
+                  {message.metadata?.edited && ' (edited)'}
                 </p>
               </div>
             </div>
@@ -573,7 +573,7 @@ export function EnhancedCrisisChat() {
               <h3 className="text-lg font-semibold text-gray-900">Immediate Support Available</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Based on what you&apos;ve shared, I want to make sure you get the best support possible. 
+              Based on what you've shared, I want to make sure you get the best support possible. 
               Would you like to speak with someone on the phone right now?
             </p>
             <div className="space-y-3">
@@ -593,7 +593,7 @@ export function EnhancedCrisisChat() {
                 onClick={() => handleEmergencyResponse('dismiss')}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                I&apos;m Okay For Now
+                I'm Okay For Now
               </button>
             </div>
           </div>

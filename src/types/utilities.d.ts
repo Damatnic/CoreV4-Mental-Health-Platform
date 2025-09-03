@@ -131,7 +131,7 @@ declare module 'idb' {
       storeName: Name,
       query?: IDBValidKey | IDBKeyRange,
       count?: number
-    ): Promise<any[]>;
+    ): Promise<unknown[]>;
     
     add<Name extends string>(
       storeName: Name,
@@ -167,7 +167,7 @@ declare module 'idb' {
 
   export interface IDBPObjectStore<DBTypes = unknown> extends IDBObjectStore {
     get(query: IDBValidKey | IDBKeyRange): Promise<unknown>;
-    getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<any[]>;
+    getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<unknown[]>;
     add(value: unknown, key?: IDBValidKey): Promise<IDBValidKey>;
     put(value: unknown, key?: IDBValidKey): Promise<IDBValidKey>;
     delete(query: IDBValidKey | IDBKeyRange): Promise<void>;

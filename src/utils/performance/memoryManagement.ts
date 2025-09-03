@@ -357,7 +357,7 @@ export class ImageLoader {
   }
 }
 
-export const _imageLoader = new ImageLoader();
+export const __imageLoader = new ImageLoader();
 
 /**
  * Debounce with cleanup
@@ -493,4 +493,4 @@ export class MemoryLeakDetector {
   }
 }
 
-export const _memoryLeakDetector = new MemoryLeakDetector();
+export const __memoryLeakDetector = new MemoryLeakDetector();

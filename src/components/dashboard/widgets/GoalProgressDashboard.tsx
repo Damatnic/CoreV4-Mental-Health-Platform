@@ -36,26 +36,18 @@ export function GoalProgressDashboard({
   onAddGoal,
   onViewDetails
 }: GoalProgressDashboardProps) {
-  const {
-    goals,
-    updateGoalProgress,
-    completeGoal,
-    pauseGoal,
-    abandonGoal,
-    addMilestone,
-    completeMilestone
-  } = useActivityStore();
+  const { goals, updateGoalProgress, completeGoal, pauseGoal, abandonGoal, addMilestone, completeMilestone } = useActivityStore();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showAddMilestone, setShowAddMilestone] = useState<string | null>(null);
+  const [__showAddMilestone, setShowAddMilestone] = useState<string | null>(null);
   const [milestoneTitle, setMilestoneTitle] = useState('');
   const [milestoneTarget, setMilestoneTarget] = useState<number>(0);
-  const [expandedGoal, setExpandedGoal] = useState<string | null>(null);
+  const [expandedGoal, _setExpandedGoal] = useState<string | null>(null);
 
   // Filter goals by category and status
   const activeGoals = goals.filter(g => g.status === 'active');
   const completedGoals = goals.filter(g => g.status === 'completed');
-  const _pausedGoals = goals.filter(g => g.status === 'paused');
+  const __pausedGoals = goals.filter(g => g.status === 'paused');
 
   const filteredGoals = selectedCategory === 'all' 
     ? activeGoals 

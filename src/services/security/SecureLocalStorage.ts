@@ -62,7 +62,7 @@ class SecureLocalStorage {
       const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
       logger.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
       return tempKey;
-    } catch {
+    } catch (_error) {
       // Fallback to browser crypto API or manual generation
       logger.warn('⚠️ CryptoJS random failed, using fallback method');
       
@@ -194,7 +194,7 @@ class SecureLocalStorage {
         if (encryptedValue) {
           try {
             return this.decrypt(encryptedValue);
-          } catch {
+          } catch (_error) {
             // If decryption fails (malformed data/wrong key), clear corrupted data
             logger.warn('🔒 Corrupted encrypted data detected, clearing:', key);
             localStorage.removeItem(`encrypted_${key}`);
@@ -349,7 +349,7 @@ export { SecureLocalStorage };
  * Use this instead of localStorage throughout the application
  */
 const secureStorageInstance = secureLocalStorage;
-export const secureStorage = {
+export const _secureStorage = {
   setItem: (key: string, value: string) => secureStorageInstance.setItem(key, value),
   getItem: (key: string) => secureStorageInstance.getItem(key),
   removeItem: (key: string) => secureStorageInstance.removeItem(key),

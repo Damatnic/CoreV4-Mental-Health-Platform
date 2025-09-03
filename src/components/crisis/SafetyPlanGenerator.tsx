@@ -140,23 +140,23 @@ const _DEFAULT_SAFETY_PLAN: PersonalizedSafetyPlan = {
 export const SafetyPlanGenerator: React.FC = () => {
   const [safetyPlan, setSafetyPlan] = useState<PersonalizedSafetyPlan>(_DEFAULT_SAFETY_PLAN);
   const [isEditing, setIsEditing] = useState(false);
-  const [_activeSection, _setActiveSection] = useState<string | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [__activeSection, _setActiveSection] = useState<string | null>(null);
+  const [__showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Load saved safety plan on mount
   useEffect(() => {
-    const _savedPlan = secureStorage.getItem('personalSafetyPlan');
-    if (_savedPlan) {
+    const savedPlan = secureStorage.getItem('personalSafetyPlan');
+    if (savedPlan) {
       try {
-        const parsed = JSON.parse(_savedPlan);
+        const parsed = JSON.parse(savedPlan);
         setSafetyPlan({
           ...parsed,
           createdAt: new Date(parsed.createdAt),
           lastUpdated: new Date(parsed.lastUpdated)
         });
-      } catch (_error) {
-        logger.error('Failed to load safety plan:');
+      } catch (error) {
+        logger.error('Failed to load safety plan', 'SafetyPlanGenerator', error);
       }
     }
   }, []);

@@ -79,12 +79,12 @@ const getNextSevenDays = () => {
 
 export function AppointmentBooking({ therapistId, onClose, onSuccess }: AppointmentBookingProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, _setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [availableDays, setAvailableDays] = useState<Date[]>([]);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [availableDays, _setAvailableDays] = useState<Date[]>([]);
+  const [timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
-  const [therapist, setTherapist] = useState<unknown>(null);
+  const [therapist, _setTherapist] = useState<unknown>(null);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -189,7 +189,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       });
       
       onSuccess(appointmentId.id);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Booking failed:');
       // Handle undefined
     } finally {

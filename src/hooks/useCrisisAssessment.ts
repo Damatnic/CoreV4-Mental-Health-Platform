@@ -31,7 +31,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
           ...parsed,
           timestamp: parsed.timestamp ? new Date(parsed.timestamp) : null
         };
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to parse _stored assessment', e as Error, {
           category: LogCategory.CRISIS
         });
@@ -41,7 +41,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
   });
 
   const [isAssessing, setIsAssessing] = useState(false);
-  const [lastAssessment, setLastAssessment] = useState<Date | null>(() => {
+  const [lastAssessment, _setLastAssessment] = useState<Date | null>(() => {
     const _stored = secureStorage.getItem('last_crisis_assessment');
     return _stored ? new Date(_stored) : null;
   });

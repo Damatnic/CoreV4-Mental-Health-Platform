@@ -192,7 +192,7 @@ export class ConsoleSoundSystem {
   private initializeAudio() {
     try {
       this.audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
-    } catch {
+    } catch (_error) {
       logger.warn('Audio context not supported:');
       this.soundEnabled = false;
     }
@@ -269,7 +269,7 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(soundConfig.haptic);
       }
 
-    } catch {
+    } catch (_error) {
       logger.warn(`Failed to play console sound "${String(_soundName)}":`, error);
     }
   }
@@ -382,7 +382,7 @@ export class ConsoleSoundSystem {
       if (scaledPattern.length > 0) {
         navigator.vibrate(_scaledPattern);
       }
-    } catch {
+    } catch (_error) {
       logger.warn('Haptic feedback failed:');
     }
   }
@@ -433,7 +433,7 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(validConfig.haptic);
       }
 
-    } catch {
+    } catch (_error) {
       logger.warn('Failed to play custom sound:');
     }
   }
@@ -476,7 +476,7 @@ export class ConsoleSoundSystem {
         try {
           source.stop();
           source.disconnect();
-        } catch {
+        } catch (_error) {
           // Source might already be stopped
         }
       });
@@ -541,10 +541,10 @@ export class ConsoleSoundSystem {
       const soundConfig = this.CONSOLE_SOUNDS[_soundName];
       if (soundConfig) {
         try {
-          const _audioBuffer = await this.createAudioBuffer(soundConfig);
+          const __audioBuffer = await this.createAudioBuffer(soundConfig);
           // Store the buffer for instant playback
           this.soundCache.set(String(_soundName), soundConfig);
-        } catch {
+        } catch (_error) {
           logger.warn(`Failed to pre-generate sound: ${String(_soundName)}`, error);
         }
       }
@@ -651,7 +651,7 @@ export class ConsoleSoundSystem {
 }
 
 // Global instance
-export const consoleSoundSystem = new ConsoleSoundSystem();
+export const _consoleSoundSystem = new ConsoleSoundSystem();
 
 // React hook for easy access
 import { useEffect, useRef } from 'react';
@@ -660,7 +660,7 @@ export function useConsoleSound() {
   const soundSystemRef = useRef(_consoleSoundSystem);
 
   useEffect(() => {
-    const _soundSystem = soundSystemRef.current;
+    const __soundSystem = soundSystemRef.current;
     
     return () => {
       // Cleanup if component unmounts

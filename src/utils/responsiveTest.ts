@@ -189,7 +189,7 @@ export class ResponsiveLayoutTester {
 
   // Test all device profiles
   async testAllDevices(testFn: (device: DeviceProfile) => Promise<boolean>): Promise<TestReport> {
-    const results: TestResult[] = [];
+    const _results: TestResult[] = [];
 
     for (const device of DEVICE_PROFILES) {
       const result = await this.testDevice(device, testFn);
@@ -216,7 +216,7 @@ export class ResponsiveLayoutTester {
     
     try {
       passed = await testFn(_device);
-    } catch (_error) {
+    } catch (error) {
       error = e as Error;
       passed = false;
     }
@@ -262,8 +262,7 @@ export class ResponsiveLayoutTester {
         failed,
         passRate: (passed / results.length) * 100,
         averageDuration: totalDuration / results.length
-      },
-      results,
+      }, _results,
       generatedAt: new Date(),
       recommendations: this.generateRecommendations(results)
     };
@@ -442,4 +441,4 @@ interface AccessibilityTest {
 }
 
 // Export test runner for use in components
-export const _responsiveTester = new ResponsiveLayoutTester();
+export const __responsiveTester = new ResponsiveLayoutTester();

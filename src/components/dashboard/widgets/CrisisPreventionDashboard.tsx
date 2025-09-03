@@ -58,12 +58,12 @@ interface PatternRecognition {
 
 export function CrisisPreventionDashboard() {
   const { _user } = useAuth();
-  const [activeView, setActiveView] = useState<'overview' | 'patterns' | 'timeline' | 'prevention'>('overview');
-  const [showSensitiveData, setShowSensitiveData] = useState(true);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [activeView, _setActiveView] = useState<'overview' | 'patterns' | 'timeline' | 'prevention'>('overview');
+  const [showSensitiveData, _setShowSensitiveData] = useState(true);
+  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   
   // State for pattern recognition data
-  const [triggers, setTriggers] = useState<TriggerPattern[]>([
+  const [triggers, _setTriggers] = useState<TriggerPattern[]>([
     {
       id: '1',
       name: 'Work Stress',
@@ -99,7 +99,7 @@ export function CrisisPreventionDashboard() {
     }
   ]);
 
-  const [warningSignsChecklist, setWarningSignsChecklist] = useState<WarningSign[]>([
+  const [warningSignsChecklist, _setWarningSignsChecklist] = useState<WarningSign[]>([
     {
       id: '1',
       sign: 'Increased irritability or mood swings',
@@ -401,7 +401,7 @@ export function CrisisPreventionDashboard() {
                           />
                           <div className="ml-3 flex-1">
                             <div className="flex items-center justify-between">
-                              <label className="font-medium text-gray-900">
+                              <label htmlFor="input_oeo6p4xwq" className="font-medium text-gray-900">
                                 {showSensitiveData ? sign.sign : '••••••••'}
                               </label>
                               <div className="flex items-center space-x-2">

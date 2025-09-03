@@ -203,7 +203,7 @@ export class HIPAAComplianceService {
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey);
       
       return encrypted.toString();
-    } catch (_error) {
+    } catch (error) {
       this.logSecurityEvent('encryption_failure', { error: 'Processing error' });
       throw new Error('Failed to encrypt PHI data');
     }
@@ -215,7 +215,7 @@ export class HIPAAComplianceService {
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       
       return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch (_error) {
+    } catch (error) {
       this.logSecurityEvent('decryption_failure', { error: 'Processing error' });
       throw new Error('Failed to decrypt PHI data');
     }
@@ -247,7 +247,7 @@ export class HIPAAComplianceService {
       if (field in decrypted && decrypted[field]) {
         try {
           decrypted[field] = JSON.parse(this.decryptPHI(decrypted[field]));
-        } catch {
+        } catch (_error) {
           // If not JSON, return as string
           decrypted[field] = this.decryptPHI(decrypted[field]);
         }
@@ -355,7 +355,7 @@ export class HIPAAComplianceService {
     const userAcl = this.accessControlList.get(userId);
     
     if (userAcl) {
-      const filtered = userAcl.filter(acl => {
+      const _filtered  = userAcl.filter(acl => {
         if (acl._resourceType !== _resourceType) return true;
         if (resourceId && acl.resourceId !== resourceId) return true;
         return false;
@@ -440,7 +440,7 @@ export class HIPAAComplianceService {
         },
         body: JSON.stringify({ entries })
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to flush audit logs:');
       
       // Re-queue failed entries
@@ -675,7 +675,7 @@ export class HIPAAComplianceService {
       // return authService.getCurrentUserId();
       
       return 'anonymous';
-    } catch {
+    } catch (_error) {
       return 'anonymous';
     }
   }
@@ -721,4 +721,4 @@ export class HIPAAComplianceService {
 }
 
 // Export singleton instance
-export const _hipaaService = HIPAAComplianceService.getInstance();
+export const __hipaaService = HIPAAComplianceService.getInstance();

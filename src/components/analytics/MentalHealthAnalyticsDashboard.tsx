@@ -111,12 +111,12 @@ interface RiskFactor {
 }
 
 export function MentalHealthAnalyticsDashboard() {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
-  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [_selectedMetrics, _setSelectedMetrics] = useState<string[]>([]);
-  const [privacyMode, setPrivacyMode] = useState(false);
-  const [_loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'goals' | 'insights' | 'interventions'>('overview');
+  const [analyticsData, _setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [timeframe, _setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [__selectedMetrics, _setSelectedMetrics] = useState<string[]>([]);
+  const [privacyMode, _setPrivacyMode] = useState(false);
+  const [___loading, setLoading] = useState(true);
+  const [activeTab, _setActiveTab] = useState<'overview' | 'trends' | 'goals' | 'insights' | 'interventions'>('overview');
 
   // Fetch analytics _data
   useEffect(() => {
@@ -124,7 +124,7 @@ export function MentalHealthAnalyticsDashboard() {
   }, [timeframe]);
 
   // Memoized calculations for performance
-  const overallWellnessScore = useMemo(() => {
+  const _overallWellnessScore  = useMemo(() => {
     if (!analyticsData) return null;
     
     const scores = analyticsData.metrics.map(metric => {
@@ -153,7 +153,7 @@ export function MentalHealthAnalyticsDashboard() {
       // In production, this would call the analytics service
       const _data = await generateMockAnalyticsData(timeframe);
       setAnalyticsData(_data);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to fetch analytics _data:');
     } finally {
       setLoading(false);

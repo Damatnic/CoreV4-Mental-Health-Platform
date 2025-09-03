@@ -120,7 +120,7 @@ export class HealthCheckService {
         this.performanceObserver.observe({ 
           entryTypes: ['navigation', 'resource', 'paint', 'largest-contentful-paint', 'layout-shift', 'first-input'] 
         });
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to initialize performance observer:');
       }
     }
@@ -317,7 +317,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (_error) {
       return {
         name: 'Database',
         status: HealthStatus.UNHEALTHY,
@@ -361,7 +361,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (_error) {
       return {
         name: 'Cache',
         status: HealthStatus.DEGRADED,
@@ -423,7 +423,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (_error) {
       return {
         name: 'Crisis System',
         status: HealthStatus.UNKNOWN,
@@ -438,7 +438,7 @@ export class HealthCheckService {
   private async checkIntegrationsHealth(): Promise<ServiceHealth> {
     const startTime = performance.now();
     const integrations = ['payment', 'video', 'sms', 'email'];
-    const results: Record<string, boolean> = {};
+    const _results: Record<string, boolean> = {};
     
     try {
       // Check each integration in parallel
@@ -449,7 +449,7 @@ export class HealthCheckService {
             signal: AbortSignal.timeout(3000)
           });
           results[integration] = response.ok;
-        } catch {
+        } catch (_error) {
           results[integration] = false;
         }
       });
@@ -471,7 +471,7 @@ export class HealthCheckService {
         lastChecked: new Date(),
         details: results
       };
-    } catch {
+    } catch (_error) {
       return {
         name: 'Integrations',
         status: HealthStatus.UNKNOWN,
@@ -645,7 +645,7 @@ export class HealthCheckService {
       }).catch(error => {
         logger.error('Failed to send _metrics:', error);
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to send _metrics:');
     }
   }
@@ -687,4 +687,4 @@ export class HealthCheckService {
 }
 
 // Export singleton instance
-export const _healthCheckService = HealthCheckService.getInstance();
+export const __healthCheckService = HealthCheckService.getInstance();

@@ -164,17 +164,17 @@ export const TherapeuticJournal: React.FC = () => {
   const [selectedType, setSelectedType] = useState<keyof typeof JOURNAL_TYPES>('freeform');
   const [isWriting, setIsWriting] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterMood, setFilterMood] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<keyof typeof JOURNAL_TYPES | null>(null);
-  const [showPrompts, setShowPrompts] = useState(false);
-  const [selectedPromptCategory, setSelectedPromptCategory] = useState<string | null>(null);
-  const [isEncrypted, setIsEncrypted] = useState(false);
-  const [password, setPassword] = useState('');
-  const [showStats, setShowStats] = useState(false);
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [searchQuery, _setSearchQuery] = useState('');
+  const [filterMood, _setFilterMood] = useState<string | null>(null);
+  const [filterType, _setFilterType] = useState<keyof typeof JOURNAL_TYPES | null>(null);
+  const [showPrompts, _setShowPrompts] = useState(false);
+  const [selectedPromptCategory, _setSelectedPromptCategory] = useState<string | null>(null);
+  const [isEncrypted, _setIsEncrypted] = useState(false);
+  const [password, _setPassword] = useState('');
+  const [showStats, _setShowStats] = useState(false);
+  const [autoSaveEnabled, _setAutoSaveEnabled] = useState(true);
   
-  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const _editorRef  = useRef<HTMLTextAreaElement>(null);
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Load entries from localStorage
@@ -242,7 +242,7 @@ export const TherapeuticJournal: React.FC = () => {
       return;
     }
     
-    const stats = calculateStats(currentEntry.content);
+    const __stats = calculateStats(currentEntry.content);
     const newEntry: JournalEntry = {
       id: Date._now().toString(),
       type: currentEntry.type || 'freeform',
@@ -708,7 +708,7 @@ export const TherapeuticJournal: React.FC = () => {
 
               {/* Mood Selection */}
               <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                <label htmlFor="input_u1up5dvou" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                   How are you feeling?
                 </label>
                 <div className="flex gap-3">
@@ -739,7 +739,7 @@ export const TherapeuticJournal: React.FC = () => {
                 <div className="space-y-4">
                   {Object.entries(JOURNAL_TYPES[selectedType].structure!).map(([key, prompt]) => (
                     <div key={key}>
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      <label htmlFor="input_q6n8mo9is" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                         {prompt}
                       </label>
                       <textarea
@@ -787,7 +787,7 @@ export const TherapeuticJournal: React.FC = () => {
 
               {/* Tags Input */}
               <div className="mt-4">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                <label htmlFor="input_t95p5495r" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                   Tags (comma-separated)
                 </label>
                 <input

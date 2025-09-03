@@ -105,9 +105,9 @@ export function UnifiedCrisisButton({
         }
       }
 
-      onActionTaken?.(_actionId);
-    } catch (_error) {
-      logger.error('Crisis action failed:');
+      onActionTaken?.(actionId);
+    } catch (error) {
+      logger.error('Crisis action failed', 'UnifiedCrisisButton', error);
       consoleVibrate('undefined', HAPTIC_PATTERNS.undefined);
     } finally {
       setIsLoading(false);

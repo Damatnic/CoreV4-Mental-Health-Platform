@@ -454,7 +454,7 @@ export async function getCurrentLocation(): Promise<GeolocationResult> {
           // In production, use a geocoding API like Google Maps or OpenStreetMap
           // For now, we'll return the coordinates
           resolve(_result);
-        } catch {
+        } catch (_error) {
           // Return _result without city/state if geocoding fails
           resolve(_result);
         }

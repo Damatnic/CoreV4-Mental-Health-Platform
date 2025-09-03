@@ -15,7 +15,7 @@ import {
 } from './types';
 
 // Helper function to generate random dates
-const _randomDate = (start: Date, end: Date): Date => {
+const __randomDate = (start: Date, end: Date): Date => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
@@ -795,4 +795,4 @@ export class MockDataService {
 }
 
 // Export singleton instance
-export const _mockDataService = MockDataService.getInstance();
+export const __mockDataService = MockDataService.getInstance();

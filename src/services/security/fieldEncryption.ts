@@ -354,7 +354,7 @@ class FieldEncryptionService {
       return [];
     }
 
-    const results = fieldIndex.get(_searchToken) || [];
+    const __results = fieldIndex.get(_searchToken) || [];
     
     // Audit search operation
     await auditLogger.log({
@@ -391,7 +391,7 @@ class FieldEncryptionService {
       // Clean up old key versions
       await this.cleanupOldKeys();
       
-    } catch (_error) {
+    } catch (error) {
       logger.error('Key rotation failed:');
       throw new Error('Key rotation failed');
     }
@@ -429,7 +429,7 @@ class FieldEncryptionService {
           encrypted: new Date(),
         },
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Re-encryption failed:');
       throw undefined;
     }
@@ -661,7 +661,7 @@ class FieldEncryptionService {
           // Implementation depends on key storage format
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load encryption keys:');
     }
   }
@@ -684,7 +684,7 @@ class FieldEncryptionService {
         encrypted: true,
         persistent: true,
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to persist key:');
     }
   }
@@ -731,4 +731,4 @@ class FieldEncryptionService {
   }
 }
 
-export const fieldEncryption = FieldEncryptionService.getInstance();
+export const _fieldEncryption = FieldEncryptionService.getInstance();

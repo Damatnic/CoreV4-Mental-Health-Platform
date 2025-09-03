@@ -230,7 +230,7 @@ describe('useAuth Hook', () => {
               email: 'test@example.com',
               _password: 'wrongpass',
             });
-          } catch {
+          } catch (_error) {
             // Expected to fail
           }
         });
@@ -283,7 +283,7 @@ describe('useAuth Hook', () => {
             email: maliciousInput,
             _password: 'Test123!',
           });
-        } catch {
+        } catch (_error) {
           // Expected to fail validation
         }
       });

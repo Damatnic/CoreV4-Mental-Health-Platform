@@ -138,7 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Auth check failed:');
       await authService.logout();
     } finally {
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const _emergencyKey = `emergency_access_${userId}`;
       const emergencyStatus = await secureStorage.getItem(_emergencyKey);
       setEmergencyAccessEnabled(!!emergencyStatus?.enabled);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load user data:');
     }
   };
@@ -236,7 +236,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         success: false,
         error: 'Login failed',
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Login failed:');
       return {
         success: false,
@@ -261,7 +261,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(result.data.user);
         setSessionExpiresAt(new Date(result.data.expiresAt));
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Anonymous login failed:');
       throw undefined;
     } finally {
@@ -278,7 +278,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSessionExpiresAt(null);
       setEmergencyAccessEnabled(false);
       setMfaChallengeId(null);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Logout failed:');
       // Force cleanup even if logout fails
       setUser(null);
@@ -322,7 +322,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           await login(email, password);
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Registration failed:');
       throw undefined;
     } finally {
@@ -336,7 +336,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (result.success && result.data) {
         setUser(result.data);
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Profile update failed:');
       throw undefined;
     }
@@ -351,7 +351,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       // Logout
       await logout();
-    } catch (_error) {
+    } catch (error) {
       logger.error('Account deletion failed:');
       throw undefined;
     }
@@ -367,7 +367,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userId: user.id,
         severity: 'info',
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Password change failed:');
       throw undefined;
     }
@@ -376,7 +376,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const requestPasswordReset = async (email: string) => {
     try {
       await authService.requestPasswordReset({ email });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Password reset request failed:');
       throw undefined;
     }
@@ -389,7 +389,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         _newPassword,
         confirmPassword: _newPassword,
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Password reset confirmation failed:');
       throw undefined;
     }

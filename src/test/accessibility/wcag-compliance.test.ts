@@ -48,9 +48,9 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         // Check audio has transcripts
         const audioElements = container.querySelectorAll('audio');
         audioElements.forEach(audio => {
-          const transcriptId = audio.getAttribute('aria-describedby');
+          const _transcriptId = audio.getAttribute('aria-describedby');
           if (_transcriptId) {
-            const transcript = document.getElementById(_transcriptId);
+            const _transcript = document.getElementById(_transcriptId);
             expect(_transcript).toBeInTheDocument();
           }
         });
@@ -93,7 +93,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           expect(captionTracks.length).toBeGreaterThan(0);
           
           // Check default caption track
-          const defaultTrack = video.querySelector('track[default]');
+          const _defaultTrack = video.querySelector('track[default]');
           expect(_defaultTrack).toBeInTheDocument();
         });
       });
@@ -103,7 +103,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         const videos = container.querySelectorAll('video[data-has-visual-content]');
         videos.forEach(video => {
-          const audioDescTrack = video.querySelector('track[kind="descriptions"]');
+          const _audioDescTrack = video.querySelector('track[kind="descriptions"]');
           expect(_audioDescTrack).toBeInTheDocument();
         });
       });
@@ -161,7 +161,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const { container } = render(<App />);
         
         // Use axe for contrast checking
-        const results = await axe(container, {
+        const _results = await axe(container, {
           rules: {
             'color-contrast': { enabled: true }
           }
@@ -201,8 +201,8 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         document.documentElement.style.fontSize = '32px'; // Default is usually 16px
         
         await waitFor(() => {
-          const viewportWidth = window.innerWidth;
-          const contentWidth = container.scrollWidth;
+          const _viewportWidth = window.innerWidth;
+          const _contentWidth = container.scrollWidth;
           
           // Content should not exceed viewport width
           expect(_contentWidth).toBeLessThanOrEqual(_viewportWidth);
@@ -241,7 +241,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             const currentRect = element.getBoundingClientRect();
             
             // Generally, tab order should go left-to-right, top-to-bottom
-            const isLogical = currentRect.top >= prevRect.top || 
+            const _isLogical = currentRect.top >= prevRect.top || 
                             (currentRect.top === prevRect.top && currentRect.left >= prevRect.left);
             expect(_isLogical).toBe(true);
           }
@@ -254,7 +254,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         render(<App />);
         
         // Open a modal/dialog
-        const openModalButton = await screen.findByRole('button', { name: /settings/i });
+        const _openModalButton = await screen.findByRole('button', { name: /settings/i });
         fireEvent.click(_openModalButton);
         
         const modal = await screen.findByRole('dialog');
@@ -282,7 +282,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         userEvent.keyboard('{Control>}k{/Control}');
         
         await waitFor(() => {
-          const searchInput = screen.getByRole('searchbox');
+          const _searchInput = screen.getByRole('searchbox');
           expect(document.activeElement).toBe(_searchInput);
         });
       });
@@ -297,11 +297,11 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         vi.advanceTimersByTime(25 * 60 * 1000); // 25 minutes
         
         await waitFor(() => {
-          const warningDialog = screen.getByRole('dialog', { name: /session.*expire/i });
+          const _warningDialog = screen.getByRole('dialog', { name: /session.*expire/i });
           expect(_warningDialog).toBeInTheDocument();
           
           // Should have option to extend
-          const extendButton = within(_warningDialog).getByRole('button', { name: /extend/i });
+          const _extendButton = within(_warningDialog).getByRole('button', { name: /extend/i });
           expect(_extendButton).toBeInTheDocument();
         });
         
@@ -317,7 +317,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         liveRegions.forEach(region => {
           // Should have pause control nearby
           const container = region.closest('[data-live-container]') || region.parentElement;
-          const pauseButton = container?.querySelector('[aria-label*="pause"], button:has-text("pause")');
+          const _pauseButton = container?.querySelector('[aria-label*="pause"], button:has-text("pause")');
           expect(_pauseButton).toBeInTheDocument();
         });
       });
@@ -369,7 +369,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         // Tab once to reveal skip link
         userEvent.tab();
         
-        const skipLink = await screen.findByRole('link', { name: /skip to main content/i });
+        const _skipLink = await screen.findByRole('link', { name: /skip to main content/i });
         expect(_skipLink).toBeInTheDocument();
         
         // Click skip link
@@ -411,7 +411,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           const border = styles.border;
           
           // Should have visible focus indicator
-          const hasVisibleFocus = 
+          const _hasVisibleFocus = 
             (outline && outline !== 'none') ||
             (boxShadow && boxShadow !== 'none') ||
             (border && border !== styles.getPropertyValue('border'));
@@ -424,7 +424,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         render(<App />);
         
         // Navigate to a sub-page
-        const therapyLink = await screen.findByRole('link', { name: /therapy/i });
+        const _therapyLink = await screen.findByRole('link', { name: /therapy/i });
         fireEvent.click(_therapyLink);
         
         await waitFor(() => {
@@ -460,7 +460,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         interactiveElements.forEach(element => {
           // Should have alternative simple interaction
-          const hasClickHandler = element.hasAttribute('onclick') || 
+          const _hasClickHandler = element.hasAttribute('onclick') || 
                                  element.matches('button, a, [role="button"]');
           expect(_hasClickHandler).toBe(true);
         });
@@ -489,7 +489,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           // Check readability (simple heuristics)
           const words = text?.split(' ') || [];
-          const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+          const _avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
           
           // Crisis instructions should use simple words
           expect(_avgWordLength).toBeLessThan(7); // Simple words
@@ -510,7 +510,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const inputs = await screen.findAllByRole('textbox');
         
         for (const input of inputs) {
-          const initialUrl = window.location.href;
+          const _initialUrl = window.location.href;
           
           input.focus();
           
@@ -526,7 +526,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const { rerender } = render(<App />);
         
         const navItems1 = screen.getAllByRole('navigation')[0].querySelectorAll('a');
-        const navOrder1 = Array.from(_navItems1).map(a => a.textContent);
+        const _navOrder1 = Array.from(_navItems1).map(a => a.textContent);
         
         // Navigate to different page and back
         fireEvent.click(navItems1[1]);
@@ -534,8 +534,8 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         rerender(<App />);
         
-        const navItems2 = screen.getAllByRole('navigation')[0].querySelectorAll('a');
-        const navOrder2 = Array.from(_navItems2).map(a => a.textContent);
+        const _navItems2 = screen.getAllByRole('navigation')[0].querySelectorAll('a');
+        const _navOrder2 = Array.from(_navItems2).map(a => a.textContent);
         
         // Navigation order should remain consistent
         expect(_navOrder2).toEqual(_navOrder1);
@@ -548,7 +548,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Try submitting invalid form
         const form = await screen.findByRole('form', { name: /mood.*track/i });
-        const submitButton = within(_form).getByRole('button', { name: /submit/i });
+        const _submitButton = within(_form).getByRole('button', { name: /submit/i });
         
         fireEvent.click(_submitButton);
         
@@ -650,7 +650,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           const role = element.getAttribute('role');
           
           // Common valid roles
-          const validRoles = [
+          const _validRoles = [
             'button', 'link', 'navigation', 'main', 'banner', 'contentinfo',
             'search', 'form', 'region', 'alert', 'dialog', 'menu', 'menuitem',
             'tab', 'tabpanel', 'complementary', 'article', 'img', 'heading'
@@ -672,7 +672,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         expect(liveRegions.length).toBeGreaterThan(0);
         
         liveRegions.forEach(region => {
-          const liveValue = region.getAttribute('aria-live');
+          const _liveValue = region.getAttribute('aria-live');
           expect(['polite', 'assertive', 'off']).toContain(_liveValue);
         });
       });
@@ -703,7 +703,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       render(<App />);
       
       // Check for voice input option
-      const voiceButton = screen.queryByRole('button', { name: /voice/i });
+      const _voiceButton = screen.queryByRole('button', { name: /voice/i });
       expect(_voiceButton).toBeInTheDocument();
       
       // Check for visual mood selection
@@ -711,7 +711,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       expect(moodIcons.length).toBeGreaterThan(0);
       
       // Check for text input option
-      const textInput = screen.queryByRole('textbox', { name: /feeling/i });
+      const _textInput = screen.queryByRole('textbox', { name: /feeling/i });
       expect(_textInput).toBeInTheDocument();
     });
     
@@ -742,7 +742,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
     it('should pass automated axe accessibility audit', async () => {
       const { container } = render(<App />);
       
-      const results = await axe(container, {
+      const _results = await axe(container, {
         rules: {
           // Run all WCAG 2.1 Level AA rules
           'wcag2a': { enabled: true },
@@ -761,7 +761,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       await waitFor(async () => {
         const crisisUI = screen.getByTestId('crisis-intervention-ui');
-        const results = await axe(_crisisUI);
+        const _results = await axe(_crisisUI);
         expect(_results).toHaveNoViolations();
       });
     });
@@ -771,7 +771,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Test light mode
       document.documentElement.setAttribute('data-theme', 'light');
-      let results = await axe(container);
+      let _results = await axe(container);
       expect(_results).toHaveNoViolations();
       
       // Test dark mode

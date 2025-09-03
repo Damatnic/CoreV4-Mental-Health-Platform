@@ -60,7 +60,7 @@ const navItems: NavItem[] = [
 export function MobileNavigation() {
   const location = useLocation();
   const { vibrate } = useVibration();
-  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+  const [isDesktopSidebarCollapsed, _setIsDesktopSidebarCollapsed] = useState(false);
 
   // Apply collapsed class to body for proper spacing
   React.useEffect(() => {

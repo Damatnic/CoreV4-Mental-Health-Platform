@@ -119,10 +119,16 @@ test.describe('Crisis Intervention Flow', () => {
     });
     
     // Intercept analytics calls
-    const analyticsRequests: any[] = [];
+    interface AnalyticsEvent {
+      category: string;
+      action: string;
+      timestamp?: number;
+      [key: string]: unknown;
+    }
+    const analyticsRequests: AnalyticsEvent[] = [];
     await page.route('**/api/analytics/event', async route => {
       const request = route.request();
-      analyticsRequests.push(await request.postDataJSON());
+      analyticsRequests.push(await request.postDataJSON() as AnalyticsEvent);
       await route.fulfill({ status: 200, body: '{"tracked": true}' });
     });
     

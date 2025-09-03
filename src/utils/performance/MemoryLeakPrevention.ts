@@ -188,7 +188,7 @@ export class CleanupManager {
     this.cleanupFunctions.forEach(cleanup => {
       try {
         cleanup();
-      } catch (_error) {
+      } catch (error) {
         logger.error('Cleanup function error: ');
       }
     });

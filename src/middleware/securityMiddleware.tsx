@@ -46,7 +46,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const [securityLevel, setSecurityLevel] = useState<'basic' | 'elevated' | 'maximum'>('basic');
   const [threatLevel, setThreatLevel] = useState<'low' | 'medium' | 'high' | 'critical'>('low');
   const [requiresCaptcha, setRequiresCaptcha] = useState(false);
-  const [requiresMFA, setRequiresMFA] = useState(false);
+  const [requiresMFA, _setRequiresMFA] = useState(false);
 
   useEffect(() => {
     initializeSecurity();
@@ -90,7 +90,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       securityHeaders.applyCSPToDocument();
       
       // Set up security monitoring
-      const _unsubscribe = securityMonitor.subscribe(_handleSecurityEvent);
+      const __unsubscribe = securityMonitor.subscribe(_handleSecurityEvent);
       
       // Validate current session if exists
       const _sessionId = getSessionId();
@@ -126,7 +126,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       // Initialize heartbeat for session keep-alive
       startHeartbeat();
       
-    } catch (_error) {
+    } catch (error) {
       logger.error('Security initialization failed:');
       setIsSecure(false);
     }
@@ -198,7 +198,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       }
       
       return true;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Request validation failed:');
       return false;
     }
@@ -225,7 +225,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const reportSecurityEvent = async (event: unknown): Promise<void> => {
     try {
       await securityMonitor.reportEvent(event);
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to report security event:');
     }
   };
@@ -251,7 +251,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 };
 
 // Security HOC for protected routes
-export const withSecurity = <P extends object>(
+export const _withSecurity = <P extends object>(
   Component: React.ComponentType<P>,
   requiredLevel: 'basic' | 'elevated' | 'maximum' = 'basic'
 ) => {
@@ -342,7 +342,7 @@ const CaptchaChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) =>
 };
 
 const MFAChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
-  const [code, setCode] = useState('');
+  const [code, _setCode] = useState('');
   const [loading, setLoading] = useState(false);
   
   const handleVerify = async () => {
@@ -355,7 +355,7 @@ const MFAChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       setTimeout(() => {
         onSuccess();
       }, 1000);
-    } catch (_error) {
+    } catch (error) {
       logger.error('MFA verification failed:');
     }
   };

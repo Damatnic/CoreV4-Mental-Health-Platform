@@ -435,7 +435,7 @@ const generateWellnessInsights = (
 };
 
 // Create the store
-export const useWellnessStore = create<WellnessState>()(
+export const _useWellnessStore = create<WellnessState>()(
   persist(
     immer((set, get) => ({
       // Initial state
@@ -664,7 +664,7 @@ export const useWellnessStore = create<WellnessState>()(
           get().analyzeMoodPatterns();
           get().generateInsights();
           get().calculateWellnessScores();
-        } catch (_error) {
+        } catch (error) {
           logger.error('Failed to import data:');
 import { logger } from '../utils/logger';
         }

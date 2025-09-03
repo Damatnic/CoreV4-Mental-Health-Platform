@@ -17,9 +17,9 @@ interface PostCardProps {
 function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showComments, setShowComments] = useState(false);
-  const [isLiked, setIsLiked] = useState(post.isLiked);
-  const [likeCount, setLikeCount] = useState(post.likes);
+  const [showComments, _setShowComments] = useState(false);
+  const [isLiked, _setIsLiked] = useState(post.isLiked);
+  const [likeCount, _setLikeCount] = useState(post.likes);
 
   const likeMutation = useMutation({
     mutationFn: () => isLiked ? communityService.unlikePost(post.id) : communityService.likePost(post.id),
@@ -269,10 +269,11 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="post-title" className="block text-sm font-medium text-gray-700 mb-1">
                 Title
               </label>
               <input
+                id="post-title"
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -285,10 +286,11 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Content */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="post-content" className="block text-sm font-medium text-gray-700 mb-1">
                 Content
               </label>
               <textarea
+                id="post-content"
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -304,10 +306,11 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Mood */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Current Mood (_optional)
+              <label htmlFor="post-mood" className="block text-sm font-medium text-gray-700 mb-1">
+                Current Mood (optional)
               </label>
               <select
+                id="post-mood"
                 value={formData.mood}
                 onChange={(e) => setFormData(prev => ({ ...prev, mood: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -326,11 +329,12 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="post-tags" className="block text-sm font-medium text-gray-700 mb-1">
                 Tags
               </label>
               <div className="flex items-center space-x-2">
                 <input
+                  id="post-tags"
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
@@ -367,10 +371,11 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Visibility */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="post-visibility" className="block text-sm font-medium text-gray-700 mb-1">
                 Visibility
               </label>
               <select
+                id="post-visibility"
                 value={formData.visibility}
                 onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as unknown }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -383,7 +388,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Trigger Warning */}
             <div className="space-y-2">
-              <label className="flex items-center space-x-2">
+              <label htmlFor="input_6vjog663e" className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={formData.triggerWarning}
@@ -400,7 +405,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
                   <p className="text-xs text-gray-600">Select content types:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {triggerWarningTypes.map((type) => (
-                      <label key={type} className="flex items-center space-x-2">
+                      <label htmlFor="input_8vrkuvscw" key={type} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
                           checked={formData.triggerWarningType?.includes(type) || false}
@@ -454,8 +459,8 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 export function CommunityPosts({ groupId }: { groupId?: string }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [__showCreateModal, setShowCreateModal] = useState(false);
+  const [__editingPost, setEditingPost] = useState<Post | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'recent' | 'popular' | 'helpful'>('recent');
 
   // Fetch posts
@@ -465,7 +470,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   });
 
   // Delete post mutation
-  const deleteMutation = useMutation({
+  const _deleteMutation  = useMutation({
     mutationFn: (_postId: string) => communityService.deletePost(_postId),
     onSuccess: () => {
       toast.success('Post deleted successfully');
@@ -477,7 +482,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   });
 
   // Report post mutation
-  const reportMutation = useMutation({
+  const _reportMutation  = useMutation({
     mutationFn: ({ _postId, reason }: { _postId: string; reason: string }) => 
       communityService.reportPost(_postId, reason),
     onSuccess: () => {

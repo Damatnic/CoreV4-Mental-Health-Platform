@@ -671,4 +671,4 @@ export class AdvancedAccessibilityService {
   }
 }
 
-export const advancedAccessibilityService = new AdvancedAccessibilityService();
+export const _advancedAccessibilityService = new AdvancedAccessibilityService();

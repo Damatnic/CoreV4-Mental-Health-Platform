@@ -450,4 +450,4 @@ export class GeolocationEmergencyService {
   }
 }
 
-export const _geolocationEmergencyService = new GeolocationEmergencyService();
+export const __geolocationEmergencyService = new GeolocationEmergencyService();

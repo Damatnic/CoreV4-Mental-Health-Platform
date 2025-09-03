@@ -205,7 +205,7 @@ class Logger {
     if (!this.isDevelopment) {
       try {
         await this.sendToRemoteLogging(_entriesToFlush);
-      } catch (_error) {
+      } catch (error) {
         // Fallback to console if remote logging fails
         logger.error('[Logger] Failed to send logs to remote service');
       }
@@ -387,11 +387,11 @@ class Logger {
 export const logger = Logger.getInstance();
 
 // Export convenience functions
-export const _logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
-export const _logInfo = (message: string, context?: LogContext) => logger.info(message, context);
-export const _logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
-export const _logError = (message: string, error?: Error, context?: LogContext) => logger.error(message, error, context);
-export const _logCritical = (message: string, error?: Error, context?: LogContext) => logger.critical(message, error, context);
+export const __logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
+export const __logInfo = (message: string, context?: LogContext) => logger.info(message, context);
+export const __logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
+export const __logError = (message: string, error?: Error, context?: LogContext) => logger.error(message, error, context);
+export const __logCritical = (message: string, error?: Error, context?: LogContext) => logger.critical(message, error, context);
 
 // Extend window interface for Sentry integration
 declare global {

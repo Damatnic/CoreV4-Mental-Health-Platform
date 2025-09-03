@@ -71,7 +71,7 @@ function CrisisButton({ icon, label, sublabel, color, onClick, urgent, disabled 
 
 // Quick access floating action button for crisis
 function CrisisFloatingButton({ onClick }: { onClick: () => void }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, _setIsExpanded] = useState(false);
   const { vibrate } = useVibration();
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -183,8 +183,8 @@ function CrisisStatusBar() {
 
 // Main mobile crisis interface
 export function MobileCrisisInterface() {
-  const [activeView, setActiveView] = useState<'main' | 'chat' | 'resources' | 'safety'>('main');
-  const [location, setLocation] = useState<GeolocationCoordinates | null>(null);
+  const [__activeView, setActiveView] = useState<'main' | 'chat' | 'resources' | 'safety'>('main');
+  const [location, _setLocation] = useState<GeolocationCoordinates | null>(null);
   const { isOnline } = useNetworkStatus();
   const { vibrate } = useVibration();
 
@@ -204,13 +204,13 @@ export function MobileCrisisInterface() {
   }, []);
 
   // Store crisis interactions for offline sync
-  const storeCrisisInteraction = useCallback(async (_data: Record<string, unknown>) => {
+  const storeCrisisInteraction = useCallback(async (data: Record<string, unknown>) => {
     try {
       const db = await openCrisisDB();
       const tx = db.transaction('interactions', 'readwrite');
-      await tx.objectStore('interactions').add(_data);
-    } catch (_error) {
-      logger.error('Failed to store crisis interaction:');
+      await tx.objectStore('interactions').add(data);
+    } catch (error) {
+      logger.error('Failed to store crisis interaction', 'MobileCrisisInterface', error);
     }
   }, []);
 
@@ -221,7 +221,7 @@ export function MobileCrisisInterface() {
     // Store crisis interaction in IndexedDB for offline sync
     if ('indexedDB' in window) {
       const timestamp = new Date().toISOString();
-      const _data = {
+      const data = {
         action: 'emergency_call',
         service,
         number,
@@ -234,7 +234,7 @@ export function MobileCrisisInterface() {
       };
       
       // Store for later sync
-      storeCrisisInteraction(_data);
+      storeCrisisInteraction(data);
     }
     
     // Make the call
@@ -288,7 +288,7 @@ export function MobileCrisisInterface() {
                     Crisis Support
                   </h1>
                   <p className="text-sm text-gray-600 mt-1">
-                    Help is available 24/7. You&apos;re not alone.
+                    Help is available 24/7. You're not alone.
                   </p>
                 </div>
               </div>

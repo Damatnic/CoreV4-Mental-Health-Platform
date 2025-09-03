@@ -104,13 +104,13 @@ export function EnhancedCrisisPanel({
   onLocationShare 
 }: EnhancedCrisisPanelProps) {
   const { _user } = useAuth();
-  const { location, error: _locationError } = useGeolocation();
+  const { location, _error: _locationError } = useGeolocation();
   const { assessmentData, _updateAssessment } = useCrisisAssessment();
   
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showFullPlan, setShowFullPlan] = useState(false);
-  const [activeTab, setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
-  const [riskFactors, setRiskFactors] = useState<RiskFactors>({
+  const [__isOnline, setIsOnline] = useState(navigator.onLine);
+  const [showFullPlan, _setShowFullPlan] = useState(false);
+  const [activeTab, _setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
+  const [riskFactors, _setRiskFactors] = useState<RiskFactors>({
     moodPattern: 0,
     behaviorChanges: 0,
     socialWithdrawal: 0,
@@ -119,8 +119,8 @@ export function EnhancedCrisisPanel({
     thoughtPatterns: 0,
     physicalSymptoms: 0
   });
-  const [crisisLevel, setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
-  const [pulseAnimation, setPulseAnimation] = useState(false);
+  const [crisisLevel, _setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
+  const [pulseAnimation, _setPulseAnimation] = useState(false);
 
   // Calculate real-time risk assessment
   const calculateRiskLevel = useCallback((): CrisisLevel => {
@@ -241,7 +241,7 @@ export function EnhancedCrisisPanel({
   ], []);
 
   // Personalized coping strategies based on risk level
-  const copingStrategies = useMemo(() => {
+  const _copingStrategies  = useMemo(() => {
     const baseStrategies = data?.safetyPlan?.copingStrategiesText ? [data.safetyPlan.copingStrategiesText] : [];
     const additionalStrategies = crisisLevel.recommendations;
     return [...baseStrategies, ...additionalStrategies];

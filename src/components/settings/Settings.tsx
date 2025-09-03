@@ -60,14 +60,14 @@ export default function Settings({ _userId, _section = 'general' }: SettingsProp
               <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="input_b1hx8mb3k" className="text-sm font-medium text-gray-900 dark:text-white">
                       Dark Mode
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Switch between light and dark themes
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label htmlFor="input_bm12vm1wt" className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />
                     <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-purple-500"></div>
                   </label>
@@ -75,7 +75,7 @@ export default function Settings({ _userId, _section = 'general' }: SettingsProp
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="input_up6c0sj2r" className="text-sm font-medium text-gray-900 dark:text-white">
                       Language
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -104,14 +104,14 @@ export default function Settings({ _userId, _section = 'general' }: SettingsProp
               <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="input_hmsthxbxo" className="text-sm font-medium text-gray-900 dark:text-white">
                       Share data for research
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Help improve mental health research (_anonymized)
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label htmlFor="input_9yjj2ghkt" className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />
                     <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-400 peer-checked:to-emerald-500"></div>
                   </label>
@@ -119,14 +119,14 @@ export default function Settings({ _userId, _section = 'general' }: SettingsProp
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="input_g2tk4xhqy" className="text-sm font-medium text-gray-900 dark:text-white">
                       Analytics & Usage Data
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Help us improve the app experience
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label htmlFor="input_pu7wfi7y9" className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />
                     <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 dark:peer-focus:ring-cyan-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-cyan-400 peer-checked:to-blue-500"></div>
                   </label>

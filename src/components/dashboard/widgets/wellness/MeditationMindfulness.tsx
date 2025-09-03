@@ -67,9 +67,9 @@ export function MeditationMindfulness({
   onViewHistory,
   onSetGoal
 }: MeditationMindfulnessProps) {
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [showRecommendations, _setShowRecommendations] = useState(true);
-  const [activeSession, _setActiveSession] = useState<string | null>(null);
+  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [_showRecommendations, _setShowRecommendations] = useState(true);
+  const [_activeSession, _setActiveSession] = useState<string | null>(null);
 
   // Mock data if no sessions provided
   const mockSessions: MeditationSession[] = [
@@ -105,7 +105,7 @@ export function MeditationMindfulness({
   const meditationSessions = sessions.length > 0 ? sessions : mockSessions;
 
   // Calculate statistics
-  const stats = useMemo(() => {
+  const __stats  = useMemo(() => {
     const _now = new Date();
     const _weekAgo = new Date(_now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const _monthAgo = new Date(_now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -294,7 +294,7 @@ export function MeditationMindfulness({
     }
 
     return recs.slice(0, 3);
-  }, [meditationSessions, stats, selectedTimeRange]);
+  }, [meditationSessions, _stats, selectedTimeRange]);
 
   // Quick meditation options
   const quickMeditations = [

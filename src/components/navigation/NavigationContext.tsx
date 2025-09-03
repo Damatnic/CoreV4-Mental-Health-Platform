@@ -69,7 +69,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [crisisDetected, setCrisisDetected] = useState(false);
   const [userRole, setUserRole] = useState<'patient' | 'caregiver' | 'professional' | 'guest'>('guest');
-  const [breadcrumbs, setBreadcrumbs] = useState<Array<{ label: string; path: string }>>([]);
+  const [breadcrumbs, _setBreadcrumbs] = useState<Array<{ label: string; path: string }>>([]);
 
   // Update breadcrumbs based on current path
   useEffect(() => {

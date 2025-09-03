@@ -23,9 +23,9 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
   const navigate = useNavigate();
   const realtimeSync = useRealtimeSync();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState(0);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [__onlineUsers, setOnlineUsers] = useState(0);
+  const [typingUsers, _setTypingUsers] = useState<string[]>([]);
+  const [_loading, _setLoading] = useState(true);
 
   useEffect(() => {
     // Load initial posts

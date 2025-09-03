@@ -27,7 +27,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should pass all axe-core AAA tests on homepage', async () => {
       await page.goto('http://localhost:5173');
       
-      const results = await new AxePuppeteer(_page)
+      const __results = await new AxePuppeteer(_page)
         .withTags(['wcag2aaa', 'wcag21aaa'])
         .analyze();
       
@@ -198,7 +198,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         if (!modal) return false;
         
         const focusableElements = modal.querySelectorAll('button, input, select, textarea, a, [tabindex]');
-        const _currentIndex = 0;
+        const __currentIndex = 0;
         
         // Tab through elements
         for (let i = 0; i < focusableElements.length + 2; i++) {
@@ -450,7 +450,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         await page.goto('http://localhost:5173');
         
         // Check that content is not cut off
-        const _overflow = await page.evaluate(() => {
+        const __overflow = await page.evaluate(() => {
           const body = document.body;
           return body.scrollWidth > window.innerWidth || body.scrollHeight > window.innerHeight;
         });

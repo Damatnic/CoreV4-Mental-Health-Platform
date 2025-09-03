@@ -90,11 +90,11 @@ export function MedicationManagement({
   onContactPharmacy,
   onContactPrescriber
 }: MedicationManagementProps) {
-  const [activeTab, setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
-  const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [_showSideEffectReport, setShowSideEffectReport] = useState(false);
-  const [_timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  const [activeTab, _setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
+  const [selectedMedication, _setSelectedMedication] = useState<Medication | null>(null);
+  const [__showDetails, setShowDetails] = useState(false);
+  const [_showSideEffectReport, _setShowSideEffectReport] = useState(false);
+  const [___timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
   // Get current time period
   useEffect(() => {
@@ -107,7 +107,7 @@ export function MedicationManagement({
 
   // Get today's medication schedule
   const getTodaysMedications = () => {
-    const _now = new Date();
+    const __now = new Date();
     const todaySchedule: Array<{
       medication: Medication;
       schedule: MedicationSchedule;

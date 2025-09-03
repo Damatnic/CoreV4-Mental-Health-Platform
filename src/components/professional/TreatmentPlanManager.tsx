@@ -163,14 +163,14 @@ export function TreatmentPlanManager({
   readOnly = false,
   isProvider = false
 }: TreatmentPlanManagerProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
+  const [activeTab, _setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
   const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
-  const [_editingGoal, setEditingGoal] = useState<string | null>(null);
-  const [_showGoalForm, setShowGoalForm] = useState(false);
-  const [_showInterventionForm, setShowInterventionForm] = useState(false);
-  const [filterPriority, setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [_searchTerm, _setSearchTerm] = useState('');
-  const [_showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
+  const [___editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [_showGoalForm, _setShowGoalForm] = useState(false);
+  const [_showInterventionForm, _setShowInterventionForm] = useState(false);
+  const [filterPriority, _setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
+  const [__searchTerm, _setSearchTerm] = useState('');
+  const [__showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
 
   // Create new treatment plan if none provided
   useEffect(() => {

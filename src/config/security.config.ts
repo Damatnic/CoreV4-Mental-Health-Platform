@@ -392,11 +392,11 @@ if (!validateSecurityConfig()) {
 }
 
 // Export individual configurations for specific use cases
-export const _encryptionConfig = securityConfig.encryption;
-export const _sessionConfig = securityConfig.session;
-export const _rateLimitConfig = securityConfig.rateLimit;
-export const _hipaaConfig = securityConfig.hipaa;
-export const _cspConfig = securityConfig.csp;
-export const _apiConfig = securityConfig.api;
-export const _monitoringConfig = securityConfig.monitoring;
-export const _featureFlags = securityConfig.features;
+export const __encryptionConfig = securityConfig.encryption;
+export const __sessionConfig = securityConfig.session;
+export const __rateLimitConfig = securityConfig.rateLimit;
+export const __hipaaConfig = securityConfig.hipaa;
+export const __cspConfig = securityConfig.csp;
+export const __apiConfig = securityConfig.api;
+export const __monitoringConfig = securityConfig.monitoring;
+export const __featureFlags = securityConfig.features;

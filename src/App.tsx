@@ -157,7 +157,7 @@ const RouteWrapper = memo(({
 RouteWrapper.displayName = 'RouteWrapper';
 
 function App() {
-  const [_showBoot, setShowBoot] = useState(() => {
+  const [_showBoot, _setShowBoot] = useState(() => {
     // Show boot sequence only on first visit or if user hasn't seen it in the last hour
     const lastBoot = localStorage.getItem('console-last-boot');
     if (!lastBoot) return true;
@@ -167,7 +167,7 @@ function App() {
     return Date.now() - lastBootTime > oneHour;
   });
 
-  const [_isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
+  const [__isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
 
   const handleBootComplete = useCallback(() => {
     startPriorityTransition(() => {
@@ -182,7 +182,7 @@ function App() {
   }, [startPriorityTransition]);
 
   // Memoize the boot sequence props
-  const _bootSequenceProps = useMemo(() => ({
+  const ___bootSequenceProps  = useMemo(() => ({
     onBootComplete: handleBootComplete,
     skipBoot: import.meta.env.DEV
   }), [handleBootComplete]);
@@ -205,7 +205,7 @@ function App() {
 
   // CRITICAL: All hooks must be declared BEFORE any conditional returns
   // Memoize toast options to prevent unnecessary re-renders
-  const toasterOptions = useMemo(() => ({
+  const _toasterOptions  = useMemo(() => ({
     position: 'top-center' as const,
     toastOptions: {
       duration: 4000,

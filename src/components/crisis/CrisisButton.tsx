@@ -34,7 +34,7 @@ const OFFLINE_RESOURCES: CrisisResource[] = [
   { name: 'SAMHSA National Helpline', number: '1-800-662-4357', available: true },
 ];
 
-const _CrisisButton: React.FC<CrisisButtonProps> = ({ 
+const CrisisButton: React.FC<CrisisButtonProps> = ({ 
   className = '', 
   size = 'medium',
   variant = 'primary',
@@ -46,7 +46,7 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [professionalAlerted, setProfessionalAlerted] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const _buttonRef  = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const { trackEvent } = useAnalytics();
 
@@ -64,7 +64,7 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
   };
 
   // Handle crisis button click with debouncing
-  const handleCrisisClick = useCallback(async () => {
+  const _handleCrisisClick  = useCallback(async () => {
     // Clear any existing debounce
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -84,12 +84,12 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
           action: 'button_clicked',
           label: 'crisis_support_activated'
         });
-      } catch (_error) {
-        logger.error('Failed to track event:', err);
+      } catch (error) {
+        logger.error('Failed to track event', 'CrisisButton', error);
       }
 
       // Trigger crisis callback if provided
-      if (_onCrisisActivated) {
+      if (onCrisisActivated) {
         onCrisisActivated();
       }
 
@@ -107,8 +107,8 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
         setResources(resourcesResponse.data);
         setProfessionalAlerted(alertResponse.data.professionalAlerted);
         setIsLoading(false);
-      } catch (_error) {
-        logger.error('Crisis API error: ', err);
+      } catch (error) {
+        logger.error('Crisis API error', 'CrisisButton', error);
         setError('Network undefined - showing offline resources');
         setResources({
           hotlines: OFFLINE_RESOURCES,
@@ -222,7 +222,7 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
                           href={`tel:${hotline.number?.replace(/\D/g, '')}`}
                           className="block p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
                           tabIndex={0}
-                          role="link"
+                         
                           aria-label={`Call ${hotline.name} at ${hotline.number || hotline.text}`}
                         >
                           <div className="font-semibold text-red-900">{hotline.name}</div>
@@ -316,4 +316,4 @@ const _CrisisButton: React.FC<CrisisButtonProps> = ({
 };
 
 // Export memoized component for critical performance
-export default React.memo(_CrisisButton);
+export default React.memo(CrisisButton);

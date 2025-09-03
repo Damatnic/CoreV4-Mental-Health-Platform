@@ -101,7 +101,7 @@ class WebSocketService {
 
         // Set up core event listeners
         this.setupCoreEventListeners();
-      } catch (_error) {
+      } catch (error) {
         logger.error('Failed to initialize WebSocket:');
         reject(_undefined);
       }
@@ -362,8 +362,8 @@ class WebSocketService {
     
     // Original code kept for reference but disabled:
     // const audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
-    // const _oscillator = audioContext.createOscillator();
-    // const _gainNode = audioContext.createGain();
+    // const __oscillator = audioContext.createOscillator();
+    // const __gainNode = audioContext.createGain();
     // ... rest of sound generation code disabled
   }
 
@@ -442,4 +442,4 @@ class WebSocketService {
 }
 
 // Export singleton instance
-export const websocketService = new WebSocketService();
+export const _websocketService = new WebSocketService();

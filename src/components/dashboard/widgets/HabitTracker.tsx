@@ -42,20 +42,13 @@ export function HabitTracker({
   onAddHabit,
   onViewAnalytics
 }: HabitTrackerProps) {
-  const {
-    habits,
-    completeHabit,
-    resetHabitStreak,
-    pauseHabit,
-    _updateHabit,
-    stackHabits
-  } = useActivityStore();
+  const { habits, completeHabit, resetHabitStreak, pauseHabit, _updateHabit, stackHabits } = useActivityStore();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
   const [showStackingMode, setShowStackingMode] = useState(false);
   const [selectedForStacking, setSelectedForStacking] = useState<string[]>([]);
-  const [expandedHabit, setExpandedHabit] = useState<string | null>(null);
+  const [expandedHabit, _setExpandedHabit] = useState<string | null>(null);
 
   // Filter active habits
   const activeHabits = habits.filter(h => h.isActive);
@@ -84,7 +77,7 @@ export function HabitTracker({
 
   // Get habit icon based on name/description
   const getHabitIcon = (habit: unknown) => {
-    const name = habit.name.toLowerCase();
+    const _name = habit.name.toLowerCase();
     if (name.includes('water') || name.includes('hydrat')) return Droplets;
     if (name.includes('sleep') || name.includes('bed')) return Moon;
     if (name.includes('wake') || name.includes('morning')) return Sun;

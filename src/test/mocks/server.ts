@@ -305,7 +305,7 @@ export const handlers = [
 export const server = setupServer(...handlers);
 
 // Test utilities for modifying handlers
-export const _mockServerUtils = {
+export const __mockServerUtils = {
   // Simulate server downtime
   simulateDowntime: () => {
     server.use(

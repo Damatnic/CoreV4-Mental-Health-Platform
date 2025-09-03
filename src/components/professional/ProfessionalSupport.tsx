@@ -45,7 +45,7 @@ import { _therapistService } from '../../services/professional/TherapistService'
  */
 
 // Professional categories and specializations
-const _PROFESSIONAL_SPECIALIZATIONS = [
+const __PROFESSIONAL_SPECIALIZATIONS = [
   'Anxiety Disorders',
   'Depression',
   'Trauma & PTSD',
@@ -64,7 +64,7 @@ const _PROFESSIONAL_SPECIALIZATIONS = [
   'Sleep Disorders'
 ];
 
-const _THERAPY_APPROACHES = [
+const __THERAPY_APPROACHES = [
   'Cognitive Behavioral Therapy (_CBT)',
   'Dialectical Behavior Therapy (_DBT)',
   'Acceptance & Commitment Therapy (_ACT)',
@@ -77,7 +77,7 @@ const _THERAPY_APPROACHES = [
   'Somatic Therapy'
 ];
 
-const _INSURANCE_PROVIDERS = [
+const __INSURANCE_PROVIDERS = [
   'Blue Cross Blue Shield',
   'Aetna',
   'United Healthcare',
@@ -322,9 +322,9 @@ const FREE_RESOURCES: FreeResource[] = [
 ];
 
 export function ProfessionalSupport() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, _setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showOnlyEmergency, setShowOnlyEmergency] = useState(false);
+  const [showOnlyEmergency, _setShowOnlyEmergency] = useState(false);
 
   // _Filter resources based on search and category
   const filteredResources = FREE_RESOURCES.filter(resource => {
@@ -382,7 +382,7 @@ export function ProfessionalSupport() {
           <div className="flex items-center gap-3">
             <HandHeart className="h-6 w-6 text-purple-400" />
             <p className="text-gray-200">
-              <span className="font-semibold text-purple-300">Your Privacy Matters:</span> We don&apos;t collect any personal data. 
+              <span className="font-semibold text-purple-300">Your Privacy Matters:</span> We don't collect any personal data. 
               All resources listed are free and many offer anonymous support. 
               You deserve help without barriers.
             </p>
@@ -559,7 +559,7 @@ export function ProfessionalSupport() {
             <h3 className="text-lg font-semibold text-white">You Deserve Support</h3>
             <p className="mt-2 text-gray-300 max-w-2xl mx-auto">
               All resources listed are completely free and many offer anonymous support. 
-              There&apos;s no shame in seeking help - it&apos;s a sign of strength. 
+              There's no shame in seeking help - it's a sign of strength. 
               Your mental health matters, and support is available without any barriers.
             </p>
           </div>

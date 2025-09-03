@@ -26,7 +26,7 @@ interface ConsoleNavigationState {
 export function useConsoleNavigation() {
   const navigate = useNavigate();
   const { onFocus, onSelect, onBack } = useConsoleSound();
-  const frameRateMonitorRef = useRef<number>(60);
+  const _frameRateMonitorRef  = useRef<number>(60);
   const lastCleanupRef = useRef<number>(0);
   const interactionTimeoutRef = useRef<number | null>(null);
   const boundsCacheRef = useRef<Map<string, DOMRect>>(new Map());
@@ -85,7 +85,7 @@ export function useConsoleNavigation() {
   }, [isLowEndDevice, state.navigationMode]);
 
   // Register a focusable element with performance optimizations
-  const registerFocusable = useCallback((focusable: ConsoleFocusable) => {
+  const _registerFocusable  = useCallback((focusable: ConsoleFocusable) => {
     const startTime = performance.now();
     
     // Cache element bounds for faster lookups
@@ -118,7 +118,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Unregister a focusable element with cleanup
-  const unregisterFocusable = useCallback((id: string) => {
+  const _unregisterFocusable  = useCallback((id: string) => {
     // Clean up cached bounds
     boundsCacheRef.current.delete(_id);
     
@@ -130,7 +130,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Get focusables in current group with memoization
-  const _getCurrentGroupFocusables = useCallback(() => {
+  const ___getCurrentGroupFocusables  = useCallback(() => {
     return state.focusables.filter(f => f.group === state.currentGroup);
   }, [state.focusables, state.currentGroup]);
   
@@ -192,7 +192,7 @@ export function useConsoleNavigation() {
             isPerformanceMode: state.isPerformanceMode
           });
         }
-      } catch (_error) {
+      } catch (error) {
         logger.warn('Error setting focus on element:');
         performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, undefined: String(_undefined) });
       }
@@ -586,7 +586,7 @@ export function useConsoleNavigation() {
           // Update button states efficiently
           lastButtonStates = gamepad.buttons.map(b => b?.pressed || false);
         }
-      } catch (_error) {
+      } catch (error) {
         // Log gamepad errors for monitoring but don't break functionality
         performanceMonitor.recordMetric('gamepad_error', 1, {
           error: String(_error)
@@ -630,7 +630,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Performance metrics for the hook
-  const getPerformanceMetrics = useCallback(() => {
+  const _getPerformanceMetrics  = useCallback(() => {
     return {
       frameRate: state.frameRate,
       isPerformanceMode: state.isPerformanceMode,

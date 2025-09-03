@@ -239,7 +239,7 @@ interface ActivityStore {
 }
 
 // Create the store with persistence
-export const _useActivityStore = create<ActivityStore>()(
+export const __useActivityStore = create<ActivityStore>()(
   persist(
     (set, get) => ({
       // Initialize state
@@ -867,7 +867,7 @@ export const _useActivityStore = create<ActivityStore>()(
             achievements: parsed.achievements || [],
             analytics: parsed.analytics || [],
           });
-        } catch (_error) {
+        } catch (error) {
           logger.error('Failed to import data:');
 import { logger } from '../utils/logger';
         }

@@ -64,13 +64,13 @@ interface CrisisBuddy {
 
 export function CrisisSupportNetwork() {
   const { _user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'contacts' | 'groups' | 'buddy' | 'professional'>('contacts');
+  const [activeTab, _setActiveTab] = useState<'contacts' | 'groups' | 'buddy' | 'professional'>('contacts');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showAddContact, setShowAddContact] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<SupportContact | null>(null);
+  const [__showAddContact, setShowAddContact] = useState(false);
+  const [selectedContact, _setSelectedContact] = useState<SupportContact | null>(null);
   
   // Support contacts state
-  const [supportContacts, setSupportContacts] = useState<SupportContact[]>([
+  const [supportContacts, _setSupportContacts] = useState<SupportContact[]>([
     {
       id: '1',
       name: 'Dr. Sarah Johnson',
@@ -127,7 +127,7 @@ export function CrisisSupportNetwork() {
   ]);
 
   // Support groups state
-  const [supportGroups, setSupportGroups] = useState<SupportGroup[]>([
+  const [supportGroups, _setSupportGroups] = useState<SupportGroup[]>([
     {
       id: '1',
       name: 'Anxiety Support Circle',
@@ -157,7 +157,7 @@ export function CrisisSupportNetwork() {
   ]);
 
   // Crisis buddy state
-  const [crisisBuddy, setCrisisBuddy] = useState<CrisisBuddy | null>({
+  const [crisisBuddy, _setCrisisBuddy] = useState<CrisisBuddy | null>({
     id: '1',
     buddyId: 'buddy123',
     name: 'Jordan Taylor',
@@ -221,7 +221,7 @@ export function CrisisSupportNetwork() {
   }, []);
 
   // Check-in with crisis buddy
-  const handleBuddyCheckIn = useCallback(() => {
+  const _handleBuddyCheckIn  = useCallback(() => {
     if (_crisisBuddy) {
       setCrisisBuddy(prev => prev ? { ...prev, lastCheckIn: new Date() } : null);
       logger.info('Crisis buddy check-in completed', {
@@ -232,7 +232,7 @@ export function CrisisSupportNetwork() {
   }, [crisisBuddy]);
 
   // Join support group
-  const handleJoinGroup = useCallback((group: SupportGroup) => {
+  const _handleJoinGroup  = useCallback((group: SupportGroup) => {
     if (group.isOnline && group.joinUrl) {
       window.open(group.joinUrl, '_blank');
     } else {

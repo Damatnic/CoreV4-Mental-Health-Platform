@@ -67,7 +67,7 @@ router.post('/register/anonymous', async (req: Request, res: Response) => {
       message: 'Anonymous user registered successfully'
     });
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     logger.error('Anonymous registration error: ', error);
     res.status(500).json({
       success: false,
@@ -113,7 +113,7 @@ router.post('/validate', async (req: Request, res: Response) => {
       valid: true
     });
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     logger.error('Token validation error: ', error);
     res.status(401).json({
       success: false,
@@ -156,7 +156,7 @@ router.get('/me', async (req: Request, res: Response) => {
       }
     });
 
-  } catch (error) {
+  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     logger.error('Get user error: ', error);
     res.status(401).json({
       success: false,

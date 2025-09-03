@@ -21,11 +21,11 @@ export function AccessibilityCommandCenter({
 }: AccessibilityCommandCenterProps) {
   const { settings, updateSetting, _presets, applyPreset, resetToDefaults } = useAccessibilityStore();
   
-  const [activeSection, setActiveSection] = useState<string>('visual');
+  const [activeSection, _setActiveSection] = useState<string>('visual');
   const [showPresetMenu, setShowPresetMenu] = useState(false);
-  const [customPresetName, setCustomPresetName] = useState('');
+  const [customPresetName, _setCustomPresetName] = useState('');
   const [showHelp, setShowHelp] = useState(false);
-  const [testMode, setTestMode] = useState(false);
+  const [testMode, _setTestMode] = useState(false);
 
   // Accessibility sections configuration
   const sections = [
@@ -591,7 +591,7 @@ export function AccessibilityCommandCenter({
                   
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="font-medium text-gray-900">
+                      <label htmlFor="input_r2bti0dds" className="font-medium text-gray-900">
                         {setting.label}
                       </label>
                       {renderSettingControl(setting)}

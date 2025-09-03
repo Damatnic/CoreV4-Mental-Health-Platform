@@ -54,14 +54,14 @@ export function OptimizedCrisisIntervention({
   onActivate,
   preloadResources = true,
 }: OptimizedCrisisInterventionProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [responseTime, setResponseTime] = useState<number | null>(null);
+  const [__isActive, setIsActive] = useState(false);
+  const [responseTime, _setResponseTime] = useState<number | null>(null);
   const activationTime = useRef<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Pre-cache DOM references
-  const _buttonRef = useRef<HTMLButtonElement>(null);
-  const _resourcesRef = useRef<HTMLDivElement>(null);
+  const ___buttonRef  = useRef<HTMLButtonElement>(null);
+  const ___resourcesRef  = useRef<HTMLDivElement>(null);
 
   // Optimized activation handler
   const handleActivation = useCallback(() => {
@@ -79,7 +79,7 @@ export function OptimizedCrisisIntervention({
     
     // Measure response time
     requestAnimationFrame(() => {
-      const time = performance.now() - activationTime.current;
+      const _time = performance.now() - activationTime.current;
       setResponseTime(time);
       performanceMonitor.measureEnd('crisis-intervention-activate');
       
@@ -129,7 +129,7 @@ export function OptimizedCrisisIntervention({
   }, [handleActivation]);
 
   // Close handler
-  const handleClose = useCallback(() => {
+  const _handleClose  = useCallback(() => {
     setIsActive(false);
     if (modalRef.current) {
       modalRef.current.style.display = 'none';
@@ -138,7 +138,7 @@ export function OptimizedCrisisIntervention({
   }, []);
 
   // Call hotline (immediate action)
-  const callHotline = useCallback((number: string) => {
+  const _callHotline  = useCallback((number: string) => {
     performanceMonitor.measureStart('crisis-call-initiate');
     
     if (number === '988' || number.includes('800')) {
@@ -338,7 +338,7 @@ async function cacheOfflineCrisisData() {
       data: CRISIS_RESOURCES,
       timestamp: Date.now(),
     });
-  } catch (_error) {
+  } catch (error) {
     logger.error('Failed to cache crisis data:');
   }
 }

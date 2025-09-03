@@ -1114,25 +1114,20 @@ const analyzeMoodTrends = (_moodHistory: unknown[], _contextData: unknown[]): Mo
 export function useAIInsights() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedInsightCategory, setSelectedInsightCategory] = useState<InsightCategory | 'all'>('all');
-  const [insightTimeRange, setInsightTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [crisisRiskPrediction, setCrisisRiskPrediction] = useState<CrisisRiskPrediction | null>(null);
-  const [moodAnalysis, setMoodAnalysis] = useState<MoodAnalysis | null>(null);
+  const [selectedInsightCategory, _setSelectedInsightCategory] = useState<InsightCategory | 'all'>('all');
+  const [insightTimeRange, _setInsightTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [crisisRiskPrediction, _setCrisisRiskPrediction] = useState<CrisisRiskPrediction | null>(null);
+  const [moodAnalysis, _setMoodAnalysis] = useState<MoodAnalysis | null>(null);
 
   // Fetch AI insights dashboard
-  const {
-    data: insightsDashboard,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: insightsDashboard, isLoading, _error, refetch,  } = useQuery({
     queryKey: ['ai-insights', user?.id, insightTimeRange],
     queryFn: async (): Promise<AIInsightsDashboard> => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 800));
 
       // Generate mock AI insights
-      const patterns = analyzePatterns(user);
+      const _patterns = analyzePatterns(user);
       const _predictions = generatePredictions(patterns);
       const recommendations = generateRecommendations(patterns, _predictions);
       const therapeuticIntelligence = analyzeTherapeuticProgress();
@@ -1389,7 +1384,7 @@ export function useAIInsights() {
   });
 
   // Filter insights by category
-  const filteredInsights = useMemo(() => {
+  const _filteredInsights  = useMemo(() => {
     if (!insightsDashboard?.insights) return [];
     if (selectedInsightCategory === 'all') return insightsDashboard.insights;
     return insightsDashboard.insights.filter(insight => insight.category === selectedInsightCategory);
@@ -1420,12 +1415,12 @@ export function useAIInsights() {
   });
 
   // Request insight refresh
-  const requestRefresh = useCallback(async () => {
+  const _requestRefresh  = useCallback(async () => {
     await refetch();
   }, [refetch]);
 
   // Get insight statistics
-  const insightStats = useMemo(() => {
+  const _insightStats  = useMemo(() => {
     if (!insightsDashboard) return null;
 
     const totalInsights = insightsDashboard.insights.length;
@@ -1470,7 +1465,7 @@ export function usePatternAnalysis(patternType?: PatternType) {
     queryKey: ['pattern-analysis', user?.id, patternType],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 600));
-      const patterns = analyzePatterns(user);
+      const _patterns = analyzePatterns(user);
       return patternType 
         ? patterns.filter(p => p.patternType === patternType)
         : patterns;
@@ -1488,7 +1483,7 @@ export function usePredictiveModels(modelType?: ModelType) {
     queryKey: ['predictive-models', user?.id, modelType],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 700));
-      const patterns = analyzePatterns(user);
+      const _patterns = analyzePatterns(user);
       const models = generatePredictions(patterns);
       return modelType
         ? models.filter(m => m.modelType === modelType)
@@ -1507,7 +1502,7 @@ export function usePersonalizedRecommendations(type?: RecommendationType) {
     queryKey: ['recommendations', user?.id, type],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 600));
-      const patterns = analyzePatterns(user);
+      const _patterns = analyzePatterns(user);
       const _predictions = generatePredictions(patterns);
       const recommendations = generateRecommendations(patterns, _predictions);
       return type

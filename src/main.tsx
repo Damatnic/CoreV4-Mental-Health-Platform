@@ -126,7 +126,7 @@ function initializeReact() {
         </EmergencyErrorBoundary>
       </React.StrictMode>
     );
-  } catch (_error) {
+  } catch (error) {
     logger.error('🚨 React initialization failed:');
     // Show emergency fallback
     rootElement.innerHTML = `

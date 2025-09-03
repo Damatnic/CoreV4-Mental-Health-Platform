@@ -36,20 +36,12 @@ export function ActivityAnalytics({
   _onExportData,
   _onViewDetails
 }: ActivityAnalyticsProps) {
-  const {
-    activityHistory,
-    _activities,
-    _goals,
-    _habits,
-    correlateActivitiesWithMood,
-    _analyzeActivityEffectiveness,
-    exportProgressReport
-  } = useActivityStore();
+  const { activityHistory, _activities, _goals, _habits, correlateActivitiesWithMood, _analyzeActivityEffectiveness, exportProgressReport } = useActivityStore();
 
-  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
+  const [selectedPeriod, _setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [showInsights, setShowInsights] = useState(true);
+  const [showInsights, _setShowInsights] = useState(true);
 
   // Get date range based on selected period
   const getDateRange = () => {
@@ -89,7 +81,7 @@ export function ActivityAnalytics({
   }, [activityHistory, selectedPeriod, selectedCategory, currentDate]);
 
   // Calculate statistics
-  const stats = useMemo(() => {
+  const ___stats  = useMemo(() => {
     const completed = filteredActivities.filter(a => a.completed).length;
     const total = filteredActivities.length;
     const completionRate = total > 0 ? (completed / total) * 100 : 0;
@@ -194,7 +186,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'success',
         title: 'Excellent Completion Rate',
-        message: `You&apos;re completing ${Math.round(stats.completionRate)}% of your activities!`,
+        message: `You're completing ${Math.round(stats.completionRate)}% of your activities!`,
         icon: Award
       });
     } else if (stats.completionRate < 50) {
@@ -231,7 +223,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'info',
         title: 'Peak Activity Time',
-        message: `You&apos;re most active in the ${maxTimeOfDay.time}`,
+        message: `You're most active in the ${maxTimeOfDay.time}`,
         icon: Clock
       });
     }

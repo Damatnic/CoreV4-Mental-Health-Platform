@@ -47,7 +47,7 @@ export function PWAInstallPrompt() {
   const { vibrate } = useVibration();
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
-  const [installSuccess, setInstallSuccess] = useState(false);
+  const [__installSuccess, setInstallSuccess] = useState(false);
   const [dismissCount, setDismissCount] = useState(() => {
     const count = localStorage.getItem('pwa_dismiss_count');
     return count ? parseInt(_count) : 0;
@@ -117,7 +117,7 @@ export function PWAInstallPrompt() {
     setDismissCount(newCount);
     localStorage.setItem('pwa_dismiss_count', newCount.toString());
     
-    // If dismissed 3 times, don&apos;t show again for 30 days
+    // If dismissed 3 times, don't show again for 30 days
     if (newCount >= 3) {
       const hideUntil = new Date();
       hideUntil.setDate(hideUntil.getDate() + 30);
@@ -190,9 +190,9 @@ export function PWAInstallPrompt() {
               <div className="bg-gray-50 rounded-lg p-3 mb-4">
                 <p className="text-xs text-gray-600">
                   {deviceInfo.isIOS ? (
-                    <>Tap the share button <span className="font-mono bg-gray-200 px-1 rounded">⎙</span> then &quot;Add to Home Screen&quot;</>
+                    <>Tap the share button <span className="font-mono bg-gray-200 px-1 rounded">⎙</span> then "Add to Home Screen"</>
                   ) : (
-                    <>Tap &quot;Install&quot; below to add CoreV4 to your home screen</>
+                    <>Tap "Install" below to add CoreV4 to your home screen</>
                   )}
                 </p>
               </div>
@@ -240,7 +240,7 @@ export function PWAInstallPrompt() {
                   }}
                   className="w-full mt-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  Don&apos;t show this again
+                  Don't show this again
                 </button>
               )}
             </div>
@@ -289,7 +289,7 @@ export function PWAInstallPrompt() {
 // Standalone component for showing install status in settings
 export function PWAInstallStatus() {
   const { deviceInfo, isAppInstallable, installApp } = useMobileFeatures();
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, _setIsInstalled] = useState(false);
 
   useEffect(() => {
     setIsInstalled(
