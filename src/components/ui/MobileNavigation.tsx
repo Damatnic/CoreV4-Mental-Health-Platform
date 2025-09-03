@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -6,7 +6,11 @@ import {
   Heart, 
   Users, 
   Stethoscope,
-  AlertTriangle 
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Brain,
+  Activity
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 
@@ -18,6 +22,7 @@ interface NavItem {
   urgent?: boolean;
 }
 
+// Simplified navigation for calmer, less overwhelming experience
 const navItems: NavItem[] = [
   {
     path: '/',
@@ -26,11 +31,10 @@ const navItems: NavItem[] = [
     color: 'text-console-accent',
   },
   {
-    path: '/crisis',
-    label: 'Crisis',
-    icon: AlertTriangle,
-    color: 'text-red-400',
-    urgent: false, // DISABLED: Removed annoying demo urgency
+    path: '/ai-therapy',
+    label: 'AI Therapy',
+    icon: Brain,
+    color: 'text-blue-400',
   },
   {
     path: '/wellness',
@@ -39,10 +43,11 @@ const navItems: NavItem[] = [
     color: 'text-pink-400',
   },
   {
-    path: '/community',
-    label: 'Community',
-    icon: Users,
-    color: 'text-green-400',
+    path: '/crisis',
+    label: 'Crisis Support',
+    icon: AlertTriangle,
+    color: 'text-red-400',
+    urgent: false, // DISABLED: Removed annoying demo urgency
   },
   {
     path: '/professional',
@@ -55,6 +60,20 @@ const navItems: NavItem[] = [
 export function MobileNavigation() {
   const location = useLocation();
   const { vibrate } = useVibration();
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+
+  // Apply collapsed class to body for proper spacing
+  React.useEffect(() => {
+    if (isDesktopSidebarCollapsed) {
+      document.body.classList.add('sidebar-collapsed');
+    } else {
+      document.body.classList.remove('sidebar-collapsed');
+    }
+    
+    return () => {
+      document.body.classList.remove('sidebar-collapsed');
+    };
+  }, [isDesktopSidebarCollapsed]);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -259,6 +278,157 @@ export function MobileNavigation() {
         })}
       </nav>
 
+      {/* Desktop Console Sidebar Navigation - Collapsible */}
+      <nav className={`hidden lg:flex fixed left-0 top-16 bottom-0 bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-r border-gray-700/50 backdrop-blur-console flex-col py-6 z-30 shadow-console-depth transition-all duration-300 ${
+        isDesktopSidebarCollapsed ? 'w-20' : 'w-64'
+      }`}>
+        {/* Console accent line */}
+        <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-console-accent/30 to-transparent" />
+        
+        {/* Collapse/Expand Toggle */}
+        <motion.button
+          onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+          className="console-focusable mb-4 mx-4 p-3 rounded-console-lg bg-gray-700/30 hover:bg-gray-600/40 border border-gray-600/50 hover:border-console-accent/50 transition-all duration-300 shadow-console-card min-h-[56px] min-w-[56px] flex items-center justify-center group"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-console-accent/10 to-blue-500/10 rounded-console-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <motion.div
+            animate={{ rotate: isDesktopSidebarCollapsed ? 0 : 180 }}
+            transition={{ duration: 0.3 }}
+            className="relative z-10"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-300 group-hover:text-white" />
+          </motion.div>
+          {!isDesktopSidebarCollapsed && (
+            <span className="ml-3 text-sm font-medium text-gray-300 group-hover:text-white">
+              Collapse
+            </span>
+          )}
+        </motion.button>
+        
+        {/* Navigation Items */}
+        <div className="flex flex-col space-y-2 px-4 flex-1">
+          {navItems.map((item, index) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
+            
+            return (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link
+                  to={item.path}
+                  onClick={() => handleNavClick(item.urgent)}
+                  className={`
+                    console-focusable relative flex items-center transition-all duration-300 group overflow-hidden rounded-console-lg min-h-[56px] min-w-[56px]
+                    ${isDesktopSidebarCollapsed ? 'p-4 justify-center' : 'p-4'}
+                    ${active 
+                      ? `bg-gradient-to-r from-${item.color.split('-')[1]}-500/20 to-${item.color.split('-')[1]}-600/10 border-${item.color.split('-')[1]}-400/30 shadow-console-glow border` 
+                      : 'border border-gray-700/50 hover:border-gray-600/50 hover:bg-gray-700/30'
+                    }
+                  `}
+                  style={{
+                    pointerEvents: 'auto',
+                    touchAction: 'manipulation'
+                  }}
+                >
+                  {/* Console tile background effect */}
+                  <div className={`absolute inset-0 bg-gradient-to-br from-console-accent/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
+                  
+                  {/* Icon container */}
+                  <motion.div
+                    whileTap={{ scale: 0.9 }}
+                    className={`relative z-10 flex-shrink-0 rounded-console transition-all duration-300 min-h-[40px] min-w-[40px] flex items-center justify-center ${
+                      active 
+                        ? `${item.color} bg-white/10` 
+                        : 'text-gray-400 group-hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-6 w-6 flex-shrink-0" />
+                    
+                    {/* Enhanced urgent indicator */}
+                    {item.urgent && (
+                      <motion.span 
+                        className="absolute -top-1 -right-1 flex h-3 w-3"
+                        animate={{ scale: [1, 1.3, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-console-glow"></span>
+                      </motion.span>
+                    )}
+                  </motion.div>
+                  
+                  {/* Label - only show when not collapsed */}
+                  {!isDesktopSidebarCollapsed && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="ml-4 flex-1 min-w-0"
+                    >
+                      <span className={`
+                        block font-medium transition-all duration-300 text-sm
+                        ${active ? `${item.color} font-bold` : 'text-gray-300 group-hover:text-white'}
+                      `}>
+                        {item.label}
+                      </span>
+                      {active && (
+                        <span className="block text-xs text-gray-400 mt-1">
+                          Current page
+                        </span>
+                      )}
+                    </motion.div>
+                  )}
+                  
+                  {/* Console active indicator */}
+                  {active && (
+                    <motion.div
+                      layoutId="activeDesktopTab"
+                      className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-console-accent to-blue-400 rounded-r-full shadow-console-glow"
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      exit={{ scaleY: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: 'easeInOut'
+                      }}
+                    />
+                  )}
+                  
+                  {/* Tooltip for collapsed state */}
+                  {isDesktopSidebarCollapsed && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                      {item.label}
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+                    </div>
+                  )}
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+        
+        {/* Footer info when expanded */}
+        {!isDesktopSidebarCollapsed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="px-4 pt-4 border-t border-gray-700/50 mt-auto"
+          >
+            <div className="text-xs text-gray-400 text-center">
+              <div className="font-medium text-console-accent mb-1">Astral Core v4</div>
+              <div>Mental Health Platform</div>
+            </div>
+          </motion.div>
+        )}
+      </nav>
+
       {/* Console Mobile Navigation Styles */}
       <style>{`
         .h-safe-area-bottom {
@@ -280,6 +450,19 @@ export function MobileNavigation() {
         .backdrop-blur-console {
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Desktop sidebar spacing adjustments */
+        @media (min-width: 1024px) {
+          main#main-content {
+            margin-left: 16rem; /* 256px for expanded sidebar (w-64) */
+            transition: margin-left 0.3s ease;
+          }
+          
+          /* When sidebar is collapsed */
+          .sidebar-collapsed main#main-content {
+            margin-left: 5rem; /* 80px for collapsed sidebar (w-20) */
+          }
         }
         
         @media (max-width: 768px) {

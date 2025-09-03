@@ -22,6 +22,7 @@ import { initializeBundleOptimization } from './utils/bundleOptimization/lazyLoa
 import { gamePerformanceOptimizer, initializeGamingPerformance } from './utils/performance/gamingOptimizations';
 
 // Enhanced lazy loading with preload support for better performance
+const AITherapyPage = lazyWithPreload(() => import('./pages/AITherapyPage'));
 const WellnessPage = lazyWithPreload(() => import('./pages/WellnessPage'));
 const CommunityPage = lazyWithPreload(() => import('./pages/CommunityPage'));
 const ProfessionalPage = lazyWithPreload(() => import('./pages/ProfessionalPage'));
@@ -35,6 +36,7 @@ if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
   // Preload crisis-related content during idle time
   requestIdleCallback(() => {
     (WellnessPage as any).preload?.();
+    (AITherapyPage as any).preload?.(); // Preload AI Therapy as it's frequently accessed
   }, { timeout: 2000 });
   
   // Preload frequently accessed pages
@@ -92,6 +94,7 @@ const createQueryClient = () => new QueryClient({
 const queryClient = createQueryClient();
 
 // Memoized security-wrapped components to prevent unnecessary re-renders
+const SecureAITherapy = memo(withSecurity(AITherapyPage, 'basic'));
 const SecureWellness = memo(withSecurity(WellnessPage, 'basic'));
 const SecureProfessional = memo(withSecurity(ProfessionalPage, 'basic'));
 const SecureCommunity = memo(withSecurity(CommunityPage, 'basic'));
@@ -262,6 +265,16 @@ function App() {
                   />
                   
                   {/* High-priority routes */}
+                  <Route 
+                    path="/ai-therapy/*" 
+                    element={
+                      <RouteWrapper 
+                        component={SecureAITherapy} 
+                        priority={UpdatePriority.HIGH}
+                        fallback={<LoadingFallbacks.FullPage />}
+                      />
+                    } 
+                  />
                   <Route 
                     path="/wellness/*" 
                     element={

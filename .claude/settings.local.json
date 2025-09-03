@@ -72,7 +72,12 @@
       "Read(H:\\h\\Astral Core\\CoreV4/**)",
       "Read(H:\\h\\Astral Core\\CoreV4/**)",
       "Read(H:\\h\\Astral Core\\CoreV4/**)",
-      "WebSearch"
+      "WebSearch",
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C/**)",
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C/**)",
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src/**)",
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\components/**)",
+      "Read(C:\\Astral Projects\\Astral-Projects\\_Repos\\C\\src\\hooks/**)"
     ],
     "deny": [],
     "ask": []

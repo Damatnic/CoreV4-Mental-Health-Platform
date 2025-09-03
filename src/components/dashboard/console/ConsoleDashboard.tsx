@@ -117,7 +117,6 @@ export function ConsoleDashboard() {
             gradient="crisis"
             size="medium"
             to="/crisis"
-            urgent
             status="24/7 Available"
             delay={5}
           />
@@ -208,13 +207,9 @@ export function ConsoleDashboard() {
                   ${isSmallScreen ? 'p-4' : 'p-6'}
                 `}
               >
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="text-4xl mb-3"
-                >
+                <div className="text-4xl mb-3">
                   🌅
-                </motion.div>
+                </div>
                 <div className="text-lg font-semibold text-white mb-2">Start Your Day</div>
                 <div className="text-gray-300 text-sm">
                   Take 5 minutes for morning meditation and set positive intentions
@@ -231,13 +226,9 @@ export function ConsoleDashboard() {
                   ${isSmallScreen ? 'p-4' : 'p-6'}
                 `}
               >
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="text-4xl mb-3"
-                >
+                <div className="text-4xl mb-3">
                   💝
-                </motion.div>
+                </div>
                 <div className="text-lg font-semibold text-white mb-2">Self-Care Reminder</div>
                 <div className="text-gray-300 text-sm">
                   You deserve kindness, especially from yourself
@@ -254,13 +245,9 @@ export function ConsoleDashboard() {
                   ${isSmallScreen ? 'p-4' : 'p-6'}
                 `}
               >
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2.5, repeat: Infinity }}
-                  className="text-4xl mb-3"
-                >
+                <div className="text-4xl mb-3">
                   🌟
-                </motion.div>
+                </div>
                 <div className="text-lg font-semibold text-white mb-2">You're Not Alone</div>
                 <div className="text-gray-300 text-sm">
                   Thousands of people are here to support you on your journey

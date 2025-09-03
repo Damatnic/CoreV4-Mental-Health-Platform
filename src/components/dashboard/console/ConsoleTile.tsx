@@ -197,7 +197,7 @@ export function ConsoleTile({
               border border-gray-700/50 backdrop-blur-md
               transition-all duration-300 ease-out
               hover:border-gray-600/70 focus:outline-none focus:ring-2 focus:ring-blue-400/50
-              ${urgent ? 'animate-pulse border-red-400/60' : ''}
+              ${urgent ? 'border-red-400/60' : ''}
               ${isMobileDevice ? 'p-4 touch-manipulation' : 'p-6'}
               ${isSmallScreen ? 'p-3 rounded-xl' : ''}
               ${deviceInfo.hasTouch ? 'console-tile-touch' : ''}

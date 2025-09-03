@@ -13,7 +13,11 @@ import {
   EmergencyContact,
   CrisisLevelConfig
 } from '../constants/crisis';
+
 import { secureStorage } from '../services/security/SecureLocalStorage';
+
+// Re-export types
+export type { CrisisLevel, EmergencyContact, CrisisLevelConfig };
 
 export interface CrisisAssessment {
   id: string;

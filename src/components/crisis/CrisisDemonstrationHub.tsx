@@ -85,15 +85,10 @@ export function CrisisDemonstrationHub() {
     }
   };
 
-  // Update system status
+  // Update system status - DISABLED: No periodic updates to prevent alerts
   const updateSystemStatus = () => {
-    // Simulate real-time status monitoring
-    setInterval(() => {
-      setSystemStatus(prev => ({
-        ...prev,
-        crisisChat: mockWebSocketAdapter.isConnectedToServer() ? 'online' : 'offline'
-      }));
-    }, 5000);
+    // DISABLED: Demo mode interval removed to prevent beeping/alerts
+    // Originally ran every 5000ms but caused unwanted notification sounds
   };
 
   // Load demonstration statistics

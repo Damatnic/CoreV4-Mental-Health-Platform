@@ -3,15 +3,19 @@
  * Provides easy access to all crisis-related components
  */
 
+// Components with default exports
 export { default as CrisisButton } from './CrisisButton';
-export { default as CrisisChat } from './CrisisChat';
-export { default as CrisisResources } from './CrisisResources';
-export { default as CrisisInterventionSystem } from './CrisisInterventionSystem';
-export { default as CrisisErrorBoundary } from './CrisisErrorBoundary';
-export { default as EmergencyContacts } from './EmergencyContacts';
-export { default as SafetyPlan } from './SafetyPlan';
-export { default as ConsoleCrisisSystem } from './ConsoleCrisisSystem';
-export { default as withCrisisErrorBoundary } from './withCrisisErrorBoundary';
+
+// Components with named exports
+export { CrisisChat } from './CrisisChat';
+export { CrisisResources } from './CrisisResources';
+export { CrisisInterventionSystem } from './CrisisInterventionSystem';
+export { CrisisErrorBoundary } from './CrisisErrorBoundary';
+export { EmergencyContacts } from './EmergencyContacts';
+export { SafetyPlan } from './SafetyPlan';
+export { SafetyPlanGenerator } from './SafetyPlanGenerator';
+export { ConsoleCrisisSystem } from './ConsoleCrisisSystem';
+export { withCrisisErrorBoundary } from './withCrisisErrorBoundary';
 
 // Named exports
 export { MobileCrisisInterface } from './MobileCrisisInterface';
