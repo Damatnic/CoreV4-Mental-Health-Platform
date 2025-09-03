@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { format, _addMinutes, isSameDay, isToday, isTomorrow } from 'date-fns';
 import { useActivityStore } from '../../../stores/activityStore';
-import { useWellnessStore } from '../../../stores/wellnessStore';
+import { _useWellnessStore } from '../../../stores/wellnessStore';
 
 interface TimeSlot {
   time: string;
@@ -64,7 +64,7 @@ const CATEGORY_COLORS = {
 export const DailyActivityPlanner: React.FC = () => {
   const { activities, _dailySchedule, addActivity, _updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
   
-  const { moodEntries } = useWellnessStore();
+  const { moodEntries } = _useWellnessStore();
   
   const [selectedDate, _setSelectedDate] = useState(new Date());
   const [currentEnergyLevel, _setCurrentEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');

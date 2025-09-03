@@ -8,8 +8,8 @@ import {
   CRISIS_KEYWORDS, 
   CRISIS_LEVELS, 
   EMERGENCY_CONTACTS, 
-  CRISIS_STORAGE_KEYS,
-  CRISIS_EVENTS,
+  _CRISIS_STORAGE_KEYS as CRISIS_STORAGE_KEYS,
+  _CRISIS_EVENTS as CRISIS_EVENTS,
   EmergencyContact,
   CrisisLevelConfig
 } from '../constants/crisis';

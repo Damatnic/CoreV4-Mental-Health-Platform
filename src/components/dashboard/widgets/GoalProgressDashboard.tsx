@@ -22,7 +22,7 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { useActivityStore } from '../../../stores/activityStore';
+import { __useActivityStore } from '../../../stores/activityStore';
 import { _format, differenceInDays, _addDays } from 'date-fns';
 
 interface GoalProgressDashboardProps {
@@ -36,7 +36,7 @@ export function GoalProgressDashboard({
   onAddGoal,
   onViewDetails
 }: GoalProgressDashboardProps) {
-  const { goals, updateGoalProgress, completeGoal, pauseGoal, abandonGoal, addMilestone, completeMilestone } = useActivityStore();
+  const { goals, updateGoalProgress, completeGoal, pauseGoal, abandonGoal, addMilestone, completeMilestone } = __useActivityStore();
 
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');
   const [___showAddMilestone, _setShowAddMilestone] = useState<string | null>(null);

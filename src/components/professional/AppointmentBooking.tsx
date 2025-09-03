@@ -18,7 +18,7 @@ import {
   MapPin,
   _Users
 } from 'lucide-react';
-import { therapistService } from '../../services/professional/TherapistService';
+import { _therapistService } from '../../services/professional/TherapistService';
 
 interface AppointmentBookingProps {
   therapistId: string;
@@ -171,7 +171,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
     setLoading(true);
     try {
       // In production, submit to booking API
-      const appointmentId = await therapistService.bookAppointment({
+      const appointmentId = await _therapistService.bookAppointment({
         therapistId,
         patientId: 'user-1',
         date: selectedDate!,

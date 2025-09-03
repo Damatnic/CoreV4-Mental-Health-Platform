@@ -10,7 +10,7 @@ import { CrisisPanelData } from '../../../types/dashboard';
 import { useAuth } from '../../../hooks/useAuth';
 import { useCrisisAssessment } from '../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../hooks/useGeolocation';
-import { logger, _LogCategory } from '../../../utils/logger';
+import { logger } from '../../../utils/logger';
 
 interface EnhancedCrisisPanelProps {
   data?: CrisisPanelData;

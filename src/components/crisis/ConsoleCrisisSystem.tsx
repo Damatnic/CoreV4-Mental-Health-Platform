@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield } from 'lucide-react';
-import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { _EmergencyContactsLazy, _SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { _CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
-import { logger, LogCategory } from '../../utils/logger';
+import { logger, LogLevel } from '../../utils/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';
@@ -75,7 +75,7 @@ export function ConsoleCrisisSystem() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (_position) => setUserLocation(_position),
-        (error) => logger.error('Location access denied', new Error(error.message), { category: LogCategory.CRISIS }),
+        (error) => logger.error('Location access denied', new Error(error.message), { category: LogLevel.CRISIS }),
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
@@ -290,7 +290,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-24 rounded border border-cyan-500/20"></div>}>
-                  <EmergencyContactsLazy />
+                  <_EmergencyContactsLazy />
                 </Suspense>
               </motion.div>
             )}
@@ -312,7 +312,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
-                  <SafetyPlanLazy />
+                  <_SafetyPlanLazy />
                 </Suspense>
               </motion.div>
             )}
@@ -324,7 +324,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
-                  <CrisisChatLazy />
+                  <_CrisisChatLazy />
                 </Suspense>
               </motion.div>
             )}

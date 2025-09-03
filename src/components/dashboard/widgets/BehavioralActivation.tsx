@@ -30,7 +30,7 @@ import {
   _CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { useActivityStore } from '../../../stores/activityStore';
+import { __useActivityStore } from '../../../stores/activityStore';
 import { _format, addDays } from 'date-fns';
 
 interface BehavioralActivationProps {
@@ -57,7 +57,7 @@ export function BehavioralActivation({
   onScheduleActivity,
   onStartExperiment
 }: BehavioralActivationProps) {
-  const { _activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = useActivityStore();
+  const { _activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = __useActivityStore();
 
   const [selectedDifficulty, _setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');

@@ -83,7 +83,8 @@
       "Read(\\/**)",
       "Read(H:\\/**)",
       "WebFetch(domain:github.com)",
-      "Read(H:\\/**)"
+      "Read(H:\\/**)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

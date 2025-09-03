@@ -2,7 +2,7 @@
 // Manages therapist onboarding, verification, appointments, and video sessions
 
 import { __apiService } from '../api/ApiService';
-import { __wsService } from '../websocket/WebSocketService';
+import { _wsService } from '../websocket/WebSocketService';
 import { logger } from '../../utils/logger';
 import {
   Therapist,

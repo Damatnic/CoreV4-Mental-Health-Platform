@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../../hooks/useAuth';
-import { logger, LogCategory } from '../../../utils/logger';
+import { logger, LogCategory } from '../../../services/logging/logger';
 
 interface SupportContact {
   id: string;

@@ -2,7 +2,7 @@
 // Provides comprehensive health monitoring for the mental health platform
 
 import { _apiService } from '../api/ApiService';
-import { wsService } from '../websocket/WebSocketService';
+import { _wsService } from '../websocket/WebSocketService';
 import { logger } from '../../utils/logger';
 
 // Health check status types
@@ -260,8 +260,8 @@ export class HealthCheckService {
     const startTime = performance.now();
     
     try {
-      const isConnected = wsService.isConnected();
-      const latency = wsService.getLatency();
+      const isConnected = _wsService.isConnected();
+      const latency = _wsService.getLatency();
       
       return {
         name: 'WebSocket',

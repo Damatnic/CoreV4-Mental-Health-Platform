@@ -20,7 +20,7 @@ import {
   Star,
   Award
 } from 'lucide-react';
-import { useActivityStore } from '../../../stores/activityStore';
+import { __useActivityStore } from '../../../stores/activityStore';
 import { format, isToday, isPast, isFuture, _differenceInMinutes, addDays } from 'date-fns';
 
 interface ActivityTrackerProps {
@@ -36,7 +36,7 @@ export function ActivityTracker({
   energyLevel = 'medium',
   currentMood = 5 
 }: ActivityTrackerProps) {
-  const { activities, _dailySchedule, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
+  const { activities, _dailySchedule, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = __useActivityStore();
 
   const [selectedDate, _setSelectedDate] = useState(new Date());
   const [showRecommendations, _setShowRecommendations] = useState(false);

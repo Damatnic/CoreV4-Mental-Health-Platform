@@ -43,7 +43,7 @@ import {
   ReferenceLine,
   _ReferenceArea
 } from 'recharts';
-import { useWellnessStore } from '../../../../stores/wellnessStore';
+import { _useWellnessStore } from '../../../../stores/wellnessStore';
 import { format, _startOfWeek, _endOfWeek, _eachDayOfInterval, subDays, addDays } from 'date-fns';
 
 interface MoodAnalyticsProps {
@@ -56,7 +56,7 @@ type ViewMode = 'overview' | 'patterns' | 'correlations' | 'predictions';
 type ChartType = 'line' | 'area' | 'bar' | 'radar';
 
 export function MoodAnalytics({ timeRange = 'week', onExport, _onTriggerIdentified }: MoodAnalyticsProps) {
-  const { moodEntries, moodPatterns, _analyzeMoodPatterns, wellnessInsights } = useWellnessStore();
+  const { moodEntries, moodPatterns, _analyzeMoodPatterns, wellnessInsights } = _useWellnessStore();
   const [viewMode, _setViewMode] = useState<ViewMode>('overview');
   const [chartType, _setChartType] = useState<ChartType>('line');
   const [_selectedDate, _setSelectedDate] = useState(new Date());

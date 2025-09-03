@@ -31,7 +31,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, _subDays } from 'date-fns';
-import { useWellnessStore } from '../../stores/wellnessStore';
+import { _useWellnessStore } from '../../stores/wellnessStore';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Wellness metrics categories
@@ -141,7 +141,7 @@ interface WellnessGoal {
 
 export const WellnessDashboard: React.FC = () => {
   // Use Zustand store for state management
-  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = useWellnessStore();
+  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = _useWellnessStore();
 
   const [wellnessData, _setWellnessData] = useState<WellnessData[]>([]);
   const [todayData, _setTodayData] = useState<WellnessData>({

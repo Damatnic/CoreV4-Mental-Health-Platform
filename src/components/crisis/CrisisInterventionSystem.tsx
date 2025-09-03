@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
-import { __EmergencyContactsLazy, __SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { _EmergencyContactsLazy, _SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { __CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { _CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { logger, LogLevel } from '../../utils/logger';
 
 interface CrisisLevel {

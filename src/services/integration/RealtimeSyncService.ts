@@ -5,8 +5,8 @@
 
 import { io, Socket } from 'socket.io-client';
 import { EventEmitter } from 'events';
-import { useWellnessStore } from '../../stores/wellnessStore';
-import { useActivityStore } from '../../stores/activityStore';
+import { _useWellnessStore } from '../../stores/wellnessStore';
+import { __useActivityStore } from '../../stores/activityStore';
 import { logger } from '../../utils/logger';
 
 // Real-time event types
@@ -293,7 +293,7 @@ class RealtimeSyncService extends EventEmitter {
       case 'alert':
         this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, _payload);
         // Update wellness store with crisis event
-        useWellnessStore.getState().recordCrisisEvent(_payload);
+        _useWellnessStore.getState().recordCrisisEvent(_payload);
         break;
         
       case 'support_connected':
@@ -363,7 +363,7 @@ class RealtimeSyncService extends EventEmitter {
       case 'appointment_reminder':
         this.emit(RealtimeEvent.APPOINTMENT_REMINDER, _payload);
         // Update activity store with appointment reminder
-        useActivityStore.getState().addActivity({
+        __useActivityStore.getState().addActivity({
           title: _payload.title,
           _type: 'appointment',
           category: 'professional',
@@ -396,7 +396,7 @@ class RealtimeSyncService extends EventEmitter {
       case 'goal_milestone':
         this.emit(RealtimeEvent.GOAL_MILESTONE_REACHED, _payload);
         // Update activity store with milestone
-        useActivityStore.getState().updateGoalProgress(
+        __useActivityStore.getState().updateGoalProgress(
           _payload.goalId,
           _payload.progress
         );
@@ -405,7 +405,7 @@ class RealtimeSyncService extends EventEmitter {
       case 'insight':
         this.emit(RealtimeEvent.WELLNESS_INSIGHT, _payload);
         // Regenerate insights in wellness store
-        useWellnessStore.getState().generateInsights();
+        _useWellnessStore.getState().generateInsights();
         break;
     }
   }

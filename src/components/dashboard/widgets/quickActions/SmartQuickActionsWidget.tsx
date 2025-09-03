@@ -8,7 +8,7 @@ import {
   Smartphone, Headphones, Wind, Coffee, Moon, Sun
 } from 'lucide-react';
 import { useQuickActionsContext } from '../../../../hooks/useQuickActionsContext';
-import { useAccessibilityStore } from '../../../../stores/accessibilityStore';
+import { __useAccessibilityStore } from '../../../../stores/accessibilityStore';
 import { useUserPreferences } from '../../../../hooks/useUserPreferences';
 import { QuickAction } from '../../../../types/dashboard';
 import { VoiceCommandInterface } from './VoiceCommandInterface';
@@ -36,7 +36,7 @@ export function SmartQuickActionsWidget({
   onActionExecute
 }: SmartQuickActionsWidgetProps) {
   const { actions, executeAction, _addCustomAction, getFrequentActions } = useQuickActionsContext();
-  const { settings: accessibilitySettings } = useAccessibilityStore();
+  const { settings: accessibilitySettings } = __useAccessibilityStore();
   const { _preferences, _updatePreference } = useUserPreferences(_userId);
   
   const [searchQuery, _setSearchQuery] = useState('');

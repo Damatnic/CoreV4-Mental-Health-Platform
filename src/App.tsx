@@ -5,7 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { __RouteComponents } from './utils/bundleOptimization/lazyLoading';
+import { _RouteComponents } from './utils/bundleOptimization/lazyLoading';
 // Crisis page is now loaded via lazy loading for better performance
 import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';

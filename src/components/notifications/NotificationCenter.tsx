@@ -20,7 +20,7 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 import {
-  comprehensiveNotificationService,
+  _comprehensiveNotificationService as comprehensiveNotificationService,
   NotificationPreferences,
   NotificationRule,
   SmartNotification

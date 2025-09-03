@@ -28,7 +28,7 @@ import {
   BarChart3,
   _Target
 } from 'lucide-react';
-import { useActivityStore } from '../../../stores/activityStore';
+import { __useActivityStore } from '../../../stores/activityStore';
 import { format, startOfWeek, addDays, isSameDay, isToday, _subDays } from 'date-fns';
 
 interface HabitTrackerProps {
@@ -42,7 +42,7 @@ export function HabitTracker({
   onAddHabit,
   onViewAnalytics
 }: HabitTrackerProps) {
-  const { habits, completeHabit, resetHabitStreak, pauseHabit, _updateHabit, stackHabits } = useActivityStore();
+  const { habits, completeHabit, resetHabitStreak, pauseHabit, _updateHabit, stackHabits } = __useActivityStore();
 
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');

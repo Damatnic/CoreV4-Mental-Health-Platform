@@ -5,9 +5,9 @@
 
 import { _create } from 'zustand';
 import { _subscribeWithSelector } from 'zustand/middleware';
-import { useWellnessStore } from '../../stores/wellnessStore';
-import { useActivityStore } from '../../stores/activityStore';
-import { useAccessibilityStore } from '../../stores/accessibilityStore';
+import { _useWellnessStore } from '../../stores/wellnessStore';
+import { __useActivityStore } from '../../stores/activityStore';
+import { __useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
 import { _User } from '../api/types';
 import { EventEmitter } from 'events';
@@ -179,14 +179,14 @@ class DataIntegrationService extends EventEmitter {
    */
   private setupStoreSubscriptions() {
     // Subscribe to wellness store changes
-    useWellnessStore.subscribe((state) => {
+    _useWellnessStore.subscribe((state) => {
       if (state.moodEntries.length > 0) {
         this.handleDataChange('wellness.mood', state.moodEntries[state.moodEntries.length - 1]);
       }
     });
     
     // Subscribe to activity store changes
-    useActivityStore.subscribe((state) => {
+    __useActivityStore.subscribe((state) => {
       const completed = state.activities.filter((a: unknown) => a.completed && !a.synced);
       completed.forEach((activity: unknown) => {
         this.handleDataChange('activity.completed', activity);
@@ -194,7 +194,7 @@ class DataIntegrationService extends EventEmitter {
     });
     
     // Subscribe to accessibility store for user preferences
-    useAccessibilityStore.subscribe((state) => {
+    __useAccessibilityStore.subscribe((state) => {
       this.updateDataFlowConfig({
         enableRealtime: !state.settings.reducedMotion
       });
@@ -351,7 +351,7 @@ class DataIntegrationService extends EventEmitter {
    * Update wellness store with integrated data
    */
   private updateWellnessStore(property: string, data: unknown) {
-    const store = useWellnessStore.getState();
+    const store = _useWellnessStore.getState();
     
     switch (_property) {
       case 'metrics':
@@ -371,7 +371,7 @@ class DataIntegrationService extends EventEmitter {
    * Update activity store with integrated data
    */
   private updateActivityStore(property: string, data: unknown) {
-    const store = useActivityStore.getState();
+    const store = __useActivityStore.getState();
     
     switch (_property) {
       case 'tasks':

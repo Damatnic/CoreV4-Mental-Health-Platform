@@ -6,8 +6,8 @@
 
 import { EventEmitter } from 'events';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { useWellnessStore } from '../../stores/wellnessStore';
-import { useActivityStore } from '../../stores/activityStore';
+import { _useWellnessStore } from '../../stores/wellnessStore';
+import { __useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
 import { dataIntegrationService } from './DataIntegrationService';
 import { logger } from '../../utils/logger';
@@ -167,14 +167,14 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private initializeMonitoring() {
     // Monitor wellness store for crisis indicators
-    useWellnessStore.subscribe((state) => {
+    _useWellnessStore.subscribe((state) => {
       if (state.moodEntries.length > 0) {
         this.analyzeMoodForCrisis(state.moodEntries[state.moodEntries.length - 1]);
       }
     });
     
     // Monitor activity patterns
-    useActivityStore.subscribe((state) => {
+    __useActivityStore.subscribe((state) => {
       this.analyzeActivityPatterns(state.activities);
     });
     
@@ -351,8 +351,8 @@ class CrisisIntegrationService extends EventEmitter {
     const factors: string[] = [];
     
     // Check recent positive activities
-    const wellnessStore = useWellnessStore.getState();
-    const activityStore = useActivityStore.getState();
+    const wellnessStore = _useWellnessStore.getState();
+    const activityStore = __useActivityStore.getState();
     
     if (wellnessStore.moodEntries.some(e => e.moodScore >= 4)) {
       factors.push('recent_positive_moods');
@@ -427,7 +427,7 @@ class CrisisIntegrationService extends EventEmitter {
     logger.info('Crisis detected:', assessment);
     
     // Update stores
-    useWellnessStore.getState().recordCrisisEvent({
+    _useWellnessStore.getState().recordCrisisEvent({
       _severity: assessment._severity === CrisisSeverity.CRITICAL ? 'critical' : 
                 assessment._severity === CrisisSeverity.HIGH ? 'high' : 
                 assessment._severity === CrisisSeverity.MEDIUM ? 'medium' : 'low',
@@ -678,8 +678,8 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private runPeriodicAssessment() {
     // Gather recent data
-    const wellnessStore = useWellnessStore.getState();
-    const activityStore = useActivityStore.getState();
+    const wellnessStore = _useWellnessStore.getState();
+    const activityStore = __useActivityStore.getState();
     
     // Analyze patterns
     const recentMoods = wellnessStore.moodEntries.slice(-10);

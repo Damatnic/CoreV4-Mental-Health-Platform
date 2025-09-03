@@ -28,7 +28,7 @@ import {
   buildStyles
 } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { useWellnessStore } from '../../../../stores/wellnessStore';
+import { _useWellnessStore } from '../../../../stores/wellnessStore';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 
 interface WellnessMetricsDashboardProps {
@@ -61,7 +61,7 @@ interface Recommendation {
 }
 
 export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
-  const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, _calculateWellnessScores } = useWellnessStore();
+  const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, _calculateWellnessScores } = _useWellnessStore();
   
   const [selectedCategory, _setSelectedCategory] = useState<string | null>(null);
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');

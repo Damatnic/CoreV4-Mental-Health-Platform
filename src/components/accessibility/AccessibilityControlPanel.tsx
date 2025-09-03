@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { logger } from '../../utils/logger';
 import {
-  advancedAccessibilityService,
+  _advancedAccessibilityService as advancedAccessibilityService,
   AccessibilityProfile,
   VoiceNavigationAction
 } from '../../services/accessibility/AdvancedAccessibilityService';

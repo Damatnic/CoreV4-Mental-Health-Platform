@@ -8,7 +8,7 @@ import {
   _Upload, HelpCircle, _Info, AlertCircle, Brain, Mic,
   MessageSquare, Edit3, Clock, Layout, Book
 } from 'lucide-react';
-import { useAccessibilityStore, type AccessibilitySettings } from '../../../../stores/accessibilityStore';
+import { __useAccessibilityStore, type AccessibilitySettings } from '../../../../stores/accessibilityStore';
 
 interface AccessibilityCommandCenterProps {
   onSettingChange?: (setting: string, value: unknown) => void;
@@ -19,7 +19,7 @@ export function AccessibilityCommandCenter({
   onSettingChange,
   _showCompactView = false
 }: AccessibilityCommandCenterProps) {
-  const { settings, updateSetting, _presets, applyPreset, resetToDefaults } = useAccessibilityStore();
+  const { settings, updateSetting, _presets, applyPreset, resetToDefaults } = __useAccessibilityStore();
   
   const [activeSection, _setActiveSection] = useState<string>('visual');
   const [showPresetMenu, _setShowPresetMenu] = useState(false);
