@@ -81,6 +81,8 @@
       "Bash(timeout 30 npx eslint . --ext .ts,.tsx,.js,.jsx --format compact)",
       "Bash(git checkout:*)",
       "Read(\\/**)",
+      "Read(H:\\/**)",
+      "WebFetch(domain:github.com)",
       "Read(H:\\/**)"
     ],
     "deny": [],

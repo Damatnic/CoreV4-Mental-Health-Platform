@@ -480,4 +480,4 @@ class CryptographyService {
   }
 }
 
-export const _cryptoService = CryptographyService.getInstance();
+export const cryptoService = CryptographyService.getInstance();

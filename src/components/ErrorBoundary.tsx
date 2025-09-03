@@ -6,7 +6,6 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, Phone, MessageCircle, Home, RefreshCw } from 'lucide-react';
-import { logError } from '../utils/logger';
 import { logger } from '../services/logging/logger';
 
 interface ErrorBoundaryState {
@@ -58,7 +57,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({ error, errorInfo });
     
     // Log error with multiple logging systems
-    logError('Component error caught by ErrorBoundary', 'ErrorBoundary', { error, errorInfo });
+    logger.error('Component error caught by ErrorBoundary', { error, errorInfo });
     
     // Log to crisis-aware logging system if available
     if (logger?.logCrisisIntervention) {

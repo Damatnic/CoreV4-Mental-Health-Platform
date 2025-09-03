@@ -545,4 +545,4 @@ class AuditLoggerService {
   }
 }
 
-export const _auditLogger = AuditLoggerService.getInstance();
+export const auditLogger = AuditLoggerService.getInstance();

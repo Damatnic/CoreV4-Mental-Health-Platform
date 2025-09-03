@@ -349,7 +349,7 @@ export { SecureLocalStorage };
  * Use this instead of localStorage throughout the application
  */
 const secureStorageInstance = secureLocalStorage;
-export const _secureStorage = {
+export const secureStorage = {
   setItem: (key: string, value: string) => secureStorageInstance.setItem(key, value),
   getItem: (key: string) => secureStorageInstance.getItem(key),
   removeItem: (key: string) => secureStorageInstance.removeItem(key),
