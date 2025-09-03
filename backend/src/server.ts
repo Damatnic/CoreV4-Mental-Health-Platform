@@ -210,7 +210,7 @@ class CoreV4Server {
         // socket.userId = decoded.userId;
         
         next();
-      } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+      } catch (_error)   {
         logger.error('Socket authentication failed:', error);
         next(new Error('Authentication failed'));
       }
@@ -237,7 +237,7 @@ class CoreV4Server {
           
           // Log for audit
           logger.info('Crisis message processed', { socketId: socket.id, roomId: data.roomId });
-        } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+        } catch (_error)   {
           logger.error('Crisis message processing failed:', error);
           socket.emit('crisis:error', { message: 'Failed to process message' });
         }
@@ -321,7 +321,7 @@ class CoreV4Server {
         }
       });
 
-    } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+    } catch (_error)   {
       logger.error('Failed to start server:', error);
       process.exit(1);
     }
@@ -357,7 +357,7 @@ class CoreV4Server {
 
       logger.info('Graceful shutdown completed');
       process.exit(0);
-    } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+    } catch (_error)   {
       logger.error('Error during shutdown:', error);
       process.exit(1);
     }

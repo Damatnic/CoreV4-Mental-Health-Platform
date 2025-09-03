@@ -267,7 +267,7 @@ export class EnhancedWebSocketService {
       session: 0,
     },
   };
-  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private eventHandlers: Map<string, Set<(...args: any[]) => void>> = new Map();
   private typingUsers: Map<string, TypingUser> = new Map();
   private messageQueue: QueuedMessage[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;
@@ -438,7 +438,7 @@ export class EnhancedWebSocketService {
       this.emit(WSEventType.CONNECT, { timestamp: new Date() });
       
       // Rejoin rooms after reconnection
-      this.activeRooms.forEach(room => {
+      this.activeRooms.forEach(_room => {
         this.joinRoom(_room);
       });
       

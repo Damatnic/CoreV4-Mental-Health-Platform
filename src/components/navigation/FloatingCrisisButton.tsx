@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Phone, MessageCircle, Heart, _X, ChevronUp, HelpCircle } from 'lucide-react';
+import { AlertTriangle, Phone, MessageCircle, Heart, X, ChevronUp, HelpCircle } from 'lucide-react';
 import { useNavigation } from './NavigationContext';
 import { useLocation } from 'react-router-dom';
 
@@ -17,15 +17,10 @@ interface CrisisOption {
 export function FloatingCrisisButton() {
   const location = useLocation();
   const { crisisDetected, setCrisisDetected, mode } = useNavigation();
-  const [isExpanded, _setIsExpanded] = useState(false);
-  const [pulseAnimation, _setPulseAnimation] = useState(true);
-  const [position, _setPosition] = useState({ x: 20, y: 20 });
-  const [isDragging, _setIsDragging] = useState(false);
-
-  // Hide on crisis page itself
-  if (location.pathname === '/crisis') {
-    return null;
-  }
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [pulseAnimation, setPulseAnimation] = useState(true);
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [isDragging, setIsDragging] = useState(false);
 
   // Crisis quick actions
   const crisisOptions: CrisisOption[] = [
@@ -68,6 +63,30 @@ export function FloatingCrisisButton() {
     },
   ];
 
+  // Handle drag functionality for repositioning
+  const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (isDragging && !isExpanded) {
+      const clientX = 'touches' in e ? (e.touches[0]?.clientX || 0) : e.clientX;
+      const clientY = 'touches' in e ? (e.touches[0]?.clientY || 0) : e.clientY;
+      
+      const newX = Math.max(20, Math.min(window.innerWidth - 80, clientX - 30));
+      const newY = Math.max(20, Math.min(window.innerHeight - 80, clientY - 30));
+      
+      setPosition({ x: window.innerWidth - newX - 60, y: window.innerHeight - newY - 60 });
+    }
+  }, [isDragging, isExpanded]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isExpanded) {
+      setIsDragging(true);
+      e.preventDefault();
+    }
+  };
+
   // Detect user distress patterns (simplified version)
   useEffect(() => {
     let rapidClickCount = 0;
@@ -103,32 +122,9 @@ export function FloatingCrisisButton() {
     }
   }, [mode, crisisDetected]);
 
-  // Handle drag functionality for repositioning
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isExpanded) {
-      setIsDragging(true);
-      e.preventDefault();
-    }
-  };
-
-  const handleDragMove = (e: MouseEvent | TouchEvent) => {
-    if (isDragging && !isExpanded) {
-      const clientX = 'touches' in e ? (e.touches[0]?.clientX || 0) : e.clientX;
-      const clientY = 'touches' in e ? (e.touches[0]?.clientY || 0) : e.clientY;
-      
-      const newX = Math.max(20, Math.min(window.innerWidth - 80, clientX - 30));
-      const newY = Math.max(20, Math.min(window.innerHeight - 80, clientY - 30));
-      
-      setPosition({ x: window.innerWidth - newX - 60, y: window.innerHeight - newY - 60 });
-    }
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
+  // Handle drag events
   useEffect(() => {
-    if (_isDragging) {
+    if (isDragging) {
       window.addEventListener('mousemove', handleDragMove);
       window.addEventListener('mouseup', handleDragEnd);
       window.addEventListener('touchmove', handleDragMove);
@@ -141,7 +137,12 @@ export function FloatingCrisisButton() {
         window.removeEventListener('touchend', handleDragEnd);
       };
     }
-  }, [isDragging]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
+  // Hide on crisis page itself
+  if (location.pathname === '/crisis') {
+    return null;
+  }
 
   return (
     <div
@@ -153,210 +154,101 @@ export function FloatingCrisisButton() {
       }}
     >
       <AnimatePresence>
-        {isExpanded ? (
+        {isExpanded && (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: 'spring', duration: 0.3 }}
-            className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl p-4 mb-2 w-64"
           >
             {/* Header */}
-            <div className="bg-red-500 text-white px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-2" />
-                <span className="font-semibold">Crisis Support</span>
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-gray-900">Crisis Support</h3>
               <button
                 onClick={() => setIsExpanded(false)}
-                className="p-1 hover:bg-red-600 rounded-lg transition-colors"
-                aria-label="Minimize crisis support panel"
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Close crisis support menu"
               >
-                <ChevronUp className="h-4 w-4" />
+                <X className="h-4 w-4 text-gray-500" />
               </button>
             </div>
-            
+
             {/* Crisis Options */}
-            <div className="p-2">
-              <div className="grid grid-cols-2 gap-2">
-                {crisisOptions.map((option) => (
-                  <motion.button
-                    key={option.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={option.action}
-                    className={`${option.color} text-white rounded-lg p-3 transition-colors`}
-                  >
-                    <div className="flex flex-col items-center">
-                      {option.icon}
-                      <span className="font-semibold text-sm mt-1">{option.label}</span>
+            <div className="space-y-2">
+              {crisisOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={option.action}
+                  className={`w-full p-3 rounded-lg text-white transition-all transform hover:scale-105 ${option.color} ${
+                    option.urgent ? 'animate-pulse' : ''
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {option.icon}
+                    <div className="text-left">
+                      <div className="font-semibold">{option.label}</div>
                       {option.sublabel && (
-                        <span className="text-xs opacity-90">{option.sublabel}</span>
+                        <div className="text-xs opacity-90">{option.sublabel}</div>
                       )}
                     </div>
-                  </motion.button>
-                ))}
-              </div>
-              
-              {/* Safety message */}
-              <div className="mt-3 p-2 bg-amber-50 rounded-lg">
-                <p className="text-xs text-amber-800 text-center">
-                  You&apos;re not alone. Help is available 24/7.
-                </p>
-              </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Message */}
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-xs text-gray-600 text-center">
+                You&apos;re not alone. Help is available 24/7.
+              </p>
             </div>
           </motion.div>
-        ) : (
-          <motion.button
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsExpanded(true)}
-            onMouseDown={handleDragStart}
-            onTouchStart={handleDragStart}
-            className={`
-              relative group bg-red-500 hover:bg-red-600 text-white rounded-full p-4 shadow-lg transition-all
-              ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
-              ${pulseAnimation && !isExpanded ? 'animate-pulse' : ''}
-            `}
-            aria-label="Open crisis support panel"
-          >
-            {/* Pulsing ring for attention */}
-            {pulseAnimation && (
-              <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-75"></span>
-            )}
-            
-            <AlertTriangle className="h-6 w-6 relative z-10" />
-            
-            {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-              Crisis Help Available
-            </div>
-          </motion.button>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
 
-// Simplified crisis button for mobile
-export function MobileCrisisButton() {
-  const location = useLocation();
-  const [___showQuickActions, _setShowQuickActions] = useState(false);
-  
-  if (location.pathname === '/crisis') {
-    return null;
-  }
-
-  return (
-    <>
-      {/* Floating button */}
+      {/* Main Button */}
       <motion.button
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setShowQuickActions(true)}
-        className="fixed right-4 bottom-20 z-40 bg-red-500 text-white rounded-full p-3 shadow-lg md:hidden"
-        aria-label="Crisis help"
+        onClick={() => setIsExpanded(!isExpanded)}
+        onMouseDown={handleDragStart}
+        onTouchStart={handleDragStart}
+        className={`relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all ${
+          mode === 'crisis' || crisisDetected
+            ? 'bg-red-600 hover:bg-red-700'
+            : 'bg-blue-600 hover:bg-blue-700'
+        } ${isDragging ? 'cursor-move' : 'cursor-pointer'}`}
+        style={{ touchAction: 'none' }}
+        aria-label="Open crisis support menu"
       >
-        <AlertTriangle className="h-5 w-5" />
-        <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-75"></span>
+        {isExpanded ? (
+          <ChevronUp className="h-6 w-6 text-white" />
+        ) : (
+          <AlertTriangle className="h-6 w-6 text-white" />
+        )}
+
+        {/* Pulse indicator for crisis mode */}
+        {(mode === 'crisis' || crisisDetected || pulseAnimation) && !isExpanded && (
+          <motion.span
+            className="absolute -top-1 -right-1 flex h-3 w-3"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1, repeat: Infinity }}
+          >
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </motion.span>
+        )}
       </motion.button>
 
-      {/* Quick actions modal */}
-      <AnimatePresence>
-        {showQuickActions && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center md:hidden"
-            onClick={() => setShowQuickActions(false)}
-          >
-            <div className="absolute inset-0 bg-black/50" />
-            
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="relative bg-white rounded-t-2xl w-full max-w-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Handle bar */}
-              <div className="flex justify-center pt-3">
-                <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
-              </div>
-              
-              {/* Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
-                  Crisis Support
-                </h2>
-              </div>
-              
-              {/* Actions */}
-              <div className="p-4 space-y-2">
-                <a
-                  href="tel:988"
-                  className="flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center">
-                    <Phone className="h-5 w-5 text-red-600 mr-3" />
-                    <div>
-                      <div className="font-semibold text-gray-900">Call 988</div>
-                      <div className="text-sm text-gray-600">24/7 Crisis Hotline</div>
-                    </div>
-                  </div>
-                  <ChevronUp className="h-5 w-5 text-gray-400 rotate-90" />
-                </a>
-                
-                <a
-                  href="sms:741741?body=HOME"
-                  className="flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center">
-                    <MessageCircle className="h-5 w-5 text-orange-600 mr-3" />
-                    <div>
-                      <div className="font-semibold text-gray-900">Text HOME to 741741</div>
-                      <div className="text-sm text-gray-600">Crisis Text Line</div>
-                    </div>
-                  </div>
-                  <ChevronUp className="h-5 w-5 text-gray-400 rotate-90" />
-                </a>
-                
-                <button
-                  onClick={() => window.location.href = '/crisis'}
-                  className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center">
-                    <HelpCircle className="h-5 w-5 text-purple-600 mr-3" />
-                    <div className="text-left">
-                      <div className="font-semibold text-gray-900">More Resources</div>
-                      <div className="text-sm text-gray-600">Coping tools & support</div>
-                    </div>
-                  </div>
-                  <ChevronUp className="h-5 w-5 text-gray-400 rotate-90" />
-                </button>
-              </div>
-              
-              {/* Close button */}
-              <div className="px-4 pb-4">
-                <button
-                  onClick={() => setShowQuickActions(false)}
-                  className="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium text-gray-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      {/* Tooltip when first loaded */}
+      {!isExpanded && pulseAnimation && (
+        <motion.div
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="absolute bottom-0 right-16 bg-gray-800 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap"
+        >
+          Need help? Click here
+        </motion.div>
+      )}
+    </div>
   );
 }

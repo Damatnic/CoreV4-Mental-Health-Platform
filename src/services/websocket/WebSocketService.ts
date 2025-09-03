@@ -109,7 +109,7 @@ export class WebSocketService {
     reconnectAttempts: 0,
     latency: 0
   };
-  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private eventHandlers: Map<string, Set<(...args: any[]) => void>> = new Map();
   private typingUsers: Map<string, TypingUser> = new Map();
   private messageQueue: QueuedMessage[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;

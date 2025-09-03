@@ -319,7 +319,7 @@ describe('Performance Testing Suite', () => {
         });
       });
 
-      apiTimes.forEach(time => {
+      apiTimes.forEach(_time => {
         expect(_time).toBeLessThan(THRESHOLDS.API_RESPONSE);
       });
     });
@@ -341,7 +341,7 @@ describe('Performance Testing Suite', () => {
           
           // Trigger multiple data requirements
           const buttons = document.querySelectorAll('[data-action]');
-          buttons.forEach(b => (b as HTMLElement).click());
+          buttons.forEach(_b => (b as HTMLElement).click());
           
           setTimeout(() => resolve(_count), 1000);
         });
@@ -385,7 +385,7 @@ describe('Performance Testing Suite', () => {
       });
       
       // Should have loaded additional chunks
-      const newBundles = afterNavigationBundles.filter(b => !initialBundles.includes(_b));
+      const newBundles = afterNavigationBundles.filter(_b => !initialBundles.includes(_b));
       expect(newBundles.length).toBeGreaterThan(0);
     });
 
@@ -501,14 +501,14 @@ describe('Performance Testing Suite', () => {
       );
 
       // Calculate statistics
-      const _avgLoadTime = loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length;
+      const _avgLoadTime = loadTimes.reduce((a, _b) => a + b, 0) / loadTimes.length;
       const _maxLoadTime = Math.max(...loadTimes);
 
       expect(_avgLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD);
       expect(_maxLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD * 1.5);
 
       // Cleanup
-      await Promise.all(browsers.map(b => b.close()));
+      await Promise.all(browsers.map(_b => b.close()));
     });
   });
 });

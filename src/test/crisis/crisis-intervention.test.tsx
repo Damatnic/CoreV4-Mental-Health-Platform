@@ -2,10 +2,11 @@
 // Priority: CRITICAL - These tests ensure user safety during mental health crises
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, _within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useCrisisAssessment } from '../../hooks/useCrisisAssessment';
 import { testUtils } from '../setup';
+import App from '../../App';
 
 describe('Crisis Intervention - Critical Safety Tests', () => {
   let mockGeolocation: unknown;
@@ -48,7 +49,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(() => {
-        const hotlineButton = screen.getByRole('button', { name: /988.*crisis/i });
+        const _hotlineButton = screen.getByRole('button', { name: /988.*crisis/i });
         expect(_hotlineButton).toBeInTheDocument();
         expect(_hotlineButton).toHaveClass('emergency-button');
       });
@@ -66,7 +67,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       testUtils.triggerCrisis();
       
-      const hotlineButton = await screen.findByRole('button', { name: /988/i });
+      const _hotlineButton = await screen.findByRole('button', { name: /988/i });
       fireEvent.click(_hotlineButton);
       
       expect(window.location.href).toContain('tel:988');
@@ -134,7 +135,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
     it('should persist assessment data securely', () => {
       const { result } = renderHook(() => useCrisisAssessment());
       
-      const assessmentData = {
+      const _assessmentData = {
         moodScore: 7,
         thoughtScore: 6,
         timestamp: new Date()
@@ -193,7 +194,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       testUtils.triggerCrisis();
       
-      const shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
+      const _shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
       fireEvent.click(_shareLocationBtn);
       
       await waitFor(() => {
@@ -215,7 +216,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       testUtils.triggerCrisis();
       
-      const shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
+      const _shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
       fireEvent.click(_shareLocationBtn);
       
       await waitFor(() => {
@@ -245,7 +246,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         const _safetyPlanElement = screen.getByTestId('safety-plan');
         expect(_safetyPlanElement).toBeInTheDocument();
         
-        const loadTime = performance.now() - startTime;
+        const _loadTime = performance.now() - startTime;
         expect(_loadTime).toBeLessThan(200);
       });
     });
@@ -271,7 +272,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
     it('should connect to crisis counselor within acceptable timeframe', async () => {
       testUtils.triggerCrisis();
       
-      const chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
+      const _chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
       fireEvent.click(_chatButton);
       
       await waitFor(() => {
@@ -286,7 +287,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
     it('should maintain chat session during network interruptions', async () => {
       testUtils.triggerCrisis();
       
-      const chatButton = await screen.findByRole('button', { name: /chat/i });
+      const _chatButton = await screen.findByRole('button', { name: /chat/i });
       fireEvent.click(_chatButton);
       
       // Simulate network interruption
@@ -345,7 +346,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
           const styles = window.getComputedStyle(_button);
           
           // Check minimum size
-          const height = parseInt(styles.height);
+          const _height = parseInt(styles._height);
           expect(_height).toBeGreaterThanOrEqual(48); // WCAG touch target size
           
           // Check contrast ratio
@@ -438,7 +439,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         const _crisisUI = screen.getByTestId('crisis-intervention-ui');
         expect(_crisisUI).toBeInTheDocument();
         
-        const loadTime = performance.now() - startTime;
+        const _loadTime = performance.now() - startTime;
         expect(_loadTime).toBeLessThan(200);
       });
     });
@@ -497,18 +498,18 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       await waitFor(() => {
         // Check ARIA labels
         const crisisButtons = screen.getAllByRole('button');
-        crisisButtons.forEach(button => {
+        crisisButtons.forEach(_button => {
           expect(_button).toHaveAttribute('aria-label');
         });
         
         // Check live regions for updates
         const alerts = screen.getAllByRole('alert');
-        alerts.forEach(alert => {
+        alerts.forEach(_alert => {
           expect(_alert).toHaveAttribute('aria-live', 'assertive');
         });
         
         // Check focus management
-        const dialog = screen.queryByRole('dialog');
+        const _dialog = screen.queryByRole('_dialog');
         if (_dialog) {
           expect(_dialog).toHaveAttribute('aria-modal', 'true');
         }

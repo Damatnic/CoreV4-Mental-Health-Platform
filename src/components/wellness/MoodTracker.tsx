@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Slider } from '@radix-ui/react-slider';
+import React, { useState, useCallback, _useEffect, useMemo } from 'react';
+import { _Slider } from '@radix-ui/react-slider';
 import { TrendingUp, TrendingDown, AlertCircle, Heart } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -269,8 +269,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         <input
           id="mood-slider"
           type="range"
-          role="slider"
-          min="1"
+                    min="1"
           max="10"
           value={mood}
           onChange={(e) => setMood(parseInt(e.target.value))}
@@ -401,7 +400,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
           
           {/* Mood Chart */}
           {chartData && (
-            <div _data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
+            <div data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
               <Line _data={chartData} options={chartOptions} />
             </div>
           )}

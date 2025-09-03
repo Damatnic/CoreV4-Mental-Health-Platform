@@ -78,7 +78,7 @@ export function ActivityAnalytics({
       
       return inDateRange && inCategory;
     });
-  }, [activityHistory, selectedPeriod, selectedCategory, currentDate]);
+  }, [activityHistory, selectedPeriod, selectedCategory, currentDate, getDateRange]);
 
   // Calculate statistics
   const ____stats   = useMemo(() => {
@@ -175,7 +175,7 @@ export function ActivityAnalytics({
         isToday: isToday(_day)
       };
     });
-  }, [filteredActivities, selectedPeriod, currentDate]);
+  }, [filteredActivities, selectedPeriod, currentDate, getDateRange]);
 
   // Get insights
   const insights = useMemo(() => {

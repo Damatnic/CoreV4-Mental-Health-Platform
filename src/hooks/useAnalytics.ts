@@ -29,7 +29,7 @@ export const useAnalytics = () => {
     }
   }, []);
 
-  const __trackPageView   = useCallback(async (page: string, properties?: Record<string, any>) => {
+  const __trackPageView   = useCallback(async (page: string, _properties?: Record<string, any>) => {
     // Intentionally empty - no page tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Page view not tracked:', page);
@@ -43,14 +43,14 @@ export const useAnalytics = () => {
     }
   }, []);
 
-  const __trackTiming   = useCallback(async (category: string, variable: string, _time: number, label?: string) => {
+  const __trackTiming   = useCallback(async (category: string, variable: string, _time: number, _label?: string) => {
     // Intentionally empty - no performance tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Timing not tracked:', category, variable);
     }
   }, []);
 
-  const __trackInteraction   = useCallback(async (element: string, action: string, value?: unknown) => {
+  const __trackInteraction   = useCallback(async (element: string, action: string, _value?: unknown) => {
     // Intentionally empty - no interaction tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Interaction not tracked:', element, action);

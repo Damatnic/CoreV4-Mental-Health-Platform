@@ -384,10 +384,11 @@ class SecureAPIService {
           await this.handleForbidden(_requestId);
           throw new Error('Access denied');
           
-        case 429:
+        case 429: {
           // Rate limited
           const retryAfter = response.headers.get('Retry-After');
           throw new Error(`Rate limited. Retry after ${retryAfter} seconds`);
+        }
           
         case 500:
         case 502:

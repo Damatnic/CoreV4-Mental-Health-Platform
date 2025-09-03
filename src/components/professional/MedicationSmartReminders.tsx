@@ -167,7 +167,7 @@ export function MedicationSmartReminders({
   useEffect(() => {
     generateInitialReminders();
     generateAIInsights();
-  }, [medications]);
+  }, [medications, generateInitialReminders]);
 
   const generateInitialReminders = () => {
     const _initialReminders: SmartReminder[] = medications.map((med, index) => ({
@@ -622,6 +622,7 @@ export function MedicationSmartReminders({
                           checked={feature.enabled}
                           onChange={() => {}}
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          aria-label={`Toggle ${feature.title}`}
                         />
                       </label>
                     </div>

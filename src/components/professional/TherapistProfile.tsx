@@ -484,6 +484,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
                           muted={isMuted}
                         >
                           <source src={therapist.introVideo} type="video/mp4" />
+                          <track kind="captions" src="" label="English captions" srcLang="en" />
                         </video>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center">

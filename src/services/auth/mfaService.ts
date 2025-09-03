@@ -102,11 +102,11 @@ class MultiFactorAuthService {
         qrCodeUrl,
         backupCodes,
       };
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -141,11 +141,11 @@ class MultiFactorAuthService {
       }
 
       return isValid;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'totp_verification_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'warning',
       });
       return false;
@@ -180,11 +180,11 @@ class MultiFactorAuthService {
         details: { method: 'sms' },
         severity: 'info',
       });
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'sms_setup_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -216,11 +216,11 @@ class MultiFactorAuthService {
         details: { method: 'email' },
         severity: 'info',
       });
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'email_setup_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -257,11 +257,11 @@ class MultiFactorAuthService {
       });
 
       return true;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'biometric_setup_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       return false;
@@ -306,11 +306,11 @@ class MultiFactorAuthService {
       });
 
       return challenge;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error) } })(),
+        details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'warning',
       });
       throw error;
@@ -399,11 +399,11 @@ class MultiFactorAuthService {
       }
 
       return isValid;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
-        _userId,
-        details: { error: error instanceof Error ? error.message : String(error), challengeId } })(),
+        userId,
+        details: { error: error instanceof Error ? error.message : String(error), challengeId },
         severity: 'error',
       });
       return false;
@@ -423,11 +423,11 @@ class MultiFactorAuthService {
         details: { method },
         severity: 'info',
       });
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
         _userId,
-        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_disable_failed' } })(),
+        details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
       throw error;
@@ -479,7 +479,7 @@ class MultiFactorAuthService {
       });
       
       return codes;
-    } catch {
+    } catch (_error) {
       logger.error('Failed to generate recovery codes:');
       throw undefined;
     }
@@ -723,18 +723,22 @@ class MultiFactorAuthService {
 
   private async sendChallengeCode(_userId: string, method: MFAMethod): Promise<void> {
     switch (method) {
-      case "sms": { const smsSetup = await this.getMFASetup(_userId, 'sms');
+      case "sms": {
+        const smsSetup = await this.getMFASetup(_userId, 'sms');
         if (smsSetup) {
           const phone = await cryptoService.decrypt(smsSetup.metadata?._phoneNumber || '');
           await this.sendSMSCode(_userId, phone);
         }
         break;
-      case "email": { const emailSetup = await this.getMFASetup(_userId, 'email');
+      }
+      case "email": {
+        const emailSetup = await this.getMFASetup(_userId, 'email');
         if (emailSetup) {
           const email = await cryptoService.decrypt(emailSetup.metadata?.email || '');
           await this.sendEmailCode(_userId, email);
         }
         break;
+      }
       // TOTP and biometric don't need to send codes
     }
   }

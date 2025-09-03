@@ -118,7 +118,7 @@ export function VoiceCommandInterface({
       }
       stopAudioAnalyzer();
     };
-  }, [isActive]);
+  }, [isActive, initializeAudioAnalyzer]);
 
   // Initialize audio analyzer for volume visualization
   const initializeAudioAnalyzer = async () => {

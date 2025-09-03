@@ -666,18 +666,17 @@ export class HIPAAComplianceService {
     // SECURITY FIX: Get user ID from secure authentication context
     // instead of localStorage which is vulnerable to XSS
     
-    try {
-      // In production, get from secure HTTP-only cookie or authentication service
-      // For now, return anonymous to prevent localStorage access
-      
-      // TODO: Implement secure user ID retrieval from authentication context
-      // const authService = AuthService.getInstance();
-      // return authService.getCurrentUserId();
-      
-      return 'anonymous';
-    } catch {
-      return 'anonymous';
-    }
+    // TODO: Implement secure user ID retrieval from authentication context
+    // When implementing, wrap in try-catch:
+    // try {
+    //   const authService = AuthService.getInstance();
+    //   return authService.getCurrentUserId();
+    // } catch (error) {
+    //   return 'anonymous';
+    // }
+    
+    // For now, return anonymous to prevent localStorage access
+    return 'anonymous';
   }
 
   private isPHIResource(_resourceType: string): boolean {

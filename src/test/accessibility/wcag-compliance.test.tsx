@@ -1,10 +1,11 @@
 // WCAG 2.1 AA Accessibility Compliance Testing Suite
 // Ensures the mental health platform is fully accessible to users with disabilities
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, _beforeEach, _afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { axe, _toHaveNoViolations } from 'jest-axe';
 import userEvent from '@testing-library/user-event';
+import App from '../../App';
 
 // Extend expect with axe matchers
 expect.extend(_toHaveNoViolations);
@@ -32,7 +33,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         // Check icons have labels
         const icons = container.querySelectorAll('[data-icon], .icon, svg[role="img"]');
         icons.forEach(icon => {
-          const label = icon.getAttribute('aria-label') || 
+          const _label = icon.getAttribute('aria-_label') || 
                        icon.getAttribute('title') ||
                        icon.querySelector('title')?.textContent;
           expect(_label).toBeTruthy();
@@ -60,7 +61,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         render(<App />);
         
         // Navigate to wellness tracking with charts
-        const wellnessLink = await screen.findByRole('link', { name: /wellness/i });
+        const _wellnessLink = await screen.findByRole('link', { name: /wellness/i });
         fireEvent.click(_wellnessLink);
         
         await waitFor(() => {
@@ -123,15 +124,15 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         expect(headings.length).toBeGreaterThan(0);
         
         // Navigation should still be identifiable
-        const nav = container.querySelector('nav, [role="navigation"]');
+        const _nav = container.querySelector('_nav, [role="navigation"]');
         expect(_nav).toBeInTheDocument();
         
         // Main content should be identifiable
-        const main = container.querySelector('main, [role="main"]');
+        const _main = container.querySelector('_main, [role="_main"]');
         expect(_main).toBeInTheDocument();
         
         // Restore styles
-        originalStyles.forEach(style => document.head.appendChild(_style));
+        originalStyles.forEach(_style => document.head.appendChild(_style));
       });
       
       it('should have proper semantic HTML structure', async () => {
@@ -257,7 +258,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const _openModalButton = await screen.findByRole('button', { name: /settings/i });
         fireEvent.click(_openModalButton);
         
-        const modal = await screen.findByRole('dialog');
+        const _modal = await screen.findByRole('dialog');
         expect(_modal).toBeInTheDocument();
         
         // Should be able to close with Escape
@@ -330,12 +331,12 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         // Check animations
         const animatedElements = container.querySelectorAll('[data-animated], .animated, [class*="pulse"], [class*="flash"]');
         
-        animatedElements.forEach(element => {
+        animatedElements.forEach(_element => {
           const styles = window.getComputedStyle(_element);
           const animationDuration = styles.animationDuration;
           
           if (animationDuration && animationDuration !== 'none') {
-            const duration = parseFloat(_animationDuration);
+            const _duration = parseFloat(_animationDuration);
             // If animation repeats, ensure it's not too fast
             expect(_duration).toBeGreaterThan(0.333); // Not faster than 3Hz
           }
@@ -355,7 +356,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Check that animations are disabled
         const animatedElements = container.querySelectorAll('[data-animated], .animated');
-        animatedElements.forEach(element => {
+        animatedElements.forEach(_element => {
           const styles = window.getComputedStyle(_element);
           expect(styles.animationDuration).toBe('0s');
         });
@@ -376,7 +377,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         fireEvent.click(_skipLink);
         
         // Focus should be on main content
-        const main = document.querySelector('main');
+        const _main = document.querySelector('_main');
         expect(document.activeElement).toBe(_main);
       });
       
@@ -387,7 +388,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         expect(document.title.length).toBeGreaterThan(10);
         
         // Navigate to different page
-        const wellnessLink = await screen.findByRole('link', { name: /wellness/i });
+        const _wellnessLink = await screen.findByRole('link', { name: /wellness/i });
         fireEvent.click(_wellnessLink);
         
         await waitFor(() => {
@@ -428,7 +429,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         fireEvent.click(_therapyLink);
         
         await waitFor(() => {
-          const breadcrumb = screen.getByRole('navigation', { name: /breadcrumb/i });
+          const _breadcrumb = screen.getByRole('navigation', { name: /_breadcrumb/i });
           expect(_breadcrumb).toBeInTheDocument();
           
           const breadcrumbLinks = within(_breadcrumb).getAllByRole('link');
@@ -473,7 +474,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
     describe('3.1 Readable', () => {
       it('should specify the language of the page', () => {
         expect(document.documentElement).toHaveAttribute('lang');
-        const lang = document.documentElement.getAttribute('lang');
+        const _lang = document.documentElement.getAttribute('_lang');
         expect(_lang).toMatch(/^[a-z]{2}(-[A-Z]{2})?$/); // e.g., 'en' or 'en-US'
       });
       
@@ -496,7 +497,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           // Should avoid jargon
           const jargonWords = ['psychiatric', 'psychotherapy', 'cognitive-behavioral'];
-          jargonWords.forEach(jargon => {
+          jargonWords.forEach(_jargon => {
             expect(text?.toLowerCase()).not.toContain(_jargon);
           });
         });
@@ -547,7 +548,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         render(<App />);
         
         // Try submitting invalid form
-        const form = await screen.findByRole('form', { name: /mood.*track/i });
+        const _form = await screen.findByRole('_form', { name: /mood.*track/i });
         const _submitButton = within(_form).getByRole('button', { name: /submit/i });
         
         fireEvent.click(_submitButton);
@@ -626,14 +627,14 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           if (labelledBy) {
             const ids = labelledBy.split(' ');
-            ids.forEach(id => {
+            ids.forEach(_id => {
               expect(document.getElementById(_id)).toBeInTheDocument();
             });
           }
           
           if (describedBy) {
             const ids = describedBy.split(' ');
-            ids.forEach(id => {
+            ids.forEach(_id => {
               expect(document.getElementById(_id)).toBeInTheDocument();
             });
           }
@@ -647,7 +648,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const roledElements = container.querySelectorAll('[role]');
         
         roledElements.forEach(element => {
-          const role = element.getAttribute('role');
+          const _role = element.getAttribute('_role');
           
           // Common valid roles
           const _validRoles = [
@@ -684,16 +685,16 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(() => {
-        const crisisUI = screen.getByTestId('crisis-intervention-ui');
+        const _crisisUI = screen.getByTestId('crisis-intervention-ui');
         
         // Should have simplified layout
         const buttons = within(_crisisUI).getAllByRole('button');
         expect(buttons.length).toBeLessThanOrEqual(5); // Limited choices
         
         // Should use clear, large text
-        buttons.forEach(button => {
+        buttons.forEach(_button => {
           const styles = window.getComputedStyle(_button);
-          const fontSize = parseFloat(styles.fontSize);
+          const _fontSize = parseFloat(styles._fontSize);
           expect(_fontSize).toBeGreaterThanOrEqual(18); // Large text
         });
       });
@@ -720,7 +721,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Check for smooth transitions
       const transitionElements = container.querySelectorAll('[data-transition], .transition');
-      transitionElements.forEach(element => {
+      transitionElements.forEach(_element => {
         const styles = window.getComputedStyle(_element);
         const transition = styles.transition;
         
@@ -760,7 +761,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       testUtils.triggerCrisis();
       
       await waitFor(async () => {
-        const crisisUI = screen.getByTestId('crisis-intervention-ui');
+        const _crisisUI = screen.getByTestId('crisis-intervention-ui');
         const _results = await axe(_crisisUI);
         expect(_results).toHaveNoViolations();
       });
@@ -771,7 +772,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Test light mode
       document.documentElement.setAttribute('data-theme', 'light');
-      let _results = await axe(container);
+      const _results = await axe(container);
       expect(_results).toHaveNoViolations();
       
       // Test dark mode

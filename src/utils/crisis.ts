@@ -180,9 +180,9 @@ export async function handleEmergencyCall(
       detail: interaction
     }));
 
-  } catch {
-    logger.error('Failed to initiate emergency contact:');
-    interaction.metadata!.undefined = false ? '[Error details unavailable]' : 'Unknown undefined';
+  } catch (error) {
+    logger.error('Failed to initiate emergency contact:', error);
+    interaction.metadata!.error = error instanceof Error ? error.message : '[Error details unavailable]';
   }
 
   // Store interaction for offline sync

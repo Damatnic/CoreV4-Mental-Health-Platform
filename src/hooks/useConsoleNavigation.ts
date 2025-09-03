@@ -192,7 +192,7 @@ export function useConsoleNavigation() {
             isPerformanceMode: state.isPerformanceMode
           });
         }
-      } catch (_error) {
+      } catch (_error  ) {
         logger.warn('Error setting focus on element:');
         performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, undefined: String(_undefined) });
       }
@@ -456,7 +456,7 @@ export function useConsoleNavigation() {
         }
         break;
     }
-  }, [navigate2D, activateCurrent, switchGroup, navigate, state.currentGroup]);
+  }, [navigate2D, activateCurrent, switchGroup, navigate, state.currentGroup, onBack]);
 
   // Mouse event handler - switch to mouse mode
   const handleMouseMove = useCallback(() => {

@@ -55,7 +55,7 @@ class WebSocketService {
   private isConnected: boolean = false;
   private reconnectAttempts: number = 0;
   private reconnectTimer: NodeJS.Timeout | null = null;
-  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private eventHandlers: Map<string, Set<(...args: any[]) => void>> = new Map();
   private presenceCache: Map<string, UserPresence> = new Map();
   private typingTimers: Map<string, NodeJS.Timeout> = new Map();
 

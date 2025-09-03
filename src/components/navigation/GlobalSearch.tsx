@@ -170,7 +170,7 @@ export function GlobalSearch() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen, _results, selectedIndex, setSearchOpen]);
+  }, [isSearchOpen, _results, selectedIndex, setSearchOpen, handleResultClick]);
 
   // Focus input when search opens
   useEffect(() => {

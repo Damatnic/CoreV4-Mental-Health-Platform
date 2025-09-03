@@ -328,7 +328,7 @@ export const WellnessDashboard: React.FC = () => {
     
     // Otherwise calculate based on current day data
     let score = 0;
-    let factors = 0;
+    let _factors = 0;
     
     // Habits score (30%)
     const completedHabits = (todayData.habits?.length || 0) / DAILY_HABITS.length;
@@ -345,7 +345,7 @@ export const WellnessDashboard: React.FC = () => {
     if (recentMoodEntries.length > 0) {
       const avgMood = recentMoodEntries.reduce((sum, e) => sum + e.moodScore, 0) / recentMoodEntries.length;
       score += (avgMood / 10) * 30;
-      factors++;
+      _factors++;
     }
     
     // Sleep score (20%)
@@ -353,7 +353,7 @@ export const WellnessDashboard: React.FC = () => {
       const sleepScore = (todayData.sleep.hours / 8) * 0.5 + 
                         (SLEEP_QUALITY[todayData.sleep.quality].value / 5) * 0.5;
       score += sleepScore * 20;
-      factors++;
+      _factors++;
     }
     
     // Exercise score (10%)
@@ -361,7 +361,7 @@ export const WellnessDashboard: React.FC = () => {
       const exerciseMinutes = todayData.exercise.reduce((sum, e) => sum + e.duration, 0);
       const exerciseScore = Math.min(exerciseMinutes / 30, 1);
       score += exerciseScore * 10;
-      factors++;
+      _factors++;
     }
     
     // Hydration score (10%)

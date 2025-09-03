@@ -59,7 +59,7 @@ class PerformanceMonitor {
     return duration;
   }
 
-  getMeasure(name: string): number | undefined {
+  getMeasure(_name: string): number | undefined {
     return this.measures.get(_name);
   }
 
@@ -94,7 +94,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       monitor.mark('crisis-start');
       await user.click(_button);
@@ -136,7 +136,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       monitor.mark('rapid-clicks-start');
       
@@ -165,7 +165,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       monitor.mark('api-start');
       await user.click(_button);
@@ -190,7 +190,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       // First click - cold cache
       monitor.mark('cold-start');
@@ -199,7 +199,7 @@ describe('Crisis Response Performance', () => {
       const coldTime = monitor.measure('cold-response', 'cold-start');
       
       // Close modal
-      const closeButton = screen.getByRole('button', { name: /close/i });
+      const _closeButton = screen.getByRole('button', { name: /close/i });
       await user.click(_closeButton);
       
       // Second click - warm cache
@@ -228,14 +228,14 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       // Perform multiple open/close cycles
       for (let i = 0; i < 5; i++) {
         await user.click(_button);
         await waitFor(() => screen.getByText('988'));
         
-        const closeButton = screen.getByRole('button', { name: /close/i });
+        const _closeButton = screen.getByRole('button', { name: /close/i });
         await user.click(_closeButton);
         await waitFor(() => expect(screen.queryByText('988')).not.toBeInTheDocument());
       }
@@ -265,7 +265,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       // Get initial listener count
@@ -383,7 +383,7 @@ describe('Crisis Response Performance', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       
       monitor.mark('slow-network-start');
       await user.click(_button);
@@ -400,7 +400,7 @@ describe('Crisis Response Performance', () => {
     it('should prioritize critical resources', async () => {
       const fetchOrder: string[] = [];
       
-      const trackingFetch = vi.fn().mockImplementation((url: string) => {
+      const trackingFetch = vi.fn().mockImplementation((_url: string) => {
         fetchOrder.push(_url);
         return Promise.resolve({
           ok: true,
@@ -440,8 +440,8 @@ describe('Crisis Response Performance', () => {
       
       // Wait for all components to be interactive
       await waitFor(() => {
-        const button = screen.getByRole('button', { name: /crisis help/i });
-        const slider = screen.getByRole('slider');
+        const _button = screen.getByRole('_button', { name: /crisis help/i });
+        const _slider = screen.getByRole('_slider');
         
         expect(_button).toBeEnabled();
         expect(_slider).toBeEnabled();

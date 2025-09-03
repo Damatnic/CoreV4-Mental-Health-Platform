@@ -1,0 +1,1605 @@
+{
+  "timestamp": "2025-09-03T18:03:04.555Z",
+  "totalErrors": 78,
+  "totalWarnings": 136,
+  "issuesByType": {
+    "react-refresh/only-export-components": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ErrorBoundary.tsx",
+        "line": 388,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ErrorBoundary.tsx",
+        "line": 410,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ErrorBoundary.tsx",
+        "line": 424,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ErrorBoundary.tsx",
+        "line": 431,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\NavigationContext.tsx",
+        "line": 218,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\theme\\WellnessThemeProvider.tsx",
+        "line": 14,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\contexts\\AnonymousAuthContext.tsx",
+        "line": 131,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\contexts\\AuthContext.tsx",
+        "line": 86,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Move your React context(s) to a separate file.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\contexts\\AuthContext.tsx",
+        "line": 88,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useToast.tsx",
+        "line": 49,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\middleware\\securityMiddleware.tsx",
+        "line": 31,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\middleware\\securityMiddleware.tsx",
+        "line": 254,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 22,
+        "column": 13,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 32,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 54,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 71,
+        "column": 14,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 156,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 221,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 251,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 261,
+        "column": 17,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 329,
+        "column": 23,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "severity": 1
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ErrorBoundary.tsx",
+        "line": 392,
+        "column": 45,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\QuickActions.tsx",
+        "line": 81,
+        "column": 33,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\TodaySchedule.tsx",
+        "line": 255,
+        "column": 50,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\quickActions\\SmartQuickActionsWidget.tsx",
+        "line": 144,
+        "column": 35,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\professional\\AppointmentBooking.tsx",
+        "line": 161,
+        "column": 67,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 20,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 25,
+        "column": 106,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 32,
+        "column": 90,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 39,
+        "column": 93,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 70,
+        "column": 53,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\usePerformanceMonitor.ts",
+        "line": 19,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\usePerformanceMonitor.ts",
+        "line": 36,
+        "column": 96,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\accessibility\\AdvancedAccessibilityService.ts",
+        "line": 7,
+        "column": 31,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 27,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 64,
+        "column": 21,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 145,
+        "column": 17,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 157,
+        "column": 18,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 174,
+        "column": 17,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 191,
+        "column": 20,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\console\\ConsoleSoundSystem.ts",
+        "line": 639,
+        "column": 43,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\crisis\\MockWebSocketAdapter.ts",
+        "line": 300,
+        "column": 61,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\crisis\\MockWebSocketAdapter.ts",
+        "line": 307,
+        "column": 62,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\crisis\\MockWebSocketAdapter.ts",
+        "line": 336,
+        "column": 79,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\integration\\DataIntegrationService.ts",
+        "line": 58,
+        "column": 31,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\integration\\DataIntegrationService.ts",
+        "line": 66,
+        "column": 34,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\integration\\DataIntegrationService.ts",
+        "line": 77,
+        "column": 37,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\integration\\DataIntegrationService.ts",
+        "line": 593,
+        "column": 44,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\integration\\RealtimeSyncService.ts",
+        "line": 57,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 51,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 316,
+        "column": 85,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 325,
+        "column": 83,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 334,
+        "column": 75,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 345,
+        "column": 79,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\monitoring\\HealthCheckService.ts",
+        "line": 24,
+        "column": 28,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 53,
+        "column": 31,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 79,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 80,
+        "column": 39,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 574,
+        "column": 34,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 641,
+        "column": 34,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 642,
+        "column": 72,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 645,
+        "column": 44,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\realtime\\websocketService.ts",
+        "line": 389,
+        "column": 54,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\realtime\\websocketService.ts",
+        "line": 396,
+        "column": 55,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 51,
+        "column": 28,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 73,
+        "column": 31,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 230,
+        "column": 49,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 243,
+        "column": 49,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 318,
+        "column": 35,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 384,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 409,
+        "column": 70,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\auditLogger.ts",
+        "line": 23,
+        "column": 28,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\auditLogger.ts",
+        "line": 124,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 174,
+        "column": 31,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 294,
+        "column": 25,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 297,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 298,
+        "column": 37,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 316,
+        "column": 25,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 319,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 320,
+        "column": 37,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\secureStorage.ts",
+        "line": 422,
+        "column": 30,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\securityMonitor.ts",
+        "line": 22,
+        "column": 27,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\securityMonitor.ts",
+        "line": 135,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\EnhancedWebSocketService.ts",
+        "line": 1116,
+        "column": 61,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\EnhancedWebSocketService.ts",
+        "line": 1123,
+        "column": 62,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\WebSocketService.ts",
+        "line": 573,
+        "column": 61,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\WebSocketService.ts",
+        "line": 580,
+        "column": 62,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\crisis.ts",
+        "line": 45,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\crisis.ts",
+        "line": 146,
+        "column": 28,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\crisis.ts",
+        "line": 200,
+        "column": 29,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\mobile\\touchOptimization.ts",
+        "line": 535,
+        "column": 60,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\MemoryLeakPrevention.ts",
+        "line": 205,
+        "column": 67,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\MemoryLeakPrevention.ts",
+        "line": 306,
+        "column": 75,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\gamingOptimizations.ts",
+        "line": 565,
+        "column": 54,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\memoryManagement.ts",
+        "line": 365,
+        "column": 71,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\memoryManagement.ts",
+        "line": 395,
+        "column": 71,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\performanceMonitor.ts",
+        "line": 48,
+        "column": 28,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\performanceMonitor.ts",
+        "line": 630,
+        "column": 77,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\performanceMonitor.ts",
+        "line": 732,
+        "column": 50,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\performanceMonitor.ts",
+        "line": 733,
+        "column": 35,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\runtimeGuards.ts",
+        "line": 28,
+        "column": 60,
+        "message": "Unexpected any. Specify a different type.",
+        "severity": 1
+      }
+    ],
+    "react/no-unescaped-entities": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\CrisisInterventionSystem.tsx",
+        "line": 183,
+        "column": 21,
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\CrisisInterventionSystem.tsx",
+        "line": 183,
+        "column": 42,
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "severity": 2
+      }
+    ],
+    "jsx-a11y/click-events-have-key-events": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\EmergencyContacts.tsx",
+        "line": 252,
+        "column": 13,
+        "message": "Visible, non-interactive elements with click handlers must have at least one keyboard listener.",
+        "severity": 2
+      }
+    ],
+    "jsx-a11y/no-static-element-interactions": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\EmergencyContacts.tsx",
+        "line": 252,
+        "column": 13,
+        "message": "Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.",
+        "severity": 2
+      }
+    ],
+    "react-hooks/exhaustive-deps": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\RealTimeCrisisChat.tsx",
+        "line": 115,
+        "column": 9,
+        "message": "The 'initializeCrisisChat' function makes the dependencies of useEffect Hook (at line 93) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'initializeCrisisChat' in its own useCallback() Hook.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\ActivityAnalytics.tsx",
+        "line": 81,
+        "column": 6,
+        "message": "React Hook useMemo has a missing dependency: 'getDateRange'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\ActivityAnalytics.tsx",
+        "line": 178,
+        "column": 6,
+        "message": "React Hook useMemo has a missing dependency: 'getDateRange'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\ActivityAnalytics.tsx",
+        "line": 242,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'stats'. Either exclude it or remove the dependency array. Outer scope values like 'stats' aren't valid dependencies because mutating them doesn't re-render the component.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\DailyActivityPlanner.tsx",
+        "line": 94,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'initializeTimeSlots'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\quickActions\\KeyboardNavigator.tsx",
+        "line": 149,
+        "column": 6,
+        "message": "React Hook useCallback has missing dependencies: 'handleTypeAheadSearch', 'keyboardShortcuts', 'navigateDown', 'navigateLeft', 'navigateRight', and 'navigateUp'. Either include them or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\quickActions\\SmartQuickActionsWidget.tsx",
+        "line": 84,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'crisisMode'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\quickActions\\VoiceCommandInterface.tsx",
+        "line": 121,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'initializeAudioAnalyzer'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\AdvancedJournal.tsx",
+        "line": 177,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'dateFilter'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\MeditationMindfulness.tsx",
+        "line": 153,
+        "column": 6,
+        "message": "React Hook useMemo has a missing dependency: 'calculateCurrentStreak'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\MeditationMindfulness.tsx",
+        "line": 214,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'selectedTimeRange'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\MeditationMindfulness.tsx",
+        "line": 297,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: '_stats'. Either exclude it or remove the dependency array. Outer scope values like '_stats' aren't valid dependencies because mutating them doesn't re-render the component.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\WellnessMetricsDashboard.tsx",
+        "line": 193,
+        "column": 6,
+        "message": "React Hook useMemo has missing dependencies: 'calculateStreak' and 'calculateTrend'. Either include them or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+        "line": 144,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'handleDragMove'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\GlobalSearch.tsx",
+        "line": 173,
+        "column": 6,
+        "message": "React Hook useEffect has missing dependencies: 'handleResultClick' and 'results'. Either include them or remove the dependency array. Outer scope values like '_results' aren't valid dependencies because mutating them doesn't re-render the component.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\NavigationContext.tsx",
+        "line": 186,
+        "column": 6,
+        "message": "React Hook React.useMemo has an unnecessary dependency: 'crisisDetected'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\OptimizedChart.tsx",
+        "line": 319,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'type'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\OptimizedCrisisIntervention.tsx",
+        "line": 101,
+        "column": 6,
+        "message": "React Hook useCallback has an unnecessary dependency: 'userId'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\VirtualizedList.tsx",
+        "line": 124,
+        "column": 6,
+        "message": "React Hook useMemo has an unnecessary dependency: 'isVariableHeight'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\professional\\MedicationSmartReminders.tsx",
+        "line": 170,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'generateInitialReminders'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\contexts\\AnonymousAuthContext.tsx",
+        "line": 342,
+        "column": 6,
+        "message": "React Hook useEffect has missing dependencies: 'cleanupStaleData' and 'validateDataIntegrity'. Either include them or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\contexts\\AuthContext.tsx",
+        "line": 119,
+        "column": 6,
+        "message": "React Hook useEffect has missing dependencies: 'checkAuth' and 'checkSessionExpiry'. Either include them or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAITherapist.ts",
+        "line": 91,
+        "column": 6,
+        "message": "React Hook useCallback has an unnecessary dependency: 'therapist.name'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAITherapist.ts",
+        "line": 242,
+        "column": 6,
+        "message": "React Hook useCallback has missing dependencies: 'generateAnxietyDepressionResponse', 'generateGeneralResponse', 'generateGrowthResponse', 'generateMensHealthResponse', 'generateRecoveryResponse', 'generateRelationshipResponse', 'generateStressResponse', and 'generateYouthResponse'. Either include them or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useConsoleNavigation.ts",
+        "line": 459,
+        "column": 6,
+        "message": "React Hook useCallback has a missing dependency: 'onBack'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useKeyboardNavigation.ts",
+        "line": 298,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'mediaQuery'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\usePerformanceMonitor.ts",
+        "line": 56,
+        "column": 6,
+        "message": "React Hook useCallback has an unnecessary dependency: 'enableLogging'. Either exclude it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useQuickActionsContext.ts",
+        "line": 213,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'defaultActions'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useToast.tsx",
+        "line": 35,
+        "column": 6,
+        "message": "React Hook useCallback has a missing dependency: 'removeToast'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\middleware\\securityMiddleware.tsx",
+        "line": 54,
+        "column": 6,
+        "message": "React Hook useEffect has a missing dependency: 'initializeSecurity'. Either include it or remove the dependency array.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\MemoryLeakPrevention.ts",
+        "line": 502,
+        "column": 22,
+        "message": "The ref value 'cleanupManager.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'cleanupManager.current' to a variable inside the effect, and use that variable in the cleanup function.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 279,
+        "column": 6,
+        "message": "React Hook React.useEffect was passed a dependency list that is not an array literal. This means we can't statically verify whether you've passed the correct dependencies.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 279,
+        "column": 6,
+        "message": "React Hook React.useEffect has missing dependencies: 'computation' and 'priority'. Either include them or remove the dependency array. If 'computation' changes too often, find the parent component that defines it and wrap that definition in useCallback.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\memoryManagement.ts",
+        "line": 246,
+        "column": 17,
+        "message": "The ref value 'timersRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'timersRef.current' to a variable inside the effect, and use that variable in the cleanup function.",
+        "severity": 1
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\memoryManagement.ts",
+        "line": 273,
+        "column": 20,
+        "message": "The ref value 'intervalsRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'intervalsRef.current' to a variable inside the effect, and use that variable in the cleanup function.",
+        "severity": 1
+      }
+    ],
+    "no-redeclare": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\SafetyPlanGenerator.tsx",
+        "line": 485,
+        "column": 7,
+        "message": "'SafetyPlanSection' is already defined.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 387,
+        "column": 14,
+        "message": "'logger' is already defined.",
+        "severity": 2
+      }
+    ],
+    "unknown": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\dashboard\\widgets\\wellness\\MoodAnalytics.tsx",
+        "line": 709,
+        "column": 8,
+        "message": "Parsing error: ')' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\PerformanceDashboard.tsx",
+        "line": 430,
+        "column": 18,
+        "message": "Parsing error: An identifier or keyword cannot immediately follow a numeric literal.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\ui\\EnhancedLayout.tsx",
+        "line": 97,
+        "column": 10,
+        "message": "Parsing error: '}' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\BreathingExercises.tsx",
+        "line": 77,
+        "column": 17,
+        "message": "Parsing error: Expression expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MeditationTimer.tsx",
+        "line": 102,
+        "column": 17,
+        "message": "Parsing error: Expression expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\TherapeuticJournal.tsx",
+        "line": 156,
+        "column": 17,
+        "message": "Parsing error: Expression expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\auth\\authService.ts",
+        "line": 144,
+        "column": 16,
+        "message": "Parsing error: ';' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\auth\\mfaService.ts",
+        "line": 110,
+        "column": 16,
+        "message": "Parsing error: ';' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\compliance\\hipaaService.ts",
+        "line": 222,
+        "column": 16,
+        "message": "Parsing error: ';' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\sessionManager.ts",
+        "line": 223,
+        "column": 16,
+        "message": "Parsing error: ';' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\accessibility\\a11y-crisis.test.ts",
+        "line": 28,
+        "column": 25,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\accessibility\\wcag-compliance.test.ts",
+        "line": 18,
+        "column": 42,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\compatibility\\cross-platform.test.ts",
+        "line": 94,
+        "column": 44,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\crisis\\crisis-intervention.test.ts",
+        "line": 317,
+        "column": 40,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\performance\\crisis-performance.test.ts",
+        "line": 35,
+        "column": 25,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\performance\\load-performance.test.ts",
+        "line": 56,
+        "column": 18,
+        "message": "Parsing error: '>' expected.",
+        "severity": 2
+      }
+    ],
+    "react-hooks/rules-of-hooks": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+        "line": 72,
+        "column": 3,
+        "message": "React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+        "line": 100,
+        "column": 3,
+        "message": "React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+        "line": 130,
+        "column": 3,
+        "message": "React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "severity": 2
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\notifications\\NotificationCenter.tsx",
+        "line": 8,
+        "column": 3,
+        "message": "'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\notifications\\NotificationCenter.tsx",
+        "line": 16,
+        "column": 3,
+        "message": "'Phone' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\notifications\\NotificationCenter.tsx",
+        "line": 18,
+        "column": 3,
+        "message": "'Filter' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\OptimizedChart.tsx",
+        "line": 215,
+        "column": 16,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MoodTracker.tsx",
+        "line": 1,
+        "column": 40,
+        "message": "'useEffect' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MoodTracker.tsx",
+        "line": 2,
+        "column": 10,
+        "message": "'Slider' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\WellnessDashboard.tsx",
+        "line": 364,
+        "column": 7,
+        "message": "'factors' is assigned a value but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAIInsights.ts",
+        "line": 718,
+        "column": 3,
+        "message": "'patterns' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAITherapist.ts",
+        "line": 457,
+        "column": 83,
+        "message": "'word' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 32,
+        "column": 62,
+        "message": "'properties' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 46,
+        "column": 97,
+        "message": "'label' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+        "line": 53,
+        "column": 84,
+        "message": "'value' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useConsoleNavigation.ts",
+        "line": 195,
+        "column": 16,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\fieldEncryption.ts",
+        "line": 629,
+        "column": 5,
+        "message": "'userId' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\EnhancedWebSocketService.ts",
+        "line": 441,
+        "column": 32,
+        "message": "'room' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\performance\\bundle-optimization.test.ts",
+        "line": 230,
+        "column": 19,
+        "message": "'name' is assigned a value but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\performance\\performance.test.ts",
+        "line": 322,
+        "column": 24,
+        "message": "'time' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\test\\performance\\performance.test.ts",
+        "line": 388,
+        "column": 56,
+        "message": "'b' is defined but never used. Allowed unused args must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\concurrentFeatures.tsx",
+        "line": 267,
+        "column": 10,
+        "message": "'isPending' is assigned a value but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\index.ts",
+        "line": 9,
+        "column": 3,
+        "message": "'memoryMonitor' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\index.ts",
+        "line": 10,
+        "column": 3,
+        "message": "'frameRateMonitor' is defined but never used. Allowed unused vars must match /^_/u.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 71,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 152,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 179,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 208,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 271,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+        "line": 403,
+        "column": 14,
+        "message": "'_error' is defined but never used.",
+        "severity": 2
+      }
+    ],
+    "react/display-name": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\performance\\VirtualizedList.tsx",
+        "line": 68,
+        "column": 24,
+        "message": "Component definition is missing display name",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAuth.test.tsx",
+        "line": 28,
+        "column": 10,
+        "message": "Component definition is missing display name",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\middleware\\securityMiddleware.tsx",
+        "line": 258,
+        "column": 10,
+        "message": "Component definition is missing display name",
+        "severity": 2
+      }
+    ],
+    "jsx-a11y/label-has-associated-control": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\professional\\MedicationSmartReminders.tsx",
+        "line": 619,
+        "column": 23,
+        "message": "A form label must have accessible text.",
+        "severity": 2
+      }
+    ],
+    "jsx-a11y/media-has-caption": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\professional\\TherapistProfile.tsx",
+        "line": 481,
+        "column": 25,
+        "message": "Media elements such as <audio> and <video> must have a <track> for captions.",
+        "severity": 2
+      }
+    ],
+    "jsx-a11y/no-redundant-roles": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MoodTracker.tsx",
+        "line": 269,
+        "column": 9,
+        "message": "The element input has an implicit role of slider. Defining this explicitly is redundant and should be avoided.",
+        "severity": 2
+      }
+    ],
+    "react/no-unknown-property": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MoodTracker.tsx",
+        "line": 404,
+        "column": 18,
+        "message": "Unknown property '_data-testid' found",
+        "severity": 2
+      }
+    ],
+    "no-constant-condition": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useMobileFeatures.ts",
+        "line": 114,
+        "column": 13,
+        "message": "Unexpected constant condition.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\securityMonitor.ts",
+        "line": 351,
+        "column": 36,
+        "message": "Unexpected constant condition.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\crisis.ts",
+        "line": 185,
+        "column": 39,
+        "message": "Unexpected constant condition.",
+        "severity": 2
+      }
+    ],
+    "no-cond-assign": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\accessibility\\AdvancedAccessibilityService.ts",
+        "line": 497,
+        "column": 12,
+        "message": "Expected a conditional expression and instead saw an assignment.",
+        "severity": 2
+      }
+    ],
+    "no-case-declarations": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\api\\secureApi.ts",
+        "line": 389,
+        "column": 11,
+        "message": "Unexpected lexical declaration in case block.",
+        "severity": 2
+      }
+    ],
+    "@typescript-eslint/no-unsafe-function-type": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\crisis\\MockWebSocketAdapter.ts",
+        "line": 12,
+        "column": 42,
+        "message": "The `Function` type accepts any function-like value.\nPrefer explicitly defining any function parameters and return type.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\realtime\\websocketService.ts",
+        "line": 58,
+        "column": 42,
+        "message": "The `Function` type accepts any function-like value.\nPrefer explicitly defining any function parameters and return type.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\EnhancedWebSocketService.ts",
+        "line": 270,
+        "column": 42,
+        "message": "The `Function` type accepts any function-like value.\nPrefer explicitly defining any function parameters and return type.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\websocket\\WebSocketService.ts",
+        "line": 112,
+        "column": 42,
+        "message": "The `Function` type accepts any function-like value.\nPrefer explicitly defining any function parameters and return type.",
+        "severity": 2
+      }
+    ],
+    "no-prototype-builtins": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 130,
+        "column": 18,
+        "message": "Do not access Object.prototype method 'hasOwnProperty' from target object.",
+        "severity": 2
+      }
+    ],
+    "no-import-assign": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+        "line": 387,
+        "column": 14,
+        "message": "'logger' is read-only.",
+        "severity": 2
+      }
+    ],
+    "no-unreachable": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 631,
+        "column": 13,
+        "message": "Unreachable code.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+        "line": 722,
+        "column": 13,
+        "message": "Unreachable code.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\HIPAAComplianceService.ts",
+        "line": 678,
+        "column": 13,
+        "message": "Unreachable code.",
+        "severity": 2
+      }
+    ],
+    "no-useless-escape": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\pushNotifications.ts",
+        "line": 116,
+        "column": 17,
+        "message": "Unnecessary escape character: \\-.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\rateLimiter.ts",
+        "line": 510,
+        "column": 24,
+        "message": "Unnecessary escape character: \\/.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\rateLimiter.ts",
+        "line": 510,
+        "column": 35,
+        "message": "Unnecessary escape character: \\/.",
+        "severity": 2
+      },
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\rateLimiter.ts",
+        "line": 510,
+        "column": 45,
+        "message": "Unnecessary escape character: \\/.",
+        "severity": 2
+      }
+    ],
+    "@typescript-eslint/no-this-alias": [
+      {
+        "file": "H:\\Astral Core\\CoreV4\\src\\utils\\performance\\MemoryLeakPrevention.ts",
+        "line": 382,
+        "column": 5,
+        "message": "Unexpected aliasing of 'this' to local variable.",
+        "severity": 2
+      }
+    ]
+  },
+  "criticalFiles": [
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\utils\\pwa\\pwaManager.ts",
+      "errors": 6,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\components\\wellness\\MoodTracker.tsx",
+      "errors": 4,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+      "errors": 3,
+      "warnings": 1
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\components\\notifications\\NotificationCenter.tsx",
+      "errors": 3,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\hooks\\useAnalytics.ts",
+      "errors": 3,
+      "warnings": 5
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\services\\logging\\logger.ts",
+      "errors": 3,
+      "warnings": 5
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\services\\security\\rateLimiter.ts",
+      "errors": 3,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\CrisisInterventionSystem.tsx",
+      "errors": 2,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\components\\crisis\\EmergencyContacts.tsx",
+      "errors": 2,
+      "warnings": 0
+    },
+    {
+      "file": "H:\\Astral Core\\CoreV4\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+      "errors": 2,
+      "warnings": 7
+    }
+  ]
+}

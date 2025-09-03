@@ -82,6 +82,8 @@ export function VirtualizedList<T>({
     );
   });
 
+  ItemRenderer.displayName = 'ItemRenderer';
+
   // Handle scroll with throttling for performance
   const __handleScroll   = useCallback(({ scrollOffset, _scrollDirection }: unknown) => {
     // Cancel previous frame
@@ -176,7 +178,8 @@ export function VirtualizedList<T>({
 /**
  * Optimized post list item component
  */
-export const VirtualizedPostItem = memo(({ 
+export const VirtualizedPostItem = memo(
+({ 
   post, 
   style,
   onLike,

@@ -90,7 +90,7 @@ export function RealTimeCrisisChat() {
       disconnectFromChat();
     };
      
-  }, []);
+  }, [initializeCrisisChat]);
 
   // Auto-scroll to latest message
   useEffect(() => {

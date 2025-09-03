@@ -300,6 +300,8 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
 
         {/* Handle spacebar skip */}
         <div
+          role="button"
+          aria-label="Press spacebar to skip"
           className="fixed inset-0 z-0"
           onKeyDown={(e) => {
             if (e.code === 'Space' && showSkip) {

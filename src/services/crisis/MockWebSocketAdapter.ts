@@ -9,7 +9,7 @@ import { logger } from '../../utils/logger';
 // Mock WebSocket Adapter that mimics the real WebSocketService interface
 export class MockWebSocketAdapter {
   private static instance: MockWebSocketAdapter;
-  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private eventHandlers: Map<string, Set<(...args: any[]) => void>> = new Map();
   private isConnected: boolean = false;
   private currentUserId: string | null = null;
   private activeSessions: Map<string, MockCrisisSession> = new Map();

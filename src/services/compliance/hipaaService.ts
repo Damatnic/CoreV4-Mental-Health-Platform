@@ -211,14 +211,14 @@ class HIPAAComplianceService {
       });
 
       return accessControl;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'SYSTEM_ERROR',
         _userId: params._userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
           _context: 'PHI access request',
-        } })(),
+        },
         severity: 'error',
       });
       throw error;
@@ -262,7 +262,7 @@ class HIPAAComplianceService {
       });
 
       return disclosure;
-    } catch {
+    } catch (_error) {
       logger.error('Failed to record PHI disclosure:');
       throw undefined;
     }
@@ -330,7 +330,7 @@ class HIPAAComplianceService {
         violations,
         recommendations,
       };
-    } catch {
+    } catch (_error) {
       logger.error('PHI validation error: ');
       return {
         compliant: false,
@@ -380,7 +380,7 @@ class HIPAAComplianceService {
       this.initiateBreachResponse(breach);
 
       return breach;
-    } catch {
+    } catch (_error) {
       logger.error('Failed to report breach:');
       throw undefined;
     }
@@ -407,7 +407,7 @@ class HIPAAComplianceService {
       const disclosures = await this.getDisclosures(patientId, startDate, endDate);
 
       return [...logs, ...disclosures];
-    } catch {
+    } catch (_error) {
       logger.error('Failed to get PHI access log:');
       return [];
     }
@@ -504,7 +504,7 @@ class HIPAAComplianceService {
         findings,
         recommendations,
       };
-    } catch {
+    } catch (_error) {
       logger.error('Risk assessment failed:');
       return {
         overallRisk: 'high',

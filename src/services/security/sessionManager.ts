@@ -213,13 +213,13 @@ class SessionManagerService {
       });
 
       return session;
-    } catch {
+    } catch (error) {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
         _userId: params._userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
-        } })(),
+        },
         severity: 'warning',
       });
       throw error;
@@ -360,7 +360,7 @@ class SessionManagerService {
         isValid: true,
         riskScore,
       };
-    } catch {
+    } catch (_error) {
       logger.error('Session validation error: ');
       return {
         isValid: false,
@@ -735,7 +735,7 @@ class SessionManagerService {
           }
         }
       }
-    } catch {
+    } catch (_error) {
       logger.error('Failed to load sessions:');
     }
   }
@@ -753,7 +753,7 @@ class SessionManagerService {
         encrypted: true,
         expires: new Date(Date.now() + 24 * 3600000), // 24 hours
       });
-    } catch {
+    } catch (_error) {
       logger.error('Failed to persist sessions:');
     }
   }

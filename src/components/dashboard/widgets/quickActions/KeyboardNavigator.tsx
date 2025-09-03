@@ -146,7 +146,7 @@ export function KeyboardNavigator({
         }
         break;
     }
-  }, [isActive, actions, focusedIndex, onActionSelect, onKeyPress]);
+  }, [isActive, actions, focusedIndex, onActionSelect, onKeyPress, handleTypeAheadSearch, keyboardShortcuts, navigateDown, navigateLeft, navigateRight,]);
 
   // Grid navigation helpers
   const navigateDown = () => {

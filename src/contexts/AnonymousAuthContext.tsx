@@ -339,7 +339,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         document.removeEventListener(event, handleActivity);
       });
     };
-  }, []);
+  }, [cleanupStaleData]);
   
   // Save user to secure storage whenever it changes
   useEffect(() => {

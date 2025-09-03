@@ -427,7 +427,7 @@ export function PerformanceDashboard() {
           
           <div className="text-center">
             <div className="text-2xl font-bold text-red-700">
-              <100ms
+              &lt;100ms
             </div>
             <div className="text-sm text-red-600">Safety Plan</div>
             <div className="text-xs text-red-500 mt-1">

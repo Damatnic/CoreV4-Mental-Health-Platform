@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { render, screen, _within } from '@testing-library/react';
+import { axe, _toHaveNoViolations } from 'jest-axe';
 import userEvent from '@testing-library/user-event';
 import CrisisButton from '../../components/crisis/CrisisButton';
 import MoodTracker from '../../components/wellness/MoodTracker';
@@ -39,7 +39,7 @@ describe('Crisis Intervention Accessibility', () => {
 
   describe('WCAG 2.1 AA Compliance', () => {
     it('crisis button should have no accessibility violations', async () => {
-      const { container } = render(
+      const { _container } = render(
         <TestWrapper>
           <CrisisButton />
         </TestWrapper>
@@ -50,7 +50,7 @@ describe('Crisis Intervention Accessibility', () => {
     });
 
     it('mood tracker should have no accessibility violations', async () => {
-      const { container } = render(
+      const { _container } = render(
         <TestWrapper>
           <MoodTracker />
         </TestWrapper>
@@ -63,13 +63,13 @@ describe('Crisis Intervention Accessibility', () => {
     it('crisis modal should have no accessibility violations when open', async () => {
       const user = userEvent.setup();
       
-      const { container } = render(
+      const { _container } = render(
         <TestWrapper>
           <CrisisButton />
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       // Wait for modal to open
@@ -106,7 +106,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       const _alertRegion = await screen.findByRole('alert');
@@ -121,7 +121,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
+      const _slider = screen.getByRole('_slider');
       
       expect(_slider).toHaveAttribute('aria-label');
       expect(_slider).toHaveAttribute('aria-valuemin', '1');
@@ -173,7 +173,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       const modal = await screen.findByRole('dialog');
@@ -197,7 +197,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       await screen.findByRole('dialog');
@@ -218,7 +218,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // Tab to slider
       await user.tab();
-      const slider = screen.getByRole('slider');
+      const _slider = screen.getByRole('_slider');
       expect(document.activeElement).toBe(_slider);
       
       // Adjust with arrow keys
@@ -235,7 +235,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // Tab to submit button
       await user.tab();
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       expect(document.activeElement).toBe(_submitButton);
     });
   });
@@ -344,7 +344,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       // Check for clear, simple instructions
@@ -368,7 +368,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       await user.click(_submitButton);
       
       const errorMessage = await screen.findByText(/failed.*try again/i);
@@ -435,7 +435,7 @@ describe('Crisis Intervention Accessibility', () => {
       // Render without authentication context
       render(<CrisisButton />);
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       // Crisis resources should still be accessible
@@ -451,7 +451,7 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const button = screen.getByRole('button', { name: /crisis help/i });
+      const _button = screen.getByRole('_button', { name: /crisis help/i });
       await user.click(_button);
       
       const images = screen.getAllByRole('img');

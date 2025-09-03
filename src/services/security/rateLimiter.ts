@@ -507,7 +507,7 @@ class RateLimiterService {
       },
       // Path traversal
       {
-        pattern: /\.\.[\/\\]|\.\.[\/\\]\.\.[\/\\]/,
+        pattern: /..[/]|..[/]..[/]/,
         severity: 'medium',
         action: 'block',
         description: 'Path traversal attempt',

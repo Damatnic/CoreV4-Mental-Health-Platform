@@ -46,10 +46,10 @@ const CRISIS_LEVELS: Record<string, CrisisLevel> = {
 
 export function CrisisInterventionSystem() {
   const [currentCrisisLevel, setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
-  const [__showEmergencyDialog, setShowEmergencyDialog] = useState(false);
-  const [userLocation, _setUserLocation] = useState<GeolocationPosition | null>(null);
-  const [activeTab, _setActiveTab] = useState<'assessment' | 'resources' | 'safety' | 'chat'>('assessment');
-  const [responseTime, _setResponseTime] = useState(0);
+  const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
+  const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
+  const [activeTab, setActiveTab] = useState<'assessment' | 'resources' | 'safety' | 'chat'>('assessment');
+  const [responseTime, setResponseTime] = useState(0);
 
   // Track response time for critical features
   useEffect(() => {
@@ -96,7 +96,7 @@ export function CrisisInterventionSystem() {
   }, [responseTime, trackCrisisInteraction]);
 
   // Crisis text line handler
-  const _handleCrisisText  = useCallback((number: string, keyword: string) => {
+  const handleCrisisText = useCallback((number: string, keyword: string) => {
     // Open SMS app with pre-filled message
     const smsUrl = `sms:${number}?body=${encodeURIComponent(keyword)}`;
     window.location.href = smsUrl;
@@ -180,7 +180,7 @@ export function CrisisInterventionSystem() {
                   Current Status: {currentCrisisLevel.description}
                 </h2>
                 <p className={`mt-2 ${currentCrisisLevel.color}`}>
-                  We're here to help. You're not alone in this.
+                  We&apos;re here to help. You&apos;re not alone in this.
                 </p>
               </div>
               <Heart className={`h-12 w-12 ${currentCrisisLevel.color}`} />
@@ -273,7 +273,7 @@ export function CrisisInterventionSystem() {
 
 // Crisis Assessment Component
 function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (_responses: Record<string, number>) => void }) {
-  const [_responses, _setResponses] = useState<Record<string, number>>({});
+  const [_responses, setResponses] = useState<Record<string, number>>({});
   
   const questions = [
     { id: 'safety', text: 'Do you feel safe right now?', inverse: true },
@@ -356,7 +356,12 @@ function EmergencyDialog({ onClose }: { onClose: () => void }) {
         <div 
           className="fixed inset-0 bg-black opacity-75" 
           onClick={onClose}
-          onKeyDown={(e) = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClose(e); } }} role="button" tabIndex={0}> e.key === 'Escape' && onClose()}
+          onKeyDown={(e) => { 
+            if (e.key === "Enter" || e.key === " " || e.key === "Escape") { 
+              e.preventDefault(); 
+              onClose(); 
+            }
+          }}
           role="button"
           tabIndex={0}
           aria-label="Close dialog"

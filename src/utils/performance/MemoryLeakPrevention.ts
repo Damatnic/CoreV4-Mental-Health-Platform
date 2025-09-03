@@ -379,6 +379,7 @@ export function createDebouncedFunction<T extends (...args: unknown[]) => any>(
     const _isInvoking = shouldInvoke(_time);
     
     lastArgs = args;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     lastThis = this;
     lastCallTime = _time;
     

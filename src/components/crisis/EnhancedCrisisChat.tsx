@@ -573,7 +573,7 @@ export function EnhancedCrisisChat() {
               <h3 className="text-lg font-semibold text-gray-900">Immediate Support Available</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Based on what you've shared, I want to make sure you get the best support possible. 
+              Based on what you&apos;ve shared, I want to make sure you get the best support possible. 
               Would you like to speak with someone on the phone right now?
             </p>
             <div className="space-y-3">
@@ -593,7 +593,7 @@ export function EnhancedCrisisChat() {
                 onClick={() => handleEmergencyResponse('dismiss')}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                I'm Okay For Now
+                I&apos;m Okay For Now
               </button>
             </div>
           </div>

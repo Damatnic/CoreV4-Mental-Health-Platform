@@ -69,9 +69,9 @@ export class PWAManager {
       logger.info(`PWA _initialized successfully in ${initTime?.toFixed(2)}ms`);
       
     } catch (_error) {
-      logger.error('Failed to initialize PWA:');
-      performanceMonitor.recordMetric('pwa_init_error', 1, { undefined: String(_undefined) });
-      throw error;
+      logger.error('Failed to initialize PWA:', _error);
+      performanceMonitor.recordMetric('pwa_init_error', 1, { error: String(_error) });
+      throw _error;
     }
   }
 
@@ -79,14 +79,14 @@ export class PWAManager {
    * Detect PWA capabilities
    */
   private async detectCapabilities(): Promise<PWACapabilities> {
-    const _userAgent = navigator._userAgent.toLowerCase();
+    const userAgent = navigator.userAgent.toLowerCase();
     const connection = (navigator as unknown).connection || {};
     
     // Device type detection
     let deviceType: 'mobile' | 'tablet' | 'desktop' = 'desktop';
-    if (/mobile|phone|android|iphone/.test(_userAgent)) {
+    if (/mobile|phone|android|iphone/.test(userAgent)) {
       deviceType = 'mobile';
-    } else if (/tablet|ipad/.test(_userAgent)) {
+    } else if (/tablet|ipad/.test(userAgent)) {
       deviceType = 'tablet';
     }
 
@@ -145,13 +145,13 @@ export class PWAManager {
       });
 
       // Listen for service worker messages
-      navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerMessage.bind(_this));
+      navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerMessage.bind(this));
 
       performanceMonitor.recordMetric('service_worker_registered', 1);
 
     } catch (_error) {
-      logger.error('Service Worker registration failed:');
-      performanceMonitor.recordMetric('service_worker_error', 1, { undefined: String(_undefined) });
+      logger.error('Service Worker registration failed:', _error);
+      performanceMonitor.recordMetric('service_worker_error', 1, { error: String(_error) });
     }
   }
 
@@ -177,8 +177,8 @@ export class PWAManager {
         performanceMonitor.recordMetric('push_notifications_initialized', 1);
       }
     } catch (_error) {
-      logger.error('Push notifications initialization failed:');
-      performanceMonitor.recordMetric('push_notifications_error', 1, { undefined: String(_undefined) });
+      logger.error('Push notifications initialization failed:', _error);
+      performanceMonitor.recordMetric('push_notifications_error', 1, { error: String(_error) });
     }
   }
 
@@ -206,8 +206,8 @@ export class PWAManager {
       performanceMonitor.recordMetric('offline_support_initialized', 1);
       
     } catch (_error) {
-      logger.error('Offline support initialization failed:');
-      performanceMonitor.recordMetric('offline_support_error', 1, { undefined: String(_undefined) });
+      logger.error('Offline support initialization failed:', _error);
+      performanceMonitor.recordMetric('offline_support_error', 1, { error: String(_error) });
     }
   }
 
@@ -269,8 +269,8 @@ export class PWAManager {
       performanceMonitor.recordMetric('performance_optimizations_initialized', 1);
       
     } catch (_error) {
-      logger.error('Performance optimizations failed:');
-      performanceMonitor.recordMetric('performance_optimizations_error', 1);
+      logger.error('Performance optimizations failed:', _error);
+      performanceMonitor.recordMetric('performance_optimizations_error', 1, { error: String(_error) });
     }
   }
 
@@ -401,8 +401,8 @@ export class PWAManager {
       return choice.outcome === 'accepted';
       
     } catch (_error) {
-      logger.error('Install failed:');
-      performanceMonitor.recordMetric('install_error', 1, { undefined: String(_undefined) });
+      logger.error('Install failed:', _error);
+      performanceMonitor.recordMetric('install_error', 1, { error: String(_error) });
       return false;
     }
   }

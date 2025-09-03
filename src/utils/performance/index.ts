@@ -6,8 +6,8 @@
 // Import for internal use
 import {
   performanceMonitor,
-  memoryMonitor,
-  frameRateMonitor,
+  _memoryMonitor,
+  _frameRateMonitor,
 } from './performanceMonitor';
 
 import {
@@ -24,8 +24,8 @@ import { logger } from '../logger';
 // Performance monitoring
 export {
   performanceMonitor,
-  memoryMonitor,
-  frameRateMonitor,
+  _memoryMonitor,
+  _frameRateMonitor,
   PERFORMANCE_THRESHOLDS,
 } from './performanceMonitor';
 

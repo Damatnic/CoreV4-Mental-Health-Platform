@@ -1,9 +1,10 @@
 // Performance and Load Testing Suite
 // Ensures the mental health platform meets performance requirements under various conditions
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, _beforeEach, _afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { performance } from 'perf_hooks';
+import App from '../../App';
 
 // Performance thresholds
 const PERFORMANCE_THRESHOLDS = {
@@ -55,7 +56,7 @@ describe('Performance Testing', () => {
     it('should display crisis intervention UI within 200ms', async () => {
       render(<App />);
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         testUtils.triggerCrisis();
         await screen.findByRole('button', { name: /988/i });
       });
@@ -72,7 +73,7 @@ describe('Performance Testing', () => {
       
       render(<App />);
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         testUtils.triggerCrisis();
         await screen.findByTestId('safety-plan');
       });
@@ -84,9 +85,9 @@ describe('Performance Testing', () => {
       render(<App />);
       testUtils.triggerCrisis();
       
-      const chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
+      const _chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         fireEvent.click(_chatButton);
         await screen.findByText(/connecting/i);
       });
@@ -97,7 +98,7 @@ describe('Performance Testing', () => {
   
   describe('Page Load Performance', () => {
     it('should complete initial page load within 3 seconds', async () => {
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         render(<App />);
         await screen.findByRole('navigation');
         await screen.findByRole('main');
@@ -107,7 +108,7 @@ describe('Performance Testing', () => {
     });
     
     it('should progressively load non-critical content', async () => {
-      const { container } = render(<App />);
+      const { _container } = render(<App />);
       
       // Critical content should load immediately
       const _criticalLoadTime = await measurePerformance(async () => {
@@ -128,7 +129,7 @@ describe('Performance Testing', () => {
     });
     
     it('should implement code splitting effectively', async () => {
-      const { container } = render(<App />);
+      const { _container } = render(<App />);
       
       // Check initial bundle size
       const scripts = Array.from(document.querySelectorAll('script'));
@@ -154,8 +155,8 @@ describe('Performance Testing', () => {
       
       const buttons = await screen.findAllByRole('button');
       
-      for (const button of buttons.slice(0, 5)) { // Test first 5 buttons
-        const duration = await measurePerformance(() => {
+      for (const _button of buttons.slice(0, 5)) { // Test first 5 buttons
+        const _duration = await measurePerformance(() => {
           fireEvent.click(_button);
         });
         
@@ -175,7 +176,7 @@ describe('Performance Testing', () => {
       });
       
       // Average time per keystroke
-      const avgTime = duration / 10;
+      const _avgTime = duration / 10;
       expect(_avgTime).toBeLessThan(50); // Should handle at least 20 keystrokes per second
     });
     
@@ -249,7 +250,7 @@ describe('Performance Testing', () => {
       
       localStorage.setItem('mood_history', JSON.stringify(_moodEntries));
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         render(<App />);
         const _historyButton = await screen.findByRole('button', { name: /mood.*history/i });
         fireEvent.click(_historyButton);
@@ -279,7 +280,7 @@ describe('Performance Testing', () => {
       
       // Interact with the app
       const buttons = await screen.findAllByRole('button');
-      buttons.forEach(button => fireEvent.click(_button));
+      buttons.forEach(_button => fireEvent.click(_button));
       
       // Unmount
       unmount();
@@ -335,7 +336,7 @@ describe('Performance Testing', () => {
     it('should batch API requests efficiently', async () => {
       const apiCalls: string[] = [];
       
-      global.fetch = vi.fn((url: string) => {
+      global.fetch = vi.fn((_url: string) => {
         apiCalls.push(_url);
         return Promise.resolve({
           ok: true,
@@ -347,7 +348,7 @@ describe('Performance Testing', () => {
       
       // Trigger multiple data needs
       const _wellnessButton = await screen.findByRole('button', { name: /wellness/i });
-      const moodButton = await screen.findByRole('button', { name: /mood/i });
+      const _moodButton = await screen.findByRole('button', { name: /mood/i });
       const _journalButton = await screen.findByRole('button', { name: /journal/i });
       
       fireEvent.click(_wellnessButton);
@@ -371,7 +372,7 @@ describe('Performance Testing', () => {
       
       const frameRates: number[] = [];
       let lastTime = performance.now();
-      let frameCount = 0;
+      const _frameCount = 0;
       
       const _measureFPS = () => {
         frameCount++;
@@ -409,7 +410,7 @@ describe('Performance Testing', () => {
       
       const animatedElements = container.querySelectorAll('[data-animated], .transition');
       
-      animatedElements.forEach(element => {
+      animatedElements.forEach(_element => {
         const styles = window.getComputedStyle(_element);
         const transition = styles.transition;
         
@@ -431,14 +432,14 @@ describe('Performance Testing', () => {
         
         // Simulate user actions
         const buttons = container.querySelectorAll('button');
-        buttons.forEach(button => fireEvent.click(_button));
+        buttons.forEach(_button => fireEvent.click(_button));
         
         return container;
       });
       
       const start = performance.now();
       const containers = await Promise.all(_userSimulations);
-      const duration = performance.now() - start;
+      const _duration = performance.now() - start;
       
       // Should handle 10 concurrent users efficiently
       expect(_duration).toBeLessThan(5000);
@@ -452,9 +453,9 @@ describe('Performance Testing', () => {
     it('should handle rapid user interactions', async () => {
       render(<App />);
       
-      const moodButton = await screen.findByRole('button', { name: /track.*mood/i });
+      const _moodButton = await screen.findByRole('button', { name: /track.*mood/i });
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         // Simulate rapid clicking (stress test)
         for (let i = 0; i < 50; i++) {
           fireEvent.click(_moodButton);
@@ -479,7 +480,7 @@ describe('Performance Testing', () => {
       
       localStorage.setItem('community_posts', JSON.stringify(_largeDataset));
       
-      const duration = await measurePerformance(async () => {
+      const _duration = await measurePerformance(async () => {
         render(<App />);
         const _communityLink = await screen.findByRole('link', { name: /community/i });
         fireEvent.click(_communityLink);
@@ -499,7 +500,7 @@ describe('Performance Testing', () => {
       render(<App />);
       
       // Open chat
-      const chatButton = await screen.findByRole('button', { name: /chat/i });
+      const _chatButton = await screen.findByRole('button', { name: /chat/i });
       fireEvent.click(_chatButton);
       
       const chatInput = await screen.findByRole('textbox', { name: /message/i });
@@ -517,7 +518,7 @@ describe('Performance Testing', () => {
       }
       
       // Average message handling time
-      const avgTime = messages.reduce((a, b) => a + b) / messages.length;
+      const _avgTime = messages.reduce((a, b) => a + b) / messages.length;
       expect(_avgTime).toBeLessThan(100);
     });
     
@@ -577,7 +578,7 @@ describe('Performance Testing', () => {
         expect(img.getAttribute('loading')).toBe('lazy');
         
         // Should use appropriate image formats
-        const src = img.getAttribute('src');
+        const _src = img.getAttribute('_src');
         expect(_src).toMatch(/\.(webp|jpg|png|svg)$/);
       });
     });
@@ -585,7 +586,7 @@ describe('Performance Testing', () => {
   
   describe('Performance Monitoring', () => {
     it('should track and report performance metrics', async () => {
-      const metrics: unknown[] = [];
+      const _metrics: unknown[] = [];
       
       // Mock performance observer
       global.PerformanceObserver = vi.fn().mockImplementation((_callback) => ({

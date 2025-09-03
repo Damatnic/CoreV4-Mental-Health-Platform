@@ -51,7 +51,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   useEffect(() => {
     initializeSecurity();
     return () => cleanupSecurity();
-  }, []);
+  }, [initializeSecurity]);
   
   // Check authentication status from authService
   useEffect(() => {
@@ -255,7 +255,7 @@ export const _withSecurity = <P extends object>(
   Component: React.ComponentType<P>,
   requiredLevel: 'basic' | 'elevated' | 'maximum' = 'basic'
 ) => {
-  return (props: P) => {
+  const SecuredComponent = (props: P) => {
     const security = useSecurityContext();
     
     if (!security.isSecure) {
@@ -280,6 +280,9 @@ export const _withSecurity = <P extends object>(
     
     return <Component {...props} />;
   };
+  
+  SecuredComponent.displayName = `withSecurity(${Component.displayName || Component.name || 'Component'})`;
+  return SecuredComponent;
 };
 
 // Utility components

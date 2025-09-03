@@ -190,7 +190,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
     ];
 
     return metrics;
-  }, [wellnessMetrics, moodEntries]);
+  }, [wellnessMetrics, moodEntries, calculateStreak]);
 
   // Calculate trend for a metric
   function calculateTrend(metricId: string, currentValue: number): number {

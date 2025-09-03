@@ -105,7 +105,7 @@ router.post('/assessment', crisisAssessmentValidation, async (req: Request, res:
       message: 'Crisis assessment completed'
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'assessment_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -146,7 +146,7 @@ router.get('/assessment/latest', async (req: Request, res: Response, next: NextF
       }
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'assessment_retrieval_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -193,7 +193,7 @@ router.post('/safety-plan', safetyPlanValidation, async (req: Request, res: Resp
       message: 'Safety plan saved successfully'
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'safety_plan_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -238,7 +238,7 @@ router.get('/safety-plan', async (req: Request, res: Response, next: NextFunctio
       }
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'safety_plan_retrieval_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -284,7 +284,7 @@ router.post('/emergency-contact', emergencyContactValidation, async (req: Reques
       message: 'Emergency contact added successfully'
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'emergency_contact_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -320,7 +320,7 @@ router.get('/emergency-contacts', async (req: Request, res: Response, next: Next
       }))
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'emergency_contacts_retrieval_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -360,7 +360,7 @@ router.post('/chat', async (req: Request, res: Response, next: NextFunction) => 
       message: 'Crisis chat session started'
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'chat_session_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -406,7 +406,7 @@ router.get('/resources', async (req: Request, res: Response, next: NextFunction)
       }))
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'resources_retrieval_error', {
       userId: req.user?.id,
       error: 'Processing error'
@@ -450,7 +450,7 @@ router.post('/panic-button', async (req: Request, res: Response, next: NextFunct
       message: 'Emergency response activated'
     });
 
-  } catch (_error) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (_error)   {
     await audit.logEvent(req.ip, 'crisis', 'panic_button_error', {
       userId: req.user?.id,
       error: 'Processing error'

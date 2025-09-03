@@ -15,7 +15,7 @@ import {
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 import { _detectCrisisLevel } from '../../utils/crisis';
 
-interface SafetyPlanSection {
+interface _SafetyPlanSection {
   id: string;
   title: string;
   icon: React.ElementType;
@@ -376,7 +376,7 @@ export const SafetyPlanGenerator: React.FC = () => {
       {/* Safety Plan Sections */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Warning Signals */}
-        <SafetyPlanSection
+        <SafetyPlanSectionComponent
           title="Warning Signals"
           subtitle="Early signs that I need to use my safety plan"
           icon={AlertTriangle}
@@ -390,7 +390,7 @@ export const SafetyPlanGenerator: React.FC = () => {
         />
 
         {/* Coping Strategies */}
-        <SafetyPlanSection
+        <SafetyPlanSectionComponent
           title="Coping Strategies"
           subtitle="Things I can do on my own to feel better"
           icon={Brain}
@@ -404,7 +404,7 @@ export const SafetyPlanGenerator: React.FC = () => {
         />
 
         {/* Distraction Techniques */}
-        <SafetyPlanSection
+        <SafetyPlanSectionComponent
           title="Distraction Techniques"
           subtitle="Activities to shift my focus"
           icon={Activity}
@@ -418,7 +418,7 @@ export const SafetyPlanGenerator: React.FC = () => {
         />
 
         {/* Reasons to Live */}
-        <SafetyPlanSection
+        <SafetyPlanSectionComponent
           title="Reasons to Live"
           subtitle="What makes life worth living for me"
           icon={Heart}
@@ -482,7 +482,8 @@ interface SafetyPlanSectionProps {
   color: string;
 }
 
-const SafetyPlanSection: React.FC<SafetyPlanSectionProps> = ({
+// Component renamed to avoid conflict with interface
+const SafetyPlanSectionComponent: React.FC<SafetyPlanSectionProps> = ({
   title,
   subtitle,
   icon: Icon,

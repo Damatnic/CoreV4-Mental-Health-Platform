@@ -261,10 +261,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Privacy Settings</h3>
               
-              <label className="flex items-center space-x-3">
+              <label htmlFor="private-group-checkbox" className="flex items-center space-x-3">
                 <input
                   id="private-group-checkbox"
                   type="checkbox"
+                  aria-label="Private Group"
                   checked={formData.isPrivate}
                   onChange={(e) => setFormData(prev => ({ ...prev, isPrivate: e.target.checked }))}
                   className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
@@ -275,10 +276,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="require-approval-checkbox" className="flex items-center space-x-3">
                 <input
                   id="require-approval-checkbox"
                   type="checkbox"
+                  aria-label="Require Approval"
                   checked={formData.requiresApproval}
                   onChange={(e) => setFormData(prev => ({ ...prev, requiresApproval: e.target.checked }))}
                   className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
@@ -294,10 +296,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-sm font-medium text-gray-900">Group Features</h3>
               
-              <label className="flex items-center space-x-3">
+              <label htmlFor="allow-anonymous-checkbox" className="flex items-center space-x-3">
                 <input
                   id="allow-anonymous-checkbox"
                   type="checkbox"
+                  aria-label="Allow Anonymous Posts"
                   checked={formData.settings?.allowAnonymous}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -311,10 +314,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="auto-moderation-checkbox" className="flex items-center space-x-3">
                 <input
                   id="auto-moderation-checkbox"
                   type="checkbox"
+                  aria-label="Auto-Moderation"
                   checked={formData.settings?.autoModeration}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -328,10 +332,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="crisis-support-checkbox" className="flex items-center space-x-3">
                 <input
                   id="crisis-support-checkbox"
                   type="checkbox"
+                  aria-label="Crisis Support Integration"
                   checked={formData.settings?.crisisSupport}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -345,10 +350,11 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3">
+              <label htmlFor="peer-support-checkbox" className="flex items-center space-x-3">
                 <input
                   id="peer-support-checkbox"
                   type="checkbox"
+                  aria-label="Peer Support Program"
                   checked={formData.settings?.peerSupport}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,

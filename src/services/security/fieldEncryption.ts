@@ -170,7 +170,7 @@ class FieldEncryptionService {
   async encryptField(
     _fieldName: string,
     value: unknown,
-    userId?: string
+    _userId?: string
   ): Promise<EncryptedField | any> {
     try {
       const config = FIELD_CONFIGS[_fieldName];
@@ -209,14 +209,14 @@ class FieldEncryptionService {
 
       // Handle searchable fields
       if (config.searchable) {
-        await this.updateSearchIndex(_fieldName, value, encrypted, userId);
+        await this.updateSearchIndex(_fieldName, value, encrypted, _userId);
       }
 
       // Audit sensitive field encryption
       if (config.sensitivity === 'critical') {
         await auditLogger.log({
           event: 'PHI_MODIFICATION',
-          userId,
+          _userId,
           details: {
             action: 'field_encrypted',
             _fieldName,
@@ -239,7 +239,7 @@ class FieldEncryptionService {
   async decryptField(
     _fieldName: string,
     encryptedData: EncryptedField | string,
-    userId?: string
+    _userId?: string
   ): Promise<unknown> {
     try {
       const config = FIELD_CONFIGS[_fieldName];
@@ -267,7 +267,7 @@ class FieldEncryptionService {
         if (config.sensitivity === 'critical') {
           await auditLogger.log({
             event: 'PHI_ACCESS',
-            userId,
+            _userId,
             details: {
               action: 'field_decrypted',
               _fieldName,
@@ -293,14 +293,14 @@ class FieldEncryptionService {
   async encryptObject(
     obj: Record<string, any>,
     fieldList?: string[],
-    userId?: string
+    _userId?: string
   ): Promise<Record<string, any>> {
     const encrypted: Record<string, any> = {};
     const fieldsToEncrypt = fieldList || Object.keys(_obj);
 
     for (const key of Object.keys(_obj)) {
       if (fieldsToEncrypt.includes(key) && FIELD_CONFIGS[key]) {
-        encrypted[key] = await this.encryptField(key, obj[key], userId);
+        encrypted[key] = await this.encryptField(key, obj[key], _userId);
       } else {
         encrypted[key] = obj[key];
       }
@@ -315,14 +315,14 @@ class FieldEncryptionService {
   async decryptObject(
     obj: Record<string, any>,
     fieldList?: string[],
-    userId?: string
+    _userId?: string
   ): Promise<Record<string, any>> {
     const decrypted: Record<string, any> = {};
     const fieldsToDecrypt = fieldList || Object.keys(_obj);
 
     for (const key of Object.keys(_obj)) {
       if (fieldsToDecrypt.includes(key) && FIELD_CONFIGS[key]) {
-        decrypted[key] = await this.decryptField(key, obj[key], userId);
+        decrypted[key] = await this.decryptField(key, obj[key], _userId);
       } else {
         decrypted[key] = obj[key];
       }
@@ -337,7 +337,7 @@ class FieldEncryptionService {
   async searchEncryptedField(
     _fieldName: string,
     searchTerm: string,
-    userId?: string
+    _userId?: string
   ): Promise<string[]> {
     const config = FIELD_CONFIGS[_fieldName];
     
@@ -359,7 +359,7 @@ class FieldEncryptionService {
     // Audit search operation
     await auditLogger.log({
       event: 'DATA_ACCESS',
-      userId,
+      _userId,
       details: {
         action: 'encrypted_search',
         _fieldName,
@@ -626,7 +626,7 @@ class FieldEncryptionService {
     _fieldName: string,
     value: unknown,
     encrypted: string,
-    userId?: string
+    _userId?: string
   ): Promise<void> {
     if (!this.searchIndexes.has(_fieldName)) {
       this.searchIndexes.set(_fieldName, new Map());

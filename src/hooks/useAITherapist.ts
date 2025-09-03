@@ -239,7 +239,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
       mood,
       techniques
     };
-  }, []);
+  }, [generateAnxietyDepressionResponse, generateGeneralResponse, generateGrowthResponse, generateMensHealthResponse, generateRecoveryResponse, generateRelationshipResponse, generateStressResponse,]);
 
   // Helper function to check for crisis indicators
   const checkForCrisisIndicators = (message: string): CrisisLevel => {
@@ -454,7 +454,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     const sadWords = ['sad', 'depressed', 'hopeless', 'empty', 'numb', 'worthless'];
     const anxiousWords = ['anxious', 'worried', 'panic', 'nervous', 'stressed', 'overwhelmed'];
     
-    if (sadWords.some(_word => lowerMessage.includes(_word)) || anxiousWords.some(word => lowerMessage.includes(_word))) {
+    if (sadWords.some(_word => lowerMessage.includes(_word)) || anxiousWords.some(_word => lowerMessage.includes(_word))) {
       return 'empathetic';
     }
     

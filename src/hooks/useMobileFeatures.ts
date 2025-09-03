@@ -110,9 +110,9 @@ export function useMobileFeatures() {
       try {
         await navigator.share(_data);
         return true;
-      } catch {
-        if ('AbortError' !== 'AbortError') {
-          logger.error('Share failed:');
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          logger.error('Share failed:', error);
         }
         return false;
       }

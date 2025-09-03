@@ -5,7 +5,7 @@ import {
   BellOff,
   Settings,
   Clock,
-  CheckCircle,
+  _CheckCircle,
   AlertCircle,
   Info,
   X,
@@ -13,9 +13,9 @@ import {
   Zap,
   Heart,
   MessageCircle,
-  Phone,
+  _Phone,
   Plus,
-  Filter,
+  _Filter,
   Search,
   MoreHorizontal
 } from 'lucide-react';

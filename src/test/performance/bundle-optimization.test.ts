@@ -227,13 +227,13 @@ describe('Bundle Optimization Tests', () => {
         .slice(0, 5);
       
       logger.debug('\n🔝 Largest bundles:');
-      for (const [name, size] of sortedBundles) {
+      for (const [_name, size] of sortedBundles) {
         logger.debug(`   ${_name}: ${(size / 1024).toFixed(2)}KB`);
       }
       
       // Critical path analysis
       const criticalSize = Object.entries(_bundleStats)
-        .filter(([name]) => 
+        .filter(([_name]) => 
           name.includes('index-') ||
           name.includes('react-core') ||
           name.includes('crisis')

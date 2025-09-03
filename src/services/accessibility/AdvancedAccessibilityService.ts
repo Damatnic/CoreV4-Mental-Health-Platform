@@ -494,10 +494,10 @@ export class AdvancedAccessibilityService {
     );
 
     let node;
-    while (node = walker.nextNode()) {
+    while ((node = walker.nextNode())) {
       const text = node.textContent?.trim();
       if (text && text.length > 2) {
-        textParts.push(_text);
+        textParts.push(text);
       }
     }
 

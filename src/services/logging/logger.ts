@@ -10,7 +10,6 @@
  */
 
 import { auditLogger } from '../security/auditLogger';
-import { logger } from '../utils/logger';
 
 export enum LogLevel {
   DEBUG = 0,
@@ -127,7 +126,7 @@ class Logger {
       const sanitized: unknown = Array.isArray(data) ? [] : {};
       
       for (const key in data) {
-        if (data.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
           const lowerKey = key.toLowerCase();
           if (sensitiveFields.some(_field => lowerKey.includes(_field))) {
             sanitized[key] = '[REDACTED]';

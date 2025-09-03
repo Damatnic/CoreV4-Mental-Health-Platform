@@ -150,7 +150,7 @@ export function MeditationMindfulness({
         currentStreak: currentStreak || calculateCurrentStreak()
       }
     };
-  }, [meditationSessions, selectedTimeRange, totalMinutes, currentStreak]);
+  }, [meditationSessions, selectedTimeRange, totalMinutes, currentStreak, calculateCurrentStreak]);
 
   // Calculate current streak
   function calculateCurrentStreak(): number {

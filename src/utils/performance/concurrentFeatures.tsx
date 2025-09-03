@@ -30,7 +30,7 @@ export enum UpdatePriority {
  * Custom hook for managing transitions with priority
  */
 export function usePrioritizedTransition(priority: UpdatePriority = UpdatePriority.MEDIUM) {
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
   
   const __prioritizedTransition   = useCallback((callback: () => void) => {
     if (priority === UpdatePriority.CRISIS) {
@@ -264,7 +264,7 @@ export function useHeavyComputation<T>(
   priority: UpdatePriority = UpdatePriority.LOW
 ): T | undefined {
   const [result, setResult] = React.useState<T>();
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
   
   React.useEffect(() => {
     if (priority === UpdatePriority.CRISIS) {

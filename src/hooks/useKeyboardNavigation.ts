@@ -295,7 +295,7 @@ export function useReducedMotion() {
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  }, [mediaQuery]);
 
   return prefersReducedMotion;
 }

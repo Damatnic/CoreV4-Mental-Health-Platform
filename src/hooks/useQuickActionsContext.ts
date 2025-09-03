@@ -210,7 +210,7 @@ export function useQuickActionsContext(): QuickActionsContext {
         logger.error('Error loading action history:');
       }
     }
-  }, []);
+  }, [defaultActions]);
 
   // Save custom actions to localStorage
   useEffect(() => {

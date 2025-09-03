@@ -623,17 +623,10 @@ export class ComprehensiveNotificationService {
   private async checkConditions(conditions: NotificationCondition[]): Promise<boolean> {
     if (conditions.length === 0) return true;
 
-    try {
-      // In a real implementation, this would check actual user data
-      // For now, return true to allow notifications
-      return true;
-
-    } catch {
-      logger.error('Error checking notification conditions:', error instanceof Error ? error : new Error(String(error)), {
-        category: LogCategory.NOTIFICATIONS
-      });
-      return false;
-    }
+    // In a real implementation, this would check actual user data
+    // For now, return true to allow notifications
+    // TODO: Implement actual condition checking logic
+    return true;
   }
 
   private async personalizeContent(
@@ -690,7 +683,7 @@ export class ComprehensiveNotificationService {
     try {
       const userProfile = await secureStorage.getItem('user_profile');
       return userProfile?.name || null;
-    } catch {
+    } catch (_error) {
       return null;
     }
   }
@@ -703,25 +696,21 @@ export class ComprehensiveNotificationService {
         return `Last mood: ${latest.mood} (${latest.energy}/10 energy)`;
       }
       return null;
-    } catch {
+    } catch (_error) {
       return null;
     }
   }
 
   private async getProgressData(): Promise<{ summary: string; details: unknown } | null> {
-    try {
-      // Mock progress data
-      return {
-        summary: "3 mood logs this week, 2 breathing sessions completed",
-        details: {
-          moodLogs: 3,
-          breathingSessions: 2,
-          weeklyStreak: 5
-        }
-      };
-    } catch {
-      return null;
-    }
+    // Mock progress data
+    return {
+      summary: "3 mood logs this week, 2 breathing sessions completed",
+      details: {
+        moodLogs: 3,
+        breathingSessions: 2,
+        weeklyStreak: 5
+      }
+    };
   }
 
   private async sendPendingNotifications(): Promise<void> {

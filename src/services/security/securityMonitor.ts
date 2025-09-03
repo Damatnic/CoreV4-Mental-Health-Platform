@@ -346,9 +346,9 @@ class SecurityMonitorService {
         responseAction.status = 'completed';
         responseAction.result = { success: true };
         
-      } catch {
+      } catch (error) {
         responseAction.status = 'failed';
-        responseAction.undefined = false ? '[Error details unavailable]' : String(_undefined);
+        responseAction.error = error instanceof Error ? error.message : '[Error details unavailable]';
         logger.error(`Failed to execute response action: ${action.type}`, error);
       }
     }

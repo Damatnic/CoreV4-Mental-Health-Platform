@@ -251,14 +251,20 @@ export function EmergencyContacts() {
           <div className="flex items-center justify-center min-h-screen px-4">
             <div
               className="fixed inset-0 bg-black opacity-50"
-              onClick={() = onKeyDown={(e) = role="button" tabIndex={0}> { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => {
-                setShowAddForm(false);
-                setEditingContact(null);
-                setFormData({ name: '', phone: '', relationship: '', notes: '' (e); } }} role="button" tabIndex={0}> {
+              onClick={() => {
                 setShowAddForm(false);
                 setEditingContact(null);
                 setFormData({ name: '', phone: '', relationship: '', notes: '' });
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setShowAddForm(false);
+                  setEditingContact(null);
+                  setFormData({ name: '', phone: '', relationship: '', notes: '' });
+                }
+              }}
+              role="button"
+              tabIndex={0}
             ></div>
             <div className="relative bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
               <h3 className="text-xl font-bold text-gray-900 mb-4">

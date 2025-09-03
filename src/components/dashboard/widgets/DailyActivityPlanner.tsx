@@ -91,7 +91,7 @@ export const DailyActivityPlanner: React.FC = () => {
       else if (todayMood.moodScore <= 7) setCurrentEnergyLevel('medium');
       else setCurrentEnergyLevel('high');
     }
-  }, [selectedDate, moodEntries, generateDailySchedule]);
+  }, [selectedDate, moodEntries, generateDailySchedule, initializeTimeSlots]);
   
   // Initialize time slots for the day
   const initializeTimeSlots = () => {

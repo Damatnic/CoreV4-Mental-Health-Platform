@@ -116,7 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, 60000); // Check every minute
     
     return () => clearInterval(_sessionInterval);
-  }, []);
+  }, [checkAuth]);
 
   const checkAuth = async () => {
     try {

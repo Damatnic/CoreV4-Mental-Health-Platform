@@ -212,7 +212,7 @@ export function OptimizedChart({
           
           setIsProcessing(false);
         });
-      } catch (_error) {
+      } catch (_error  ) {
         logger.error('Chart data processing _error');
         setError('Processing failed');
         setIsProcessing(false);

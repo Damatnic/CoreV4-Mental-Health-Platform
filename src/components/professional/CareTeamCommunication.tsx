@@ -687,6 +687,7 @@ export function CareTeamCommunication({
                       <label key={member.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
                         <input
                           type="checkbox"
+                          aria-label={`Select ${member.name}`}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <div className="ml-3 flex items-center space-x-2">
