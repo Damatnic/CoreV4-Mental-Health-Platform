@@ -45,7 +45,7 @@ class SecureLocalStorage {
     } catch (error) {
       console.error('🔒 SecureLocalStorage initialization failed:', error);
       // Fallback to a simple key to prevent app crashes
-      this.encryptionKey = 'fallback_emergency_key_' + Date.now();
+      this.encryptionKey = `fallback_emergency_key_${  Date.now()}`;
       this.isInitialized = false;
     }
   }
