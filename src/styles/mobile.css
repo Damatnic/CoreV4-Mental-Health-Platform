@@ -20,15 +20,27 @@ a,
   scroll-behavior: smooth;
 }
 
-/* Larger touch targets for mobile */
+/* Larger touch targets for mobile - Updated to 56px minimum */
 @media (max-width: 768px) {
   button,
   a,
   input[type="button"],
   input[type="submit"],
-  .touchable {
-    min-height: 44px;
-    min-width: 44px;
+  .touchable,
+  .console-focusable {
+    min-height: 56px;
+    min-width: 56px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Console navigation items specifically */
+  nav button,
+  nav a,
+  .mobile-nav button,
+  .mobile-nav a {
+    min-height: 60px;
+    min-width: 60px;
   }
   
   /* Increase spacing between interactive elements */
@@ -232,6 +244,99 @@ select {
   pointer-events: none;
 }
 
+/* Console-specific accessibility improvements */
+.console-nav-item {
+  min-height: 56px;
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  contain: layout style paint;
+}
+
+/* Console transform boundary fixes */
+.console-nav-item:hover,
+.console-nav-item:focus {
+  transform: scale(1.02) translate3d(0, 0, 0);
+  transform-origin: center;
+  contain: layout style paint size;
+  z-index: 5;
+}
+
+.console-nav-item:active {
+  transform: scale(0.98) translate3d(0, 0, 0);
+  transform-origin: center;
+}
+
+/* Prevent console layout shifts */
+.console-layout {
+  contain: layout style;
+  isolation: isolate;
+}
+
+.console-sidebar {
+  contain: layout style paint;
+  will-change: transform, width;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Mobile console navigation optimization */
+@media (max-width: 768px) {
+  .console-mobile-nav {
+    contain: layout style paint;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    min-height: 64px;
+  }
+  
+  .console-mobile-nav button,
+  .console-mobile-nav a {
+    min-height: 60px;
+    min-width: 60px;
+    contain: layout style paint;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  /* Console button boundaries */
+  .console-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    min-width: 56px;
+    position: relative;
+    contain: layout style paint size;
+    overflow: hidden;
+  }
+  
+  .console-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border: 1px solid transparent;
+    border-radius: inherit;
+  }
+  
+  /* Active console button state */
+  .console-button.active {
+    isolation: isolate;
+    z-index: 5;
+  }
+  
+  .console-button.active::before {
+    border-color: rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.1);
+  }
+}
+
 /* Loading states for slow connections */
 .skeleton {
   animation: skeleton-loading 1s linear infinite alternate;
@@ -276,6 +381,30 @@ select {
   will-change: transform;
 }
 
+/* Console performance optimizations */
+.console-optimized {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  contain: layout style paint;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.console-animation-optimized {
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduce console layout thrashing */
+.console-container {
+  contain: layout style;
+  position: relative;
+}
+
+.console-container * {
+  contain: layout style;
+}
+
 .no-bounce {
   overscroll-behavior: contain;
 }
@@ -309,6 +438,47 @@ select {
   }
 }
 
+/* Console transform fixes and containment */
+.console-focusable {
+  contain: layout style paint;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  pointer-events: auto;
+}
+
+.console-focusable:focus {
+  outline: 2px solid rgb(0, 212, 255);
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* Fix console-focused scale transforms extending beyond boundaries */
+.console-focused {
+  transform: scale(1.05);
+  transform-origin: center;
+  contain: layout style paint size;
+  overflow: hidden;
+}
+
+/* Console navigation item containment */
+nav .console-focusable,
+.mobile-nav .console-focusable,
+.sidebar-nav .console-focusable {
+  contain: layout style paint size;
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Prevent layout shifts during console navigation */
+.console-navigation-container {
+  contain: layout style;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+}
+
 /* Android specific optimizations */
 @media (hover: none) and (pointer: coarse) {
   /* Touch device optimizations */
@@ -318,5 +488,11 @@ select {
   
   .hover\:bg-gray-100:active {
     background-color: rgb(243 244 246);
+  }
+  
+  /* Enhanced touch targets for console navigation */
+  .console-focusable:active {
+    transform: scale(0.95) translate3d(0, 0, 0);
+    transition: transform 0.1s ease;
   }
 }

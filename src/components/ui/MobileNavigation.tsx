@@ -79,7 +79,7 @@ export function MobileNavigation() {
         {/* Console glow accent line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-console-accent/50 to-transparent" />
         
-        <div className={`grid grid-cols-${navItems.length} h-16 relative`}>
+        <div className="flex justify-between items-center h-16 px-2 relative">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -89,43 +89,54 @@ export function MobileNavigation() {
                 key={item.path}
                 to={item.path}
                 onClick={() => handleNavClick(item.urgent)}
-                className="console-focusable relative flex flex-col items-center justify-center py-2 px-1 group transition-all duration-300"
+                className="console-focusable relative flex flex-col items-center justify-center py-2 px-2 group transition-all duration-300 flex-1 min-h-[56px] min-w-[56px]"
+                style={{
+                  pointerEvents: 'auto',
+                  touchAction: 'manipulation'
+                }}
               >
                 {/* Console active indicator */}
                 {active && (
                   <motion.div
-                    layoutId="activeMobileTab"
+                    layoutId={`activeMobileTab-${item.path}`}
                     className="absolute top-0 left-2 right-2 h-1 bg-gradient-to-r from-console-accent to-blue-400 rounded-b-full shadow-console-glow"
-                    initial={false}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    exit={{ scaleX: 0 }}
                     transition={{
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 30,
+                      duration: 0.3,
+                      ease: 'easeInOut'
                     }}
                   />
                 )}
                 
                 {/* Console button background effect */}
                 <motion.div
-                  className={`absolute inset-1 rounded-console-lg transition-all duration-300 ${
+                  className={`absolute inset-1 rounded-console-lg transition-all duration-300 pointer-events-none ${
                     active 
                       ? 'bg-gradient-to-t from-console-accent/20 to-blue-500/10 border border-console-accent/30' 
                       : 'group-hover:bg-gray-700/30'
                   }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  style={{
+                    contain: 'layout style paint'
+                  }}
                 />
                 
                 {/* Icon with console styling */}
                 <motion.div
                   whileTap={{ scale: 0.9 }}
-                  className={`relative z-10 p-2 rounded-console transition-all duration-300 ${
+                  className={`relative z-10 p-2 rounded-console transition-all duration-300 min-h-[40px] min-w-[40px] flex items-center justify-center ${
                     active 
                       ? `${item.color} bg-white/10 shadow-console-glow` 
                       : 'text-gray-400 group-hover:text-white group-hover:bg-gray-700/50'
                   }`}
+                  style={{
+                    contain: 'layout style paint'
+                  }}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 flex-shrink-0" />
                   
                   {/* Enhanced urgent indicator for crisis */}
                   {item.urgent && (
@@ -142,7 +153,7 @@ export function MobileNavigation() {
                 
                 {/* Console label with gaming font */}
                 <span className={`
-                  text-xs mt-1 font-medium tracking-wide transition-all duration-300 z-10 relative
+                  text-xs mt-1 font-medium tracking-wide transition-all duration-300 z-10 relative text-center leading-tight
                   ${active ? `${item.color} font-bold` : 'text-gray-400 group-hover:text-white'}
                 `}>
                   {item.label}
@@ -176,27 +187,36 @@ export function MobileNavigation() {
                 to={item.path}
                 onClick={() => handleNavClick(item.urgent)}
                 className={`
-                  console-focusable relative w-18 h-18 rounded-console-lg flex flex-col items-center justify-center
-                  transition-all duration-300 group overflow-hidden border
+                  console-focusable relative w-20 h-20 rounded-console-lg flex flex-col items-center justify-center
+                  transition-all duration-300 group overflow-hidden border min-h-[56px] min-w-[56px]
                   ${active 
                     ? `bg-gradient-to-br from-${item.color.split('-')[1]}-500/20 to-${item.color.split('-')[1]}-600/10 border-${item.color.split('-')[1]}-400/30 shadow-console-glow` 
                     : 'border-gray-700/50 hover:border-gray-600/50 hover:bg-gray-700/30'
                   }
                 `}
+                style={{
+                  pointerEvents: 'auto',
+                  touchAction: 'manipulation'
+                }}
               >
                 {/* Console tile background effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br from-console-accent/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br from-console-accent/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} style={{
+                  contain: 'layout style paint'
+                }} />
                 
                 {/* Icon container */}
                 <motion.div
                   whileTap={{ scale: 0.9 }}
-                  className={`relative z-10 p-2 rounded-console transition-all duration-300 ${
+                  className={`relative z-10 p-2 rounded-console transition-all duration-300 min-h-[40px] min-w-[40px] flex items-center justify-center ${
                     active 
                       ? `${item.color} bg-white/10` 
                       : 'text-gray-400 group-hover:text-white group-hover:bg-gray-700/50'
                   }`}
+                  style={{
+                    contain: 'layout style paint'
+                  }}
                 >
-                  <Icon className="h-6 w-6" />
+                  <Icon className="h-6 w-6 flex-shrink-0" />
                   
                   {/* Enhanced urgent indicator */}
                   {item.urgent && (
@@ -213,7 +233,7 @@ export function MobileNavigation() {
                 
                 {/* Console label */}
                 <span className={`
-                  text-xs mt-1 font-medium text-center leading-tight tracking-wide transition-all duration-300 z-10 relative
+                  text-xs mt-1 font-medium text-center leading-tight tracking-wide transition-all duration-300 z-10 relative max-w-full overflow-hidden text-ellipsis
                   ${active ? `${item.color} font-bold` : 'text-gray-400 group-hover:text-white'}
                 `}>
                   {item.label}
@@ -222,13 +242,14 @@ export function MobileNavigation() {
                 {/* Console active indicator */}
                 {active && (
                   <motion.div
-                    layoutId="activeTabTabletConsole"
+                    layoutId={`activeTabTabletConsole-${item.path}`}
                     className="absolute left-0 top-3 bottom-3 w-1 bg-gradient-to-b from-console-accent to-blue-400 rounded-r-full shadow-console-glow"
-                    initial={false}
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    exit={{ scaleY: 0 }}
                     transition={{
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 30,
+                      duration: 0.3,
+                      ease: 'easeInOut'
                     }}
                   />
                 )}

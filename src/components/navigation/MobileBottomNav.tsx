@@ -362,7 +362,13 @@ export function MobileBottomNav() {
                   <button
                     key={action.id}
                     onClick={action.action}
-                    className={`${action.color} text-white rounded-xl px-4 py-3 flex flex-col items-center space-y-1`}
+                    className={`${action.color} text-white rounded-xl px-4 py-3 flex flex-col items-center space-y-1 min-h-[56px] min-w-[56px]`}
+                    style={{
+                      pointerEvents: 'auto',
+                      touchAction: 'manipulation',
+                      minWidth: '56px',
+                      minHeight: '56px'
+                    }}
                   >
                     {action.icon}
                     <span className="text-xs font-medium">{action.label}</span>
@@ -417,7 +423,7 @@ export function MobileBottomNav() {
 
             {/* Drawer Items */}
             <div className="px-4 pb-4">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {drawerItems.map(item => {
                   if (item.requiresAuth && !isAuthenticated) return null;
                   
@@ -425,7 +431,13 @@ export function MobileBottomNav() {
                     <button
                       key={item.id}
                       onClick={() => handleNavClick(item)}
-                      className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                      className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors min-h-[56px] min-w-[56px]"
+                      style={{
+                        pointerEvents: 'auto',
+                        touchAction: 'manipulation',
+                        minWidth: '56px',
+                        minHeight: '56px'
+                      }}
                     >
                       <div className={`mb-2 ${item.color || 'text-gray-600'}`}>
                         {item.icon}
@@ -443,12 +455,18 @@ export function MobileBottomNav() {
                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-2">
                   Crisis Support
                 </p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {crisisQuickActions.map(action => (
                     <button
                       key={action.id}
                       onClick={action.action}
-                      className={`${action.color} text-white rounded-xl py-3 flex flex-col items-center space-y-1`}
+                      className={`${action.color} text-white rounded-xl py-3 flex flex-col items-center space-y-1 min-h-[56px] min-w-[56px]`}
+                      style={{
+                        pointerEvents: 'auto',
+                        touchAction: 'manipulation',
+                        minWidth: '56px',
+                        minHeight: '56px'
+                      }}
                     >
                       {action.icon}
                       <span className="text-xs font-medium">{action.label}</span>
@@ -510,7 +528,7 @@ export function MobileBottomNav() {
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center justify-around h-16">
+        <div className="flex items-center justify-between h-16 px-2">
           {/* Console-themed Main Navigation Items */}
           {mainNavItems.map(item => {
             const isActive = activeTab === item.id;
@@ -522,20 +540,24 @@ export function MobileBottomNav() {
                 id={`mobile-nav-${item.id}`}
                 group="mobile-navigation"
                 priority={isActive ? 100 : 50}
-                className="flex-1 h-full"
+                className="flex-1 min-h-[56px] min-w-[56px]"
                 onActivate={() => handleNavClick(item)}
               >
                 <button
                   onClick={() => handleNavClick(item)}
                   disabled={isDisabled}
                   className={`
-                    px-4 py-2 rounded-console transition-all duration-200
+                    w-full h-full flex flex-col items-center justify-center px-2 py-2 rounded-console transition-all duration-200 min-h-[56px] min-w-[56px]
                     ${isActive ? 'bg-console-accent/20 text-console-accent' : 'text-gray-400 hover:text-console-accent'}
                     ${isDisabled ? 'opacity-50' : ''}
                   `}
                   aria-label={`${item.label} - Console Navigation`}
                   aria-current={isActive ? 'page' : undefined}
                   data-console-button={consoleMode}
+                  style={{
+                    pointerEvents: 'auto',
+                    touchAction: 'manipulation'
+                  }}
                 >
                   <div className="relative">
                     {React.cloneElement(item.icon as React.ReactElement, {
@@ -595,18 +617,22 @@ export function MobileBottomNav() {
             id="mobile-nav-menu"
             group="mobile-navigation"
             priority={75}
-            className="px-4 h-full"
+            className="min-h-[56px] min-w-[56px]"
             onActivate={handleMenuToggle}
           >
             <button
               onClick={handleMenuToggle}
               className={`
-                px-4 py-2 rounded-console transition-all duration-200
+                w-full h-full flex flex-col items-center justify-center px-2 py-2 rounded-console transition-all duration-200 min-h-[56px] min-w-[56px]
                 ${isDrawerOpen ? 'bg-console-accent/20 text-console-accent' : 'text-gray-400 hover:text-console-accent'}
               `}
               aria-label="Console Menu - More options"
               aria-expanded={isDrawerOpen}
               data-console-menu={consoleMode}
+              style={{
+                pointerEvents: 'auto',
+                touchAction: 'manipulation'
+              }}
             >
               <div className="relative">
                 {isConsoleStyleActive ? (
@@ -689,8 +715,8 @@ export function MobileBottomNav() {
         
         /* Touch Target Optimization for Console */
         .touch-target {
-          min-width: 48px;
-          min-height: 48px;
+          min-width: 56px;
+          min-height: 56px;
         }
         
         /* Console Theme Specific Styles */
@@ -719,6 +745,11 @@ export function MobileBottomNav() {
         /* Mobile-specific Console Optimizations */
         @media (max-width: 768px) {
           .touch-target {
+            min-width: 60px;
+            min-height: 60px;
+          }
+          
+          button, a, .touchable {
             min-width: 56px;
             min-height: 56px;
           }

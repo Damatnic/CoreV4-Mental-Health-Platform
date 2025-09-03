@@ -387,8 +387,15 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
           width: isMobileMenuOpen ? 300 : 90,
           x: window.innerWidth < 768 && !isMobileMenuOpen ? -90 : 0 // Hide on mobile when closed
         }}
-        className="bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-r border-gray-700/50 flex-shrink-0 overflow-hidden backdrop-blur-console shadow-console-depth relative z-40 md:relative md:z-10"
-        style={{ marginTop: '56px' }} // Space for crisis banner
+        transition={{
+          duration: 0.2,
+          ease: 'easeInOut'
+        }}
+        className="bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-r border-gray-700/50 flex-shrink-0 overflow-hidden backdrop-blur-console shadow-console-depth fixed z-50 md:relative md:z-30"
+        style={{ 
+          marginTop: '56px',
+          pointerEvents: 'auto'
+        }}
       >
         {/* Sidebar glow effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
@@ -427,11 +434,15 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                 >
                   <Link
                     to={item.href}
-                    className={`group flex items-center p-4 rounded-console-lg transition-all duration-300 relative overflow-hidden ${
+                    className={`group flex items-center p-4 rounded-console-lg transition-all duration-300 relative overflow-hidden min-h-[56px] min-w-[56px] ${
                       isActiveRoute
                         ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-400/30 shadow-console-glow'
                         : 'text-gray-300 hover:text-white hover:bg-gray-700/50 border border-gray-700/30 hover:border-gray-600/50'
                     }`}
+                    style={{
+                      pointerEvents: 'auto',
+                      zIndex: 10
+                    }}
                   >
                     {/* Console tile background effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -481,7 +492,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
             <div className="space-y-2">
               <Link
                 to="/wellness/breathing"
-                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-cyan-500/10 border border-gray-700/50 hover:border-cyan-400/30 transition-all duration-300"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-cyan-500/10 border border-gray-700/50 hover:border-cyan-400/30 transition-all duration-300 min-h-[56px] min-w-[56px]"
+                style={{
+                  pointerEvents: 'auto',
+                  zIndex: 10
+                }}
               >
                 <div className="p-1.5 bg-cyan-500/20 rounded-console">
                   <Wind className="h-4 w-4 text-cyan-400" />
@@ -499,7 +514,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               
               <Link
                 to="/wellness/meditation"
-                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-indigo-500/10 border border-gray-700/50 hover:border-indigo-400/30 transition-all duration-300"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-indigo-500/10 border border-gray-700/50 hover:border-indigo-400/30 transition-all duration-300 min-h-[56px] min-w-[56px]"
+                style={{
+                  pointerEvents: 'auto',
+                  zIndex: 10
+                }}
               >
                 <div className="p-1.5 bg-indigo-500/20 rounded-console">
                   <Timer className="h-4 w-4 text-indigo-400" />
@@ -517,7 +536,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               
               <Link
                 to="/wellness/journal"
-                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-green-500/10 border border-gray-700/50 hover:border-green-400/30 transition-all duration-300"
+                className="group flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-green-500/10 border border-gray-700/50 hover:border-green-400/30 transition-all duration-300 min-h-[56px] min-w-[56px]"
+                style={{
+                  pointerEvents: 'auto',
+                  zIndex: 10
+                }}
               >
                 <div className="p-1.5 bg-green-500/20 rounded-console">
                   <BookOpen className="h-4 w-4 text-green-400" />
@@ -543,7 +566,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
             <div className="space-y-3">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="w-full flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-gray-700/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 group"
+                className="w-full flex items-center p-3 rounded-console text-gray-300 hover:text-white hover:bg-gray-700/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 group min-h-[56px] min-w-[56px]"
+                style={{
+                  pointerEvents: 'auto',
+                  zIndex: 10
+                }}
               >
                 <div className="p-1.5 bg-gray-700/50 group-hover:bg-gray-600/50 rounded-console transition-colors">
                   <Search className="h-4 w-4" />
@@ -590,11 +617,15 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
             {/* Console Menu Toggle - Gaming Button */}
             <motion.button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-              className="console-focusable group relative p-3 rounded-console-lg text-gray-300 hover:text-white bg-gray-700/30 hover:bg-gray-600/40 border border-gray-600/50 hover:border-console-accent/50 transition-all duration-300 shadow-console-card"
+              className="console-focusable group relative p-3 rounded-console-lg text-gray-300 hover:text-white bg-gray-700/30 hover:bg-gray-600/40 border border-gray-600/50 hover:border-console-accent/50 transition-all duration-300 shadow-console-card min-h-[56px] min-w-[56px]"
               aria-label="Toggle console sidebar"
               aria-expanded={isMobileMenuOpen}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              style={{
+                pointerEvents: 'auto',
+                zIndex: 20
+              }}
             >
               {/* Button glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-console-accent/10 to-blue-500/10 rounded-console-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
