@@ -69,7 +69,7 @@ export class ActionRecommendationEngine {
     });
 
     // Social connection rules
-    this.contextualRules.set('social_isolation', (_ctx) => {
+    this.contextualRules.set('socialisolation', (_ctx) => {
       if (_ctx.socialInteraction && _ctx.socialInteraction < 3) return 0.7;
       return 0.3;
     });
@@ -238,7 +238,7 @@ export class ActionRecommendationEngine {
       'crisis_low_mood': ['emergency', 'crisis', 'help'],
       'breathing_anxiety': ['breathe', 'grounding', 'calm'],
       'medication_reminder': ['medication', 'pill', 'reminder'],
-      'social_isolation': ['community', 'connect', 'social'],
+      'socialisolation': ['community', 'connect', 'social'],
       'sleep_hygiene': ['sleep', 'relax', 'wind-down'],
       'indoor_activities': ['meditation', 'journal', 'breathe'],
       'stress_relief': ['breathe', 'meditation', 'music', 'grounding']
@@ -247,7 +247,7 @@ export class ActionRecommendationEngine {
     const applicableActions = ruleActionMap[ruleName] || [];
     return applicableActions.some(actionType => 
       action.icon === actionType || 
-      action.label.toLowerCase().includes(_actionType)
+      action.label.toLowerCase().includes(actionType)
     );
   }
 
@@ -258,7 +258,7 @@ export class ActionRecommendationEngine {
       'crisis_low_mood': 'Support available',
       'breathing_anxiety': 'Calm your mind',
       'medication_reminder': 'Medication time',
-      'social_isolation': 'Connect with others',
+      'socialisolation': 'Connect with others',
       'sleep_hygiene': 'Prepare for better sleep',
       'indoor_activities': 'Indoor activity',
       'stress_relief': 'Reduce stress'
@@ -269,7 +269,7 @@ export class ActionRecommendationEngine {
 
   public getRecommendations(actions: QuickAction[], limit: number = 5): QuickAction[] {
     const scoredActions: ActionScore[] = actions.map(action => {
-      const baseScore = this.calculateBaseScore(_action);
+      const baseScore = this.calculateBaseScore(action);
       return this.applyContextualBoosts(action, baseScore);
     });
 
@@ -298,10 +298,10 @@ export class ActionRecommendationEngine {
     const frequency = this.context.actionHistory?.filter(id => id === actionId).length || 0;
     
     return {
-      bestTimes: this.getBestTimesForAction(_actionId),
-      complementaryActions: this.getComplementaryActions(_actionId),
+      bestTimes: this.getBestTimesForAction(actionId),
+      complementaryActions: this.getComplementaryActions(actionId),
       frequency,
-      effectiveness: this.calculateEffectiveness(_actionId)
+      effectiveness: this.calculateEffectiveness(actionId)
     };
   }
 

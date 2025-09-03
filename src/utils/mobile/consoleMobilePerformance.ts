@@ -54,7 +54,7 @@ class ConsoleMobilePerformance {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       return !!gl;
-    } catch {
+    } catch (error) {
       return false;
     }
   }
@@ -66,7 +66,7 @@ class ConsoleMobilePerformance {
 
   private getOptimalSettings(): MobilePerformanceSettings {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const __isLowBattery = (navigator as unknown).getBattery?.()?.then?.((battery: unknown) => battery.level < 0.2);
+    const isLowBattery = (navigator as unknown).getBattery?.()?.then?.((battery: unknown) => battery.level < 0.2);
     
     return {
       reduceMotion: prefersReducedMotion || this.deviceCapabilities.isLowEndDevice,
@@ -107,7 +107,7 @@ class ConsoleMobilePerformance {
         });
         
         this.performanceObserver.observe({ entryTypes: ['measure', 'navigation'] });
-      } catch {
+      } catch (error) {
         console.warn('Performance Observer not supported:');
       }
     }

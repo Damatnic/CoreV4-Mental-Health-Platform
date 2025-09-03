@@ -20,12 +20,12 @@ const DEFAULT_FLAGS: FeatureFlags = {
   crisis_ai_support: true,
   enhanced_crisis_panel: true,
   professional_care_dashboard: true,
-  ai_insights_dashboard: true,
+  aiinsights_dashboard: true,
   activity_tracking_v2: true,
   wellness_analytics: true,
   emergency_location_sharing: true,
   offline_mode: true,
-  pwa_install_prompt: true,
+  pwainstall_prompt: true,
   dark_mode: false,
   beta_features: false,
   advanced_analytics: false,
@@ -62,7 +62,7 @@ export function useFeatureFlag(
     if (override !== null) {
       try {
         return JSON.parse(_override);
-      } catch {
+      } catch (error) {
         return override;
       }
     }
@@ -98,7 +98,7 @@ export function useFeatureFlag(
         }
         
         if (_mounted) setFlagValue(_value);
-      } catch {
+      } catch (error) {
         // Silent fallback to prevent console spam
         const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
         if (_mounted) setFlagValue(_value);
@@ -129,7 +129,7 @@ export function useFeatureFlags(): FeatureFlags {
       try {
         // DISABLED: Use local defaults only to prevent console spam
         if (_mounted) setFlags(_DEFAULT_FLAGS);
-      } catch {
+      } catch (error) {
         // Silent fallback
         if (_mounted) setFlags(_DEFAULT_FLAGS);
       }

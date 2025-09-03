@@ -510,14 +510,14 @@ export function MeditationMindfulness({
       {showRecommendations && recommendations.length > 0 && (
         <div className="space-y-2">
           <h4 className="font-semibold text-gray-800">Insights</h4>
-          {recommendations.map((rec, _idx) => {
+          {recommendations.map((rec, idx) => {
             const Icon = rec.icon;
             return (
               <motion.div
-                key={_idx}
+                key={idx}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: _idx * 0.1 }}
+                transition={{ delay: idx * 0.1 }}
                 className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-gray-200"
               >
                 <Icon className={`h-5 w-5 mt-0.5 ${rec.color}`} />
@@ -544,7 +544,7 @@ export function MeditationMindfulness({
           </button>
         </div>
         
-        {meditationSessions.slice(0, 3).map((session, _idx) => (
+        {meditationSessions.slice(0, 3).map((session, idx) => (
           <div
             key={session.id}
             className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"

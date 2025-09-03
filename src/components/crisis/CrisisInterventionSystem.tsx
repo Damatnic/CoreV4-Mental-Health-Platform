@@ -82,7 +82,7 @@ export function CrisisInterventionSystem() {
   const handleEmergencyCall = useCallback((number: string, service: string) => {
     // Log the emergency call attempt for safety tracking
     const timestamp = new Date().toISOString();
-    logger.logCrisisIntervention('emergency_call_initiated', undefined, {
+    logger.logCrisisIntervention('emergency_callinitiated', undefined, {
       service,
       timestamp,
       responseTime

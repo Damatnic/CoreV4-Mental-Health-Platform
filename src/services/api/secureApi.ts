@@ -10,7 +10,7 @@ import { fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
 import { securityMonitor } from '../security/securityMonitor';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 interface SecureRequestConfig {
   url: string;
@@ -132,7 +132,7 @@ class SecureAPIService {
         requestId,
       };
       
-    } catch {
+    } catch (error) {
       // Handle and log errors
       await this.handleRequestError(error, config, requestId);
       throw error;
@@ -240,7 +240,7 @@ class SecureAPIService {
       }
       
       return await response.json();
-    } catch {
+    } catch (error) {
       logger.error('Secure upload failed:');
       throw undefined;
     }
@@ -274,7 +274,7 @@ class SecureAPIService {
         const binaryString = atob(decrypted);
         const uint8Array = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
-          uint8Array[i] = binaryString.charCodeAt(_i);
+          uint8Array[i] = binaryString.charCodeAt(i);
         }
         
         data = new Blob([uint8Array], { 
@@ -283,7 +283,7 @@ class SecureAPIService {
       }
       
       return data;
-    } catch {
+    } catch (error) {
       logger.error('Secure download failed:');
       throw undefined;
     }
@@ -452,7 +452,7 @@ class SecureAPIService {
 
   private async decryptResponseData(data: unknown): Promise<unknown> {
     if (Array.isArray(data)) {
-      return await Promise.all(data.map(_item => this.decryptResponseData(_item)));
+      return await Promise.all(data.map(item => this.decryptResponseData(item)));
     }
     
     if (typeof data === 'object' && data !== null) {
@@ -569,7 +569,7 @@ class SecureAPIService {
         const data = await response.json();
         this.csrfToken = data.token;
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to get CSRF token:');
     }
   }

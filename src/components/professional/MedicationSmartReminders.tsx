@@ -158,7 +158,7 @@ export function MedicationSmartReminders({
   _onUpdateReminders 
 }: SmartReminderProps) {
   const [reminders, _setReminders] = useState<SmartReminder[]>([]);
-  const [activeTab, _setActiveTab] = useState<'overview' | 'configure' | '_insights' | 'history'>('overview');
+  const [activeTab, _setActiveTab] = useState<'overview' | 'configure' | 'insights' | 'history'>('overview');
   const [__selectedMedication, _setSelectedMedication] = useState<string | null>(null);
   const [isLearningMode, _setIsLearningMode] = useState(true);
   const [aiInsights, _setAiInsights] = useState<AIInsight[]>([]);
@@ -170,7 +170,7 @@ export function MedicationSmartReminders({
   }, [medications, generateInitialReminders]);
 
   const generateInitialReminders = () => {
-    const _initialReminders: SmartReminder[] = medications.map((med, index) => ({
+    const initialReminders: SmartReminder[] = medications.map((med, index) => ({
       id: `reminder-${med.id}`,
       medicationId: med.id,
       _type: 'adaptive',
@@ -208,11 +208,11 @@ export function MedicationSmartReminders({
       userFeedback: Math.random() > 0.7 ? 'helpful' : Math.random() > 0.5 ? 'neutral' : 'annoying'
     }));
 
-    setReminders(_initialReminders);
+    setReminders(initialReminders);
   };
 
   const generateAIInsights = () => {
-    const _insights: AIInsight[] = [
+    const insights: AIInsight[] = [
       {
         _type: 'pattern',
         title: 'Optimal Timing Discovered',
@@ -246,7 +246,7 @@ export function MedicationSmartReminders({
       }
     ];
 
-    setAiInsights(_insights);
+    setAiInsights(insights);
   };
 
   const testReminder = (_type: string) => {
@@ -376,7 +376,7 @@ export function MedicationSmartReminders({
         {[
           { id: 'overview', label: 'Overview', icon: Activity },
           { id: 'configure', label: 'Configure', icon: Settings },
-          { id: '_insights', label: 'AI Insights', icon: BrainCircuit },
+          { id: 'insights', label: 'AI Insights', icon: BrainCircuit },
           { id: 'history', label: 'History', icon: FileText }
         ].map(tab => {
           const Icon = tab.icon;
@@ -392,7 +392,7 @@ export function MedicationSmartReminders({
             >
               <Icon className="w-4 h-4" />
               {tab.label}
-              {tab.id === '_insights' && aiInsights.filter(i => i.actionable).length > 0 && (
+              {tab.id === 'insights' && aiInsights.filter(i => i.actionable).length > 0 && (
                 <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                   {aiInsights.filter(i => i.actionable).length}
                 </span>
@@ -634,9 +634,9 @@ export function MedicationSmartReminders({
         )}
 
         {/* AI Insights Tab */}
-        {activeTab === '_insights' && (
+        {activeTab === 'insights' && (
           <motion.div
-            key="_insights"
+            key="insights"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}

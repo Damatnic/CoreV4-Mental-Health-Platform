@@ -76,7 +76,7 @@ describe('useAuth Hook', () => {
             email: 'wrong@example.com',
             _password: 'wrongpass',
           });
-        } catch {
+        } catch (error) {
           expect(error.message).toContain('Invalid credentials');
         }
       });
@@ -232,7 +232,7 @@ describe('useAuth Hook', () => {
               email: 'test@example.com',
               _password: 'wrongpass',
             });
-          } catch {
+          } catch (error) {
             // Expected to fail
           }
         });
@@ -245,7 +245,7 @@ describe('useAuth Hook', () => {
             email: 'test@example.com',
             _password: 'Test123!',
           });
-        } catch {
+        } catch (error) {
           expect(error.message).toContain('Too many attempts');
         }
       });
@@ -264,8 +264,8 @@ describe('useAuth Hook', () => {
       ];
 
       for (const _password of weakPasswords) {
-        const _isValid = result.current.validatePassword(_password);
-        expect(_isValid).toBe(false);
+        const isValid = result.current.validatePassword(_password);
+        expect(isValid).toBe(false);
       }
 
       const _strongPassword = 'SecureP@ssw0rd123!';
@@ -285,7 +285,7 @@ describe('useAuth Hook', () => {
             email: maliciousInput,
             _password: 'Test123!',
           });
-        } catch {
+        } catch (error) {
           // Expected to fail validation
         }
       });
@@ -412,7 +412,7 @@ describe('useAuth Hook', () => {
             email: 'test@example.com',
             _password: 'Test123!',
           });
-        } catch {
+        } catch (error) {
           expect(error.message).toContain('Network error');
         }
       });

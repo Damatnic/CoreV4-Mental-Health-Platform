@@ -104,10 +104,10 @@ export function EnhancedCrisisPanel({
   onLocationShare 
 }: EnhancedCrisisPanelProps) {
   const { _user } = useAuth();
-  const { location, _error: _locationError } = useGeolocation();
+  const { location, error: _locationError } = useGeolocation();
   const { assessmentData, _updateAssessment } = useCrisisAssessment();
   
-  const [___isOnline, _setIsOnline] = useState(navigator.onLine);
+  const [_isOnline, _setIsOnline] = useState(navigator.onLine);
   const [_showFullPlan, _setShowFullPlan] = useState(false);
   const [activeTab, _setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
   const [riskFactors, _setRiskFactors] = useState<RiskFactors>({
@@ -176,7 +176,7 @@ export function EnhancedCrisisPanel({
 
   // Simulate real-time risk monitoring (in production, this would come from actual data)
   useEffect(() => {
-    const _interval = setInterval(() => {
+    const interval = setInterval(() => {
       // This would be replaced with actual data from mood tracking, behavior patterns, etc.
       if (assessmentData) {
         setRiskFactors(prev => ({
@@ -187,7 +187,7 @@ export function EnhancedCrisisPanel({
       }
     }, 30000); // Check every 30 seconds
     
-    return () => clearInterval(_interval);
+    return () => clearInterval(interval);
   }, [assessmentData]);
 
   // Emergency call handler with location sharing

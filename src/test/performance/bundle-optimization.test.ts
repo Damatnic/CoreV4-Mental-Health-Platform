@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, statSync } from 'fs';
 import { join } from 'path';
 import { glob } from 'glob';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 describe('Bundle Optimization Tests', () => {
   const bundleStats: Record<string, number> = {};
@@ -23,7 +23,7 @@ describe('Bundle Optimization Tests', () => {
       try {
         const stats = statSync(_filePath);
         bundleStats[file] = stats.size;
-      } catch {
+      } catch (error) {
         logger.warn(`Could not read bundle file: ${file}`);
       }
     }
@@ -31,7 +31,7 @@ describe('Bundle Optimization Tests', () => {
     // Read index.html to check module preloads
     try {
       manifestContent = readFileSync(join(distPath, 'index.html'), 'utf-8');
-    } catch {
+    } catch (error) {
       logger.warn('Could not read index.html');
     }
   });

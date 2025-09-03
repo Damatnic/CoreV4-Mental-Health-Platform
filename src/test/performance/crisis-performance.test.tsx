@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 import CrisisButton from '../../components/crisis/CrisisButton';
 import MoodTracker from '../../components/wellness/MoodTracker';
 
@@ -283,7 +283,7 @@ describe('Crisis Response Performance', () => {
       const _finalListeners = getListenerCount();
       
       if (initialListeners > 0) {
-        expect(_finalListeners).toBeLessThanOrEqual(_initialListeners);
+        expect(_finalListeners).toBeLessThanOrEqual(initialListeners);
       }
     });
   });
@@ -338,8 +338,8 @@ describe('Crisis Response Performance', () => {
       );
       
       // Initial render without history
-      const _initialComponents = screen.queryByTestId('mood-history-chart');
-      expect(_initialComponents).not.toBeInTheDocument();
+      const initialComponents = screen.queryByTestId('mood-history-chart');
+      expect(initialComponents).not.toBeInTheDocument();
       
       // Re-render with history
       monitor.mark('lazy-load-start');

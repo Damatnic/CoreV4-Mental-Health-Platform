@@ -119,10 +119,10 @@ export function VirtualizedList<T>({
 
   // Get item size for variable height list
   const __getItemSize   = useMemo(() => {
-    if (_isVariableHeight) {
+    if (isVariableHeight) {
       return itemHeight as (index: number) => number;
     }
-    return (_index: number) => itemHeight as number;
+    return (index: number) => itemHeight as number;
   }, [itemHeight, isVariableHeight]);
 
   // Custom item key for better performance

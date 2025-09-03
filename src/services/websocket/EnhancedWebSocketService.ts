@@ -6,7 +6,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Connection state interface
 interface ConnectionState {
@@ -146,7 +146,7 @@ export enum NotificationType {
   NEW_COMMUNITY_POST = 'new_community_post',
   POST_REPLY = 'post_reply',
   POST_LIKED = 'post_liked',
-  SUPPORT_GROUP_INVITATION = 'support_group_invitation',
+  SUPPORT_GROUP_INVITATION = 'support_groupinvitation',
   GROUP_EVENT_REMINDER = 'group_event_reminder',
   PEER_SUPPORT_REQUEST = 'peer_support_request',
   
@@ -240,7 +240,7 @@ export interface QueuedMessage {
 export interface NotificationOptions {
   icon?: string;
   _priority?: 'low' | 'normal' | 'high' | 'critical';
-  actions?: { _action: string; title: string }[];
+  actions?: { action: string; title: string }[];
   requireInteraction?: boolean;
   celebrationEffect?: boolean;
   soundType?: 'gentle' | 'urgent' | 'success' | 'none';
@@ -345,7 +345,7 @@ export class EnhancedWebSocketService {
         const preferences = JSON.parse(_prefs);
         logger.debug('Loaded _notification preferences', 'EnhancedWebSocket', preferences);
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to load _notification preferences:');
     }
   }
@@ -509,9 +509,9 @@ export class EnhancedWebSocketService {
         _priority: 'critical',
         requireInteraction: true,
         actions: [
-          { _action: 'emergency', title: 'Emergency Services' },
-          { _action: 'crisis-chat', title: 'Crisis Chat' },
-          { _action: 'support', title: 'Find Support' }
+          { action: 'emergency', title: 'Emergency Services' },
+          { action: 'crisis-chat', title: 'Crisis Chat' },
+          { action: 'support', title: 'Find Support' }
         ]
       });
     });
@@ -543,8 +543,8 @@ export class EnhancedWebSocketService {
       this.showNotification('New Community Post', `${data.author}: "${data.preview}"`, {
         icon: '💬',
         actions: [
-          { _action: 'view', title: 'View Post' },
-          { _action: 'react', title: 'Send Support' }
+          { action: 'view', title: 'View Post' },
+          { action: 'react', title: 'Send Support' }
         ]
       });
     });
@@ -579,9 +579,9 @@ export class EnhancedWebSocketService {
       this.showNotification('Medication Reminder', data.payload.message, {
         icon: '💊',
         actions: [
-          { _action: 'taken', title: 'Taken' },
-          { _action: 'skip', title: 'Skip' },
-          { _action: 'snooze', title: 'Remind in 15m' }
+          { action: 'taken', title: 'Taken' },
+          { action: 'skip', title: 'Skip' },
+          { action: 'snooze', title: 'Remind in 15m' }
         ],
         requireInteraction: true
       });
@@ -591,10 +591,10 @@ export class EnhancedWebSocketService {
       this.showNotification('Wellness Check-In', 'How are you feeling right now?', {
         icon: '🌈',
         actions: [
-          { _action: 'great', title: '😄 Great' },
-          { _action: 'good', title: '😊 Good' },
-          { _action: 'okay', title: '😐 Okay' },
-          { _action: 'low', title: '😔 Low' }
+          { action: 'great', title: '😄 Great' },
+          { action: 'good', title: '😊 Good' },
+          { action: 'okay', title: '😐 Okay' },
+          { action: 'low', title: '😔 Low' }
         ]
       });
     });
@@ -605,8 +605,8 @@ export class EnhancedWebSocketService {
         _celebrationEffect: true,
         soundType: 'success',
         actions: [
-          { _action: 'view', title: 'View Progress' },
-          { _action: 'share', title: 'Share Achievement' }
+          { action: 'view', title: 'View Progress' },
+          { action: 'share', title: 'Share Achievement' }
         ]
       });
     });
@@ -640,8 +640,8 @@ export class EnhancedWebSocketService {
         _priority: 'high',
         requireInteraction: true,
         actions: [
-          { _action: 'accept', title: 'Offer Support' },
-          { _action: 'refer', title: 'Refer Professional' }
+          { action: 'accept', title: 'Offer Support' },
+          { action: 'refer', title: 'Refer Professional' }
         ]
       });
       this.emit(WSEventType.PEER_SUPPORT_REQUEST, data);
@@ -665,8 +665,8 @@ export class EnhancedWebSocketService {
       this.showNotification('New Therapy Homework', `Your therapist assigned: ${data.title}`, {
         icon: '📚',
         actions: [
-          { _action: 'view', title: 'View Assignment' },
-          { _action: 'schedule', title: 'Schedule Time' }
+          { action: 'view', title: 'View Assignment' },
+          { action: 'schedule', title: 'Schedule Time' }
         ]
       });
     });
@@ -676,7 +676,7 @@ export class EnhancedWebSocketService {
         icon: '👨⚕️',
         _priority: 'high',
         requireInteraction: true,
-        actions: [{ _action: 'join', title: 'Join Session' }]
+        actions: [{ action: 'join', title: 'Join Session' }]
       });
     });
   }
@@ -688,7 +688,7 @@ export class EnhancedWebSocketService {
     this.socket.on(WSEventType.GROUP_SESSION_START, (data: unknown) => {
       this.showNotification('Group Session Starting', `${data.groupName} session is beginning`, {
         icon: '👥',
-        actions: [{ _action: 'join', title: 'Join Now' }]
+        actions: [{ action: 'join', title: 'Join Now' }]
       });
       this.joinGroupSession(data.groupId, data.sessionId);
     });
@@ -696,7 +696,7 @@ export class EnhancedWebSocketService {
     this.socket.on(WSEventType.GROUP_ACTIVITY_START, (data: unknown) => {
       this.showNotification('Group Activity', `${data.activityName} is starting in your group`, {
         icon: '🎯',
-        actions: [{ _action: 'participate', title: 'Participate' }]
+        actions: [{ action: 'participate', title: 'Participate' }]
       });
     });
   }
@@ -717,8 +717,8 @@ export class EnhancedWebSocketService {
       this.showNotification('Mood Pattern Insight', data.insight, {
         icon: '📈',
         actions: [
-          { _action: 'view-insights', title: 'View Insights' },
-          { _action: 'adjust-goals', title: 'Adjust Goals' }
+          { action: 'view-insights', title: 'View Insights' },
+          { action: 'adjust-goals', title: 'Adjust Goals' }
         ]
       });
     });
@@ -811,7 +811,7 @@ export class EnhancedWebSocketService {
     return true;
   }
 
-  private categorizeNotification(title: string, _message: string): string {
+  private categorizeNotification(title: string, message: string): string {
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('crisis') || lowerTitle.includes('emergency')) return 'crisis';
     if (lowerTitle.includes('medication') || lowerTitle.includes('pill')) return 'medication';
@@ -863,13 +863,13 @@ export class EnhancedWebSocketService {
     this.emit('_notification:celebration', { type: 'achievement' });
   }
 
-  private handleNotificationClick(notificationId: string, _action: string, _event: unknown): void {
+  private handleNotificationClick(notificationId: string, action: string, _event: unknown): void {
     const _notification = this.activeNotifications.get(_notificationId);
     if (!_notification) return;
 
     this.markNotificationAsRead(_notificationId);
 
-    switch (_action) {
+    switch (action) {
       case 'click':
         window.focus();
         this.emit('_notification:clicked', { notificationId, _notification });
@@ -905,7 +905,7 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('notification_history', JSON.stringify(_history));
-    } catch {
+    } catch (error) {
       logger.error('Failed to save _notification to history:');
     }
   }
@@ -969,7 +969,7 @@ export class EnhancedWebSocketService {
       try {
         this.socket.emit(message.event, message.data);
         this.connectionState.lastSuccessfulMessage = new Date();
-      } catch {
+      } catch (error) {
         logger.error('Failed to send queued message:');
         
         if (Date.now() - message.timestamp < 86400000 && message.retries < 3) {
@@ -985,20 +985,20 @@ export class EnhancedWebSocketService {
 
   private saveQueuedMessages(): void {
     try {
-      secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch {
+      secureStorage.setItem('wsmessage_queue', JSON.stringify(this.messageQueue));
+    } catch (error) {
       logger.error('Failed to save message queue:');
     }
   }
 
   private loadQueuedMessages(): void {
     try {
-      const _saved = secureStorage.getItem('ws_message_queue');
+      const _saved = secureStorage.getItem('wsmessage_queue');
       if (_saved) {
         this.messageQueue = JSON.parse(_saved);
         this.connectionState.messagesQueued = this.messageQueue.length;
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
@@ -1032,7 +1032,7 @@ export class EnhancedWebSocketService {
       escalationLevel,
       timestamp: new Date(),
       userId: this.currentUser?.id,
-      context: 'user_initiated_escalation'
+      context: 'userinitiated_escalation'
     };
     
     if (this.socket?.connected) {
@@ -1040,15 +1040,15 @@ export class EnhancedWebSocketService {
     }
     
     this.realTimeAnalytics.crisisAlertsHandled++;
-    this.logCriticalEvent('crisis_escalation_initiated', escalationData);
+    this.logCriticalEvent('crisis_escalationinitiated', escalationData);
     
     this.showNotification('Crisis Support Activated', 'Professional help is being contacted', {
       icon: '🚨',
       _priority: 'critical',
       requireInteraction: true,
       actions: [
-        { _action: 'emergency', title: 'Call Emergency' },
-        { _action: 'chat', title: 'Crisis Chat' }
+        { action: 'emergency', title: 'Call Emergency' },
+        { action: 'chat', title: 'Crisis Chat' }
       ]
     });
     
@@ -1082,7 +1082,7 @@ export class EnhancedWebSocketService {
     }
     
     this.realTimeAnalytics.supportSessionsInitiated++;
-    this.emit('peer_support:session_initiated', { sessionId, session });
+    this.emit('peer_support:sessioninitiated', { sessionId, session });
   }
 
   // Real-time presence management
@@ -1133,7 +1133,7 @@ export class EnhancedWebSocketService {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch {
+        } catch (error) {
           logger.error(`Error in event handler for ${event}`);
         }
       });
@@ -1191,7 +1191,7 @@ export class EnhancedWebSocketService {
       }
       
       secureStorage.setItem('critical_events', JSON.stringify(_logs));
-    } catch {
+    } catch (error) {
       logger.error('Failed to log critical event:');
     }
   }

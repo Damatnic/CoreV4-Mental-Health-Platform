@@ -375,7 +375,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
           expect(screen.getByRole('alert')).toHaveTextContent(/crisis.*detected/i);
         });
         
-        await userEvent.clear(_input);
+        await userEvent.clear(input);
       }
     });
     

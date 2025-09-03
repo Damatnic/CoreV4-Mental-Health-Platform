@@ -73,17 +73,17 @@ export const __getConsoleShadowEffect = (_mode: ConsoleMode = 'playstation', int
  */
 export const __getConsoleButtonStyle = (
   _mode: ConsoleMode = 'playstation', 
-  _isActive: boolean = false,
-  _isHovered: boolean = false
+  isActive: boolean = false,
+  isHovered: boolean = false
 ): string => {
   const baseStyle = 'transition-all duration-200 ease-in-out';
   const accentColor = getConsoleAccentColorHex(_mode);
   
-  if (_isActive) {
+  if (isActive) {
     return `${baseStyle} bg-gradient-to-b from-gray-700 to-gray-800 text-white border-2 border-${accentColor} shadow-lg`;
   }
   
-  if (_isHovered) {
+  if (isHovered) {
     return `${baseStyle} bg-gradient-to-b from-gray-600 to-gray-700 text-white border border-gray-500 shadow-md`;
   }
   
@@ -93,8 +93,8 @@ export const __getConsoleButtonStyle = (
 /**
  * Get console-specific icon color
  */
-export const __getConsoleIconColor = (_mode: ConsoleMode = 'playstation', _isActive: boolean = false): string => {
-  if (_isActive) {
+export const __getConsoleIconColor = (_mode: ConsoleMode = 'playstation', isActive: boolean = false): string => {
+  if (isActive) {
     return getConsoleAccentColorHex(_mode);
   }
   return '#9CA3AF'; // Gray-400

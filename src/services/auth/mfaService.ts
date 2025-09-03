@@ -7,7 +7,7 @@
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 export type MFAMethod = 'totp' | 'sms' | 'email' | 'biometric' | 'backup';
 
@@ -126,7 +126,7 @@ class MultiFactorAuthService {
       const secret = await cryptoService.decrypt(setup.metadata?.secret || '');
       const isValid = await this.verifyTOTPCode(secret, code);
 
-      if (_isValid) {
+      if (isValid) {
         // Mark as verified and enabled
         setup.enabled = true;
         setup.verified = true;
@@ -372,7 +372,7 @@ class MultiFactorAuthService {
           break;
       }
 
-      if (_isValid) {
+      if (isValid) {
         // Remove challenge
         this.activeChallenges.delete(_challengeId);
         
@@ -479,7 +479,7 @@ class MultiFactorAuthService {
       });
       
       return codes;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to generate recovery codes:');
       throw undefined;
     }
@@ -608,7 +608,7 @@ class MultiFactorAuthService {
     const storedCode = await cryptoService.decrypt(stored.code);
     const isValid = storedCode === code;
     
-    if (_isValid) {
+    if (isValid) {
       await secureStorage.removeItem(_key);
     }
     
@@ -638,7 +638,7 @@ class MultiFactorAuthService {
     
     const isValid = backupCodes.includes(code);
     
-    if (_isValid) {
+    if (isValid) {
       // Mark code as used
       usedCodes.push(code);
       if (setup.metadata) {
@@ -745,9 +745,9 @@ class MultiFactorAuthService {
 
   private cleanupExpiredChallenges(): void {
     const now = new Date();
-    for (const [_id, challenge] of this.activeChallenges.entries()) {
+    for (const [id, challenge] of this.activeChallenges.entries()) {
       if (now > challenge.expiresAt) {
-        this.activeChallenges.delete(_id);
+        this.activeChallenges.delete(id);
       }
     }
   }

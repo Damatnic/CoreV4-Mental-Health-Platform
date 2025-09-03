@@ -21,7 +21,7 @@ import {
   Award
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, _isToday, isPast, _isFuture, _differenceInMinutes, addDays } from 'date-fns';
+import { format, isToday, isPast, isFuture, _differenceInMinutes, addDays } from 'date-fns';
 
 interface ActivityTrackerProps {
   onActivityClick?: (activity: unknown) => void;
@@ -341,7 +341,7 @@ export function ActivityTracker({
                                 {[-3, -2, -1, 0, 1, 2, 3].map((impact) => (
                                   <button
                                     key={impact}
-                                    onClick={() => setMoodImpact(_impact)}
+                                    onClick={() => setMoodImpact(impact)}
                                     className={`
                                       px-3 py-1 rounded-lg text-sm font-medium transition-colors
                                       ${moodImpact === impact 

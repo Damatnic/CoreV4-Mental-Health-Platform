@@ -311,14 +311,14 @@ describe('Cross-Platform Compatibility Tests', () => {
       installEvent.preventDefault = vi.fn();
       installEvent.prompt = vi.fn();
       
-      window.dispatchEvent(_installEvent);
+      window.dispatchEvent(installEvent);
 
       render(<App />);
       
       await waitFor(() => {
-        const _installButton = screen.queryByRole('button', { name: /install/i });
-        if (_installButton) {
-          fireEvent.click(_installButton);
+        const installButton = screen.queryByRole('button', { name: /install/i });
+        if (installButton) {
+          fireEvent.click(installButton);
           expect(installEvent.prompt).toHaveBeenCalled();
         }
       });

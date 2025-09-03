@@ -2,7 +2,7 @@
 // CRITICAL: This is for DEMO PURPOSES ONLY - Production requires certified counselors
 
 import { RealtimeMessage } from '../realtime/websocketService';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Crisis Counselor Personas with Different Specializations
 export interface MockCounselor {
@@ -289,7 +289,7 @@ export class MockCrisisServer {
     this.emergencyCallbacks.forEach(callback => {
       try {
         callback(action, { ...data, protocol });
-      } catch {
+      } catch (error) {
         logger.error('Emergency callback failed:');
       }
     });
@@ -465,7 +465,7 @@ export class MockCrisisSession {
     this.messageCallbacks.forEach(callback => {
       try {
         callback(_counselorMessage);
-      } catch {
+      } catch (error) {
         logger.error('Message callback failed:');
       }
     });
@@ -572,7 +572,7 @@ class CrisisMessageAnalyzer {
 
     suicideKeywords.forEach(_keyword => {
       if (lowerContent.includes(_keyword)) {
-        indicators.push('suicide_ideation');
+        indicators.push('suicideideation');
         crisisScore += 10;
         emergencyScore += 5;
       }
@@ -618,7 +618,7 @@ class CrisisMessageAnalyzer {
       'drugs': { factor: 'substance_use', weight: 4 },
       'lost my job': { factor: 'employment_loss', weight: 3 },
       'broke up': { factor: 'relationship_loss', weight: 3 },
-      'no friends': { factor: 'social_isolation', weight: 5 },
+      'no friends': { factor: 'socialisolation', weight: 5 },
       'abuse': { factor: 'abuse_history', weight: 6 }
     };
 
@@ -656,7 +656,7 @@ class CrisisMessageAnalyzer {
     _userMessage: string,
     analysis: unknown,
     counselor: MockCounselor,
-    _messageHistory: RealtimeMessage[]
+    messageHistory: RealtimeMessage[]
   ): string {
     const templates = CRISIS_RESPONSE_TEMPLATES.find(t => t.level === analysis.crisisLevel);
     if (!templates) {

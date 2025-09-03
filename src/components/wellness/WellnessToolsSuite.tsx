@@ -97,19 +97,19 @@ const WELLNESS_TIPS = [
 ];
 
 interface WellnessToolsSuiteProps {
-  _initialTool?: string;
+  initialTool?: string;
   onToolChange?: (_toolId: string) => void;
   showNavigation?: boolean;
   compactMode?: boolean;
 }
 
 export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
-  _initialTool = 'dashboard',
+  initialTool = 'dashboard',
   onToolChange,
   showNavigation = true,
   compactMode = false
 }) => {
-  const [selectedTool, _setSelectedTool] = useState(_initialTool);
+  const [selectedTool, _setSelectedTool] = useState(initialTool);
   const [sidebarCollapsed, _setSidebarCollapsed] = useState(_compactMode);
   const [_showTips, _setShowTips] = useState(true);
   const [currentTipIndex, _setCurrentTipIndex] = useState(0);

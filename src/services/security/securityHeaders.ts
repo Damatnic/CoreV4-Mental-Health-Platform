@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 /**
  * Security Headers Service
@@ -403,7 +403,7 @@ class SecurityHeadersService {
           }),
         });
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to report CSP violation:');
     }
   }

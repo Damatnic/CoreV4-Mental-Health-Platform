@@ -11,7 +11,7 @@ import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
 import { _User } from '../api/types';
 import { EventEmitter } from 'events';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Integration event types
 export enum IntegrationEvent {
@@ -277,7 +277,7 @@ class DataIntegrationService extends EventEmitter {
         this.handleCommunityUpdate(update);
       });
       
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize WebSocket:');
       this.state.syncErrors.push(error as Error);
     }
@@ -577,7 +577,7 @@ class DataIntegrationService extends EventEmitter {
       this.state.lastSyncTime = new Date();
       this.emit(IntegrationEvent.STORE_SYNC_COMPLETED);
       
-    } catch {
+    } catch (error) {
       logger.error('Sync failed:');
       this.state.syncErrors.push(error as Error);
       this.emit(IntegrationEvent.STORE_SYNC_FAILED, undefined);
@@ -627,7 +627,7 @@ class DataIntegrationService extends EventEmitter {
         const [store, property] = key.split(':');
         this.routeDataToTarget(`${store}.${property}`, data);
         this.offlineQueue.delete(key);
-      } catch {
+      } catch (error) {
         logger.error(`Failed to sync offline item ${key}:`, error);
       }
     }

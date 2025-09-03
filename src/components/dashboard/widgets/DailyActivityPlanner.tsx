@@ -23,7 +23,7 @@ import {
   TrendingUp,
   Sparkles
 } from 'lucide-react';
-import { format, _addMinutes, isSameDay, _isToday, _isTomorrow } from 'date-fns';
+import { format, _addMinutes, isSameDay, isToday, isTomorrow } from 'date-fns';
 import { useActivityStore } from '../../../stores/activityStore';
 import { useWellnessStore } from '../../../stores/wellnessStore';
 

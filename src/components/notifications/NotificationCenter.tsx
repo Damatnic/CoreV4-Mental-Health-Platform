@@ -25,7 +25,7 @@ import {
   NotificationRule,
   SmartNotification
 } from '../../services/notifications/ComprehensiveNotificationService';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface NotificationCenterProps {
   className?: string;
@@ -41,11 +41,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const [preferences, _setPreferences] = useState<NotificationPreferences | null>(null);
   const [rules, _setRules] = useState<NotificationRule[]>([]);
   const [notifications, _setNotifications] = useState<SmartNotification[]>([]);
-  const [____isLoading, _setIsLoading] = useState(true);
+  const [__isLoading, _setIsLoading] = useState(true);
   const [activeTab, _setActiveTab] = useState<'notifications' | 'rules' | 'settings'>('notifications');
   const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
   const [searchQuery, _setSearchQuery] = useState('');
-  const [___inAppNotifications, _setInAppNotifications] = useState<InAppNotification[]>([]);
+  const [_inAppNotifications, _setInAppNotifications] = useState<InAppNotification[]>([]);
 
   useEffect(() => {
     initializeNotificationCenter();
@@ -65,7 +65,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       setRules(_allRules);
       setNotifications(_notificationHistory);
       
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize notification center:');
     } finally {
       setIsLoading(false);
@@ -103,7 +103,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       await comprehensiveNotificationService.updatePreferences(_updates);
       const _updatedPreferences = comprehensiveNotificationService.getPreferences();
       setPreferences(_updatedPreferences);
-    } catch {
+    } catch (error) {
       logger.error('Failed to update preferences:');
     }
   };
@@ -118,7 +118,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         // In a real implementation, this would update the rule in the service
         // For now, we&apos;ll just update the local state
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to toggle rule:');
     }
   };
@@ -133,7 +133,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     try {
       await comprehensiveNotificationService.handleNotificationClick(notificationId, actionId);
       dismissInAppNotification(_notificationId);
-    } catch {
+    } catch (error) {
       logger.error('Failed to handle notification action:');
     }
   };
@@ -169,7 +169,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return matchesPriority && matchesSearch;
   });
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className={`bg-white rounded-xl shadow-lg p-6 ${className}`}>
         <div className="flex items-center justify-center space-x-3">

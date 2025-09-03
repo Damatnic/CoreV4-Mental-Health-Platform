@@ -116,7 +116,7 @@ export class CrisisDetectionService {
       
       return profile;
       
-    } catch {
+    } catch (error) {
       logger.error('Crisis detection analysis failed', error as Error, { 
         category: LogCategory.CRISIS,
         userId 
@@ -501,7 +501,7 @@ export class CrisisDetectionService {
     logger.info('Crisis detection models initialized', { category: LogCategory.CRISIS });
   }
 
-  private detectPatterns(_indicators: CrisisIndicator[]): Promise<CrisisPattern[]> {
+  private detectPatterns(indicators: CrisisIndicator[]): Promise<CrisisPattern[]> {
     // Implement pattern detection algorithm
     // This is a simplified version - production would use more sophisticated ML
     return Promise.resolve([]);

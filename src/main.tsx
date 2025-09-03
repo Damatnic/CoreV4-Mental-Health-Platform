@@ -107,7 +107,7 @@ function initializeReact() {
     // If DOM is ready but no root element, create it
     const newRoot = document.createElement('div');
     newRoot.id = 'root';
-    document.body.appendChild(_newRoot);
+    document.body.appendChild(newRoot);
     
     // Retry initialization
     setTimeout(() => {
@@ -117,7 +117,7 @@ function initializeReact() {
   }
 
   try {
-    const root = ReactDOM.createRoot(_rootElement);
+    const root = ReactDOM.createRoot(rootElement);
 
     root.render(
       <React.StrictMode>
@@ -126,7 +126,7 @@ function initializeReact() {
         </EmergencyErrorBoundary>
       </React.StrictMode>
     );
-  } catch {
+  } catch (error) {
     logger.error('🚨 React initialization failed:');
     // Show emergency fallback
     rootElement.innerHTML = `

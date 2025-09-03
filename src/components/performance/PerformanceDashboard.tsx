@@ -50,7 +50,7 @@ interface PerformanceStats {
 export function PerformanceDashboard() {
   const { deviceInfo } = useMobileFeatures();
   const [stats, _setStats] = useState<PerformanceStats | null>(null);
-  const [__isLoading, _setIsLoading] = useState(true);
+  const [isLoading, _setIsLoading] = useState(true);
   const [refreshInterval, _setRefreshInterval] = useState(5000); // 5 seconds
   const [showDetails, _setShowDetails] = useState(false);
   const [selectedMetric, _setSelectedMetric] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export function PerformanceDashboard() {
       };
       
       setStats(_newStats);
-    } catch {
+    } catch (error) {
       logger.error('Failed to refresh performance stats:');
     }
   }, [deviceInfo]);
@@ -100,7 +100,7 @@ export function PerformanceDashboard() {
         
         performanceMonitor.recordMetric('dashboard_load_complete', Date.now());
         setIsLoading(false);
-      } catch {
+      } catch (error) {
         logger.error('Failed to initialize performance monitoring:');
         setIsLoading(false);
       }
@@ -112,8 +112,8 @@ export function PerformanceDashboard() {
 
   // Auto-refresh performance data
   useEffect(() => {
-    const _interval = setInterval(refreshStats, refreshInterval);
-    return () => clearInterval(_interval);
+    const interval = setInterval(refreshStats, refreshInterval);
+    return () => clearInterval(interval);
   }, [refreshInterval, refreshStats]);
 
   // Generate metric summaries with status and trends
@@ -200,7 +200,7 @@ export function PerformanceDashboard() {
     }
   };
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>

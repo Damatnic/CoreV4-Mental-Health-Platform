@@ -120,7 +120,7 @@ export function useConsoleNavigation() {
   // Unregister a focusable element with cleanup
   const __unregisterFocusable   = useCallback((id: string) => {
     // Clean up cached bounds
-    boundsCacheRef.current.delete(_id);
+    boundsCacheRef.current.delete(id);
     
     setState(prev => ({
       ...prev,
@@ -192,9 +192,9 @@ export function useConsoleNavigation() {
             isPerformanceMode: state.isPerformanceMode
           });
         }
-      } catch (_error  ) {
+      } catch (error  ) {
         logger.warn('Error setting focus on element:');
-        performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, undefined: String(_undefined) });
+        performanceMonitor.recordMetric('focuserror', 1, { focusableId: id, undefined: String(_undefined) });
       }
     }
   }, [state.focusables, state.isPerformanceMode, onFocus]);
@@ -254,29 +254,29 @@ export function useConsoleNavigation() {
       const deltaY = center.y - currentCenter.y;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      let _isValidDirection = false;
+      let isValidDirection = false;
       let alignment = 0;
       
       switch (_direction) {
         case 'up':
-          _isValidDirection = deltaY < -10; // Must be significantly above
+          isValidDirection = deltaY < -10; // Must be significantly above
           alignment = 1 - Math.abs(_deltaX) / window.innerWidth; // Prefer aligned horizontally
           break;
         case 'down':
-          _isValidDirection = deltaY > 10; // Must be significantly below
+          isValidDirection = deltaY > 10; // Must be significantly below
           alignment = 1 - Math.abs(_deltaX) / window.innerWidth;
           break;
         case 'left':
-          _isValidDirection = deltaX < -10; // Must be significantly to the left
+          isValidDirection = deltaX < -10; // Must be significantly to the left
           alignment = 1 - Math.abs(_deltaY) / window.innerHeight; // Prefer aligned vertically
           break;
         case 'right':
-          _isValidDirection = deltaX > 10; // Must be significantly to the right
+          isValidDirection = deltaX > 10; // Must be significantly to the right
           alignment = 1 - Math.abs(_deltaY) / window.innerHeight;
           break;
       }
       
-      if (_isValidDirection) {
+      if (isValidDirection) {
         // Score combines distance and alignment
         const score = distance - (alignment * 100); // Alignment bonus
         
@@ -336,7 +336,7 @@ export function useConsoleNavigation() {
           
           focusable.element.click();
           onSelect();
-        } catch {
+        } catch (error) {
     logger.warn('Error activating element:');
         }
       }
@@ -364,7 +364,7 @@ export function useConsoleNavigation() {
     
     // Throttle rapid keypresses for performance
     interactionTimeoutRef.current = window.setTimeout(() => {
-      performanceMonitor.recordMetric('keyboard_interaction', performance.now() - startTime);
+      performanceMonitor.recordMetric('keyboardinteraction', performance.now() - startTime);
     }, 100);
 
     switch (event.key) {
@@ -471,7 +471,7 @@ export function useConsoleNavigation() {
       if (f.element && f.element.classList) {
         try {
           f.element.classList.remove('console-focused');
-        } catch {
+        } catch (error) {
     logger.warn('Error removing focus styling:');
         }
       }
@@ -586,10 +586,10 @@ export function useConsoleNavigation() {
           // Update button states efficiently
           lastButtonStates = gamepad.buttons.map(b => b?.pressed || false);
         }
-      } catch (_error) {
+      } catch (error) {
         // Log gamepad errors for monitoring but don't break functionality
-        performanceMonitor.recordMetric('gamepad_error', 1, {
-          error: String(_error)
+        performanceMonitor.recordMetric('gamepaderror', 1, {
+          error: String(error)
         });
       }
     };

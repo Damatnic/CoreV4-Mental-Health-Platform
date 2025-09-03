@@ -282,7 +282,7 @@ class GamePerformanceOptimizer {
     document.documentElement.style.removeProperty('--animation-duration');
     document.documentElement.style.removeProperty('--box-shadow-intensity');
     
-    performanceMonitor.recordMetric('quality_increased', 1, {
+    performanceMonitor.recordMetric('qualityincreased', 1, {
       reason: 'good_fps',
       currentFPS: this.metrics.fps
     });

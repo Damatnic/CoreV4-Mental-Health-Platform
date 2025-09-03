@@ -23,7 +23,7 @@ interface MedicationTrackerWidgetProps {
 export function MedicationTrackerWidget({ medications, error }: MedicationTrackerWidgetProps) {
   const navigate = useNavigate();
 
-  if (_error) {
+  if (error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>

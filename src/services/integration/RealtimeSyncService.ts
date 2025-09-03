@@ -7,7 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import { EventEmitter } from 'events';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Real-time event types
 export enum RealtimeEvent {
@@ -49,7 +49,7 @@ export enum RealtimeEvent {
 
 // Message types
 interface RealtimeMessage {
-  _id: string;
+  id: string;
   _type: string;
   _payload: unknown;
   timestamp: Date;
@@ -154,14 +154,14 @@ class RealtimeSyncService extends EventEmitter {
           resolve();
         });
         
-        this.socket.once('connect_error', (error: unknown) => {
+        this.socket.once('connecterror', (error: unknown) => {
           clearTimeout(_timeout);
           this.emit(RealtimeEvent.ERROR, error);
-          reject(_error);
+          reject(error);
         });
         
-      } catch (_error) {
-        reject(_error);
+      } catch (error) {
+        reject(error);
       }
     });
   }
@@ -187,7 +187,7 @@ class RealtimeSyncService extends EventEmitter {
     // Professional care channel subscription
     this.subscribe({
       channel: 'professional',
-      events: ['therapist_available', 'appointment_reminder', 'prescription_update', 'care_team_message'],
+      events: ['therapist_available', 'appointment_reminder', 'prescription_update', 'care_teammessage'],
       handler: (_data) => this.handleProfessionalUpdate(data)
     });
     
@@ -376,7 +376,7 @@ class RealtimeSyncService extends EventEmitter {
         this.emit(RealtimeEvent.PRESCRIPTION_UPDATE, _payload);
         break;
         
-      case 'care_team_message':
+      case 'care_teammessage':
         this.emit(RealtimeEvent.CARE_TEAM_MESSAGE, _payload);
         break;
     }
@@ -531,7 +531,7 @@ class RealtimeSyncService extends EventEmitter {
    */
   public send(channel: string, event: string, data: unknown): void {
     const message: RealtimeMessage = {
-      _id: `msg-${Date.now()}-${Math.random()}`,
+      id: `msg-${Date.now()}-${Math.random()}`,
       _type: channel,
       _payload: data,
       timestamp: new Date(),
@@ -684,7 +684,7 @@ export function useRealtimeSync() {
     connect: (_auth?: { token: string; _userId: string }) => service.connect(_auth),
     disconnect: () => service.disconnect(),
     subscribe: (config: SubscriptionConfig) => service.subscribe(config),
-    unsubscribe: (_id: string) => service.unsubscribe(_id),
+    unsubscribe: (id: string) => service.unsubscribe(id),
     send: (channel: string, event: string, data: unknown) => service.send(channel, event, data),
     getPresence: (_userId: string) => service.getPresence(_userId),
     getOnlineUsers: () => service.getOnlineUsers(),

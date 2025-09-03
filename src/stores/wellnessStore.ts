@@ -569,7 +569,7 @@ export const _useWellnessStore = create<WellnessState>()(
       }),
       
       analyzeMoodPatterns: () => set((state) => {
-        const entries = state.moodEntries.map((e: unknown) => ({
+        const entries = state.moodEntries.map((e: MoodEntry) => ({
           ...e,
           timestamp: e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp)
         }));
@@ -577,7 +577,7 @@ export const _useWellnessStore = create<WellnessState>()(
       }),
       
       generateInsights: () => set((state) => {
-        const entries = state.moodEntries.map((e: unknown) => ({
+        const entries = state.moodEntries.map((e: MoodEntry) => ({
           ...e,
           timestamp: e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp)
         }));
@@ -665,7 +665,7 @@ export const _useWellnessStore = create<WellnessState>()(
           get().analyzeMoodPatterns();
           get().generateInsights();
           get().calculateWellnessScores();
-        } catch {
+        } catch (error) {
           logger.error('Failed to import data:');
         }
       })

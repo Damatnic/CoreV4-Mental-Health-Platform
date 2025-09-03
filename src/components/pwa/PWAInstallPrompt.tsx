@@ -47,7 +47,7 @@ export function PWAInstallPrompt() {
   const { vibrate } = useVibration();
   const [showPrompt, _setShowPrompt] = useState(false);
   const [isInstalling, _setIsInstalling] = useState(false);
-  const [___installSuccess, _setInstallSuccess] = useState(false);
+  const [_installSuccess, _setInstallSuccess] = useState(false);
   const [dismissCount, _setDismissCount] = useState(() => {
     const count = localStorage.getItem('pwa_dismiss_count');
     return count ? parseInt(_count) : 0;
@@ -99,8 +99,8 @@ export function PWAInstallPrompt() {
       }, 3000);
 
       // Track successful installation
-      localStorage.setItem('pwa_installed', 'true');
-      localStorage.setItem('pwa_install_date', new Date().toISOString());
+      localStorage.setItem('pwainstalled', 'true');
+      localStorage.setItem('pwainstall_date', new Date().toISOString());
     } else {
       // Installation was cancelled or failed
       handleDismiss();
@@ -289,16 +289,16 @@ export function PWAInstallPrompt() {
 // Standalone component for showing install status in settings
 export function PWAInstallStatus() {
   const { deviceInfo, isAppInstallable, installApp } = useMobileFeatures();
-  const [_isInstalled, _setIsInstalled] = useState(false);
+  const [isInstalled, _setIsInstalled] = useState(false);
 
   useEffect(() => {
     setIsInstalled(
       deviceInfo.isPWA || 
-      localStorage.getItem('pwa_installed') === 'true'
+      localStorage.getItem('pwainstalled') === 'true'
     );
   }, [deviceInfo.isPWA]);
 
-  if (_isInstalled) {
+  if (isInstalled) {
     return (
       <div className="flex items-center space-x-2 text-green-600">
         <CheckCircle className="h-5 w-5" />

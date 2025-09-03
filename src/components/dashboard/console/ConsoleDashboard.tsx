@@ -11,7 +11,7 @@ import { useMobileFeatures } from '../../../hooks/useMobileFeatures';
 
 export function ConsoleDashboard() {
   const { navigationMode, isPerformanceMode } = useConsoleNavigation();
-  const { _deviceInfo, isMobileDevice, isSmallScreen } = useMobileFeatures();
+  const { deviceInfo, isMobileDevice, isSmallScreen } = useMobileFeatures();
 
   // Apply navigation mode class to body for styling
   useEffect(() => {

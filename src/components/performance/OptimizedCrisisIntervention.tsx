@@ -54,7 +54,7 @@ export function OptimizedCrisisIntervention({
   onActivate,
   preloadResources = true,
 }: OptimizedCrisisInterventionProps) {
-  const [___isActive, _setIsActive] = useState(false);
+  const [_isActive, _setIsActive] = useState(false);
   const [responseTime, _setResponseTime] = useState<number | null>(null);
   const activationTime = useRef<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -316,7 +316,7 @@ function preloadCrisisResources() {
   const link = document.createElement('link');
   link.rel = 'preconnect';
   link.href = 'https://988lifeline.org';
-  document.head.appendChild(_link);
+  document.head.appendChild(link);
   
   // Cache crisis data in IndexedDB for offline access
   if ('indexedDB' in window) {
@@ -338,7 +338,7 @@ async function cacheOfflineCrisisData() {
       data: CRISIS_RESOURCES,
       timestamp: Date.now(),
     });
-  } catch {
+  } catch (error) {
     logger.error('Failed to cache crisis data:');
   }
 }

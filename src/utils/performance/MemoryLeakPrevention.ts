@@ -188,7 +188,7 @@ export class CleanupManager {
     this.cleanupFunctions.forEach(cleanup => {
       try {
         cleanup();
-      } catch {
+      } catch (error) {
         logger.error('Cleanup function error: ');
       }
     });
@@ -238,7 +238,7 @@ export class MemoryEfficientEventEmitter<T extends Record<string, any>> {
       eventListeners.forEach(listener => {
         try {
           listener(data);
-        } catch {
+        } catch (error) {
           logger.error(`Error in event listener for ${String(event)}:`, error);
         }
       });
@@ -376,14 +376,14 @@ export function createDebouncedFunction<T extends (...args: unknown[]) => any>(
   
   function debounced(this: unknown, ...args: unknown[]) {
     const _time = Date.now();
-    const _isInvoking = shouldInvoke(_time);
+    const isInvoking = shouldInvoke(_time);
     
     lastArgs = args;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     lastThis = this;
     lastCallTime = _time;
     
-    if (_isInvoking) {
+    if (isInvoking) {
       if (timeoutId === null) {
         return leadingEdge(_time);
       }

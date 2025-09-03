@@ -22,7 +22,7 @@ import {
   CrisisLevel,
   CrisisTheme
 } from '../../constants/crisis';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface UnifiedCrisisButtonProps {
   variant?: 'primary' | 'floating' | 'quick' | 'emergency';

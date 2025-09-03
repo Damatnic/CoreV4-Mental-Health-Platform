@@ -57,10 +57,10 @@ export function ConsoleCrisisSystem() {
   // Enhanced pulse effect for critical situations
   useEffect(() => {
     if (currentCrisisLevel?.level === 'critical') {
-      const _interval = setInterval(() => {
+      const interval = setInterval(() => {
         setPulseIntensity(prev => prev === 1 ? 1.2 : 1);
       }, 800);
-      return () => clearInterval(_interval);
+      return () => clearInterval(interval);
     }
   }, [currentCrisisLevel]);
 
@@ -84,7 +84,7 @@ export function ConsoleCrisisSystem() {
   // Emergency handlers
   const handleEmergencyCall = useCallback((number: string, service: string) => {
     const timestamp = new Date().toISOString();
-    logger.logCrisisIntervention('emergency_call_initiated', undefined, {
+    logger.logCrisisIntervention('emergency_callinitiated', undefined, {
       service,
       timestamp,
       responseTime
@@ -97,7 +97,7 @@ export function ConsoleCrisisSystem() {
     const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(keyword)}` : ''}`;
     window.location.href = smsUrl;
     
-    logger.logCrisisIntervention('crisis_text_initiated', undefined, {
+    logger.logCrisisIntervention('crisis_textinitiated', undefined, {
       number,
       keyword,
       timestamp: new Date().toISOString()

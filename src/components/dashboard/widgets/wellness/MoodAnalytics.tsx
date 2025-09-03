@@ -174,7 +174,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, _onTriggerIdentifi
 
         correlationData.push({
           factor: factor.charAt(0).toUpperCase() + factor.slice(1).replace(/([A-Z])/g, ' $1'),
-          impact: Math.round(_impact),
+          impact: Math.round(impact),
           positive: impact > 0,
           avgWith: avgWithFactor.toFixed(1),
           avgWithout: avgWithoutFactor.toFixed(1),

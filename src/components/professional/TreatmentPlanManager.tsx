@@ -58,7 +58,7 @@ interface TreatmentModality {
 
 interface TreatmentGoal {
   id: string;
-  category: 'symptom_reduction' | 'functional_improvement' | 'skill_development' | 'relationship' | 'behavioral' | 'cognitive' | 'other';
+  category: 'symptom_reduction' | 'functionalimprovement' | 'skill_development' | 'relationship' | 'behavioral' | 'cognitive' | 'other';
   description: string;
   targetDate: Date;
   _priority: 'high' | 'medium' | 'low';
@@ -76,7 +76,7 @@ interface TreatmentGoal {
 interface Intervention {
   id: string;
   name: string;
-  type: 'individual_therapy' | 'group_therapy' | 'medication' | 'behavioral_intervention' | 'skill_training' | 'family_session' | 'other';
+  type: 'individual_therapy' | 'group_therapy' | 'medication' | 'behavioralintervention' | 'skill_training' | 'family_session' | 'other';
   frequency: string;
   provider?: string;
   startDate: Date;
@@ -170,7 +170,7 @@ export function TreatmentPlanManager({
   const [__showInterventionForm, _setShowInterventionForm] = useState(false);
   const [filterPriority, _setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [___searchTerm, _setSearchTerm] = useState('');
-  const [___showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
+  const [___showPrivateNotes, _setShowPrivateNotes] = useState(isProvider);
 
   // Create new treatment plan if none provided
   useEffect(() => {

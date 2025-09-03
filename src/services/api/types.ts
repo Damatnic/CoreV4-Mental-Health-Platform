@@ -427,7 +427,7 @@ export interface CommunityWebSocketEvent extends WebSocketEvent {
 }
 
 export interface NotificationWebSocketEvent extends WebSocketEvent {
-  type: 'appointment_reminder' | 'medication_reminder' | 'crisis_check_in' | 'system_alert';
+  type: 'appointment_reminder' | 'medication_reminder' | 'crisis_checkin' | 'system_alert';
   priority: 'low' | 'medium' | 'high' | 'critical';
 }
 

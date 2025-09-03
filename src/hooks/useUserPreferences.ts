@@ -137,7 +137,7 @@ export function useUserPreferences(userId: string) {
           // const data = await response.json();
           // setPreferences(_data);
         }
-      } catch {
+      } catch (error) {
         logger.error('Error loading preferences:', err);
         setError('Failed to load preferences');
       } finally {
@@ -162,7 +162,7 @@ export function useUserPreferences(userId: string) {
       // });
       
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Error saving preferences:', err);
       setError('Failed to save preferences');
       return false;
@@ -219,7 +219,7 @@ export function useUserPreferences(userId: string) {
   }, [preferences, userId]);
 
   // Import preferences
-  const __importPreferences   = useCallback(async (file: File): Promise<boolean> => {
+  const importPreferences   = useCallback(async (file: File): Promise<boolean> => {
     try {
       const _text = await file._text();
       const imported = JSON.parse(_text);
@@ -234,7 +234,7 @@ export function useUserPreferences(userId: string) {
       await savePreferences(_newPreferences);
       
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Error importing preferences:', err);
       setError('Failed to import preferences');
 import { logger } from '../utils/logger';

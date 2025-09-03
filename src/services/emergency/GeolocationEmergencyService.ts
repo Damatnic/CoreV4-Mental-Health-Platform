@@ -50,7 +50,7 @@ export class GeolocationEmergencyService {
         this.updatePermissionStatus(permission._state);
       });
 
-    } catch {
+    } catch (error) {
       logger.error('Geolocation initialization failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -155,7 +155,7 @@ export class GeolocationEmergencyService {
 
       return this.nearbyServices;
 
-    } catch {
+    } catch (error) {
       logger.error('Failed to find nearby emergency services:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -268,7 +268,7 @@ export class GeolocationEmergencyService {
   ): Promise<{
     success: boolean;
     service: EmergencyServiceProvider;
-    action: 'call_initiated' | 'location_shared' | 'emergency_contacted';
+    action: 'callinitiated' | 'location_shared' | 'emergency_contacted';
   }> {
     try {
       // Find appropriate service based on crisis level
@@ -300,7 +300,7 @@ export class GeolocationEmergencyService {
         action: 'location_shared'
       };
 
-    } catch {
+    } catch (error) {
       logger.error('Emergency response failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -319,7 +319,7 @@ export class GeolocationEmergencyService {
     const services = await this.findNearbyEmergencyServices();
     
     // Crisis-specific service selection
-    if (crisisProfile.indicators.includes('suicidal_ideation')) {
+    if (crisisProfile.indicators.includes('suicidalideation')) {
       return services.find(s => s.specialties.includes('suicide_prevention')) || services[0] || this.getDefaultService();
     }
 
@@ -341,7 +341,7 @@ export class GeolocationEmergencyService {
       coordinates: { latitude: 0, longitude: 0, accuracy: 0 },
       distance: 0,
       availability: '24/7',
-      specialties: ['crisis_intervention', 'suicide_prevention'],
+      specialties: ['crisisintervention', 'suicide_prevention'],
       rating: 5.0
     };
   }
@@ -349,7 +349,7 @@ export class GeolocationEmergencyService {
   private async initiateEmergencyCall(service: EmergencyServiceProvider): Promise<{
     success: boolean;
     service: EmergencyServiceProvider;
-    action: 'call_initiated' | 'location_shared' | 'emergency_contacted';
+    action: 'callinitiated' | 'location_shared' | 'emergency_contacted';
   }> {
     try {
       // In a real implementation, this would integrate with device calling capabilities
@@ -373,10 +373,10 @@ export class GeolocationEmergencyService {
       return {
         success: true,
         service,
-        action: 'call_initiated'
+        action: 'callinitiated'
       };
 
-    } catch {
+    } catch (error) {
       logger.error('Emergency call initiation failed:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });
@@ -387,7 +387,7 @@ export class GeolocationEmergencyService {
   private async prepareEmergencyResponse(service: EmergencyServiceProvider): Promise<{
     success: boolean;
     service: EmergencyServiceProvider;
-    action: 'call_initiated' | 'location_shared' | 'emergency_contacted';
+    action: 'callinitiated' | 'location_shared' | 'emergency_contacted';
   }> {
     // Prepare all emergency information for quick access
     const emergencyPackage = {
@@ -429,7 +429,7 @@ export class GeolocationEmergencyService {
       });
       return true;
 
-    } catch {
+    } catch (error) {
       logger.error('Failed to share location:', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.EMERGENCY
       });

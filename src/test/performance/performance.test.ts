@@ -393,8 +393,8 @@ describe('Performance Testing Suite', () => {
       await page.goto('http://localhost:5173');
       
       const imageMetrics = await page.evaluate(() => {
-        const _images = document.querySelectorAll('img');
-        return Array.from(_images).map(img => ({
+        const images = document.querySelectorAll('img');
+        return Array.from(images).map(img => ({
           src: img.src,
           loading: img.loading,
           srcset: img.srcset,

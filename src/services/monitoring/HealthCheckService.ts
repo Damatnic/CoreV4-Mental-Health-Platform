@@ -3,7 +3,7 @@
 
 import { _apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 // Health check status types
 export enum HealthStatus {
@@ -120,7 +120,7 @@ export class HealthCheckService {
         this.performanceObserver.observe({ 
           entryTypes: ['navigation', 'resource', 'paint', 'largest-contentful-paint', 'layout-shift', 'first-input'] 
         });
-      } catch {
+      } catch (error) {
         logger.error('Failed to initialize performance observer:');
       }
     }
@@ -244,7 +244,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (error) {
       return {
         name: 'API',
         status: HealthStatus.UNHEALTHY,
@@ -273,7 +273,7 @@ export class HealthCheckService {
           latency
         }
       };
-    } catch {
+    } catch (error) {
       return {
         name: 'WebSocket',
         status: HealthStatus.UNHEALTHY,
@@ -317,7 +317,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (error) {
       return {
         name: 'Database',
         status: HealthStatus.UNHEALTHY,
@@ -361,7 +361,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (error) {
       return {
         name: 'Cache',
         status: HealthStatus.DEGRADED,
@@ -423,7 +423,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch {
+    } catch (error) {
       return {
         name: 'Crisis System',
         status: HealthStatus.UNKNOWN,
@@ -438,7 +438,7 @@ export class HealthCheckService {
   private async checkIntegrationsHealth(): Promise<ServiceHealth> {
     const startTime = performance.now();
     const integrations = ['payment', 'video', 'sms', 'email'];
-    const _results: Record<string, boolean> = {};
+    const results: Record<string, boolean> = {};
     
     try {
       // Check each integration in parallel
@@ -449,15 +449,15 @@ export class HealthCheckService {
             signal: AbortSignal.timeout(3000)
           });
           results[integration] = response.ok;
-        } catch {
+        } catch (error) {
           results[integration] = false;
         }
       });
       
       await Promise.all(_checks);
       
-      const healthyCount = Object.values(_results).filter(v => v).length;
-      const totalCount = Object.values(_results).length;
+      const healthyCount = Object.values(results).filter(v => v).length;
+      const totalCount = Object.values(results).length;
       
       let status = HealthStatus.HEALTHY;
       if (healthyCount < totalCount) {
@@ -471,7 +471,7 @@ export class HealthCheckService {
         lastChecked: new Date(),
         details: results
       };
-    } catch {
+    } catch (error) {
       return {
         name: 'Integrations',
         status: HealthStatus.UNKNOWN,
@@ -645,7 +645,7 @@ export class HealthCheckService {
       }).catch(error => {
         logger.error('Failed to send _metrics:', error);
       });
-    } catch {
+    } catch (error) {
       logger.error('Failed to send _metrics:');
     }
   }

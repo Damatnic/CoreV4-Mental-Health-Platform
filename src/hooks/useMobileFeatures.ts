@@ -62,7 +62,7 @@ export function useMobileFeatures() {
   }, []);
 
   // Install PWA
-  const __installApp   = useCallback(async () => {
+  const installApp   = useCallback(async () => {
     if (!deferredPrompt) return false;
 
     try {
@@ -75,7 +75,7 @@ export function useMobileFeatures() {
         
         // Track installation
         if ('gtag' in window) {
-          (window as unknown).gtag('event', 'pwa_install', {
+          (window as unknown).gtag('event', 'pwainstall', {
             event_category: 'engagement',
             event_label: 'success'
           });
@@ -83,7 +83,7 @@ export function useMobileFeatures() {
         
         return true;
       }
-    } catch {
+    } catch (error) {
       logger.error('PWA installation failed:');
     }
     
@@ -96,7 +96,7 @@ export function useMobileFeatures() {
       try {
         const granted = await navigator.storage.persist();
         return granted;
-      } catch {
+      } catch (error) {
         logger.error('Persistent storage request failed:');
         return false;
       }
@@ -123,7 +123,7 @@ export function useMobileFeatures() {
       try {
         await navigator.clipboard.writeText(data.url);
         return true;
-      } catch {
+      } catch (error) {
         logger.error('Clipboard write failed:');
         return false;
       }
@@ -138,7 +138,7 @@ export function useMobileFeatures() {
       try {
         const wakeLock = await (navigator as unknown).wakeLock.request('screen');
         return wakeLock;
-      } catch {
+      } catch (error) {
         logger.error('Wake lock request failed:');
         return null;
       }
@@ -359,7 +359,7 @@ export function usePullToRefresh(
   } = {}
 ) {
   const { threshold = 80, disabled = false } = options;
-  const [___isPulling, _setIsPulling] = useState(false);
+  const [_isPulling, _setIsPulling] = useState(false);
   const [pullDistance, _setPullDistance] = useState(0);
   const startYRef = useRef(0);
 
@@ -393,7 +393,7 @@ export function usePullToRefresh(
       if (pullDistance > threshold) {
         try {
           await onRefresh();
-        } catch {
+        } catch (error) {
           logger.error('Pull to refresh failed:');
         }
       }

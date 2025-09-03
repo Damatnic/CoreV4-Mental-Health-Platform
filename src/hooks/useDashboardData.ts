@@ -249,7 +249,7 @@ export function useWidgetData(widgetType: string, widgetId: string) {
             case 'wellness_status':
               resolve(mockData.wellnessStatus);
               break;
-            case 'todays_schedule':
+            case 'todaysschedule':
               resolve(mockData.todaySchedule);
               break;
             case 'crisis_panel':

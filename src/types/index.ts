@@ -51,7 +51,7 @@ export interface PrivacySettings {
 export interface ConsentRecord {
   id: string;
   userId: string;
-  type: 'terms' | 'privacy' | 'data_processing' | 'marketing' | 'data_sharing' | 'analytics' | 'cookies' | 'health_data' | 'crisis_intervention' | 'emergency_contact' | 'therapist_access' | 'research' | 'third_party';
+  type: 'terms' | 'privacy' | 'data_processing' | 'marketing' | 'data_sharing' | 'analytics' | 'cookies' | 'health_data' | 'crisisintervention' | 'emergency_contact' | 'therapist_access' | 'research' | 'third_party';
   version: string;
   consentGiven: boolean;
   timestamp: Date;

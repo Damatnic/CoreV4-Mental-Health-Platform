@@ -205,7 +205,7 @@ export function CrisisSupportNetwork() {
     ));
 
     // Perform action based on type
-    switch (_action) {
+    switch (action) {
       case 'call':
         window.location.href = `tel:${contact.phone}`;
         break;

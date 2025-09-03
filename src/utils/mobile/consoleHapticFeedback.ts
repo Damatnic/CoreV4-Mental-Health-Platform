@@ -81,7 +81,7 @@ class ConsoleHapticFeedbackSystem {
       if (_stored) {
         return { ...this.getDefaultSettings(), ...JSON.parse(_stored) };
       }
-    } catch {
+    } catch (error) {
       logger.warn('Failed to load haptic settings:');
     }
     return this.getDefaultSettings();
@@ -100,7 +100,7 @@ class ConsoleHapticFeedbackSystem {
   private saveSettings(): void {
     try {
       localStorage.setItem('consoleHapticSettings', JSON.stringify(this.settings));
-    } catch {
+    } catch (error) {
       logger.warn('Failed to save haptic settings:');
     }
   }
@@ -202,7 +202,7 @@ class ConsoleHapticFeedbackSystem {
   private executeHaptic(pattern: number[]): void {
     try {
       navigator.vibrate(pattern);
-    } catch {
+    } catch (error) {
       logger.warn('Haptic feedback failed:');
     }
   }
@@ -246,7 +246,7 @@ class ConsoleHapticFeedbackSystem {
   }
 
   public triggerSequence(_sequence: Array<{ action: ActionType; delay?: number }>): void {
-    _sequence.forEach(({ _action, delay = 0 }, index) => {
+    _sequence.forEach(({ action, delay = 0 }, index) => {
       setTimeout(() => {
         this.triggerHaptic(action);
       }, delay + (index * 150)); // 150ms base delay between sequence items

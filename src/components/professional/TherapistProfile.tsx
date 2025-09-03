@@ -243,7 +243,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
         };
         
         setTherapist(_therapistData);
-      } catch {
+      } catch (error) {
         logger.error('Failed to load therapist:');
       } finally {
         setLoading(false);

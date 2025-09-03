@@ -7,7 +7,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccessibilityStore } from '../../stores/accessibilityStore';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface VoiceCommand {
   phrase: string;
@@ -176,7 +176,7 @@ export const VoiceNavigation: React.FC = () => {
         setTimeout(() => {
           try {
             recognitionInstance.start();
-          } catch {
+          } catch (error) {
     logger.warn('Voice recognition restart failed', 'VoiceNavigation', error);
           }
         }, 1000);
@@ -210,7 +210,7 @@ export const VoiceNavigation: React.FC = () => {
       try {
         recognition.start();
         announceAction('Voice navigation started. Say "crisis help" for emergency assistance.');
-      } catch {
+      } catch (error) {
         logger.error('Failed to start voice recognition', 'VoiceNavigation', error);
       }
     }

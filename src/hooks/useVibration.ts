@@ -13,7 +13,7 @@ export function useVibration() {
       if (_hapticEnabled) {
         try {
           navigator.vibrate(_pattern);
-        } catch {
+        } catch (error) {
           console.error('Vibration failed:');
         }
       }
@@ -28,7 +28,7 @@ export function useVibration() {
       if (customPattern) {
         consoleHapticFeedback.triggerHaptic(action, customPattern);
       } else {
-        consoleHapticFeedback.triggerHaptic(_action);
+        consoleHapticFeedback.triggerHaptic(action);
       }
     } else {
       // Fallback to basic vibration

@@ -7,7 +7,7 @@
 
 // @ts-expect-error - CryptoJS types compatibility
 import CryptoJS from 'crypto-js';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Sensitive data types that must be encrypted
 const SENSITIVE_DATA_KEYS = [
@@ -31,7 +31,7 @@ const SENSITIVE_DATA_KEYS = [
   'userId',
   'anonymous_user',
   'critical_events',
-  'corev4_critical_errors'
+  'corev4_criticalerrors'
 ];
 
 class SecureLocalStorage {
@@ -43,7 +43,7 @@ class SecureLocalStorage {
       // Get encryption key from environment (secure approach)
       this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
       this.isInitialized = true;
-    } catch {
+    } catch (error) {
       logger.error('🔒 SecureLocalStorage initialization failed:', error);
       // Fallback to a simple key to prevent app crashes
       this.encryptionKey = `fallback_emergency_key_${  Date.now()}`;
@@ -62,7 +62,7 @@ class SecureLocalStorage {
       const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
       logger.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
       return tempKey;
-    } catch {
+    } catch (error) {
       // Fallback to browser crypto API or manual generation
       logger.warn('⚠️ CryptoJS random failed, using fallback method');
       
@@ -112,7 +112,7 @@ class SecureLocalStorage {
         padding: CryptoJS.pad.Pkcs7
       });
       return encrypted.toString();
-    } catch {
+    } catch (error) {
       logger.error('🔒 Encryption failed:', error);
       logger.warn('🔒 Storing data unencrypted due to encryption failure');
       return data; // Fallback to unencrypted to prevent app crashes
@@ -153,7 +153,7 @@ class SecureLocalStorage {
       }
       
       return result;
-    } catch {
+    } catch (error) {
       logger.error('🔒 Decryption failed:', error);
       // Return original data instead of throwing to prevent app crashes
       logger.warn('🔒 Returning data unencrypted due to decryption failure');
@@ -177,7 +177,7 @@ class SecureLocalStorage {
         // Store non-sensitive data normally
         localStorage.setItem(key, value);
       }
-    } catch {
+    } catch (error) {
       logger.error('🔒 SecureLocalStorage.setItem failed:', error);
       throw undefined;
     }
@@ -194,7 +194,7 @@ class SecureLocalStorage {
         if (encryptedValue) {
           try {
             return this.decrypt(encryptedValue);
-          } catch {
+          } catch (error) {
             // If decryption fails (malformed data/wrong key), clear corrupted data
             logger.warn('🔒 Corrupted encrypted data detected, clearing:', key);
             localStorage.removeItem(`encrypted_${key}`);
@@ -212,7 +212,7 @@ class SecureLocalStorage {
             localStorage.removeItem(key); // Remove plain text version
             logger.info('Migrated plain text data to encrypted storage', 'SecureLocalStorage', { key, isPrivacySafe: true });
             return plainValue;
-          } catch {
+          } catch (error) {
     logger.warn('🔒 Failed to encrypt during migration, returning plain value:', key);
             return plainValue;
           }
@@ -223,7 +223,7 @@ class SecureLocalStorage {
         // Get non-sensitive data normally
         return localStorage.getItem(key);
       }
-    } catch {
+    } catch (error) {
       logger.error('🔒 SecureLocalStorage.getItem failed:', error);
       return null;
     }
@@ -241,7 +241,7 @@ class SecureLocalStorage {
       } else {
         localStorage.removeItem(key);
       }
-    } catch {
+    } catch (error) {
       logger.error('🔒 SecureLocalStorage.removeItem failed:', error);
     }
   }
@@ -253,7 +253,7 @@ class SecureLocalStorage {
     try {
       localStorage.clear();
       logger.info('Cleared all localStorage data', 'SecureLocalStorage');
-    } catch {
+    } catch (error) {
       logger.error('🔒 SecureLocalStorage.clear failed:', error);
     }
   }
@@ -278,7 +278,7 @@ class SecureLocalStorage {
         total,
         percentage: Math.round((used / total) * 100)
       };
-    } catch {
+    } catch (error) {
       logger.error('🔒 Failed to get storage info:', error);
       return { used: 0, total: 0, percentage: 0 };
     }
@@ -305,7 +305,7 @@ class SecureLocalStorage {
           }
         }
       }
-    } catch {
+    } catch (error) {
       logger.error('🔒 Failed to audit stored data:', error);
     }
 
@@ -328,7 +328,7 @@ class SecureLocalStorage {
         try {
           this.setItem(key, value); // This will encrypt it
           migrated++;
-        } catch {
+        } catch (error) {
           logger.error(`🔒 Failed to migrate ${key}:`, error);
         }
       }
@@ -355,5 +355,5 @@ export const secureStorage = {
   removeItem: (key: string) => secureStorageInstance.removeItem(key),
   clear: () => secureStorageInstance.clear(),
   get length() { return localStorage.length; },
-  key: (_index: number) => localStorage.key(_index)
+  key: (index: number) => localStorage.key(index)
 };

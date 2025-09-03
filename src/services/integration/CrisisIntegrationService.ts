@@ -10,7 +10,7 @@ import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
 import { dataIntegrationService } from './DataIntegrationService';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 // Crisis severity levels
 export enum CrisisSeverity {
@@ -503,16 +503,16 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Add message to crisis session
    */
-  public addSessionMessage(_message: CrisisMessage) {
+  public addSessionMessage(message: CrisisMessage) {
     if (!this.currentSession) return;
     
-    this.currentSession.messages.push(_message);
+    this.currentSession.messages.push(message);
     
     // Send via real-time if connected
     if (this.currentSession.status === 'connected') {
-      realtimeSyncService.send('crisis', '_message', {
+      realtimeSyncService.send('crisis', 'message', {
         sessionId: this.currentSession.id,
-        _message
+        message
       });
     }
   }
@@ -710,7 +710,7 @@ class CrisisIntegrationService extends EventEmitter {
     const socialActivities = recentActivities.filter(a => a.category === 'social');
     if (socialActivities.length === 0) {
       triggers.push({
-        _type: 'social_isolation',
+        _type: 'socialisolation',
         source: 'periodic_assessment',
         timestamp: new Date(),
         data: { hours: 24 },
@@ -754,7 +754,7 @@ class CrisisIntegrationService extends EventEmitter {
         
       case 'message_received':
         if (this.currentSession) {
-          this.currentSession.messages.push(payload._message);
+          this.currentSession.messages.push(payload.message);
         }
         break;
         
@@ -812,7 +812,7 @@ export function useCrisisIntegration() {
     activateSafetyPlan: () => service.activateSafetyPlan(),
     updateSafetyPlan: (_plan: Partial<SafetyPlan>) => service.updateSafetyPlan(_plan),
     contactEmergency: (_contactId: string) => service.contactEmergencyServices(_contactId),
-    sendMessage: (_message: CrisisMessage) => service.addSessionMessage(_message),
+    sendMessage: (message: CrisisMessage) => service.addSessionMessage(message),
     getStatus: () => service.getCrisisStatus(),
     on: (event: CrisisEventType, callback: (...args: unknown[]) => void) => {
       service.on(event, callback);

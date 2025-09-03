@@ -280,7 +280,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
     
     // Handle 'g' prefix mode for navigation
     if (event.key === 'g' && !isInputField && !event.ctrlKey && !event.altKey && !event.shiftKey) {
-      if (_isGMode) {
+      if (isGMode) {
         // Double 'g' goes to top
         window.scrollTo(0, 0);
         setIsGMode(false);
@@ -416,7 +416,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
 
 // Hook for displaying keyboard shortcuts help
 export function useKeyboardShortcutsHelp() {
-  const [___isOpen, _setIsOpen] = useState(false);
+  const [_isOpen, _setIsOpen] = useState(false);
   const { shortcuts } = useEnhancedKeyboardNavigation();
 
   useEffect(() => {

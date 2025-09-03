@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
     if (duration > 0) {
       setTimeout(() => {
-        removeToast(_id);
+        removeToast(id);
       }, duration);
     }
   }, [removeToast]);

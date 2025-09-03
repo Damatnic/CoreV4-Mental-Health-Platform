@@ -177,7 +177,7 @@ export function MobileBottomNav() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { vibrate } = useVibration();
-  const { _deviceInfo, isMobileDevice } = useMobileFeatures();
+  const { deviceInfo, isMobileDevice } = useMobileFeatures();
   const { _navigationMode, isPerformanceMode } = useConsoleNavigation();
   const [isDrawerOpen, _setIsDrawerOpen] = useState(false);
   const [___showCrisisActions, _setShowCrisisActions] = useState(false);
@@ -293,7 +293,7 @@ export function MobileBottomNav() {
     const item = mainNavItems.find(item => 
       currentPath === item._path || currentPath.startsWith(`${item._path  }/`)
     );
-    if (_item) {
+    if (item) {
       setActiveTab(item.id);
     }
   }, [location]);
@@ -430,7 +430,7 @@ export function MobileBottomNav() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleNavClick(_item)}
+                      onClick={() => handleNavClick(item)}
                       className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors min-h-[56px] min-w-[56px]"
                       style={{
                         pointerEvents: 'auto',
@@ -541,10 +541,10 @@ export function MobileBottomNav() {
                 group="mobile-navigation"
                 priority={isActive ? 100 : 50}
                 className="flex-1 min-h-[56px] min-w-[56px]"
-                onActivate={() => handleNavClick(_item)}
+                onActivate={() => handleNavClick(item)}
               >
                 <button
-                  onClick={() => handleNavClick(_item)}
+                  onClick={() => handleNavClick(item)}
                   disabled={isDisabled}
                   className={`
                     w-full h-full flex flex-col items-center justify-center px-2 py-2 rounded-console transition-all duration-200 min-h-[56px] min-w-[56px]

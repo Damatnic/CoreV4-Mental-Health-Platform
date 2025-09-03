@@ -14,7 +14,7 @@ import {
   RotateCcw,
   Zap
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 import {
   advancedAccessibilityService,
   AccessibilityProfile,
@@ -32,7 +32,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
   const [isVoiceActive, _setIsVoiceActive] = useState(false);
   const [isEyeTrackingActive, _setIsEyeTrackingActive] = useState(false);
   const [availableCommands, _setAvailableCommands] = useState<VoiceNavigationAction[]>([]);
-  const [___isLoading, _setIsLoading] = useState(true);
+  const [_isLoading, _setIsLoading] = useState(true);
   const [testingSpeech, _setTestingSpeech] = useState(false);
   const [calibratingEyeTracking, _setCalibratingEyeTracking] = useState(false);
 
@@ -56,7 +56,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
       setIsVoiceActive(advancedAccessibilityService.isVoiceNavigationActive());
       setIsEyeTrackingActive(advancedAccessibilityService.isEyeTrackingEnabled());
       
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize accessibility', 'AccessibilityControlPanel', error);
     } finally {
       setIsLoading(false);
@@ -76,7 +76,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
           await updateProfile({ voiceNavigation: true });
         }
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to toggle voice navigation', 'AccessibilityControlPanel', error);
     }
   };
@@ -94,7 +94,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
           await updateProfile({ eyeTracking: true });
         }
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to toggle eye tracking', 'AccessibilityControlPanel', error);
     }
   };
@@ -106,7 +106,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
         'Voice accessibility is working correctly. You can now use voice commands to navigate the application.',
         'normal'
       );
-    } catch {
+    } catch (error) {
       logger.error('Speech test failed', 'AccessibilityControlPanel', error);
     } finally {
       setTestingSpeech(false);
@@ -134,7 +134,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
       
       await advancedAccessibilityService.speak('Eye tracking calibration completed successfully.');
       
-    } catch {
+    } catch (error) {
       logger.error('Eye tracking calibration failed', 'AccessibilityControlPanel', error);
     } finally {
       setCalibratingEyeTracking(false);
@@ -146,7 +146,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
       await advancedAccessibilityService.updateProfile(updates);
       const updatedProfile = advancedAccessibilityService.getProfile();
       setProfile(updatedProfile);
-    } catch {
+    } catch (error) {
       logger.error('Failed to update profile', 'AccessibilityControlPanel', error);
     }
   };

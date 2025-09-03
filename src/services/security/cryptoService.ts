@@ -4,7 +4,7 @@
  * HIPAA-compliant implementation with AES-256-GCM encryption
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 class CryptographyService {
   private static instance: CryptographyService;
@@ -51,7 +51,7 @@ class CryptographyService {
         // Store the key securely (in production, use HSM or secure key storage)
         this.storeMasterKey(this.masterKey);
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize master key', 'CryptoService', error);
       throw new Error('Cryptography initialization failed');
     }
@@ -108,7 +108,7 @@ class CryptographyService {
       
       // Convert to base64 for storage
       return this.arrayBufferToBase64(combined.buffer);
-    } catch {
+    } catch (error) {
       logger.error('Encryption failed', 'CryptoService', error);
       throw new Error('Failed to encrypt data');
     }
@@ -156,7 +156,7 @@ class CryptographyService {
       // Decode the result
       const decoder = new TextDecoder();
       return decoder.decode(decryptedData);
-    } catch {
+    } catch (error) {
       logger.error('Decryption failed', 'CryptoService', error);
       throw new Error('Failed to decrypt data');
     }
@@ -200,7 +200,7 @@ class CryptographyService {
       combined.set(new Uint8Array(derivedBits), saltBytes.byteLength);
       
       return this.arrayBufferToBase64(combined.buffer);
-    } catch {
+    } catch (error) {
       logger.error('Password hashing failed', 'CryptoService', error);
       throw new Error('Failed to hash password');
     }
@@ -228,7 +228,7 @@ class CryptographyService {
       
       // Compare hashes using constant-time comparison
       return this.constantTimeCompare(originalHash, newHash);
-    } catch {
+    } catch (error) {
       logger.error('Password verification failed', 'CryptoService', error);
       return false;
     }
@@ -296,7 +296,7 @@ class CryptographyService {
       this.derivedKeys.set(cacheKey, derivedKey);
       
       return derivedKey;
-    } catch {
+    } catch (error) {
       logger.error('Key derivation failed', 'CryptoService', error);
       throw new Error('Failed to derive key from password');
     }
@@ -344,7 +344,7 @@ class CryptographyService {
       );
       
       return this.arrayBufferToBase64(signature);
-    } catch {
+    } catch (error) {
       logger.error('Data signing failed', 'CryptoService', error);
       throw new Error('Failed to sign data');
     }
@@ -386,7 +386,7 @@ class CryptographyService {
         signatureBuffer,
         dataBuffer
       );
-    } catch {
+    } catch (error) {
       logger.error('Signature verification failed', 'CryptoService', error);
       return false;
     }
@@ -452,7 +452,7 @@ class CryptographyService {
     const binary = atob(_base64);
     const bytes = new Uint8Array(binary._length);
     for (let i = 0; i < binary._length; i++) {
-      bytes[i] = binary.charCodeAt(_i);
+      bytes[i] = binary.charCodeAt(i);
     }
     return bytes.buffer;
   }

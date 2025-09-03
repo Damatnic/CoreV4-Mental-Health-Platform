@@ -12,21 +12,21 @@ describe('CrisisButton', () => {
   });
 
   describe('Rendering', () => {
-    it('should render the crisis _button with correct text', () => {
+    it('should render the crisis button with correct text', () => {
       render(<CrisisButton />);
-      expect(screen.getByRole('_button', { name: /crisis help/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /crisis help/i })).toBeInTheDocument();
     });
 
     it('should have proper ARIA attributes for accessibility', () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       expect(_button).toHaveAttribute('aria-label');
       expect(_button).toHaveAttribute('aria-describedby');
     });
 
     it('should be keyboard accessible', () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       _button.focus();
       expect(document.activeElement).toBe(_button);
     });
@@ -37,7 +37,7 @@ describe('CrisisButton', () => {
       const startTime = performance.now();
       render(<CrisisButton />);
       
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       await userEvent.click(_button);
       
       await waitFor(() => {
@@ -50,7 +50,7 @@ describe('CrisisButton', () => {
 
     it('should immediately show loading state on click', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       fireEvent.click(_button);
       
@@ -61,7 +61,7 @@ describe('CrisisButton', () => {
   describe('Crisis Resources Display', () => {
     it('should display emergency hotline numbers', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -73,7 +73,7 @@ describe('CrisisButton', () => {
 
     it('should show local emergency resources', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -85,7 +85,7 @@ describe('CrisisButton', () => {
 
     it('should provide text-based crisis support options', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -160,7 +160,7 @@ describe('CrisisButton', () => {
 
     it('should show professional response status', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -189,7 +189,7 @@ describe('CrisisButton', () => {
 
     it('should support touch gestures', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       const touchStart = new TouchEvent('touchstart', {
         touches: [{ clientX: 0, clientY: 0 } as Touch],
@@ -233,7 +233,7 @@ describe('CrisisButton', () => {
   describe('Accessibility Compliance', () => {
     it('should announce crisis resources to screen readers', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -246,7 +246,7 @@ describe('CrisisButton', () => {
 
     it('should support keyboard navigation through resources', async () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       await userEvent.click(_button);
       
@@ -260,7 +260,7 @@ describe('CrisisButton', () => {
 
     it('should provide clear focus indicators', () => {
       render(<CrisisButton />);
-      const _button = screen.getByRole('_button');
+      const _button = screen.getByRole('button');
       
       _button.focus();
       const styles = window.getComputedStyle(_button);
@@ -281,8 +281,8 @@ describe('CrisisButton', () => {
       // After interaction, additional resources can load
       await waitFor(() => {
         const lazyImages = container.querySelectorAll('img[loading="lazy"]');
-        lazyImages.forEach((_img) => {
-          expect(_img).toHaveAttribute('loading', 'lazy');
+        lazyImages.forEach((img) => {
+          expect(img).toHaveAttribute('loading', 'lazy');
         });
       });
     });

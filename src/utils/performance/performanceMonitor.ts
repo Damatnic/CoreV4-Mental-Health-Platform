@@ -126,7 +126,7 @@ class PerformanceMonitor {
           
           // Alert if long task blocks crisis features
           if (longTask.duration > 50 && this.isInCrisisFlow()) {
-            this.alertPerformanceIssue('long_task_in_crisis', longTask.duration, 50);
+            this.alertPerformanceIssue('long_taskin_crisis', longTask.duration, 50);
           }
         }
       });
@@ -520,7 +520,7 @@ class PerformanceMonitor {
     
     // Send to analytics
     this.reportMetric({
-      name: 'performance_issue',
+      name: 'performanceissue',
       value,
       timestamp: Date.now(),
       context: {
@@ -539,7 +539,7 @@ class PerformanceMonitor {
     
     // Immediately report critical issues
     this.reportMetric({
-      name: 'critical_performance_issue',
+      name: 'critical_performanceissue',
       value,
       timestamp: Date.now(),
       context: {
@@ -707,7 +707,7 @@ class PerformanceMonitor {
       if (process.env.NODE_ENV === 'development') {
         logger.info('Performance Metrics', 'PerformanceMonitor', metrics);
       }
-    } catch {
+    } catch (error) {
       logger.error('[Performance] Failed to process metrics:');
     }
   }
@@ -795,7 +795,7 @@ class PerformanceMonitor {
         this.recordMetric(label, measure.duration);
         return measure.duration;
       }
-    } catch {
+    } catch (error) {
     logger.warn(`Failed to measure ${label}:`, error);
     }
     

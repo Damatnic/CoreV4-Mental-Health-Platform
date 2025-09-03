@@ -138,7 +138,7 @@ function preloadCriticalResources() {
       const link = document.createElement('link');
       link.rel = 'preconnect';
       link.href = new URL(_url).origin;
-      document.head.appendChild(_link);
+      document.head.appendChild(link);
     }
   });
 }
@@ -190,7 +190,7 @@ function setupPerformanceBudget() {
       });
       
       resourceObserver.observe({ entryTypes: ['resource'] });
-    } catch {
+    } catch (error) {
       logger.warn('Resource timing not supported');
     }
   }

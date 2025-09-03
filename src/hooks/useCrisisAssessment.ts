@@ -31,7 +31,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
           ...parsed,
           timestamp: parsed.timestamp ? new Date(parsed.timestamp) : null
         };
-      } catch {
+      } catch (error) {
         logger.error('Failed to parse _stored assessment', e as Error, {
           category: LogCategory.CRISIS
         });

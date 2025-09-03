@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Types for real-time events
 export interface UserPresence {
@@ -15,7 +15,7 @@ export interface TypingIndicator {
   userId: string;
   username: string;
   roomId: string;
-  _isTyping: boolean;
+  isTyping: boolean;
 }
 
 export interface RealtimeMessage {
@@ -93,7 +93,7 @@ class WebSocketService {
           this.handleReconnection();
         });
 
-        this.socket.on('connect_error', (error: unknown) => {
+        this.socket.on('connecterror', (error: unknown) => {
           logger.error('WebSocket connection error:', error);
           this.emit('connection:error', { error: error.message });
           reject(error);
@@ -101,7 +101,7 @@ class WebSocketService {
 
         // Set up core event listeners
         this.setupCoreEventListeners();
-      } catch {
+      } catch (error) {
         logger.error('Failed to initialize WebSocket:');
         reject(_undefined);
       }
@@ -222,7 +222,7 @@ class WebSocketService {
   }
 
   // Send typing indicator
-  sendTypingIndicator(roomId: string, _isTyping: boolean): void {
+  sendTypingIndicator(roomId: string, isTyping: boolean): void {
     if (!this.socket?.connected) return;
 
     // Clear existing timer for this room
@@ -232,7 +232,7 @@ class WebSocketService {
       this.typingTimers.delete(_roomId);
     }
 
-    if (_isTyping) {
+    if (isTyping) {
       this.socket.emit('typing:start', { roomId });
       
       // Auto-stop typing after 5 seconds

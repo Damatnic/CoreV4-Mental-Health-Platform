@@ -35,7 +35,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
     accuracy: 'denied',
     timestamp: 0
   });
-  const [_isLoadingServices, setIsLoadingServices] = useState(false);
+  const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [__emergencyTriggered, setEmergencyTriggered] = useState<string | null>(null);
 
@@ -142,7 +142,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
     return `~${responseTime}min response`;
   };
 
-  if (_isLoadingServices) {
+  if (isLoadingServices) {
     return (
       <div className={`bg-white rounded-xl shadow-lg p-6 ${className}`}>
         <div className="flex items-center justify-center space-x-3">

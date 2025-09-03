@@ -137,13 +137,13 @@ export function TherapySessionLogger({
 
   // _Timer effect
   useEffect(() => {
-    let _interval: NodeJS.Timeout;
-    if (_isTimerRunning) {
-      _interval = setInterval(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
         setSessionTimer(prev => prev + 1);
       }, 1000);
     }
-    return () => clearInterval(_interval);
+    return () => clearInterval(interval);
   }, [isTimerRunning]);
 
   // Format timer display

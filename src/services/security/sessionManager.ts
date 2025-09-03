@@ -9,7 +9,7 @@ import { secureStorage } from './secureStorage';
 import { auditLogger } from './auditLogger';
 import { _rateLimiter } from './rateLimiter';
 import { _fieldEncryption } from './fieldEncryption';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface Session {
   sessionId: string;
@@ -360,7 +360,7 @@ class SessionManagerService {
         isValid: true,
         riskScore,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Session validation error: ');
       return {
         isValid: false,
@@ -672,7 +672,7 @@ class SessionManagerService {
     if (userSessions.size >= maxSessions) {
       // Terminate oldest session
       const sessions = Array.from(_userSessions)
-        .map(_id => this.sessions.get(_id))
+        .map(id => this.sessions.get(id))
         .filter(s => s !== undefined)
         .sort((a, b) => a!.createdAt.getTime() - b!.createdAt.getTime());
       
@@ -735,7 +735,7 @@ class SessionManagerService {
           }
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load sessions:');
     }
   }
@@ -753,7 +753,7 @@ class SessionManagerService {
         encrypted: true,
         expires: new Date(Date.now() + 24 * 3600000), // 24 hours
       });
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to persist sessions:');
     }
   }

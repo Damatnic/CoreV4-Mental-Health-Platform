@@ -59,7 +59,7 @@ export function SmartQuickActionsWidget({
 
   // Get recommended actions based on context
   useEffect(() => {
-    const _recommendations = recommendationEngine.getRecommendations(_actions);
+    const _recommendations = recommendationEngine.getRecommendations(actions);
     setContextualActions(_recommendations);
   }, [actions, recommendationEngine]);
 
@@ -94,11 +94,11 @@ export function SmartQuickActionsWidget({
     }
 
     if (searchQuery) {
-      const _query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(a => 
-        a.label.toLowerCase().includes(_query) ||
-        a.description?.toLowerCase().includes(_query) ||
-        a.tags?.some(tag => tag.toLowerCase().includes(_query))
+        a.label.toLowerCase().includes(query) ||
+        a.description?.toLowerCase().includes(query) ||
+        a.tags?.some(tag => tag.toLowerCase().includes(query))
       );
     }
 
@@ -133,9 +133,9 @@ export function SmartQuickActionsWidget({
   // Keyboard navigation handler
   const __handleKeyboardNavigation   = useCallback((key: string) => {
     // Handle keyboard shortcuts for actions
-    const _actionWithShortcut = actions.find(a => a.keyboard === key);
-    if (_actionWithShortcut) {
-      handleActionClick(_actionWithShortcut);
+    const actionWithShortcut = actions.find(a => a.keyboard === key);
+    if (actionWithShortcut) {
+      handleActionClick(actionWithShortcut);
     }
   }, [actions, handleActionClick]);
 

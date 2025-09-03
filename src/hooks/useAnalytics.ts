@@ -64,7 +64,7 @@ export const useAnalytics = () => {
     trackTiming,
     trackInteraction,
     // These methods also do nothing - maintaining interface compatibility
-    setUserId: (_id: string) => {
+    setUserId: (id: string) => {
       // Never store user IDs - we're anonymous only
     },
     setUserProperties: (_properties: Record<string, any>) => {

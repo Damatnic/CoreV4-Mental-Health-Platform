@@ -9,7 +9,7 @@
 import { io, Socket } from 'socket.io-client';
 import { ApiService } from '../api/ApiService';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 export interface WebSocketMessage {
   type: string;
@@ -104,7 +104,7 @@ export class SecureWebSocketClient {
           resolve();
         });
 
-        this.socket.on('connect_error', (error: unknown) => {
+        this.socket.on('connecterror', (error: unknown) => {
           logger.error('❌ WebSocket connection failed:', error);
           this.isConnected = false;
           this.onConnectionChange?.(false);
@@ -113,7 +113,7 @@ export class SecureWebSocketClient {
         });
       });
 
-    } catch {
+    } catch (error) {
       logger.error('❌ WebSocket connection error: ');
       this.isConnected = false;
       this.onConnectionChange?.(false);
@@ -205,7 +205,7 @@ export class SecureWebSocketClient {
       this.disconnect();
       await new Promise(resolve => setTimeout(resolve, 2000));
       await this.connect();
-    } catch {
+    } catch (error) {
       logger.error('❌ Failed to handle auth error: ');
       this.onError?.(_undefined);
     }
@@ -250,7 +250,7 @@ export class SecureWebSocketClient {
     setTimeout(async () => {
       try {
         await this.connect();
-      } catch {
+      } catch (error) {
         logger.error('❌ Reconnection failed:');
       }
     }, delay);

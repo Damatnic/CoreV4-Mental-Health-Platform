@@ -161,7 +161,7 @@ function getOrCreateAnonymousUser(): AnonymousUser {
       }
       
       return user;
-    } catch {
+    } catch (error) {
       logger.error('Failed to parse _stored user _data:');
       // Create new user if _data is corrupted
     }
@@ -310,9 +310,9 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     };
     
     updateDuration();
-    const _interval = setInterval(updateDuration, 60000); // Update every minute
+    const interval = setInterval(updateDuration, 60000); // Update every minute
     
-    return () => clearInterval(_interval);
+    return () => clearInterval(interval);
   }, [user.sessionStarted]);
   
   // Auto-update last active and cleanup stale data
@@ -420,7 +420,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       };
       
       return JSON.stringify(exportData, null, 2);
-    } catch {
+    } catch (error) {
       logger.error('Failed to export user _data:');
       throw new Error('Unable to export _data. Please try again.');
     }
@@ -456,7 +456,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       
       logger.info('✅ Successfully imported user data');
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Failed to import user _data:');
       return false;
     }
@@ -493,7 +493,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       }
       
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Data integrity validation failed:');
       return false;
     }

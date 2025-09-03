@@ -63,7 +63,7 @@ export function VoiceCommandInterface({
     };
 
     recognition.onresult = (event: unknown) => {
-      let _interim = '';
+      let interim = '';
       let final = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -71,7 +71,7 @@ export function VoiceCommandInterface({
         if (event.results[i].isFinal) {
           final += `${transcript  } `;
         } else {
-          _interim += transcript;
+          interim += transcript;
         }
       }
 
@@ -80,7 +80,7 @@ export function VoiceCommandInterface({
         processCommand(final.trim());
       }
       
-      setInterimTranscript(_interim);
+      setInterimTranscript(interim);
     };
 
     recognition.onerror = (event: unknown) => {
@@ -132,7 +132,7 @@ export function VoiceCommandInterface({
       microphoneRef.current.connect(analyserRef.current);
       
       updateVolume();
-    } catch {
+    } catch (error) {
       logger.error('Error initializing audio analyzer:');
     }
   };
@@ -205,7 +205,7 @@ export function VoiceCommandInterface({
   const toggleListening = () => {
     if (!recognitionRef.current) return;
 
-    if (_isListening) {
+    if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
       setStatus('idle');

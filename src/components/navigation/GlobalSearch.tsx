@@ -136,7 +136,7 @@ export function GlobalSearch() {
   // Handle search input change
   useEffect(() => {
     const _debounceTimer = setTimeout(() => {
-      performSearch(_query);
+      performSearch(query);
     }, 150);
 
     return () => clearTimeout(_debounceTimer);
@@ -170,7 +170,7 @@ export function GlobalSearch() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen, _results, selectedIndex, setSearchOpen, handleResultClick]);
+  }, [isSearchOpen, results, selectedIndex, setSearchOpen, handleResultClick]);
 
   // Focus input when search opens
   useEffect(() => {
@@ -181,7 +181,7 @@ export function GlobalSearch() {
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
-    saveRecentSearch(_query);
+    saveRecentSearch(query);
     addToRecent(result.path);
     
     if (result.path.startsWith('tel:') || result.path.startsWith('sms:')) {
@@ -264,7 +264,7 @@ export function GlobalSearch() {
                       <button
                         key={result.id}
                         onClick={() => handleResultClick(_result)}
-                        onMouseEnter={() => setSelectedIndex(_index)}
+                        onMouseEnter={() => setSelectedIndex(index)}
                         className={`w-full px-6 py-3 flex items-center hover:bg-gray-50 transition-colors ${
                           index === selectedIndex ? 'bg-gray-50' : ''
                         }`}

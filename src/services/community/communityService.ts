@@ -201,12 +201,12 @@ class CommunityService {
     // Add response interceptor for error handling
     this.apiClient.interceptors.response.use(
       (_response) => response,
-      (_error) => {
+      (error) => {
         if (error.response?.status === 401) {
           // Handle unauthorized access
           window.location.href = '/login';
         }
-        return Promise.reject(_error);
+        return Promise.reject(error);
       }
     );
   }

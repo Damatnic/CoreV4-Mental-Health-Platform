@@ -46,15 +46,15 @@ export function KeyboardNavigator({
     const key = event.key.toLowerCase();
     const isAlt = event.altKey;
     const isCtrl = event.ctrlKey;
-    const _isShift = event.shiftKey;
+    const isShift = event.shiftKey;
     const isMeta = event.metaKey;
 
     // Construct key combination string
     let keyCombo = '';
-    if (_isCtrl) keyCombo += 'ctrl+';
-    if (_isAlt) keyCombo += 'alt+';
-    if (_isShift) keyCombo += 'shift+';
-    if (_isMeta) keyCombo += 'meta+';
+    if (isCtrl) keyCombo += 'ctrl+';
+    if (isAlt) keyCombo += 'alt+';
+    if (isShift) keyCombo += 'shift+';
+    if (isMeta) keyCombo += 'meta+';
     keyCombo += key;
 
     // Check for direct keyboard shortcuts
@@ -215,7 +215,7 @@ export function KeyboardNavigator({
 
   // Attach keyboard event listeners
   useEffect(() => {
-    if (_isActive) {
+    if (isActive) {
       window.addEventListener('keydown', handleKeyDown);
       
       return () => {

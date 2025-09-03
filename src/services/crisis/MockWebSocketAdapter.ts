@@ -4,7 +4,7 @@
 import { RealtimeMessage } from '../realtime/websocketService';
 import { mockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
 import { toast } from 'react-hot-toast';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Mock WebSocket Adapter that mimics the real WebSocketService interface
 export class MockWebSocketAdapter {
@@ -105,8 +105,8 @@ export class MockWebSocketAdapter {
       this.emit('message:new', message);
     });
 
-    session.onTyping((_isTyping: boolean) => {
-      if (_isTyping) {
+    session.onTyping((isTyping: boolean) => {
+      if (isTyping) {
         this.emit('typing:start', {
           userId: session.counselor.id,
           username: session.counselor.name,
@@ -186,7 +186,7 @@ export class MockWebSocketAdapter {
   }
 
   // Send typing indicator
-  public sendTypingIndicator(_roomId: string, _isTyping: boolean): void {
+  public sendTypingIndicator(_roomId: string, isTyping: boolean): void {
     // Mock typing indicators are handled automatically by the crisis session
     // This is a no-op in the mock implementation
   }
@@ -195,7 +195,7 @@ export class MockWebSocketAdapter {
   private handleEmergencyProtocol(action: string, data: unknown): void {
     logger.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
 
-    switch (_action) {
+    switch (action) {
       case 'auto_dial_988':
         this.triggerEmergencyCall('988', 'Suicide & Crisis Lifeline', data);
         break;
@@ -317,7 +317,7 @@ export class MockWebSocketAdapter {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch {
+        } catch (error) {
           logger.error(`Error in event handler for ${event}`);
         }
       });

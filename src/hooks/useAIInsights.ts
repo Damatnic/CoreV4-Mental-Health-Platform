@@ -249,7 +249,7 @@ const generateImmediateActions = (_riskScore: number): string[] => ['Monitor moo
 const generatePreventiveStrategies = (_riskIndicators: RiskFactor[], _protectiveFactors: ProtectiveFactor[]): string[] => [];
 const createMonitoringPlan = (_riskScore: number, _timeToRisk: number): MonitoringPlan => ({
   frequency: 'daily' as const,
-  keyMetrics: ['mood', 'sleep', 'social_interaction'],
+  keyMetrics: ['mood', 'sleep', 'socialinteraction'],
   escalationTriggers: ['mood < 3', 'no social contact for 2 days'],
   checkInQuestions: ['How are you feeling?', 'Did you sleep well?'],
   emergencyContacts: ['therapist', 'family_member']
@@ -347,7 +347,7 @@ const analyzeMoodPatterns = (_moodData: unknown[], _contextData: unknown[]): Pat
         avoidanceStrategies: weatherPattern.mitigationStrategies
       }],
       outcomes: [{
-        outcome: weatherPattern.correlation > 0 ? 'mood_improvement' : 'mood_decline',
+        outcome: weatherPattern.correlation > 0 ? 'moodimprovement' : 'mood_decline',
         probability: Math.abs(weatherPattern.correlation),
         averageImpact: weatherPattern.averageImpact,
         duration: 24,
@@ -390,7 +390,7 @@ const assessCrisisRisk = (_userData: unknown, _moodData: unknown[], _behaviorDat
 
 // Personalized intervention recommendation engine
 const generatePersonalizedInterventions = (_patterns: PatternAnalysis[], _crisisRisk: CrisisRiskAssessment, _userProfile: unknown): PersonalizedIntervention[] => {
-  const _interventions: PersonalizedIntervention[] = [];
+  const interventions: PersonalizedIntervention[] = [];
   
   // Evidence-based intervention matching
   const matchedInterventions = matchInterventionsToPatterns(_patterns, _userProfile);
@@ -532,7 +532,7 @@ const analyzePatterns = (_userData: unknown): PatternAnalysis[] => {
       triggers: [
         {
           id: 'trigger-3',
-          triggerType: 'social_interaction',
+          triggerType: 'socialinteraction',
           triggerEvents: ['friend_meetup', 'family_dinner', 'group_activity'],
           responseTime: 2,
           responseIntensity: 0.75,
@@ -592,7 +592,7 @@ const generatePredictions = (_patterns: PatternAnalysis[]): PredictiveModel[] =>
               improvementSuggestions: ['Set consistent bedtime alarm', 'Create wind-down routine'],
             },
             {
-              factor: 'social_interaction',
+              factor: 'socialinteraction',
               impact: 0.28,
               modifiable: true,
               currentState: 'moderate',
@@ -630,7 +630,7 @@ const generatePredictions = (_patterns: PatternAnalysis[]): PredictiveModel[] =>
           description: 'Quality and duration of sleep',
         },
         {
-          feature: 'social_interaction_frequency',
+          feature: 'socialinteraction_frequency',
           importance: 0.24,
           category: 'social',
           description: 'Number and quality of social interactions',
@@ -1120,7 +1120,7 @@ export function useAIInsights() {
   const [_moodAnalysis, _setMoodAnalysis] = useState<MoodAnalysis | null>(null);
 
   // Fetch AI insights dashboard
-  const { data: insightsDashboard, isLoading, _error, refetch,  } = useQuery({
+  const { data: insightsDashboard, isLoading, error, refetch,  } = useQuery({
     queryKey: ['ai-insights', user?.id, insightTimeRange],
     queryFn: async (): Promise<AIInsightsDashboard> => {
       // Simulate API call delay
@@ -1392,7 +1392,7 @@ export function useAIInsights() {
 
   // Mark insight as actioned
   const markInsightActioned = useMutation({
-    mutationFn: async (_insightId: string) => {
+    mutationFn: async (insightId: string) => {
       // In production, this would be an API call
       await new Promise(resolve => setTimeout(resolve, 500));
       return { success: true };
@@ -1404,7 +1404,7 @@ export function useAIInsights() {
 
   // Dismiss insight
   const dismissInsight = useMutation({
-    mutationFn: async (_insightId: string) => {
+    mutationFn: async (insightId: string) => {
       // In production, this would be an API call
       await new Promise(resolve => setTimeout(resolve, 500));
       return { success: true };
@@ -1420,7 +1420,7 @@ export function useAIInsights() {
   }, [refetch]);
 
   // Get insight statistics
-  const __insightStats   = useMemo(() => {
+  const insightStats   = useMemo(() => {
     if (!insightsDashboard) return null;
 
     const totalInsights = insightsDashboard.insights.length;

@@ -189,7 +189,7 @@ export class ResponsiveLayoutTester {
 
   // Test all device profiles
   async testAllDevices(testFn: (device: DeviceProfile) => Promise<boolean>): Promise<TestReport> {
-    const _results: TestResult[] = [];
+    const results: TestResult[] = [];
 
     for (const device of DEVICE_PROFILES) {
       const result = await this.testDevice(device, testFn);
@@ -215,8 +215,8 @@ export class ResponsiveLayoutTester {
     let error: Error | undefined;
     
     try {
-      passed = await testFn(_device);
-    } catch {
+      passed = await testFn(device);
+    } catch (e) {
       error = e as Error;
       passed = false;
     }
@@ -262,7 +262,7 @@ export class ResponsiveLayoutTester {
         failed,
         passRate: (passed / results.length) * 100,
         averageDuration: totalDuration / results.length
-      }, _results,
+      }, results,
       generatedAt: new Date(),
       recommendations: this.generateRecommendations(results)
     };
@@ -328,9 +328,9 @@ export function validateMediaQueries(): MediaQueryValidation[] {
   const validations: MediaQueryValidation[] = [];
   
   // Check common breakpoints
-  for (const [name, minWidth] of Object.entries(_BREAKPOINTS)) {
+  for (const [name, minWidth] of Object.entries(BREAKPOINTS)) {
     const query = `(min-width: ${minWidth}px)`;
-    const matches = window.matchMedia(_query).matches;
+    const matches = window.matchMedia(query).matches;
     
     validations.push({
       breakpoint: name,

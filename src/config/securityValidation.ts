@@ -119,7 +119,7 @@ export class SecurityValidationService {
       } else {
         logger.error('❌ CLIENT SECURITY: FAILED');
         logger.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
-        validation.criticalIssues.forEach(_issue => logger.error(_issue));
+        validation.criticalIssues.forEach(issue => logger.error(issue));
       }
 
       if (validation.warnings.length > 0) {
@@ -146,7 +146,7 @@ export class SecurityValidationService {
 // Auto-validate on module load
 try {
   SecurityValidationService.validateAndLog();
-} catch {
+} catch (error) {
   logger.error('Security validation failed:');
   if (import.meta.env.PROD) {
     // Prevent insecure production deployments

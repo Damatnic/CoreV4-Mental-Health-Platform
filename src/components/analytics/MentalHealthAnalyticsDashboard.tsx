@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 import {
   TrendingUp, TrendingDown, Activity, Heart, Brain,
   Target, BarChart3,
@@ -153,7 +153,7 @@ export function MentalHealthAnalyticsDashboard() {
       // In production, this would call the analytics service
       const _data = await generateMockAnalyticsData(timeframe);
       setAnalyticsData(_data);
-    } catch {
+    } catch (_error) {
       logger.error('Failed to fetch analytics _data:');
     } finally {
       setLoading(false);
@@ -456,11 +456,11 @@ function GoalsProgress({ _goals, _privacyMode }: unknown) {
   return <div>Goals Progress Component</div>;
 }
 
-function InsightsPanel({ _insights, _privacyMode }: unknown) {
+function InsightsPanel({ insights: _insights, _privacyMode }: unknown) {
   return <div>Insights Panel Component</div>;
 }
 
-function InterventionsAnalysis({ _interventions, _privacyMode }: unknown) {
+function InterventionsAnalysis({ interventions: _interventions, _privacyMode }: unknown) {
   return <div>Interventions Analysis Component</div>;
 }
 

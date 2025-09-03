@@ -34,11 +34,11 @@ export function createLazyComponent<T extends ComponentType<unknown>>(
       );
       
       return module;
-    } catch {
+    } catch (error) {
       logger.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, error);
       
       // Record error
-      performanceMonitor.recordMetric('lazy_load_error', 1, {
+      performanceMonitor.recordMetric('lazy_loaderror', 1, {
         chunkName,
         error: 'Processing error'
       });
@@ -246,9 +246,9 @@ export class ComponentPreloader {
       performanceMonitor.recordMetric(`preload_${name}`, loadTime, { preloaded: true });
       
       this.preloadedComponents.add(name);
-    } catch {
+    } catch (error) {
     logger.warn(`Failed to preload component ${name}:`, error);
-      performanceMonitor.recordMetric('preload_error', 1, { componentName: name });
+      performanceMonitor.recordMetric('preloaderror', 1, { componentName: name });
     }
   }
 

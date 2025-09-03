@@ -40,13 +40,13 @@ export function DashboardWidget({
   // Auto-refresh functionality
   useEffect(() => {
     if (widget.refreshInterval && onRefresh && !loading) {
-      const _interval = setInterval(async () => {
+      const interval = setInterval(async () => {
         setIsRefreshing(true);
         await onRefresh();
         setIsRefreshing(false);
       }, widget.refreshInterval * 1000);
 
-      return () => clearInterval(_interval);
+      return () => clearInterval(interval);
     }
   }, [widget.refreshInterval, onRefresh, loading]);
 

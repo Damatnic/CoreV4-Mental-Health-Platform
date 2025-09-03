@@ -13,7 +13,7 @@ import {
   AlertCircle, UserCheck,
   MessageSquare, Volume2, VolumeX
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface ChatMessage {
   id: string;
@@ -80,7 +80,7 @@ export function RealTimeCrisisChat() {
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const __inputRef   = useRef<HTMLInputElement>(null);
+  const inputRef   = useRef<HTMLInputElement>(null);
   const __chatContainerRef   = useRef<HTMLDivElement>(null);
 
   // Initialize crisis chat connection
@@ -270,7 +270,7 @@ export function RealTimeCrisisChat() {
     }
   };
 
-  const triggerCrisisProtocol = async (priority: string, _message: ChatMessage) => {
+  const triggerCrisisProtocol = async (priority: string, message: ChatMessage) => {
     // Log crisis event (_anonymized)
     logger.crisis('Crisis protocol triggered', priority as 'low' | 'medium' | 'high' | 'critical', 'RealTimeCrisisChat', { priority, timestamp: new Date() });
     
@@ -375,11 +375,11 @@ Professional counselors are joining this chat now. You matter and help is here.`
   };
 
   // Placeholder functions for full implementation
-  const sendToParticipants = async (_message: ChatMessage) => {
+  const sendToParticipants = async (message: ChatMessage) => {
     // Implementation for sending message to chat participants
   };
 
-  const requestSupportResponse = (_message: ChatMessage) => {
+  const requestSupportResponse = (message: ChatMessage) => {
     // Implementation for requesting response from supporters
   };
 

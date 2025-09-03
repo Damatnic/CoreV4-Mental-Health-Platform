@@ -162,13 +162,13 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const { container } = render(<App />);
         
         // Use axe for contrast checking
-        const _results = await axe(container, {
+        const results = await axe(container, {
           rules: {
             'color-contrast': { enabled: true }
           }
         });
         
-        expect(_results).toHaveNoViolations();
+        expect(results).toHaveNoViolations();
       });
       
       it('should not use color as the only means of conveying information', async () => {
@@ -242,9 +242,9 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             const currentRect = element.getBoundingClientRect();
             
             // Generally, tab order should go left-to-right, top-to-bottom
-            const _isLogical = currentRect.top >= prevRect.top || 
+            const isLogical = currentRect.top >= prevRect.top || 
                             (currentRect.top === prevRect.top && currentRect.left >= prevRect.left);
-            expect(_isLogical).toBe(true);
+            expect(isLogical).toBe(true);
           }
           
           previousElement = element;
@@ -511,12 +511,12 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const inputs = await screen.findAllByRole('textbox');
         
         for (const input of inputs) {
-          const _initialUrl = window.location.href;
+          const initialUrl = window.location.href;
           
           input.focus();
           
           // URL should not change
-          expect(window.location.href).toBe(_initialUrl);
+          expect(window.location.href).toBe(initialUrl);
           
           // No new windows/modals should open
           expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -627,15 +627,15 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           if (labelledBy) {
             const ids = labelledBy.split(' ');
-            ids.forEach(_id => {
-              expect(document.getElementById(_id)).toBeInTheDocument();
+            ids.forEach(id => {
+              expect(document.getElementById(id)).toBeInTheDocument();
             });
           }
           
           if (describedBy) {
             const ids = describedBy.split(' ');
-            ids.forEach(_id => {
-              expect(document.getElementById(_id)).toBeInTheDocument();
+            ids.forEach(id => {
+              expect(document.getElementById(id)).toBeInTheDocument();
             });
           }
         });
@@ -743,7 +743,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
     it('should pass automated axe accessibility audit', async () => {
       const { container } = render(<App />);
       
-      const _results = await axe(container, {
+      const results = await axe(container, {
         rules: {
           // Run all WCAG 2.1 Level AA rules
           'wcag2a': { enabled: true },
@@ -754,7 +754,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         }
       });
       
-      expect(_results).toHaveNoViolations();
+      expect(results).toHaveNoViolations();
     });
     
     it('should pass accessibility audit for crisis mode', async () => {
@@ -762,8 +762,8 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       await waitFor(async () => {
         const _crisisUI = screen.getByTestId('crisis-intervention-ui');
-        const _results = await axe(_crisisUI);
-        expect(_results).toHaveNoViolations();
+        const results = await axe(_crisisUI);
+        expect(results).toHaveNoViolations();
       });
     });
     
@@ -772,18 +772,18 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Test light mode
       document.documentElement.setAttribute('data-theme', 'light');
-      const _results = await axe(container);
-      expect(_results).toHaveNoViolations();
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
       
       // Test dark mode
       document.documentElement.setAttribute('data-theme', 'dark');
       results = await axe(container);
-      expect(_results).toHaveNoViolations();
+      expect(results).toHaveNoViolations();
       
       // Test high contrast mode
       document.documentElement.setAttribute('data-theme', 'high-contrast');
       results = await axe(container);
-      expect(_results).toHaveNoViolations();
+      expect(results).toHaveNoViolations();
     });
   });
 });

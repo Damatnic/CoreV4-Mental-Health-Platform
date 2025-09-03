@@ -359,15 +359,15 @@ export const TherapeuticJournal: React.FC = () => {
     let matches = true;
     
     if (searchQuery) {
-      const _query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase();
       const content = typeof entry.content === 'string' 
         ? entry.content.toLowerCase()
         : Object.values(entry.content).join(' ').toLowerCase();
       
       matches = matches && (
-        entry.title.toLowerCase().includes(_query) ||
-        content.includes(_query) ||
-        entry.tags.some(tag => tag.toLowerCase().includes(_query))
+        entry.title.toLowerCase().includes(query) ||
+        content.includes(query) ||
+        entry.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
     

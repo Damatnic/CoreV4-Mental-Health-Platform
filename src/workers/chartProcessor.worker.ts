@@ -475,7 +475,7 @@ self.addEventListener('message', (event: MessageEvent<ProcessingRequest>) => {
     };
     
     self.postMessage(response);
-  } catch {
+  } catch (error) {
     self.postMessage({
       type: 'ERROR',
       error: error instanceof Error ? error.message : 'Processing error',

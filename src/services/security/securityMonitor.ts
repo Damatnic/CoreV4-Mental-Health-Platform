@@ -8,10 +8,10 @@ import { auditLogger } from './auditLogger';
 import { rateLimiter } from './rateLimiter';
 import { hipaaService } from '../compliance/hipaaService';
 import { cryptoService } from './cryptoService';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface SecurityEvent {
-  _id: string;
+  id: string;
   timestamp: Date;
   type: SecurityEventType;
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -28,7 +28,7 @@ interface SecurityEvent {
 type SecurityEventType =
   | 'unauthorized_access'
   | 'brute_force_attack'
-  | 'sql_injection'
+  | 'sqlinjection'
   | 'xss_attack'
   | 'csrf_attempt'
   | 'data_breach'
@@ -135,7 +135,7 @@ class SecurityMonitorService {
     details: Record<string, any>;
   }): Promise<SecurityEvent> {
     const event: SecurityEvent = {
-      _id: cryptoService.generateSecureUUID(),
+      id: cryptoService.generateSecureUUID(),
       timestamp: new Date(),
       type: params.type,
       severity: params.severity,
@@ -156,7 +156,7 @@ class SecurityMonitorService {
     await auditLogger.log({ event: 'SECURITY_ALERT',
       userId: params.userId,
       details: {
-        eventId: event._id,
+        eventId: event.id,
         type: params.type,
         severity: params.severity,
         source: params.source,
@@ -274,11 +274,11 @@ class SecurityMonitorService {
     });
 
     // Execute incident response playbook
-    await this.executeIncidentPlaybook(_incident);
+    await this.executeIncidentPlaybook(incident);
 
     // Check if HIPAA breach notification required
-    if (this.requiresBreachNotification(_incident)) {
-      await this.initiateBreachNotification(_incident);
+    if (this.requiresBreachNotification(incident)) {
+      await this.initiateBreachNotification(incident);
     }
 
     return incident;
@@ -311,7 +311,7 @@ class SecurityMonitorService {
         
         // Execute action based on type
         switch (action.type) {
-          case 'block_ip':
+          case 'blockip':
             await rateLimiter.blockIP(action.target, 'Security incident', action.duration);
             break;
             
@@ -328,11 +328,11 @@ class SecurityMonitorService {
             break;
             
           case 'notify_admin':
-            await this.notifyAdministrators(_incident);
+            await this.notifyAdministrators(incident);
             break;
             
           case 'escalate':
-            await this.escalateIncident(_incident);
+            await this.escalateIncident(incident);
             break;
             
           case 'snapshot_system':
@@ -439,7 +439,7 @@ class SecurityMonitorService {
       // Injection attacks
       {
         pattern: /sql.*injection|union.*select|drop.*table/i,
-        type: 'sql_injection',
+        type: 'sqlinjection',
         severity: 'critical',
         confidence: 0.95,
         description: 'SQL injection attempt',
@@ -511,8 +511,8 @@ class SecurityMonitorService {
     const correlated: SecurityEvent[] = [];
     const correlationWindow = Date.now() - this.CORRELATION_WINDOW;
     
-    for (const [_id, existingEvent] of this.events) {
-      if (_id === event._id) continue;
+    for (const [id, existingEvent] of this.events) {
+      if (id === event.id) continue;
       
       if (existingEvent.timestamp.getTime() > correlationWindow) {
         // Check for correlation patterns
@@ -607,7 +607,7 @@ class SecurityMonitorService {
         { type: 'escalate', target: 'security_team' },
       ],
       'high:brute_force_attack': [
-        { type: 'block_ip', target: 'attacker', duration: 3600000 },
+        { type: 'blockip', target: 'attacker', duration: 3600000 },
         { type: 'force_logout', target: 'affected_user' },
         { type: 'notify_admin', target: 'security' },
       ],
@@ -629,7 +629,7 @@ class SecurityMonitorService {
         }
         break;
         
-      case 'sql_injection':
+      case 'sqlinjection':
       case 'xss_attack':
         if (event.ipAddress) {
           await rateLimiter.blockIP(event.ipAddress, 'Attack detected', 3600000);
@@ -742,9 +742,9 @@ class SecurityMonitorService {
   private cleanupOldEvents(): void {
     const cutoff = Date.now() - (this.EVENT_RETENTION_DAYS * 24 * 3600000);
     
-    for (const [_id, event] of this.events) {
+    for (const [id, event] of this.events) {
       if (event.timestamp.getTime() < cutoff) {
-        this.events.delete(_id);
+        this.events.delete(id);
       }
     }
   }
@@ -758,7 +758,7 @@ class SecurityMonitorService {
     this.alertSubscribers.forEach(callback => {
       try {
         callback(event);
-      } catch {
+      } catch (error) {
         logger.error('Alert subscriber error: ');
       }
     });

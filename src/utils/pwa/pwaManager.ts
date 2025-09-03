@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../logger';
 /**
  * Progressive Web App (_PWA) Management System
  * Coordinates all PWA features including offline support, push notifications, and app installation
@@ -48,7 +48,7 @@ export class PWAManager {
     if (this.isInitialized) return;
 
     try {
-      performanceMonitor.measureStart('pwa_initialization');
+      performanceMonitor.measureStart('pwainitialization');
 
       // Detect PWA capabilities
       this.capabilities = await this.detectCapabilities();
@@ -65,13 +65,13 @@ export class PWAManager {
       
       this.isInitialized = true;
       
-      const initTime = performanceMonitor.measureEnd('pwa_initialization');
-      logger.info(`PWA _initialized successfully in ${initTime?.toFixed(2)}ms`);
+      const initTime = performanceMonitor.measureEnd('pwainitialization');
+      logger.info(`PWA initialized successfully in ${initTime?.toFixed(2)}ms`);
       
-    } catch (_error) {
-      logger.error('Failed to initialize PWA:', _error);
-      performanceMonitor.recordMetric('pwa_init_error', 1, { error: String(_error) });
-      throw _error;
+    } catch (error) {
+      logger.error('Failed to initialize PWA:', error);
+      performanceMonitor.recordMetric('pwainiterror', 1, { error: String(error) });
+      throw error;
     }
   }
 
@@ -149,9 +149,9 @@ export class PWAManager {
 
       performanceMonitor.recordMetric('service_worker_registered', 1);
 
-    } catch (_error) {
-      logger.error('Service Worker registration failed:', _error);
-      performanceMonitor.recordMetric('service_worker_error', 1, { error: String(_error) });
+    } catch (error) {
+      logger.error('Service Worker registration failed:', error);
+      performanceMonitor.recordMetric('service_workererror', 1, { error: String(error) });
     }
   }
 
@@ -165,20 +165,20 @@ export class PWAManager {
     }
 
     try {
-      const _initialized = await pushNotifications.init();
-      if (_initialized) {
-        logger.info('Push notifications _initialized');
+      const initialized = await pushNotifications.init();
+      if (initialized) {
+        logger.info('Push notifications initialized');
         
         // Schedule wellness reminders based on device _type
         if (this.capabilities.deviceType === 'mobile') {
           await this.scheduleMobileNotifications();
         }
         
-        performanceMonitor.recordMetric('push_notifications_initialized', 1);
+        performanceMonitor.recordMetric('push_notificationsinitialized', 1);
       }
-    } catch (_error) {
-      logger.error('Push notifications initialization failed:', _error);
-      performanceMonitor.recordMetric('push_notifications_error', 1, { error: String(_error) });
+    } catch (error) {
+      logger.error('Push notifications initialization failed:', error);
+      performanceMonitor.recordMetric('push_notificationserror', 1, { error: String(error) });
     }
   }
 
@@ -199,15 +199,15 @@ export class PWAManager {
       await precacheCrisisResources();
       
       // Setup offline event handlers
-      window.addEventListener('online', this.handleOnline.bind(_this));
-      window.addEventListener('offline', this.handleOffline.bind(_this));
+      window.addEventListener('online', this.handleOnline.bind(this));
+      window.addEventListener('offline', this.handleOffline.bind(this));
       
-      logger.info('Offline support _initialized');
-      performanceMonitor.recordMetric('offline_support_initialized', 1);
+      logger.info('Offline support initialized');
+      performanceMonitor.recordMetric('offline_supportinitialized', 1);
       
-    } catch (_error) {
-      logger.error('Offline support initialization failed:', _error);
-      performanceMonitor.recordMetric('offline_support_error', 1, { error: String(_error) });
+    } catch (error) {
+      logger.error('Offline support initialization failed:', error);
+      performanceMonitor.recordMetric('offline_supporterror', 1, { error: String(error) });
     }
   }
 
@@ -245,7 +245,7 @@ export class PWAManager {
       }
       
       window.dispatchEvent(new CustomEvent('pwa:installed'));
-      performanceMonitor.recordMetric('app_installed', 1);
+      performanceMonitor.recordMetric('appinstalled', 1);
     });
   }
 
@@ -266,11 +266,11 @@ export class PWAManager {
         await this.enableSlowConnectionOptimizations();
       }
       
-      performanceMonitor.recordMetric('performance_optimizations_initialized', 1);
+      performanceMonitor.recordMetric('performance_optimizationsinitialized', 1);
       
-    } catch (_error) {
-      logger.error('Performance optimizations failed:', _error);
-      performanceMonitor.recordMetric('performance_optimizations_error', 1, { error: String(_error) });
+    } catch (error) {
+      logger.error('Performance optimizations failed:', error);
+      performanceMonitor.recordMetric('performance_optimizationserror', 1, { error: String(error) });
     }
   }
 
@@ -400,9 +400,9 @@ export class PWAManager {
       
       return choice.outcome === 'accepted';
       
-    } catch (_error) {
-      logger.error('Install failed:', _error);
-      performanceMonitor.recordMetric('install_error', 1, { error: String(_error) });
+    } catch (error) {
+      logger.error('Install failed:', error);
+      performanceMonitor.recordMetric('installerror', 1, { error: String(error) });
       return false;
     }
   }
@@ -475,7 +475,7 @@ export class PWAManager {
       if ('sync' in registration) {
         await (registration as unknown).sync.register('sync-data');
       }
-    } catch {
+    } catch (error) {
       logger.error('Background sync failed:');
     }
   }

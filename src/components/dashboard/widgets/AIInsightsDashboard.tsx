@@ -52,7 +52,7 @@ import {
 } from '../../../types/ai-insights';
 
 export function AIInsightsDashboard() {
-  const { insightsDashboard, filteredInsights, _isLoading, _error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, _dismissInsight, requestRefresh, insightStats, isMarkingActioned, _isDismissing,  } = useAIInsights();
+  const { insightsDashboard, filteredInsights, isLoading, error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, _dismissInsight, requestRefresh, insightStats, isMarkingActioned, isDismissing,  } = useAIInsights();
 
   const [_expandedInsight, _setExpandedInsight] = useState<string | null>(null);
   const [activeTab, _setActiveTab] = useState<'insights' | 'patterns' | 'predictions' | 'recommendations' | 'progress'>('insights');
@@ -138,7 +138,7 @@ export function AIInsightsDashboard() {
     );
   };
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center">
@@ -149,7 +149,7 @@ export function AIInsightsDashboard() {
     );
   }
 
-  if (_error) {
+  if (error) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6">
         <div className="flex items-center gap-3 text-red-600">

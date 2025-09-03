@@ -9,10 +9,10 @@ export type { MoodEntry, WellnessGoal, TherapySession, CrisisResource, Activity,
 export type DashboardWidgetType = 
   | 'crisis_panel'
   | 'wellness_status'
-  | 'todays_schedule'
+  | 'todaysschedule'
   | 'progress_tracker'
   | 'recent_activity'
-  | 'quick_actions'
+  | 'quickactions'
   | 'professional_care'
   | 'insights'
   | 'environmental_factors'

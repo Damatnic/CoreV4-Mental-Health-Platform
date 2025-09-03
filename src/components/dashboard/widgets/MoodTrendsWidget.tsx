@@ -140,7 +140,7 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       .map(([emotion]) => emotion);
   };
 
-  if (_error) {
+  if (error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>

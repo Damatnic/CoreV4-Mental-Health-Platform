@@ -138,7 +138,7 @@ export class WellnessRecommendationService {
 
       return recommendations;
 
-    } catch {
+    } catch (error) {
       logger.error('Wellness recommendation generation failed', error instanceof Error ? error : new Error(String(error)), {
         category: LogCategory.AI,
         userId

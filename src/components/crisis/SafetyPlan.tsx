@@ -61,7 +61,7 @@ export function SafetyPlan() {
   // Auto-save functionality
   useEffect(() => {
     const _saveTimer = setTimeout(() => {
-      if (_isEditing) {
+      if (isEditing) {
         setAutoSaveStatus('saving');
         secureStorage.setItem('safetyPlan', JSON.stringify(_safetyPlan));
         setTimeout(() => setAutoSaveStatus('saved'), 1000);
@@ -98,7 +98,7 @@ export function SafetyPlan() {
           text: 'I created a safety plan for crisis situations',
           url: window.location.href
         });
-      } catch {
+      } catch (error) {
         logger.error('Error sharing safety plan', 'SafetyPlan', error);
       }
     } else {
@@ -275,7 +275,7 @@ export function SafetyPlan() {
               : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
         >
-          {isEditing ? '_Save Changes' : 'Edit Plan'}
+          {isEditing ? 'Save Changes' : 'Edit Plan'}
         </button>
         <button
           onClick={() => setShowTemplates(!showTemplates)}
@@ -496,7 +496,7 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
             <span className="text-gray-800">{item}</span>
             {isEditing && (
               <button
-                onClick={() => handleRemove(_index)}
+                onClick={() => handleRemove(index)}
                 className="text-red-600 hover:text-red-700"
               >
                 Remove
@@ -567,7 +567,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: SupportPeopleEdito
               </div>
               {isEditing && (
                 <button
-                  onClick={() => handleRemove(_index)}
+                  onClick={() => handleRemove(index)}
                   className="text-red-600 hover:text-red-700"
                 >
                   Remove
@@ -650,7 +650,7 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: Professio
               </div>
               {isEditing && (
                 <button
-                  onClick={() => handleRemove(_index)}
+                  onClick={() => handleRemove(index)}
                   className="text-red-600 hover:text-red-700"
                 >
                   Remove

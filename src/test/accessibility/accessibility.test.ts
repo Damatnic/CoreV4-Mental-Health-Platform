@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { AxePuppeteer } from '@axe-core/puppeteer';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
   let browser: Browser;
@@ -27,7 +27,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should pass all axe-core AAA tests on homepage', async () => {
       await page.goto('http://localhost:5173');
       
-      const __results = await new AxePuppeteer(_page)
+      const results = await new AxePuppeteer(_page)
         .withTags(['wcag2aaa', 'wcag21aaa'])
         .analyze();
       
@@ -177,12 +177,12 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       
       for (const shortcut of shortcuts) {
         await page.keyboard.press(shortcut.key);
-        const _actionPerformed = await page.evaluate((action) => {
+        const actionPerformed = await page.evaluate((action) => {
           return document.querySelector(`[data-action-performed="${action}"]`) !== null;
         }, shortcut.action);
         
         // Some action should be performed
-        // expect(_actionPerformed).toBeTruthy();
+        // expect(actionPerformed).toBeTruthy();
       }
     });
 
@@ -354,8 +354,8 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       await page.click('[type="submit"]');
       
       const errorMessages = await page.evaluate(() => {
-        const _errors = document.querySelectorAll('[role="alert"]');
-        return Array.from(_errors).map(e => ({
+        const errors = document.querySelectorAll('[role="alert"]');
+        return Array.from(errors).map(e => ({
           text: e.textContent,
           hasIcon: e.querySelector('svg, img') !== null,
           hasColor: window.getComputedStyle(_e).color !== 'rgb(0, 0, 0)',
@@ -491,7 +491,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should provide alt text for images', async () => {
       await page.goto('http://localhost:5173');
       
-      const _images = await page.evaluate(() => {
+      const images = await page.evaluate(() => {
         const imgs = document.querySelectorAll('img');
         const missing: string[] = [];
         
@@ -505,7 +505,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return missing;
       });
       
-      expect(_images).toHaveLength(0);
+      expect(images).toHaveLength(0);
     });
 
     it('should provide audio descriptions where needed', async () => {

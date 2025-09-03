@@ -265,8 +265,8 @@ function _QuickAccessPanel() {
 // Main enhanced layout component
 function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   const location = useLocation();
-  const { mode, _isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, _preferences, _crisisDetected } = useNavigation();
-  const [__isInstallable, setIsInstallable] = useState(false);
+  const { mode, isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, _preferences, _crisisDetected } = useNavigation();
+  const [isInstallable, setIsInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
   const [_notificationCount] = useState(0);
 

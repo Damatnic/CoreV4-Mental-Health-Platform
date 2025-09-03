@@ -61,7 +61,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     
     // Log to crisis-aware logging system if available
     if (logger?.logCrisisIntervention) {
-      logger.logCrisisIntervention('component_error', undefined, {
+      logger.logCrisisIntervention('componenterror', undefined, {
         error: error.message,
         component: errorInfo.componentStack,
         severity: 'high',
@@ -115,7 +115,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           }).catch(() => {
             // Fail silently - don&apos;t let monitoring failures affect crisis support
           });
-        } catch {
+        } catch (error) {
           // Fail silently - don&apos;t let monitoring failures affect crisis support
           console.error('Monitoring error:', error);
         }
@@ -133,7 +133,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           }
         });
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to report error', 'ErrorBoundary', error);
     }
   };
@@ -165,7 +165,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   private handleEmergencyCall = (number: string) => {
     if (logger?.logCrisisIntervention) {
-      logger.logCrisisIntervention('emergency_call_from_error_boundary', undefined, {
+      logger.logCrisisIntervention('emergency_call_fromerror_boundary', undefined, {
         number,
         error_context: this.state.error?.message
       });
@@ -441,7 +441,7 @@ export const _setupGlobalErrorHandling = () => {
 
     // Store error for analysis
     const errorReport = {
-      type: 'uncaught_error',
+      type: 'uncaughterror',
       message: event.message,
       source: event.filename,
       line: event.lineno,
@@ -451,7 +451,7 @@ export const _setupGlobalErrorHandling = () => {
     };
 
     try {
-      localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(errorReport));
+      localStorage.setItem(`uncaughterror_${Date.now()}`, JSON.stringify(errorReport));
     } catch (err) {
       logger.error('Failed to store error report', 'ErrorBoundary', err);
     }

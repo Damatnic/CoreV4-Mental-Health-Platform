@@ -7,7 +7,7 @@
 import { cryptoService } from './cryptoService';
 import { auditLogger } from './auditLogger';
 import { secureStorage } from './secureStorage';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface EncryptionKeyMetadata {
   _keyId: string;
@@ -112,8 +112,8 @@ const FIELD_CONFIGS: Record<string, FieldEncryptionConfig> = {
     encryptionRequired: true,
     formatPreserving: true,
   },
-  'insurance_info': {
-    _fieldName: 'insurance_info',
+  'insuranceinfo': {
+    _fieldName: 'insuranceinfo',
     dataType: 'object',
     sensitivity: 'high',
     encryptionRequired: true,
@@ -227,7 +227,7 @@ class FieldEncryptionService {
       }
 
       return encryptedField;
-    } catch {
+    } catch (error) {
       logger.error(`Failed to encrypt field ${_fieldName}:`, error);
       throw new Error('Field encryption failed');
     }
@@ -281,7 +281,7 @@ class FieldEncryptionService {
       }
 
       return encryptedData;
-    } catch {
+    } catch (error) {
       logger.error(`Failed to decrypt field ${_fieldName}:`, error);
       throw new Error('Field decryption failed');
     }
@@ -354,7 +354,7 @@ class FieldEncryptionService {
       return [];
     }
 
-    const __results = fieldIndex.get(_searchToken) || [];
+    const results = fieldIndex.get(_searchToken) || [];
     
     // Audit search operation
     await auditLogger.log({
@@ -391,7 +391,7 @@ class FieldEncryptionService {
       // Clean up old key versions
       await this.cleanupOldKeys();
       
-    } catch {
+    } catch (error) {
       logger.error('Key rotation failed:');
       throw new Error('Key rotation failed');
     }
@@ -429,7 +429,7 @@ class FieldEncryptionService {
           encrypted: new Date(),
         },
       };
-    } catch {
+    } catch (error) {
       logger.error('Re-encryption failed:');
       throw undefined;
     }
@@ -661,7 +661,7 @@ class FieldEncryptionService {
           // Implementation depends on key storage format
         }
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to load encryption keys:');
     }
   }
@@ -684,7 +684,7 @@ class FieldEncryptionService {
         encrypted: true,
         persistent: true,
       });
-    } catch {
+    } catch (error) {
       logger.error('Failed to persist key:');
     }
   }

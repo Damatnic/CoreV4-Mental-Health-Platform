@@ -7,7 +7,7 @@
 import { auditLogger } from './auditLogger';
 import { _cryptoService } from './cryptoService';
 import { secureStorage } from './SecureLocalStorage';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -39,7 +39,7 @@ interface AttackPattern {
 }
 
 interface IPReputation {
-  _ip: string;
+  ip: string;
   score: number; // 0-100, higher is worse
   lastSeen: Date;
   violations: number;
@@ -150,7 +150,7 @@ class RateLimiterService {
    */
   async checkRateLimit(params: {
     endpoint: string;
-    _ip: string;
+    ip: string;
     userId?: string;
     _method?: string;
     headers?: Record<string, string>;
@@ -159,10 +159,10 @@ class RateLimiterService {
     info: RateLimitInfo;
     reason?: string;
   }> {
-    const { endpoint, _ip, userId, _method = 'GET' } = params;
+    const { endpoint, ip, userId, _method = 'GET' } = params;
 
     // Check if IP is blocked
-    if (this.isIPBlocked(_ip)) {
+    if (this.isIPBlocked(ip)) {
       return {
         allowed: false,
         info: this.getRateLimitInfo(endpoint, 0, 0),
@@ -173,7 +173,7 @@ class RateLimiterService {
     // Check for attack patterns
     const attackDetected = this.detectAttackPattern(endpoint, params.headers);
     if (attackDetected) {
-      await this.handleAttackDetection(_ip, attackDetected);
+      await this.handleAttackDetection(ip, attackDetected);
       if (attackDetected.action === 'block') {
         return {
           allowed: false,
@@ -185,7 +185,7 @@ class RateLimiterService {
 
     // Check if honeypot endpoint
     if (this.isHoneypot(endpoint)) {
-      await this.handleHoneypotAccess(_ip, endpoint);
+      await this.handleHoneypotAccess(ip, endpoint);
       return {
         allowed: false,
         info: this.getRateLimitInfo(endpoint, 0, 0),
@@ -197,17 +197,17 @@ class RateLimiterService {
     const config = this.getRateLimitConfig(endpoint);
     
     // Generate rate limit key
-    const key = this.generateKey(_ip, userId, endpoint);
+    const key = this.generateKey(ip, userId, endpoint);
     
     // Get current request count
     const count = this.getRequestCount(key, config.windowMs);
     
     // Check if limit exceeded
     if (count >= config.maxRequests) {
-      await this.handleRateLimitExceeded(_ip, endpoint, count);
+      await this.handleRateLimitExceeded(ip, endpoint, count);
       
       // Check if CAPTCHA is required
-      if (this.requiresCaptcha(_ip)) {
+      if (this.requiresCaptcha(ip)) {
         return {
           allowed: false,
           info: this.getRateLimitInfo(endpoint, config.maxRequests, 0),
@@ -226,7 +226,7 @@ class RateLimiterService {
     this.incrementRequestCount(_key);
 
     // Update IP reputation
-    this.updateIPReputation(_ip, true);
+    this.updateIPReputation(ip, true);
 
     return {
       allowed: true,
@@ -238,11 +238,11 @@ class RateLimiterService {
    * Throttle request with adaptive delay
    */
   async throttleRequest(params: {
-    _ip: string;
+    ip: string;
     endpoint: string;
     userId?: string;
   }): Promise<number> {
-    const reputation = this.getIPReputation(params._ip);
+    const reputation = this.getIPReputation(params.ip);
     const baseDelay = 100; // Base delay in milliseconds
     
     // Calculate adaptive delay based on reputation
@@ -269,12 +269,12 @@ class RateLimiterService {
   /**
    * Block IP address
    */
-  async blockIP(_ip: string, reason: string, duration: number = 3600000): Promise<void> {
+  async blockIP(ip: string, reason: string, duration: number = 3600000): Promise<void> {
     const blockUntil = new Date(Date.now() + duration);
-    this.blockedIPs.set(_ip, blockUntil);
+    this.blockedIPs.set(ip, blockUntil);
     
     // Update reputation
-    const reputation = this.getIPReputation(_ip);
+    const reputation = this.getIPReputation(ip);
     reputation.blocked = true;
     reputation.reason = reason;
     reputation.score = 100;
@@ -284,7 +284,7 @@ class RateLimiterService {
       event: 'SECURITY_ALERT',
       details: {
         action: 'ip_blocked',
-        _ip,
+        ip,
         reason,
         duration,
         blockUntil,
@@ -299,10 +299,10 @@ class RateLimiterService {
   /**
    * Unblock IP address
    */
-  async unblockIP(_ip: string): Promise<void> {
-    this.blockedIPs.delete(_ip);
+  async unblockIP(ip: string): Promise<void> {
+    this.blockedIPs.delete(ip);
     
-    const reputation = this.ipReputations.get(_ip);
+    const reputation = this.ipReputations.get(ip);
     if (reputation) {
       reputation.blocked = false;
       reputation.reason = undefined;
@@ -314,13 +314,13 @@ class RateLimiterService {
   /**
    * Check if IP is blocked
    */
-  isIPBlocked(_ip: string): boolean {
-    const blockUntil = this.blockedIPs.get(_ip);
+  isIPBlocked(ip: string): boolean {
+    const blockUntil = this.blockedIPs.get(ip);
     if (!blockUntil) return false;
     
     if (new Date() > blockUntil) {
       // Block expired, remove it
-      this.blockedIPs.delete(_ip);
+      this.blockedIPs.delete(ip);
       return false;
     }
     
@@ -330,18 +330,18 @@ class RateLimiterService {
   /**
    * Get IP reputation
    */
-  getIPReputation(_ip: string): IPReputation {
-    let reputation = this.ipReputations.get(_ip);
+  getIPReputation(ip: string): IPReputation {
+    let reputation = this.ipReputations.get(ip);
     
     if (!reputation) {
       reputation = {
-        _ip,
+        ip,
         score: 0,
         lastSeen: new Date(),
         violations: 0,
         blocked: false,
       };
-      this.ipReputations.set(_ip, reputation);
+      this.ipReputations.set(ip, reputation);
     }
     
     return reputation;
@@ -350,20 +350,20 @@ class RateLimiterService {
   /**
    * Require CAPTCHA for IP
    */
-  requireCaptcha(_ip: string, duration: number = 3600000): void {
+  requireCaptcha(ip: string, duration: number = 3600000): void {
     const requireUntil = new Date(Date.now() + duration);
-    this.captchaRequired.set(_ip, requireUntil);
+    this.captchaRequired.set(ip, requireUntil);
   }
 
   /**
    * Check if CAPTCHA is required
    */
-  requiresCaptcha(_ip: string): boolean {
-    const requireUntil = this.captchaRequired.get(_ip);
+  requiresCaptcha(ip: string): boolean {
+    const requireUntil = this.captchaRequired.get(ip);
     if (!requireUntil) return false;
     
     if (new Date() > requireUntil) {
-      this.captchaRequired.delete(_ip);
+      this.captchaRequired.delete(ip);
       return false;
     }
     
@@ -373,14 +373,14 @@ class RateLimiterService {
   /**
    * Verify CAPTCHA response
    */
-  async verifyCaptcha(_ip: string, token: string): Promise<boolean> {
+  async verifyCaptcha(ip: string, token: string): Promise<boolean> {
     // In production, verify with CAPTCHA service (reCAPTCHA, hCaptcha, etc.)
     // For now, simple validation
     if (token && token.length > 10) {
-      this.captchaRequired.delete(_ip);
+      this.captchaRequired.delete(ip);
       
       // Improve reputation
-      const reputation = this.getIPReputation(_ip);
+      const reputation = this.getIPReputation(ip);
       reputation.score = Math.max(0, reputation.score - 10);
       
       return true;
@@ -397,7 +397,7 @@ class RateLimiterService {
     blockedIPs: number;
     captchaRequired: number;
     averageReputationScore: number;
-    topViolators: Array<{ _ip: string; violations: number }>;
+    topViolators: Array<{ ip: string; violations: number }>;
   } {
     let totalRequests = 0;
     this.requestCounts.forEach(counts => {
@@ -412,7 +412,7 @@ class RateLimiterService {
     const topViolators = reputations
       .sort((a, b) => b.violations - a.violations)
       .slice(0, 10)
-      .map(r => ({ _ip: r._ip, violations: r.violations }));
+      .map(r => ({ ip: r.ip, violations: r.violations }));
     
     return {
       totalRequests,
@@ -446,8 +446,8 @@ class RateLimiterService {
     return this.defaultLimits['/api/*'] || { maxRequests: 100, windowMs: 60000 };
   }
 
-  private generateKey(_ip: string, userId?: string, endpoint?: string): string {
-    const parts = [_ip];
+  private generateKey(ip: string, userId?: string, endpoint?: string): string {
+    const parts = [ip];
     if (_userId) parts.push(_userId);
     if (endpoint) parts.push(endpoint);
     return parts.join(':');
@@ -544,9 +544,9 @@ class RateLimiterService {
     return null;
   }
 
-  private async handleAttackDetection(_ip: string, attack: AttackPattern): Promise<void> {
+  private async handleAttackDetection(ip: string, attack: AttackPattern): Promise<void> {
     // Update reputation
-    const reputation = this.getIPReputation(_ip);
+    const reputation = this.getIPReputation(ip);
     reputation.violations++;
     reputation.score = Math.min(100, reputation.score + 20);
     
@@ -555,7 +555,7 @@ class RateLimiterService {
       event: 'SECURITY_ALERT',
       details: {
         type: 'attack_detected',
-        _ip,
+        ip,
         pattern: attack.description,
         severity: attack.severity,
         action: attack.action,
@@ -565,11 +565,11 @@ class RateLimiterService {
     
     // Take action based on severity
     if (attack.severity === 'critical' || reputation.violations > 5) {
-      await this.blockIP(_ip, attack.description, 24 * 3600000); // 24 hour block
+      await this.blockIP(ip, attack.description, 24 * 3600000); // 24 hour block
     } else if (attack.severity === 'high') {
-      await this.blockIP(_ip, attack.description, 3600000); // 1 hour block
+      await this.blockIP(ip, attack.description, 3600000); // 1 hour block
     } else {
-      this.requireCaptcha(_ip);
+      this.requireCaptcha(ip);
     }
   }
 
@@ -589,25 +589,25 @@ class RateLimiterService {
     return this.honeypotEndpoints.has(endpoint);
   }
 
-  private async handleHoneypotAccess(_ip: string, endpoint: string): Promise<void> {
+  private async handleHoneypotAccess(ip: string, endpoint: string): Promise<void> {
     // Immediate block for honeypot access
-    await this.blockIP(_ip, `Honeypot access: ${endpoint}`, 7 * 24 * 3600000); // 7 day block
+    await this.blockIP(ip, `Honeypot access: ${endpoint}`, 7 * 24 * 3600000); // 7 day block
     
     // Log critical security event
     await auditLogger.log({
       event: 'SECURITY_ALERT',
       details: {
         type: 'honeypot_triggered',
-        _ip,
+        ip,
         endpoint,
       },
       severity: 'critical',
     });
   }
 
-  private async handleRateLimitExceeded(_ip: string, endpoint: string, count: number): Promise<void> {
+  private async handleRateLimitExceeded(ip: string, endpoint: string, count: number): Promise<void> {
     // Update reputation
-    const reputation = this.getIPReputation(_ip);
+    const reputation = this.getIPReputation(ip);
     reputation.violations++;
     reputation.score = Math.min(100, reputation.score + 5);
     
@@ -616,7 +616,7 @@ class RateLimiterService {
       event: 'SECURITY_ALERT',
       details: {
         type: 'rate_limit_exceeded',
-        _ip,
+        ip,
         endpoint,
         requestCount: count,
       },
@@ -625,14 +625,14 @@ class RateLimiterService {
     
     // Progressive penalties
     if (reputation.violations > 10) {
-      await this.blockIP(_ip, 'Excessive rate limit violations', 3600000);
+      await this.blockIP(ip, 'Excessive rate limit violations', 3600000);
     } else if (reputation.violations > 5) {
-      this.requireCaptcha(_ip);
+      this.requireCaptcha(ip);
     }
   }
 
-  private updateIPReputation(_ip: string, _success: boolean): void {
-    const reputation = this.getIPReputation(_ip);
+  private updateIPReputation(ip: string, _success: boolean): void {
+    const reputation = this.getIPReputation(ip);
     reputation.lastSeen = new Date();
     
     if (_success) {
@@ -663,24 +663,24 @@ class RateLimiterService {
     });
     
     // Clean up expired blocks
-    this.blockedIPs.forEach((blockUntil, _ip) => {
+    this.blockedIPs.forEach((blockUntil, ip) => {
       if (new Date() > blockUntil) {
-        this.blockedIPs.delete(_ip);
+        this.blockedIPs.delete(ip);
       }
     });
     
     // Clean up expired CAPTCHA requirements
-    this.captchaRequired.forEach((requireUntil, _ip) => {
+    this.captchaRequired.forEach((requireUntil, ip) => {
       if (new Date() > requireUntil) {
-        this.captchaRequired.delete(_ip);
+        this.captchaRequired.delete(ip);
       }
     });
     
     // Clean up old reputations
-    this.ipReputations.forEach((reputation, _ip) => {
+    this.ipReputations.forEach((reputation, ip) => {
       const daysSinceLastSeen = (now - reputation.lastSeen.getTime()) / (24 * 3600000);
       if (daysSinceLastSeen > 30 && reputation.score < 10) {
-        this.ipReputations.delete(_ip);
+        this.ipReputations.delete(ip);
       }
     });
   }
@@ -688,14 +688,14 @@ class RateLimiterService {
   private async loadBlockedIPs(): Promise<void> {
     // Load blocked IPs from storage
     try {
-      const _stored = secureStorage.getItem('blocked_ips');
+      const _stored = secureStorage.getItem('blockedips');
       if (_stored) {
         const _parsed = JSON.parse(_stored);
-        Object.entries(_parsed).forEach(([_ip, blockUntil]) => {
-          this.blockedIPs.set(_ip, new Date(blockUntil as string));
+        Object.entries(_parsed).forEach(([ip, blockUntil]) => {
+          this.blockedIPs.set(ip, new Date(blockUntil as string));
         });
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to load blocked IPs:');
     }
   }
@@ -704,11 +704,11 @@ class RateLimiterService {
     // Persist blocked IPs to storage
     try {
       const data: Record<string, string> = {};
-      this.blockedIPs.forEach((blockUntil, _ip) => {
-        data[_ip] = blockUntil.toISOString();
+      this.blockedIPs.forEach((blockUntil, ip) => {
+        data[ip] = blockUntil.toISOString();
       });
-      secureStorage.setItem('blocked_ips', JSON.stringify(_data));
-    } catch {
+      secureStorage.setItem('blockedips', JSON.stringify(_data));
+    } catch (error) {
       logger.error('Failed to persist blocked IPs:');
     }
   }

@@ -64,7 +64,7 @@ export function MobileNavigation() {
 
   // Apply collapsed class to body for proper spacing
   React.useEffect(() => {
-    if (_isDesktopSidebarCollapsed) {
+    if (isDesktopSidebarCollapsed) {
       document.body.classList.add('sidebar-collapsed');
     } else {
       document.body.classList.remove('sidebar-collapsed');

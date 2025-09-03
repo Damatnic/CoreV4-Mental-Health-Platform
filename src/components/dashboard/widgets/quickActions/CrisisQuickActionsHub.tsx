@@ -48,8 +48,8 @@ export function CrisisQuickActionsHub({
   emergencyContacts = [],
   safetyPlan
 }: CrisisQuickActionsHubProps) {
-  const { assessmentData, _isAssessing, _updateAssessment } = useCrisisAssessment();
-  const { location, _error: _locationError, loading } = useGeolocation();
+  const { assessmentData, isAssessing, _updateAssessment } = useCrisisAssessment();
+  const { location, error: _locationError, loading } = useGeolocation();
   
   const [___activeAction, _setActiveAction] = useState<string | null>(null);
   const [showSafetyPlan, _setShowSafetyPlan] = useState(false);
@@ -143,10 +143,10 @@ export function CrisisQuickActionsHub({
   const __shareEmergencyLocation   = useCallback(async () => {
     if (location) {
       const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-      const _message = `Emergency: I need help. My location: ${googleMapsUrl}`;
+      const message = `Emergency: I need help. My location: ${googleMapsUrl}`;
       
       // Copy to clipboard
-      navigator.clipboard.writeText(_message);
+      navigator.clipboard.writeText(message);
       setCopiedToClipboard('location');
       
       onActionTaken?.('location_shared', {

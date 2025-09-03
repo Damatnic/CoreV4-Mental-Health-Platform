@@ -8,7 +8,7 @@ import { User, ApiResponse } from '@/types';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 interface AuthTokens {
   accessToken: string;
@@ -244,7 +244,7 @@ class AuthenticationService {
         clearTimeout(this.activityTimer);
         this.activityTimer = null;
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Logout error: ');
       // Force clear session even if API call fails
       await this.clearSession();
@@ -275,7 +275,7 @@ class AuthenticationService {
       this.scheduleTokenRefresh();
 
       return newTokens;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Token refresh failed:');
       // If refresh fails, user needs to re-authenticate
       await this.logout();
@@ -444,7 +444,7 @@ class AuthenticationService {
           await this.clearSession();
         }
       }
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to load stored session:');
       await this.clearSession();
     }

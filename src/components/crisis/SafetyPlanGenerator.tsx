@@ -175,7 +175,7 @@ export const SafetyPlanGenerator: React.FC = () => {
     }
 
     if (errors.length > 0) {
-      setValidationErrors(_errors);
+      setValidationErrors(errors);
       return;
     }
 
@@ -534,7 +534,7 @@ const SafetyPlanSectionComponent: React.FC<SafetyPlanSectionProps> = ({
                   className="flex-1 bg-transparent text-gray-300 outline-none"
                 />
                 <button
-                  onClick={() => onRemove(_index)}
+                  onClick={() => onRemove(index)}
                   className="text-red-400 hover:text-red-300 ml-2"
                 >
                   <X className="h-4 w-4" />

@@ -7,7 +7,7 @@
 import { dataIntegrationService, _IntegrationEvent } from './DataIntegrationService';
 import { realtimeSyncService, _RealtimeEvent } from './RealtimeSyncService';
 import { crisisIntegrationService, _CrisisEventType, _CrisisSeverity } from './CrisisIntegrationService';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 // Core integration services
 export { 
@@ -30,7 +30,7 @@ export {
 } from './CrisisIntegrationService';
 
 // Integration utilities
-export const __initializeIntegration = async (userId: string, token: string) => {
+export const initializeIntegration = async (userId: string, token: string) => {
   try {
     // Initialize real-time connection
     await realtimeSyncService.connect({ userId, token });
@@ -50,7 +50,7 @@ export const __initializeIntegration = async (userId: string, token: string) => 
         crisis: crisisStatus
       }
     };
-  } catch {
+  } catch (error) {
     logger.error('Failed to initialize integration services:');
     return {
       success: false,

@@ -24,7 +24,7 @@ interface CareTeamMember {
   permissions: Permission[];
   lastActive?: Date;
   timezone?: string;
-  preferredContact: 'email' | 'phone' | 'secure_message';
+  preferredContact: 'email' | 'phone' | 'securemessage';
 }
 
 interface Permission {
@@ -128,7 +128,7 @@ export function CareTeamCommunication({
   const [searchTerm, _setSearchTerm] = useState('');
   const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
   const [notifications, _setNotifications] = useState<Notification[]>([]);
-  const [___isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
+  const [_isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom of messages

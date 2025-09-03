@@ -266,7 +266,7 @@ export const __HAPTIC_PATTERNS = {
 export const _CRISIS_STORAGE_KEYS = {
   safetyPlan: 'crisis_safety_plan',
   emergencyContacts: 'crisis_emergency_contacts',
-  interactions: 'crisis_interactions',
+  interactions: 'crisisinteractions',
   preferences: 'crisis_preferences',
   lastAssessment: 'crisis_last_assessment'
 } as const;

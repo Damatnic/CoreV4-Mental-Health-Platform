@@ -125,7 +125,7 @@ export function CrisisDemonstrationHub() {
     toast.loading('Running comprehensive crisis system tests...');
     
     try {
-      const __results = await crisisScenarioTester.runAllScenarios();
+      const results = await crisisScenarioTester.runAllScenarios();
       const report = crisisScenarioTester.generateReport();
       
       setTestResults(report);

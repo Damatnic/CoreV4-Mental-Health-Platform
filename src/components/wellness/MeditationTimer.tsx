@@ -278,7 +278,7 @@ export const MeditationTimer: React.FC = () => {
   // Pause/Resume meditation
   const togglePause = () => {
     setIsPaused(!isPaused);
-    if (_isPaused) {
+    if (isPaused) {
       startAmbientSound();
     } else {
       stopAmbientSound();

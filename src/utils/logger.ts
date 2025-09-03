@@ -161,7 +161,7 @@ class Logger {
     // For now, just store critical errors in localStorage for debugging
     try {
       const criticalErrors = JSON.parse(
-        localStorage.getItem('corev4_critical_errors') || '[]'
+        localStorage.getItem('corev4_criticalerrors') || '[]'
       );
       criticalErrors.push({
         ...entry,
@@ -171,8 +171,8 @@ class Logger {
       if (criticalErrors.length > 50) {
         criticalErrors.shift();
       }
-      localStorage.setItem('corev4_critical_errors', JSON.stringify(criticalErrors));
-    } catch {
+      localStorage.setItem('corev4_criticalerrors', JSON.stringify(criticalErrors));
+    } catch (error) {
       // Fail silently if localStorage is full or unavailable
     }
   }
@@ -227,7 +227,7 @@ class Logger {
         crisisEvents.shift();
       }
       localStorage.setItem('corev4_crisis_events', JSON.stringify(crisisEvents));
-    } catch {
+    } catch (error) {
       // Fail silently
     }
   }

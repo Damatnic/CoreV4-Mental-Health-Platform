@@ -285,12 +285,12 @@ export function MedicationManagement({
                     {period}
                   </h4>
                   
-                  {periodMeds.map((item, _idx) => (
+                  {periodMeds.map((item, idx) => (
                     <motion.div
-                      key={`${item.medication.id}-${_idx}`}
+                      key={`${item.medication.id}-${idx}`}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: _idx * 0.05 }}
+                      transition={{ delay: idx * 0.05 }}
                       className={`p-3 rounded-lg border ${
                         item.schedule.taken 
                           ? 'bg-green-50 border-green-200' 
@@ -397,8 +397,8 @@ export function MedicationManagement({
                     
                     {/* Schedule Times */}
                     <div className="flex space-x-2 mt-2">
-                      {med.schedule.map((sched, _idx) => (
-                        <span key={_idx} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex items-center">
+                      {med.schedule.map((sched, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex items-center">
                           {getTimeIcon(sched.time)}
                           <span className="ml-1">{sched.time}</span>
                         </span>
@@ -451,7 +451,7 @@ export function MedicationManagement({
             <div className="p-4 bg-white border border-gray-200 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-3">Weekly Adherence</h4>
               <div className="space-y-2">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, _idx) => (
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => (
                   <div key={day} className="flex items-center">
                     <span className="text-xs text-gray-600 w-8">{day}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-4 ml-2">
@@ -595,8 +595,8 @@ export function MedicationManagement({
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-1">Possible Side Effects</p>
                     <ul className="list-disc list-inside text-sm text-gray-600">
-                      {selectedMedication.sideEffects.map((effect, _idx) => (
-                        <li key={_idx}>{effect}</li>
+                      {selectedMedication.sideEffects.map((effect, idx) => (
+                        <li key={idx}>{effect}</li>
                       ))}
                     </ul>
                   </div>
@@ -606,8 +606,8 @@ export function MedicationManagement({
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-1">Drug Interactions</p>
                     <ul className="list-disc list-inside text-sm text-gray-600">
-                      {selectedMedication.interactions.map((interaction, _idx) => (
-                        <li key={_idx}>{interaction}</li>
+                      {selectedMedication.interactions.map((interaction, idx) => (
+                        <li key={idx}>{interaction}</li>
                       ))}
                     </ul>
                   </div>

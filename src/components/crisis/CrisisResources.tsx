@@ -87,7 +87,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, _setShowMap] = useState(false);
 
-  // Filter resources based on type and search _query
+  // Filter resources based on type and search query
   useEffect(() => {
     let filtered = resources;
 
@@ -96,11 +96,11 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
     }
 
     if (searchQuery) {
-      const _query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(r => 
-        r.name.toLowerCase().includes(_query) ||
-        r.services.some(s => s.toLowerCase().includes(_query)) ||
-        r._address?.toLowerCase().includes(_query)
+        r.name.toLowerCase().includes(query) ||
+        r.services.some(s => s.toLowerCase().includes(query)) ||
+        r.address?.toLowerCase().includes(query)
       );
     }
 

@@ -34,8 +34,8 @@ interface UseAITherapistOptions {
 
 export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAITherapistOptions) => {
   const [session, _setSession] = useState<TherapySession | null>(null);
-  const [___isTyping, _setIsTyping] = useState(false);
-  const [___isConnected, _setIsConnected] = useState(false);
+  const [_isTyping, _setIsTyping] = useState(false);
+  const [_isConnected, _setIsConnected] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Initialize or load session
@@ -84,7 +84,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
 
       setSession(_existingSession);
       setIsConnected(true);
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize therapy session:');
       setIsConnected(false);
     }
@@ -162,7 +162,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
         setIsTyping(false);
       }, typingDelay);
 
-    } catch {
+    } catch (error) {
       logger.error('Failed to generate therapist response:');
       
       // Add undefined recovery message
@@ -534,7 +534,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     
     try {
       localStorage.setItem(`therapy-session-${session.id}`, JSON.stringify(session));
-    } catch {
+    } catch (error) {
       logger.error('Failed to save therapy session:');
     }
   }, [session]);

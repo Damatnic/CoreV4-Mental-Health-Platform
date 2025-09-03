@@ -146,7 +146,7 @@ export function transformErrorMessage(error: string | Error): string {
   const errorString = typeof error === 'string' ? error : error.message;
   
   // Map common technical errors to supportive messages
-  const _errorMappings: Record<string, string> = {
+  const errorMappings: Record<string, string> = {
     'Network Error': supportiveMessages.errors.network,
     '404': supportiveMessages.errors.notFound,
     '401': supportiveMessages.errors.unauthorized,
@@ -157,7 +157,7 @@ export function transformErrorMessage(error: string | Error): string {
   };
 
   // Check if we have a mapping for this error
-  for (const [key, value] of Object.entries(_errorMappings)) {
+  for (const [key, value] of Object.entries(errorMappings)) {
     if (errorString.toLowerCase().includes(key.toLowerCase())) {
       return value;
     }

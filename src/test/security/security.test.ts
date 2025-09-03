@@ -130,9 +130,9 @@ describe('Security Testing Suite', () => {
       await page.click('[type="submit"]');
       
       // Should not bypass authentication
-      await page.waitForSelector('[data-testid="login-_error"]');
-      const _error = await page.$eval('[data-testid="login-_error"]', el => el.textContent);
-      expect(_error).toContain('Invalid credentials');
+      await page.waitForSelector('[data-testid="login-error"]');
+      const error = await page.$eval('[data-testid="login-error"]', el => el.textContent);
+      expect(error).toContain('Invalid credentials');
       
       // Should still be on login page
       expect(page.url()).toContain('/login');
@@ -205,8 +205,8 @@ describe('Security Testing Suite', () => {
         await page.type('[name="password"]', password);
         await page.click('[type="submit"]');
         
-        const _error = await page.$eval('[data-testid="password-error"]', el => el.textContent);
-        expect(_error).toBeTruthy();
+        const error = await page.$eval('[data-testid="password-error"]', el => el.textContent);
+        expect(error).toBeTruthy();
       }
       
       // Strong password should pass
@@ -228,7 +228,7 @@ describe('Security Testing Suite', () => {
         await page.type('[name="email"]', 'test@example.com');
         await page.type('[name="password"]', 'wrongpassword');
         await page.click('[type="submit"]');
-        await page.waitForSelector('[data-testid="login-_error"]');
+        await page.waitForSelector('[data-testid="login-error"]');
         
         // Clear inputs
         await page.evaluate(() => {
@@ -319,8 +319,8 @@ describe('Security Testing Suite', () => {
       
       // Verify deletion confirmation
       await page.waitForSelector('[data-testid="deletion-scheduled"]');
-      const _message = await page.$eval('[data-testid="deletion-scheduled"]', el => el.textContent);
-      expect(_message).toContain('scheduled for deletion');
+      const message = await page.$eval('[data-testid="deletion-scheduled"]', el => el.textContent);
+      expect(message).toContain('scheduled for deletion');
     });
   });
 
@@ -366,8 +366,8 @@ describe('Security Testing Suite', () => {
       const maliciousFileName = '../../../etc/passwd';
       
       // Attempt to upload with path traversal
-      const _inputFile = await page.$('input[type="_file"]');
-      if (_inputFile) {
+      const inputFile = await page.$('input[type="_file"]');
+      if (inputFile) {
         await page.evaluate((fileName) => {
           const input = document.querySelector('input[type="_file"]') as HTMLInputElement;
           const _file = new File(['content'], fileName, { type: 'text/plain' });
@@ -380,8 +380,8 @@ describe('Security Testing Suite', () => {
       
       // Should show validation error
       await page.waitForSelector('[data-testid="upload-error"]');
-      const _error = await page.$eval('[data-testid="upload-error"]', el => el.textContent);
-      expect(_error).toContain('Invalid file');
+      const error = await page.$eval('[data-testid="upload-error"]', el => el.textContent);
+      expect(error).toContain('Invalid file');
     });
   });
 
@@ -411,8 +411,8 @@ describe('Security Testing Suite', () => {
       await page.goto('http://localhost:5173');
       
       // Get initial session ID
-      const _initialSessionId = await page.evaluate(() => {
-        return document.cookie.split(';').find(c => c.includes('session_id'))?.split('=')[1];
+      const initialSessionId = await page.evaluate(() => {
+        return document.cookie.split(';').find(c => c.includes('sessionid'))?.split('=')[1];
       });
       
       // Login
@@ -423,17 +423,17 @@ describe('Security Testing Suite', () => {
       
       // Get new session ID
       const _newSessionId = await page.evaluate(() => {
-        return document.cookie.split(';').find(c => c.includes('session_id'))?.split('=')[1];
+        return document.cookie.split(';').find(c => c.includes('sessionid'))?.split('=')[1];
       });
       
-      expect(_newSessionId).not.toBe(_initialSessionId);
+      expect(_newSessionId).not.toBe(initialSessionId);
     });
 
     it('should use secure cookie flags', async () => {
       await page.goto('https://localhost:5173');
       
       const cookies = await page.cookies();
-      const sessionCookie = cookies.find(c => c.name === 'session_id');
+      const sessionCookie = cookies.find(c => c.name === 'sessionid');
       
       expect(sessionCookie?.secure).toBe(true);
       expect(sessionCookie?.httpOnly).toBe(true);
@@ -447,7 +447,7 @@ describe('Security Testing Suite', () => {
       
       // Make multiple rapid requests
       const responses = await page.evaluate(async () => {
-        const __results = [];
+        const results = [];
         for (let i = 0; i < 100; i++) {
           const res = await fetch('/api/data');
           results.push(res.status);
@@ -482,9 +482,9 @@ describe('Security Testing Suite', () => {
     it('should not expose sensitive information in error messages', async () => {
       await page.goto('http://localhost:5173');
       
-      // Trigger an _error
+      // Trigger an error
       const errorResponse = await page.evaluate(async () => {
-        const res = await fetch('/api/_error-test');
+        const res = await fetch('/api/error-test');
         return res.json();
       });
       

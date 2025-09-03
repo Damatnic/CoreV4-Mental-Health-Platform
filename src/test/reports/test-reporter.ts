@@ -64,12 +64,12 @@ export class TestReporter {
     this.performanceMetrics.push(_metric);
   }
 
-  addSecurityIssue(_issue: SecurityVulnerability) {
-    this.securityIssues.push(_issue);
+  addSecurityIssue(issue: SecurityVulnerability) {
+    this.securityIssues.push(issue);
   }
 
-  addAccessibilityIssue(_issue: AccessibilityViolation) {
-    this.accessibilityIssues.push(_issue);
+  addAccessibilityIssue(issue: AccessibilityViolation) {
+    this.accessibilityIssues.push(issue);
   }
 
   finish() {
@@ -257,19 +257,19 @@ Performance traces available at: \`./performance/traces/\`
     const grouped = new Map<string, SecurityVulnerability[]>();
     
     this.securityIssues.forEach(issue => {
-      if (!grouped.has(_issue.severity)) {
-        grouped.set(_issue.severity, []);
+      if (!grouped.has(issue.severity)) {
+        grouped.set(issue.severity, []);
       }
-      grouped.get(issue.severity)!.push(_issue);
+      grouped.get(issue.severity)!.push(issue);
     });
 
     ['critical', 'high', 'medium', 'low'].forEach(severity => {
       const issues = grouped.get(severity) || [];
       if (issues.length > 0) {
         section += `\n#### ${severity.toUpperCase()} (${issues.length})\n`;
-        issues.forEach(_issue => {
-          section += `- **${_issue.type}**: ${_issue.description}\n`;
-          section += `  *Recommendation*: ${_issue.recommendation}\n`;
+        issues.forEach(issue => {
+          section += `- **${issue.type}**: ${issue.description}\n`;
+          section += `  *Recommendation*: ${issue.recommendation}\n`;
         });
       }
     });
@@ -286,20 +286,20 @@ Performance traces available at: \`./performance/traces/\`
     const grouped = new Map<string, AccessibilityViolation[]>();
     
     this.accessibilityIssues.forEach(issue => {
-      if (!grouped.has(_issue.impact)) {
-        grouped.set(_issue.impact, []);
+      if (!grouped.has(issue.impact)) {
+        grouped.set(issue.impact, []);
       }
-      grouped.get(issue.impact)!.push(_issue);
+      grouped.get(issue.impact)!.push(issue);
     });
 
     ['critical', 'serious', 'moderate', 'minor'].forEach(impact => {
       const issues = grouped.get(impact) || [];
       if (issues.length > 0) {
         section += `\n#### ${impact.toUpperCase()} (${issues.length})\n`;
-        issues.forEach(_issue => {
-          section += `- ${_issue.description}\n`;
-          section += `  Element: \`${_issue.element}\`\n`;
-          section += `  Fix: ${_issue.fix}\n`;
+        issues.forEach(issue => {
+          section += `- ${issue.description}\n`;
+          section += `  Element: \`${issue.element}\`\n`;
+          section += `  Fix: ${issue.fix}\n`;
         });
       }
     });
@@ -452,7 +452,7 @@ The platform does not meet all production requirements. Please address the issue
   }
 
   saveReport(outputPath: string = './test-results') {
-    if (!existsSync(_outputPath)) {
+    if (!existsSync(outputPath)) {
       mkdirSync(outputPath, { recursive: true });
     }
 

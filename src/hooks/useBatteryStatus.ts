@@ -62,7 +62,7 @@ export function useBatteryStatus(): BatteryStatus {
           battery.addEventListener('chargingtimechange', () => updateBatteryStatus(battery));
           battery.addEventListener('dischargingtimechange', () => updateBatteryStatus(battery));
         }
-      } catch {
+      } catch (error) {
         console.error('Battery API not available:');
       }
     };

@@ -145,7 +145,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       );
       
       return btoa(String.fromCharCode(...new Uint8Array(_encrypted)));
-    } catch {
+    } catch (error) {
       logger.error('Encryption failed:');
       return null;
     }
@@ -164,7 +164,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       }
       
       secureStorage.setItem('mood_data', btoa(JSON.stringify(_moodHistory)));
-    } catch {
+    } catch (error) {
       logger.error('Failed to store mood locally:');
     }
   };

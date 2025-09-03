@@ -193,8 +193,8 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       onClose();
     },
-    onError: (_error: Error) => {
-      toast._error(_error.message || 'Failed to create event');
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create event');
     },
   });
 
@@ -203,7 +203,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
     
     // Validate dates
     if (formData.endTime <= formData.startTime) {
-      toast._error('End time must be after start time');
+      toast.error('End time must be after start time');
       return;
     }
     
@@ -504,7 +504,7 @@ export function CommunityEvents() {
   const dateRange = getDateRange();
 
   // Fetch events
-  const { data, _isLoading, _error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['events', selectedType, dateFilter],
     queryFn: () => communityService.getEvents({
       type: selectedType === 'all' ? undefined : selectedType,
@@ -522,7 +522,7 @@ export function CommunityEvents() {
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
     onError: () => {
-      toast._error('Failed to register for event');
+      toast.error('Failed to register for event');
     },
   });
 
@@ -534,7 +534,7 @@ export function CommunityEvents() {
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
     onError: () => {
-      toast._error('Failed to cancel registration');
+      toast.error('Failed to cancel registration');
     },
   });
 
@@ -548,7 +548,7 @@ export function CommunityEvents() {
     { value: 'social', label: 'Social' },
   ];
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -556,7 +556,7 @@ export function CommunityEvents() {
     );
   }
 
-  if (_error) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load events. Please try again later.</p>

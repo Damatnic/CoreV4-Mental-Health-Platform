@@ -57,7 +57,7 @@ export type InsightType =
   | 'opportunity'
   | 'correlation'
   | 'recommendation'
-  | 'therapeutic_insight';
+  | 'therapeuticinsight';
 
 export type InsightCategory =
   | 'mood'

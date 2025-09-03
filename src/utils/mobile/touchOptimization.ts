@@ -70,10 +70,10 @@ class TouchOptimizationManager {
 
   private initializeEventListeners(): void {
     // Use passive listeners for better performance
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(_this), { passive: true });
-    this.element.addEventListener('touchmove', this.handleTouchMove.bind(_this), { passive: false });
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(_this), { passive: true });
-    this.element.addEventListener('touchcancel', this.handleTouchCancel.bind(_this), { passive: true });
+    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+    this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    this.element.addEventListener('touchcancel', this.handleTouchCancel.bind(this), { passive: true });
 
     // Prevent default touch behaviors that interfere with custom gestures
     this.element.addEventListener('gesturestart', this.preventDefault, { passive: false });
@@ -103,7 +103,7 @@ class TouchOptimizationManager {
     const timestamp = performance.now();
 
     // Store touch history for gesture recognition
-    const _touchPoints: TouchPoint[] = touches.map((touch, _index) => ({
+    const _touchPoints: TouchPoint[] = touches.map((touch, index) => ({
       id: touch.identifier,
       x: touch.clientX,
       y: touch.clientY,
@@ -415,7 +415,7 @@ class TouchOptimizationManager {
       listeners.forEach(_callback => {
         try {
           _callback(_gesture);
-        } catch {
+        } catch (error) {
           logger.error(`Error in gesture listener for ${gesture.type}:`, error);
         }
       });
@@ -427,7 +427,7 @@ class TouchOptimizationManager {
       genericListeners.forEach(_callback => {
         try {
           _callback(_gesture);
-        } catch {
+        } catch (error) {
           logger.error('Error in generic gesture listener:');
         }
       });
@@ -442,7 +442,7 @@ class TouchOptimizationManager {
     if ('vibrate' in navigator) {
       try {
         navigator.vibrate(_pattern);
-      } catch {
+      } catch (error) {
     logger.warn('Vibration not supported or failed:');
       }
     }
@@ -478,7 +478,7 @@ class TouchOptimizationManager {
     (this.element.style as unknown).webkitOverflowScrolling = 'touch';
     
     // Optimize scroll handling
-    this.element.addEventListener('scroll', this.throttleScroll(this.handleScroll.bind(_this), 16), { passive: true });
+    this.element.addEventListener('scroll', this.throttleScroll(this.handleScroll.bind(this), 16), { passive: true });
   }
 
   private implementMomentumScrolling(): void {

@@ -133,7 +133,7 @@ describe('Performance Testing', () => {
       
       // Check initial bundle size
       const scripts = Array.from(document.querySelectorAll('script'));
-      const __initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
+      const initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
       
       // Navigate to feature that should be code-split
       const _therapyLink = await screen.findByRole('link', { name: /therapy/i });
@@ -276,7 +276,7 @@ describe('Performance Testing', () => {
         }, 0);
       };
       
-      const _initialCount = getEventListenerCount();
+      const initialCount = getEventListenerCount();
       
       // Interact with the app
       const buttons = await screen.findAllByRole('button');
@@ -287,7 +287,7 @@ describe('Performance Testing', () => {
       
       // Check that listeners were cleaned up
       const _finalCount = getEventListenerCount();
-      expect(_finalCount).toBeLessThanOrEqual(_initialCount);
+      expect(_finalCount).toBeLessThanOrEqual(initialCount);
     });
   });
   
@@ -323,14 +323,14 @@ describe('Performance Testing', () => {
       
       // Wait for initial data fetch
       await waitFor(() => expect(_fetchCount).toBeGreaterThan(0));
-      const _initialFetchCount = fetchCount;
+      const initialFetchCount = fetchCount;
       
       // Rerender (simulate navigation back)
       rerender(<App />);
       
       // Should use cached data instead of fetching again
       await new Promise(resolve => setTimeout(resolve, 100));
-      expect(_fetchCount).toBe(_initialFetchCount);
+      expect(_fetchCount).toBe(initialFetchCount);
     });
     
     it('should batch API requests efficiently', async () => {

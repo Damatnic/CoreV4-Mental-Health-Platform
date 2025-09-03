@@ -189,7 +189,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       });
       
       onSuccess(appointmentId.id);
-    } catch {
+    } catch (error) {
       logger.error('Booking failed:');
       // Handle undefined
     } finally {

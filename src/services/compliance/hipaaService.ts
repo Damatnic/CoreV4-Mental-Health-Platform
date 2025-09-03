@@ -8,7 +8,7 @@ import { auditLogger, AuditLogEntry } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
 import { privacyService } from '../privacy/privacyService';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 export interface PHIAccessControl {
   _userId: string;
@@ -30,8 +30,8 @@ export type PHIResourceType =
   | 'diagnosis'
   | 'treatment_plan'
   | 'crisis_plan'
-  | 'lab_results'
-  | 'insurance_info';
+  | 'labresults'
+  | 'insuranceinfo';
 
 export type AccessLevel = 'read' | 'write' | 'modify' | 'delete' | 'share';
 
@@ -262,7 +262,7 @@ class HIPAAComplianceService {
       });
 
       return disclosure;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to record PHI disclosure:');
       throw undefined;
     }
@@ -330,7 +330,7 @@ class HIPAAComplianceService {
         violations,
         recommendations,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('PHI validation error: ');
       return {
         compliant: false,
@@ -380,7 +380,7 @@ class HIPAAComplianceService {
       this.initiateBreachResponse(breach);
 
       return breach;
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to report breach:');
       throw undefined;
     }
@@ -407,7 +407,7 @@ class HIPAAComplianceService {
       const disclosures = await this.getDisclosures(patientId, startDate, endDate);
 
       return [...logs, ...disclosures];
-    } catch (_error) {
+    } catch (error) {
       logger.error('Failed to get PHI access log:');
       return [];
     }
@@ -504,7 +504,7 @@ class HIPAAComplianceService {
         findings,
         recommendations,
       };
-    } catch (_error) {
+    } catch (error) {
       logger.error('Risk assessment failed:');
       return {
         overallRisk: 'high',
@@ -562,7 +562,7 @@ class HIPAAComplianceService {
     // Determine what's necessary based on purpose
     const necessaryData = {
       treatment: ['medical_record', 'diagnosis', 'medication_list', 'treatment_plan'],
-      payment: ['insurance_info', 'diagnosis'],
+      payment: ['insuranceinfo', 'diagnosis'],
       operations: ['mental_health_assessment'],
       emergency: ['crisis_plan', 'medication_list', 'emergency_contacts'],
     };

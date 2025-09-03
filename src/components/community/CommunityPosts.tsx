@@ -29,7 +29,7 @@ function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: () => {
-      toast._error('Failed to update like status');
+      toast.error('Failed to update like status');
     },
   });
 
@@ -224,8 +224,8 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       onClose();
     },
-    onError: (_error: unknown) => {
-      toast._error(_error.message || 'Failed to save post');
+    onError: (error: unknown) => {
+      toast.error(error.message || 'Failed to save post');
     },
   });
 
@@ -464,7 +464,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   const [selectedFilter, _setSelectedFilter] = useState<'recent' | 'popular' | 'helpful'>('recent');
 
   // Fetch posts
-  const { data, _isLoading, _error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['posts', groupId, selectedFilter],
     queryFn: () => communityService.getPosts({ groupId, limit: 20 }),
   });
@@ -477,7 +477,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: () => {
-      toast._error('Failed to delete post');
+      toast.error('Failed to delete post');
     },
   });
 
@@ -489,7 +489,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
       toast.success('Post reported. Our moderation team will review it.');
     },
     onError: () => {
-      toast._error('Failed to report post');
+      toast.error('Failed to report post');
     },
   });
 
@@ -542,7 +542,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     setEditingPost(null);
   };
 
-  if (_isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -550,7 +550,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     );
   }
 
-  if (_error) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load posts. Please try again later.</p>

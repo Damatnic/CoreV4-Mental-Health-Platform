@@ -46,7 +46,7 @@ if (typeof Worker !== 'undefined') {
       new URL('../../workers/chartProcessor.worker.ts', import.meta.url),
       { type: 'module' }
     );
-  } catch {
+  } catch (error) {
     logger.warn('Web Worker not available, falling back to main thread processing');
   }
 }
@@ -81,12 +81,12 @@ export function OptimizedChart({
   const chartRef = useRef<unknown>(null);
   const ____canvasRef   = useRef<HTMLCanvasElement>(null);
   const [processedData, _setProcessedData] = useState<ChartData | null>(null);
-  const [___isProcessing, _setIsProcessing] = useState(false);
-  const [_error, _setError] = useState<string | null>(null);
+  const [_isProcessing, _setIsProcessing] = useState(false);
+  const [error, _setError] = useState<string | null>(null);
   
   // Use deferred value for non-critical updates
   const deferredData = useDeferredValue(_data);
-  const [__isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
+  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
 
   // Performance monitoring
   useEffect(() => {
@@ -125,9 +125,9 @@ export function OptimizedChart({
 
       performanceMonitor.measureEnd('chart-data-processing');
       return chartData;
-    } catch (_error) {
+    } catch (error) {
       performanceMonitor.measureEnd('chart-data-processing');
-      throw _error;
+      throw error;
     }
   }, [enableSampling, samplingThreshold, type]);
 
@@ -139,10 +139,10 @@ export function OptimizedChart({
 
     return new Promise((resolve, reject) => {
       const messageHandler = (event: MessageEvent) => {
-        const { _type, result, _error } = event.data;
+        const { _type, result, error } = event.data;
         
-        if (_error) {
-          reject(new Error(_error));
+        if (error) {
+          reject(new Error(error));
         } else {
           resolve(result);
         }
@@ -212,8 +212,8 @@ export function OptimizedChart({
           
           setIsProcessing(false);
         });
-      } catch (_error  ) {
-        logger.error('Chart data processing _error');
+      } catch (error  ) {
+        logger.error('Chart data processing error');
         setError('Processing failed');
         setIsProcessing(false);
         
@@ -221,7 +221,7 @@ export function OptimizedChart({
         try {
           const _fallbackData = processDataOnMainThread(_deferredData);
           setProcessedData(_fallbackData);
-        } catch {
+        } catch (error) {
     logger.error('Fallback processing failed');
         }
       }
@@ -318,12 +318,12 @@ export function OptimizedChart({
     }
   }, [type]);
 
-  if (_error) {
+  if (error) {
     return (
       <div className={`flex items-center justify-center h-${height} bg-red-50 rounded-lg ${className}`}>
         <div className="text-center">
           <p className="text-red-600 mb-2">Chart Error</p>
-          <p className="text-sm text-red-500">{_error}</p>
+          <p className="text-sm text-red-500">{error}</p>
         </div>
       </div>
     );

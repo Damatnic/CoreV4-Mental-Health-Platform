@@ -234,7 +234,7 @@ export function getEmergencyLocation(): Promise<GeolocationCoordinates> {
 
     navigator.geolocation.getCurrentPosition(
       (position) => resolve(position.coords),
-      (_error) => reject(_error),
+      (error) => reject(error),
       {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -288,7 +288,7 @@ async function storeCrisisAssessment(_assessment: CrisisAssessment): Promise<voi
     const db = await openCrisisDB();
     const tx = db.transaction('assessments', 'readwrite');
     await tx.objectStore('assessments').add(_assessment);
-  } catch {
+  } catch (error) {
     logger.error('Failed to store crisis _assessment:');
     // Fallback to localStorage
     try {
@@ -298,7 +298,7 @@ async function storeCrisisAssessment(_assessment: CrisisAssessment): Promise<voi
       // Keep only last 50 assessments
       const _trimmed = assessments.slice(-50);
       localStorage.setItem(CRISIS_STORAGE_KEYS.lastAssessment, JSON.stringify(_trimmed));
-    } catch {
+    } catch (error) {
     logger.error('Failed to store _assessment in localStorage:', fallbackError);
     }
   }
@@ -312,7 +312,7 @@ async function storeCrisisInteraction(interaction: CrisisInteraction): Promise<v
     const db = await openCrisisDB();
     const tx = db.transaction('interactions', 'readwrite');
     await tx.objectStore('interactions').add(interaction);
-  } catch {
+  } catch (error) {
     logger.error('Failed to store crisis interaction:');
     // Fallback to localStorage
     try {
@@ -322,7 +322,7 @@ async function storeCrisisInteraction(interaction: CrisisInteraction): Promise<v
       // Keep only last 100 interactions
       const _trimmed = interactions.slice(-100);
       localStorage.setItem(CRISIS_STORAGE_KEYS.interactions, JSON.stringify(_trimmed));
-    } catch {
+    } catch (error) {
     logger.error('Failed to store interaction in localStorage:', fallbackError);
     }
   }
@@ -402,14 +402,14 @@ export async function getRecentAssessments(limit: number = 10): Promise<CrisisAs
       };
       request.onerror = () => reject(request.error);
     });
-  } catch {
+  } catch (error) {
     logger.error('Failed to get recent assessments:');
     // Fallback to localStorage
     try {
       const _stored = localStorage.getItem(CRISIS_STORAGE_KEYS.lastAssessment) || '[]';
       const assessments = JSON.parse(_stored);
       return assessments.slice(-limit).reverse();
-    } catch {
+    } catch (error) {
     logger.error('Failed to get assessments from localStorage:', fallbackError);
       return [];
     }

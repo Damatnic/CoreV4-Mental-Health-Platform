@@ -1,6 +1,6 @@
 // Push Notification Service for Wellness Reminders
 import { openDB } from 'idb';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 
 interface NotificationSchedule {
   id: string;
@@ -52,7 +52,7 @@ class PushNotificationService {
         await this.subscribeToNotifications();
         return true;
       }
-    } catch {
+    } catch (error) {
       logger.error('Failed to initialize push notifications:');
     }
 
@@ -100,11 +100,11 @@ class PushNotificationService {
         });
 
         // Send subscription to server
-        await this.sendSubscriptionToServer(_subscription);
+        await this.sendSubscriptionToServer(subscription);
       }
       
       return subscription;
-    } catch {
+    } catch (error) {
       logger.error('Failed to subscribe to push notifications:');
       return null;
     }
@@ -120,7 +120,7 @@ class PushNotificationService {
     const outputArray = new Uint8Array(rawData.length);
 
     for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(_i);
+      outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
   }
@@ -144,7 +144,7 @@ class PushNotificationService {
       if (!response.ok) {
         throw new Error('Failed to send subscription to server');
       }
-    } catch {
+    } catch (error) {
       logger.error('Error sending subscription to server:');
     }
   }
@@ -286,7 +286,7 @@ class PushNotificationService {
     const db = await this.openNotificationDB();
     const schedule = await db.get('schedules', scheduleId);
     
-    if (_schedule) {
+    if (schedule) {
       const updated = { ...schedule, ...updates };
       await db.put('schedules', updated);
       
@@ -316,7 +316,7 @@ class PushNotificationService {
 
   // Handle notification clicks
   async handleNotificationClick(action: string, data: unknown): Promise<void> {
-    switch (_action) {
+    switch (action) {
       case 'taken':
         // Log medication taken
         await this.logMedicationTaken(data);
@@ -366,7 +366,7 @@ class PushNotificationService {
           action: 'taken'
         })
       });
-    } catch {
+    } catch (error) {
       logger.error('Failed to log medication:');
     }
   }
@@ -439,7 +439,7 @@ class PushNotificationService {
     try {
       const notifications = await this.registration.getNotifications({ tag });
       notifications.forEach(notification => notification.close());
-    } catch {
+    } catch (error) {
       logger.error('Failed to cancel notifications:');
     }
   }
@@ -458,7 +458,7 @@ class PushNotificationService {
         active: notifications.length,
         scheduled: activeSchedules.length
       };
-    } catch {
+    } catch (error) {
       logger.error('Failed to get notification stats:');
       return { active: 0, scheduled: 0 };
     }

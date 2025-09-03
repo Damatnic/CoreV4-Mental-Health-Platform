@@ -64,7 +64,7 @@ interface TestResult {
   error?: string;
 }
 
-const _results: TestResult[] = [];
+const results: TestResult[] = [];
 
 // Helper functions
 function log(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {
@@ -76,7 +76,7 @@ function log(message: string, type: 'info' | 'success' | 'error' | 'warning' = '
     warning: chalk.yellow,
   };
   
-  logger.info(`[${timestamp}] ${colors[type](_message)}`);
+  logger.info(`[${timestamp}] ${colors[type](message)}`);
 }
 
 async function ensureDirectories() {
@@ -102,7 +102,7 @@ async function runTest(suite: string, config: typeof TEST_SUITES[keyof typeof TE
       const duration = Date.now() - startTime;
       const passed = !error;
       
-      if (_passed) {
+      if (passed) {
         log(`✓ ${config.name} passed in ${(duration / 1000).toFixed(2)}s`, 'success');
       } else {
         log(`✗ ${config.name} failed after ${(duration / 1000).toFixed(2)}s`, 'error');
@@ -136,7 +136,7 @@ async function checkCrisisResponseTime() {
     
     log(`Crisis response time: ${metrics.crisisResponseTime}ms ✓`, 'success');
     return true;
-  } catch {
+  } catch (error) {
     log('Could not validate crisis response time', 'warning');
     return true;
   }
@@ -150,7 +150,7 @@ async function generateReport() {
     totalSuites: results.length,
     passed: results.filter(r => r.passed).length,
     failed: results.filter(r => !r.passed).length,
-    totalDuration: results.reduce((sum, r) => sum + r.duration, 0), _results,
+    totalDuration: results.reduce((sum, r) => sum + r.duration, 0), results,
     criticalFailures: results.filter(r => !r.passed && TEST_SUITES[r.suite as keyof typeof TEST_SUITES].critical),
   };
   
@@ -296,7 +296,7 @@ async function main() {
     await ensureDirectories();
     
     // Run all test suites
-    for (const [suite, config] of Object.entries(_TEST_SUITES)) {
+    for (const [suite, config] of Object.entries(TEST_SUITES)) {
       const result = await runTest(suite, config);
       results.push(result);
       
@@ -343,7 +343,7 @@ async function main() {
       process.exit(0);
     }
     
-  } catch {
+  } catch (error) {
     logger.error(chalk.red('Fatal undefined during test execution:'), undefined);
     process.exit(1);
   }

@@ -3,15 +3,15 @@
 
 import CryptoJS from 'crypto-js';
 import { _secureStorage } from './SecureLocalStorage';
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // HIPAA compliance requirements
 export enum ComplianceRequirement {
   ENCRYPTION_AT_REST = 'encryption_at_rest',
-  ENCRYPTION_IN_TRANSIT = 'encryption_in_transit',
+  ENCRYPTION_IN_TRANSIT = 'encryptionin_transit',
   ACCESS_CONTROL = 'access_control',
   AUDIT_LOGGING = 'audit_logging',
-  DATA_INTEGRITY = 'data_integrity',
+  DATA_INTEGRITY = 'dataintegrity',
   TRANSMISSION_SECURITY = 'transmission_security',
   DATA_BACKUP = 'data_backup',
   DISASTER_RECOVERY = 'disaster_recovery',
@@ -28,13 +28,13 @@ export enum PHIFieldType {
   HEALTH_PLAN = 'health_plan',
   ACCOUNT_NUMBER = 'account_number',
   CERTIFICATE_LICENSE = 'certificate_license',
-  VEHICLE_ID = 'vehicle_id',
-  DEVICE_ID = 'device_id',
+  VEHICLE_ID = 'vehicleid',
+  DEVICE_ID = 'deviceid',
   WEB_URL = 'web_url',
   IP_ADDRESS = 'ip_address',
   BIOMETRIC = 'biometric',
   PHOTO = 'photo',
-  OTHER_UNIQUE_ID = 'other_unique_id'
+  OTHER_UNIQUE_ID = 'other_uniqueid'
 }
 
 // Audit log entry
@@ -203,7 +203,7 @@ export class HIPAAComplianceService {
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey);
       
       return encrypted.toString();
-    } catch {
+    } catch (error) {
       this.logSecurityEvent('encryption_failure', { error: 'Processing error' });
       throw new Error('Failed to encrypt PHI data');
     }
@@ -215,7 +215,7 @@ export class HIPAAComplianceService {
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       
       return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch {
+    } catch (error) {
       this.logSecurityEvent('decryption_failure', { error: 'Processing error' });
       throw new Error('Failed to decrypt PHI data');
     }
@@ -247,7 +247,7 @@ export class HIPAAComplianceService {
       if (field in decrypted && decrypted[field]) {
         try {
           decrypted[field] = JSON.parse(this.decryptPHI(decrypted[field]));
-        } catch {
+        } catch (error) {
           // If not JSON, return as string
           decrypted[field] = this.decryptPHI(decrypted[field]);
         }
@@ -400,7 +400,7 @@ export class HIPAAComplianceService {
     this.auditQueue.push(_entry);
     
     // Flush immediately for critical actions
-    if (this.isCriticalAction(_action)) {
+    if (this.isCriticalAction(action)) {
       this.flushAuditQueue();
     }
   }
@@ -440,7 +440,7 @@ export class HIPAAComplianceService {
         },
         body: JSON.stringify({ entries })
       });
-    } catch {
+    } catch (error) {
       logger.error('Failed to flush audit logs:');
       
       // Re-queue failed entries
@@ -525,14 +525,14 @@ export class HIPAAComplianceService {
   // ============================================
 
   // Detect potential breach
-  public detectBreach(_indicators: {
+  public detectBreach(indicators: {
     unusualAccess?: boolean;
     multipleFailedAttempts?: boolean;
     unauthorizedDataAccess?: boolean;
     abnormalDataVolume?: boolean;
   }): boolean {
-    const breachScore = Object.values(_indicators).filter(v => v).length;
-    return breachScore >= 2; // Breach detected if 2+ _indicators
+    const breachScore = Object.values(indicators).filter(v => v).length;
+    return breachScore >= 2; // Breach detected if 2+ indicators
   }
 
   // Report breach

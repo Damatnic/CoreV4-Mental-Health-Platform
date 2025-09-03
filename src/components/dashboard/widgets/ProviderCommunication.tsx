@@ -22,7 +22,7 @@ interface Message {
   urgent: boolean;
   encrypted: boolean;
   attachments?: Attachment[];
-  relatedTo?: 'appointment' | 'prescription' | 'lab_results' | 'treatment_plan' | 'general';
+  relatedTo?: 'appointment' | 'prescription' | 'labresults' | 'treatment_plan' | 'general';
   status: 'sent' | 'delivered' | 'read' | 'replied';
   parentMessageId?: string;
 }

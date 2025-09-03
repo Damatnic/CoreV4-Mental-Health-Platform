@@ -357,7 +357,7 @@ export class ImageLoader {
   }
 }
 
-export const __imageLoader = new ImageLoader();
+export const imageLoader = new ImageLoader();
 
 /**
  * Debounce with cleanup
@@ -456,16 +456,16 @@ export class MemoryLeakDetector {
   detectLeak(): boolean {
     if (this.snapshots.length < 3) return false;
     
-    // Check if memory is consistently _increasing
-    let _increasing = true;
+    // Check if memory is consistently increasing
+    let increasing = true;
     for (let i = 1; i < this.snapshots.length; i++) {
       if (this.snapshots[i].usedJSHeapSize <= this.snapshots[i - 1].usedJSHeapSize) {
-        _increasing = false;
+        increasing = false;
         break;
       }
     }
     
-    if (_increasing) {
+    if (increasing) {
       const firstSnapshot = this.snapshots[0];
       const lastSnapshot = this.snapshots[this.snapshots.length - 1];
       const increase = lastSnapshot.usedJSHeapSize - firstSnapshot.usedJSHeapSize;

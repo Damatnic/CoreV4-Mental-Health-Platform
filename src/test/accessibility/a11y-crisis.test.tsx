@@ -45,8 +45,8 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const _results = await axe(_container);
-      expect(_results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(results).toHaveNoViolations();
     });
 
     it('mood tracker should have no accessibility violations', async () => {
@@ -56,8 +56,8 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const _results = await axe(_container);
-      expect(_results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(results).toHaveNoViolations();
     });
 
     it('crisis modal should have no accessibility violations when open', async () => {
@@ -75,8 +75,8 @@ describe('Crisis Intervention Accessibility', () => {
       // Wait for modal to open
       await screen.findByRole('dialog');
       
-      const _results = await axe(_container);
-      expect(_results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(results).toHaveNoViolations();
     });
   });
 
@@ -457,7 +457,7 @@ describe('Crisis Intervention Accessibility', () => {
       const images = screen.getAllByRole('img');
       
       images.forEach(img => {
-        expect(_img).toHaveAttribute('alt');
+        expect(img).toHaveAttribute('alt');
         expect(img.getAttribute('alt')).not.toBe('');
       });
     });

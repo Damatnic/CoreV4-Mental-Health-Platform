@@ -69,7 +69,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
           setSessionValid(true);
           setSecurityLevel('basic');
         }
-      } catch {
+      } catch (error) {
         logger.debug('Auth check in security middleware:', error);
         // Allow demo mode even if auth check fails
         setSessionValid(true);
@@ -79,9 +79,9 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     
     checkAuthStatus();
     // Re-check periodically
-    const _interval = setInterval(checkAuthStatus, 30000); // Every 30 seconds
+    const interval = setInterval(checkAuthStatus, 30000); // Every 30 seconds
     
-    return () => clearInterval(_interval);
+    return () => clearInterval(interval);
   }, []);
 
   const initializeSecurity = async () => {
@@ -106,7 +106,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
           if (!validation.isValid && validation.requiresAction === 'mfa') {
             setRequiresMFA(true);
           }
-        } catch {
+        } catch (error) {
           logger.debug('Session validation error:', error);
           // For demo/development, allow access
           setSessionValid(true);
@@ -126,7 +126,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       // Initialize heartbeat for session keep-alive
       startHeartbeat();
       
-    } catch {
+    } catch (error) {
       logger.error('Security initialization failed:');
       setIsSecure(false);
     }
@@ -198,7 +198,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       }
       
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Request validation failed:');
       return false;
     }
@@ -207,7 +207,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const encryptField = async (fieldName: string, value: unknown): Promise<unknown> => {
     try {
       return await fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
-    } catch {
+    } catch (error) {
       logger.error(`Failed to encrypt field ${fieldName}:`, error);
       throw error;
     }
@@ -216,7 +216,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const decryptField = async (fieldName: string, encryptedValue: unknown): Promise<unknown> => {
     try {
       return await fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
-    } catch {
+    } catch (error) {
       logger.error(`Failed to decrypt field ${fieldName}:`, error);
       throw error;
     }
@@ -225,7 +225,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const reportSecurityEvent = async (event: unknown): Promise<void> => {
     try {
       await securityMonitor.reportEvent(event);
-    } catch {
+    } catch (error) {
       logger.error('Failed to report security event:');
     }
   };
@@ -358,7 +358,7 @@ const MFAChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       setTimeout(() => {
         onSuccess();
       }, 1000);
-    } catch {
+    } catch (error) {
       logger.error('MFA verification failed:');
     }
   };
@@ -413,7 +413,7 @@ const getSessionId = (): string | null => {
     if (session?._sessionId) {
       return session._sessionId;
     }
-  } catch {
+  } catch (error) {
     logger.debug('Could not get session from authService:', error);
   }
   
@@ -428,7 +428,7 @@ const getCurrentUserId = (): string | undefined => {
     if (user?.id) {
       return user.id;
     }
-  } catch {
+  } catch (error) {
     logger.debug('Could not get user from authService:', error);
   }
   

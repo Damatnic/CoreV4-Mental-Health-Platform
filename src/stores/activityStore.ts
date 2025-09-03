@@ -867,7 +867,7 @@ export const __useActivityStore = create<ActivityStore>()(
             achievements: parsed.achievements || [],
             analytics: parsed.analytics || [],
           });
-        } catch {
+        } catch (error) {
           logger.error('Failed to import data:');
 import { logger } from '../utils/logger';
         }

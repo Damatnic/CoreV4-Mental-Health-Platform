@@ -3,7 +3,7 @@
 
 import { apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
-import { logger } from '../logging/logger';
+import { logger } from '../utils/logger';
 import {
   Therapist,
   Appointment,
@@ -251,7 +251,7 @@ export class TherapistService {
         verificationStatus,
         nextSteps
       };
-    } catch {
+    } catch (error) {
       logger.error('Onboarding failed:');
       throw undefined;
     }
@@ -326,7 +326,7 @@ export class TherapistService {
 
       await Promise.all(_uploads);
       return true;
-    } catch {
+    } catch (error) {
       logger.error('Document upload failed:');
       return false;
     }
@@ -439,7 +439,7 @@ export class TherapistService {
       await this.sendAppointmentConfirmation(_appointment);
       
       return appointment;
-    } catch {
+    } catch (error) {
       logger.error('Appointment booking failed:');
       throw undefined;
     }
@@ -582,7 +582,7 @@ export class TherapistService {
         reason,
         cancelledBy
       });
-    } catch {
+    } catch (error) {
       logger.error('Appointment cancellation failed:');
       throw undefined;
     }
@@ -647,7 +647,7 @@ export class TherapistService {
       });
       
       return this.activeVideoSession;
-    } catch {
+    } catch (error) {
       logger.error('Failed to start video session:');
       throw undefined;
     }
@@ -728,7 +728,7 @@ export class TherapistService {
       
       // Clean up
       this.activeVideoSession = null;
-    } catch {
+    } catch (error) {
       logger.error('Failed to end video session:');
       throw undefined;
     }

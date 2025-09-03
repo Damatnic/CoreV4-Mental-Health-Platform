@@ -107,7 +107,7 @@ const SecureNotifications = memo(withSecurity(NotificationCenterPage, 'basic'));
 const PerformanceMonitoring = memo(() => {
   useEffect(() => {
     // Initialize performance monitoring
-    performanceMonitor.recordMetric('app_initialized', performance.now());
+    performanceMonitor.recordMetric('appinitialized', performance.now());
     performanceMonitor.measureStart('app_lifecycle');
     
     // Initialize bundle optimization
@@ -157,17 +157,17 @@ const RouteWrapper = memo(({
 RouteWrapper.displayName = 'RouteWrapper';
 
 function App() {
-  const [__showBoot, _setShowBoot] = useState(() => {
+  const [showBoot, setShowBoot] = useState(() => {
     // Show boot sequence only on first visit or if user hasn&apos;t seen it in the last hour
     const lastBoot = localStorage.getItem('console-last-boot');
     if (!lastBoot) return true;
     
-    const lastBootTime = parseInt(_lastBoot);
+    const lastBootTime = parseInt(lastBoot);
     const oneHour = 60 * 60 * 1000;
     return Date.now() - lastBootTime > oneHour;
   });
 
-  const [___isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
+  const [_isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
 
   const handleBootComplete = useCallback(() => {
     startPriorityTransition(() => {
@@ -199,13 +199,13 @@ function App() {
       link.rel = 'preconnect';
       link.href = url;
       link.crossOrigin = 'anonymous';
-      document.head.appendChild(_link);
+      document.head.appendChild(link);
     });
   }, []);
 
   // CRITICAL: All hooks must be declared BEFORE any conditional returns
   // Memoize toast options to prevent unnecessary re-renders
-  const __toasterOptions   = useMemo(() => ({
+  const toasterOptions = useMemo(() => ({
     position: 'top-center' as const,
     toastOptions: {
       duration: 4000,
@@ -224,7 +224,7 @@ function App() {
   }), []);
 
   // Conditional return MUST come after all hooks
-  if (_showBoot) {
+  if (showBoot) {
     return (
       <ConsoleBootSequence 
         onBootComplete={handleBootComplete}
