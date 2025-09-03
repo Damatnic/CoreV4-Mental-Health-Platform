@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users, Zap } from 'lucide-react';
-import { EmergencyContacts } from './EmergencyContacts';
-import { SafetyPlan } from './SafetyPlan';
+import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
 import { CrisisChat } from './CrisisChat';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
@@ -290,7 +289,9 @@ export function ConsoleCrisisSystem() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <EmergencyContacts />
+                <Suspense fallback={<div className="animate-pulse bg-gray-800 h-24 rounded border border-cyan-500/20"></div>}>
+                  <EmergencyContactsLazy />
+                </Suspense>
               </motion.div>
             )}
             {activeTab === 'resources' && (
@@ -310,7 +311,9 @@ export function ConsoleCrisisSystem() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <SafetyPlan />
+                <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
+                  <SafetyPlanLazy />
+                </Suspense>
               </motion.div>
             )}
             {activeTab === 'chat' && (

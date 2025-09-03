@@ -19,7 +19,7 @@ import {
 } from './utils/performance/concurrentFeatures';
 import { performanceMonitor } from './utils/performance/performanceMonitor';
 import { initializeBundleOptimization } from './utils/bundleOptimization/lazyLoading';
-import { gamePerformanceOptimizer, initializeGamingPerformance } from './utils/performance/gamingOptimizations';
+import { initializeGamingPerformance } from './utils/performance/gamingOptimizations';
 
 // Enhanced lazy loading with preload support for better performance
 const AITherapyPage = lazyWithPreload(() => import('./pages/AITherapyPage'));
@@ -34,7 +34,7 @@ const NotificationCenterPage = lazyWithPreload(() => import('./pages/Notificatio
 // Preload critical pages immediately
 if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
   // Preload crisis-related content during idle time
-  requestIdleCallback(() => {
+  (window as any).requestIdleCallback(() => {
     (WellnessPage as any).preload?.();
     (AITherapyPage as any).preload?.(); // Preload AI Therapy as it's frequently accessed
   }, { timeout: 2000 });
@@ -167,7 +167,7 @@ function App() {
     return Date.now() - lastBootTime > oneHour;
   });
 
-  const [isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
+  const [_isPending, startPriorityTransition] = usePrioritizedTransition(UpdatePriority.HIGH);
 
   const handleBootComplete = useCallback(() => {
     startPriorityTransition(() => {
@@ -182,7 +182,7 @@ function App() {
   }, [startPriorityTransition]);
 
   // Memoize the boot sequence props
-  const bootSequenceProps = useMemo(() => ({
+  const _bootSequenceProps = useMemo(() => ({
     onBootComplete: handleBootComplete,
     skipBoot: import.meta.env.DEV
   }), [handleBootComplete]);

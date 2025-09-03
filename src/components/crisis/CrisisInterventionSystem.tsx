@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
-import { EmergencyContacts } from './EmergencyContacts';
-import { SafetyPlan } from './SafetyPlan';
+import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
 import { CrisisChat } from './CrisisChat';
 import { logger, LogCategory } from '../../services/logging/logger';
@@ -224,7 +223,9 @@ export function CrisisInterventionSystem() {
               <CrisisResources location={userLocation} />
             )}
             {activeTab === 'safety' && (
-              <SafetyPlan />
+              <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
+                <SafetyPlanLazy />
+              </Suspense>
             )}
             {activeTab === 'chat' && (
               <CrisisChat />
@@ -233,7 +234,9 @@ export function CrisisInterventionSystem() {
         </div>
 
         {/* Emergency Contacts Widget */}
-        <EmergencyContacts />
+        <Suspense fallback={<div className="animate-pulse bg-gray-200 h-24 rounded"></div>}>
+          <EmergencyContactsLazy />
+        </Suspense>
 
         {/* Quick Access Tools */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
