@@ -6,18 +6,15 @@ import {
   Eye,
   EyeOff,
   Volume2,
-  VolumeX,
   Contrast,
-  Type,
-  Move,
   Settings,
   CheckCircle,
   AlertTriangle,
   Play,
-  Pause,
   RotateCcw,
   Zap
 } from 'lucide-react';
+import { logger } from '../../utils/logger';
 import {
   advancedAccessibilityService,
   AccessibilityProfile,
@@ -35,7 +32,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isEyeTrackingActive, setIsEyeTrackingActive] = useState(false);
   const [availableCommands, setAvailableCommands] = useState<VoiceNavigationAction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
   const [testingSpeech, setTestingSpeech] = useState(false);
   const [calibratingEyeTracking, setCalibratingEyeTracking] = useState(false);
 
@@ -48,19 +45,19 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
       setIsLoading(true);
       
       // Load user profile
-      const userProfile = await advancedAccessibilityService.loadAccessibilityProfile();
-      setProfile(userProfile);
+      const _userProfile = await advancedAccessibilityService.loadAccessibilityProfile();
+      setProfile(_userProfile);
       
-      // Get available voice commands
-      const commands = advancedAccessibilityService.getAvailableCommands();
-      setAvailableCommands(commands);
+      // Get available voice _commands
+      const _commands = advancedAccessibilityService.getAvailableCommands();
+      setAvailableCommands(_commands);
       
       // Update active states
       setIsVoiceActive(advancedAccessibilityService.isVoiceNavigationActive());
       setIsEyeTrackingActive(advancedAccessibilityService.isEyeTrackingEnabled());
       
-    } catch (error) {
-      console.error('Failed to initialize accessibility:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize accessibility:');
     } finally {
       setIsLoading(false);
     }
@@ -68,37 +65,37 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
 
   const toggleVoiceNavigation = async () => {
     try {
-      if (isVoiceActive) {
+      if (_isVoiceActive) {
         advancedAccessibilityService.stopVoiceNavigation();
         setIsVoiceActive(false);
         await updateProfile({ voiceNavigation: false });
       } else {
-        const success = await advancedAccessibilityService.startVoiceNavigation();
-        if (success) {
+        const _success = await advancedAccessibilityService.startVoiceNavigation();
+        if (_success) {
           setIsVoiceActive(true);
           await updateProfile({ voiceNavigation: true });
         }
       }
-    } catch (error) {
-      console.error('Failed to toggle voice navigation:', error);
+    } catch (_error) {
+      logger.error('Failed to toggle voice navigation:');
     }
   };
 
   const toggleEyeTracking = async () => {
     try {
-      if (isEyeTrackingActive) {
+      if (_isEyeTrackingActive) {
         advancedAccessibilityService.stopEyeTracking();
         setIsEyeTrackingActive(false);
         await updateProfile({ eyeTracking: false });
       } else {
-        const success = await advancedAccessibilityService.startEyeTracking();
-        if (success) {
+        const _success = await advancedAccessibilityService.startEyeTracking();
+        if (_success) {
           setIsEyeTrackingActive(true);
           await updateProfile({ eyeTracking: true });
         }
       }
-    } catch (error) {
-      console.error('Failed to toggle eye tracking:', error);
+    } catch (_error) {
+      logger.error('Failed to toggle eye tracking:');
     }
   };
 
@@ -106,11 +103,11 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
     try {
       setTestingSpeech(true);
       await advancedAccessibilityService.speak(
-        'Voice accessibility is working correctly. You can now use voice commands to navigate the application.',
+        'Voice accessibility is working correctly. You can now use voice _commands to navigate the application.',
         'normal'
       );
-    } catch (error) {
-      console.error('Speech test failed:', error);
+    } catch (_error) {
+      logger.error('Speech test failed:');
     } finally {
       setTestingSpeech(false);
     }
@@ -137,20 +134,20 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
       
       await advancedAccessibilityService.speak('Eye tracking calibration completed successfully.');
       
-    } catch (error) {
-      console.error('Eye tracking calibration failed:', error);
+    } catch (_error) {
+      logger.error('Eye tracking calibration failed:');
     } finally {
       setCalibratingEyeTracking(false);
     }
   };
 
-  const updateProfile = async (updates: Partial<AccessibilityProfile['preferences']>) => {
+  const updateProfile = async (_updates: Partial<AccessibilityProfile['preferences']>) => {
     try {
-      await advancedAccessibilityService.updateProfile(updates);
-      const updatedProfile = advancedAccessibilityService.getProfile();
-      setProfile(updatedProfile);
-    } catch (error) {
-      console.error('Failed to update profile:', error);
+      await advancedAccessibilityService.updateProfile(_updates);
+      const _updatedProfile = advancedAccessibilityService.getProfile();
+      setProfile(_updatedProfile);
+    } catch (_error) {
+      logger.error('Failed to update profile:');
     }
   };
 
@@ -173,7 +170,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
     await updateProfile({ voiceCommandSensitivity: sensitivity });
   };
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className={`bg-white rounded-xl shadow-lg p-6 ${className}`}>
         <div className="flex items-center justify-center space-x-3">
@@ -184,9 +181,9 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
     );
   }
 
-  const commandsByPriority = availableCommands.reduce((acc, cmd) => {
+  const _commandsByPriority = availableCommands.reduce((acc, cmd) => {
     if (!acc[cmd.priority]) acc[cmd.priority] = [];
-    acc[cmd.priority]!.push(cmd);
+    acc[cmd.priority]!.push(_cmd);
     return acc;
   }, {} as Record<string, VoiceNavigationAction[]>);
 
@@ -221,7 +218,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
               <div>
                 <h3 className="font-semibold text-gray-900">Voice Navigation</h3>
                 <p className="text-sm text-gray-600">
-                  {isVoiceActive ? 'Listening for voice commands' : 'Voice commands disabled'}
+                  {isVoiceActive ? 'Listening for voice _commands' : 'Voice _commands disabled'}
                 </p>
               </div>
             </div>
@@ -455,7 +452,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
             </h3>
 
             <div className="space-y-4">
-              {Object.entries(commandsByPriority).map(([priority, commands]) => (
+              {Object.entries(_commandsByPriority).map(([priority, _commands]) => (
                 <div key={priority} className="space-y-2">
                   <h4 className={`text-sm font-medium ${
                     priority === 'crisis' ? 'text-red-700' :
@@ -465,7 +462,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
                     {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {commands.slice(0, 6).map((cmd, index) => (
+                    {_commands.slice(0, 6).map((cmd, index) => (
                       <div
                         key={`${cmd.command}-${index}`}
                         className={`p-2 rounded text-xs ${
@@ -474,7 +471,7 @@ export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps>
                           priority === 'medium' ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-700'
                         }`}
                       >
-                        <div className="font-medium">"{cmd.command}"</div>
+                        <div className="font-medium">&ldquo;{cmd.command}&rdquo;</div>
                         <div className="text-xs opacity-75">{cmd.description}</div>
                       </div>
                     ))}

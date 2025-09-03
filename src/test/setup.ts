@@ -2,11 +2,12 @@
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
+import * as _matchers from '@testing-library/jest-dom/matchers';
 import { server } from './mocks/server';
+import { logger } from '../utils/logger';
 
 // Extend Vitest matchers with jest-dom
-expect.extend(matchers);
+expect.extend(_matchers);
 
 // Setup MSW (Mock Service Worker)
 beforeAll(() => {
@@ -67,7 +68,7 @@ navigator.vibrate = vi.fn();
 // Mock crypto for security testing with full WebCrypto API
 Object.defineProperty(window, 'crypto', {
   value: {
-    getRandomValues: (arr: any) => {
+    getRandomValues: (arr: unknown) => {
       for (let i = 0; i < arr.length; i++) {
         arr[i] = Math.floor(Math.random() * 256);
       }
@@ -103,7 +104,7 @@ Object.defineProperty(window, 'crypto', {
 // Mock IndexedDB for storage testing
 const indexedDBMock = {
   databases: new Map(),
-  open: vi.fn((name: string) => {
+  open: vi.fn((_name: string) => {
     return {
       result: {
         objectStoreNames: [],
@@ -141,10 +142,10 @@ global.beforeEach(() => {
 
 global.afterEach(() => {
   const startTime = performanceMarks.get('test-start');
-  if (startTime) {
+  if (_startTime) {
     const duration = performance.now() - startTime;
     if (duration > 200) {
-      console.warn(`Test took ${duration.toFixed(2)}ms - exceeds 200ms threshold for crisis response`);
+      logger.warn(`Test took ${duration.toFixed(2)}ms - exceeds 200ms threshold for crisis response`);
     }
   }
   performanceMarks.clear();
@@ -190,7 +191,7 @@ expect.extend({
     };
   },
   
-  toHaveValidCrisisResponse(received: any) {
+  toHaveValidCrisisResponse(received: unknown) {
     const requiredFields = ['hotlineNumber', 'emergencyProtocol', 'responseTime'];
     const missingFields = requiredFields.filter(field => !received[field]);
     
@@ -210,7 +211,7 @@ expect.extend({
     };
   },
   
-  toBeHIPAACompliant(received: any) {
+  toBeHIPAACompliant(received: unknown) {
     const violations: string[] = [];
     
     // Check for encryption
@@ -243,13 +244,13 @@ expect.extend({
 });
 
 // Test utilities for mental health features
-export const testUtils = {
+export const _testUtils = {
   // Simulate crisis trigger
   triggerCrisis: () => {
-    const event = new CustomEvent('crisis-detected', {
+    const _event = new CustomEvent('crisis-detected', {
       detail: { severity: 'high', timestamp: Date.now() }
     });
-    window.dispatchEvent(event);
+    window.dispatchEvent(_event);
   },
   
   // Simulate professional response
@@ -266,8 +267,8 @@ export const testUtils = {
   },
   
   // Check wellness score calculation
-  calculateWellnessScore: (metrics: any) => {
-    const weights = {
+  calculateWellnessScore: (metrics: unknown) => {
+    const _weights = {
       mood: 0.3,
       sleep: 0.2,
       exercise: 0.2,
@@ -275,7 +276,7 @@ export const testUtils = {
       social: 0.15,
     };
     
-    return Object.entries(weights).reduce((score, [key, weight]) => {
+    return Object.entries(_weights).reduce((score, [key, weight]) => {
       return score + (metrics[key] || 0) * weight;
     }, 0);
   },

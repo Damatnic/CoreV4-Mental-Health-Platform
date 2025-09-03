@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '../utils/logger';
 
 export interface AccessibilitySettings {
   // Visual
@@ -191,7 +192,7 @@ const defaultPresets: AccessibilityPreset[] = [
   }
 ];
 
-export const useAccessibilityStore = create<AccessibilityStore>()(
+export const _useAccessibilityStore = create<AccessibilityStore>()(
   persist(
     (set, get) => ({
       settings: defaultSettings,
@@ -218,7 +219,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         }));
         
         // Apply all settings
-        Object.entries(newSettings).forEach(([key, value]) => {
+        Object.entries(_newSettings).forEach(([key, value]) => {
           applyAccessibilitySetting(key as keyof AccessibilitySettings, value);
         });
       },
@@ -241,7 +242,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         set({ settings: defaultSettings });
         
         // Apply default settings
-        Object.entries(defaultSettings).forEach(([key, value]) => {
+        Object.entries(_defaultSettings).forEach(([key, value]) => {
           applyAccessibilitySetting(key as keyof AccessibilitySettings, value);
         });
       },
@@ -262,7 +263,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         const settings = get().settings;
         
         // Run accessibility tests
-        console.log('Running accessibility tests...');
+        logger.info('Running accessibility tests...', 'AccessibilityStore');
         
         // Test screen reader
         if (settings.screenReader) {
@@ -307,7 +308,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           const utterance = new SpeechSynthesisUtterance(message);
           utterance.rate = get().settings.voiceSpeed;
           utterance.pitch = get().settings.voicePitch;
-          window.speechSynthesis.speak(utterance);
+          window.speechSynthesis.speak(_utterance);
         }
       },
 
@@ -339,10 +340,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
 );
 
 // Helper function to apply accessibility settings to the DOM
-function applyAccessibilitySetting(key: keyof AccessibilitySettings, value: any) {
+function applyAccessibilitySetting(key: keyof AccessibilitySettings, value: unknown) {
   const root = document.documentElement;
   
-  switch (key) {
+  switch (_key) {
     case 'highContrast':
       root.classList.toggle('high-contrast', value);
       break;

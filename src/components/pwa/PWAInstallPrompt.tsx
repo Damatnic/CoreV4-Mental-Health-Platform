@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Download, 
-  Wifi, 
+  _Wifi, 
   WifiOff, 
   Bell, 
   Shield, 
@@ -50,18 +50,18 @@ export function PWAInstallPrompt() {
   const [installSuccess, setInstallSuccess] = useState(false);
   const [dismissCount, setDismissCount] = useState(() => {
     const count = localStorage.getItem('pwa_dismiss_count');
-    return count ? parseInt(count) : 0;
+    return count ? parseInt(_count) : 0;
   });
 
   useEffect(() => {
     // Show prompt after user engagement (30 seconds on site)
     // But not if dismissed more than 3 times
     if (isAppInstallable && dismissCount < 3) {
-      const timer = setTimeout(() => {
+      const _timer = setTimeout(() => {
         setShowPrompt(true);
       }, 30000);
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(_timer);
     }
   }, [isAppInstallable, dismissCount]);
 
@@ -86,13 +86,13 @@ export function PWAInstallPrompt() {
     vibrate([50]);
     setIsInstalling(true);
 
-    const success = await installApp();
+    const _success = await installApp();
     
-    if (success) {
+    if (_success) {
       vibrate([100, 50, 100]);
       setInstallSuccess(true);
       
-      // Hide prompt after showing success
+      // Hide prompt after showing _success
       setTimeout(() => {
         setShowPrompt(false);
         setInstallSuccess(false);
@@ -117,7 +117,7 @@ export function PWAInstallPrompt() {
     setDismissCount(newCount);
     localStorage.setItem('pwa_dismiss_count', newCount.toString());
     
-    // If dismissed 3 times, don't show again for 30 days
+    // If dismissed 3 times, don&apos;t show again for 30 days
     if (newCount >= 3) {
       const hideUntil = new Date();
       hideUntil.setDate(hideUntil.getDate() + 30);
@@ -190,9 +190,9 @@ export function PWAInstallPrompt() {
               <div className="bg-gray-50 rounded-lg p-3 mb-4">
                 <p className="text-xs text-gray-600">
                   {deviceInfo.isIOS ? (
-                    <>Tap the share button <span className="font-mono bg-gray-200 px-1 rounded">⎙</span> then "Add to Home Screen"</>
+                    <>Tap the share button <span className="font-mono bg-gray-200 px-1 rounded">⎙</span> then &quot;Add to Home Screen&quot;</>
                   ) : (
-                    <>Tap "Install" below to add CoreV4 to your home screen</>
+                    <>Tap &quot;Install&quot; below to add CoreV4 to your home screen</>
                   )}
                 </p>
               </div>
@@ -240,7 +240,7 @@ export function PWAInstallPrompt() {
                   }}
                   className="w-full mt-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  Don't show this again
+                  Don&apos;t show this again
                 </button>
               )}
             </div>
@@ -298,7 +298,7 @@ export function PWAInstallStatus() {
     );
   }, [deviceInfo.isPWA]);
 
-  if (isInstalled) {
+  if (_isInstalled) {
     return (
       <div className="flex items-center space-x-2 text-green-600">
         <CheckCircle className="h-5 w-5" />

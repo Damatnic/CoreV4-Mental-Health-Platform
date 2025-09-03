@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Heart, Users, Wifi, WifiOff, Volume2, VolumeX, 
+  Heart, _Users, Wifi, WifiOff, Volume2, VolumeX, 
   Phone, MessageCircle, Shield, Clock, Activity
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
@@ -254,7 +254,7 @@ const HeartbeatCheckin: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Check-in Alert</h3>
             </div>
             <p className="text-gray-300 mb-4">
-              We haven't heard from your partner in a while. This could be normal, but let's make sure they're okay.
+              We haven&apos;t heard from your partner in a while. This could be normal, but let&apos;s make sure they&apos;re okay.
             </p>
             <div className="flex space-x-3">
               <button className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-red-600 transition-colors">

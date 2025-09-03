@@ -46,15 +46,15 @@ export function KeyboardNavigator({
     const key = event.key.toLowerCase();
     const isAlt = event.altKey;
     const isCtrl = event.ctrlKey;
-    const isShift = event.shiftKey;
+    const _isShift = event.shiftKey;
     const isMeta = event.metaKey;
 
     // Construct key combination string
     let keyCombo = '';
-    if (isCtrl) keyCombo += 'ctrl+';
-    if (isAlt) keyCombo += 'alt+';
-    if (isShift) keyCombo += 'shift+';
-    if (isMeta) keyCombo += 'meta+';
+    if (_isCtrl) keyCombo += 'ctrl+';
+    if (_isAlt) keyCombo += 'alt+';
+    if (_isShift) keyCombo += 'shift+';
+    if (_isMeta) keyCombo += 'meta+';
     keyCombo += key;
 
     // Check for direct keyboard shortcuts
@@ -63,19 +63,19 @@ export function KeyboardNavigator({
       onKeyPress?.(keyCombo);
       
       // Find and execute matching action
-      const matchingAction = actions.find(a => 
+      const _matchingAction = actions.find(a => 
         a.keyboard?.toLowerCase() === keyCombo ||
         a.icon === keyboardShortcuts[keyCombo]
       );
       
-      if (matchingAction) {
-        onActionSelect(matchingAction);
+      if (_matchingAction) {
+        onActionSelect(_matchingAction);
       }
       return;
     }
 
     // Navigation keys
-    switch (key) {
+    switch (_key) {
       case 'arrowdown':
         event.preventDefault();
         navigateDown();
@@ -142,7 +142,7 @@ export function KeyboardNavigator({
       default:
         // Type-ahead search
         if (key.length === 1 && !isCtrl && !isAlt && !isMeta) {
-          handleTypeAheadSearch(key);
+          handleTypeAheadSearch(_key);
         }
         break;
     }
@@ -191,7 +191,7 @@ export function KeyboardNavigator({
   // Type-ahead search functionality
   const handleTypeAheadSearch = (char: string) => {
     const newBuffer = searchBuffer + char;
-    setSearchBuffer(newBuffer);
+    setSearchBuffer(_newBuffer);
 
     // Clear previous timeout
     if (searchTimeoutRef.current) {
@@ -204,7 +204,7 @@ export function KeyboardNavigator({
     );
 
     if (matchIndex !== -1) {
-      setFocusedIndex(matchIndex);
+      setFocusedIndex(_matchIndex);
     }
 
     // Reset search buffer after delay
@@ -215,7 +215,7 @@ export function KeyboardNavigator({
 
   // Attach keyboard event listeners
   useEffect(() => {
-    if (isActive) {
+    if (_isActive) {
       window.addEventListener('keydown', handleKeyDown);
       
       return () => {

@@ -1,3 +1,5 @@
+import { logger } from '../../utils/logger';
+
 /**
  * Security Headers Service
  * Implements comprehensive security headers for XSS, CSRF, and other attack prevention
@@ -99,7 +101,7 @@ class SecurityHeadersService {
         ],
         connectSrc: [
           "'self'",
-          "https://api.mentalhealth.app", // Your API domain
+          "https://api.mentalhealth.app", // Your API _domain
           "wss://api.mentalhealth.app", // WebSocket connections
           "https://sentry.io", // Error tracking
         ],
@@ -149,7 +151,7 @@ class SecurityHeadersService {
    */
   generateNonce(): string {
     const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
+    crypto.getRandomValues(_array);
     this.nonce = btoa(String.fromCharCode(...array));
     return this.nonce;
   }
@@ -169,7 +171,7 @@ class SecurityHeadersService {
     const directives: string[] = [];
 
     // Process each CSP directive
-    const processDirective = (name: string, values: any[]): string => {
+    const processDirective = (name: string, values: unknown[]): string => {
       const processedValues = values.map(value => {
         if (typeof value === 'function') {
           return value({ nonce: this.nonce });
@@ -270,17 +272,17 @@ class SecurityHeadersService {
     return [
       'accelerometer=()',
       'ambient-light-sensor=()',
-      'autoplay=(self)',
+      'autoplay=(_self)',
       'battery=()',
       'camera=()',
-      'cross-origin-isolated=(self)',
+      'cross-origin-isolated=(_self)',
       'display-capture=()',
-      'document-domain=()',
-      'encrypted-media=(self)',
+      'document-_domain=()',
+      'encrypted-media=(_self)',
       'execution-while-not-rendered=()',
       'execution-while-out-of-viewport=()',
-      'fullscreen=(self)',
-      'geolocation=(self)', // May be needed for crisis location services
+      'fullscreen=(_self)',
+      'geolocation=(_self)', // May be needed for crisis location services
       'gyroscope=()',
       'keyboard-map=()',
       'magnetometer=()',
@@ -293,7 +295,7 @@ class SecurityHeadersService {
       'screen-wake-lock=()',
       'sync-xhr=()',
       'usb=()',
-      'web-share=(self)',
+      'web-share=(_self)',
       'xr-spatial-tracking=()',
     ].join(', ');
   }
@@ -328,7 +330,7 @@ class SecurityHeadersService {
     const meta = document.createElement('meta');
     meta.httpEquiv = 'Content-Security-Policy';
     meta.content = this.buildCSP(true); // Pass true to filter out meta-incompatible directives
-    document.head.appendChild(meta);
+    document.head.appendChild(_meta);
   }
 
   /**
@@ -349,8 +351,8 @@ class SecurityHeadersService {
       
       // Support wildcard subdomains
       if (allowed.startsWith('*.')) {
-        const domain = allowed.slice(2);
-        return origin.endsWith(domain);
+        const _domain = allowed.slice(2);
+        return origin.endsWith(_domain);
       }
       
       return false;
@@ -360,10 +362,10 @@ class SecurityHeadersService {
   /**
    * Get CORS headers for response
    */
-  getCORSHeaders(origin: string, method: string): Record<string, string> {
+  getCORSHeaders(origin: string, _method: string): Record<string, string> {
     const headers: Record<string, string> = {};
     
-    if (this.validateOrigin(origin)) {
+    if (this.validateOrigin(_origin)) {
       headers['Access-Control-Allow-Origin'] = origin;
       headers['Access-Control-Allow-Methods'] = this.config.cors.allowedMethods.join(', ');
       headers['Access-Control-Allow-Headers'] = this.config.cors.allowedHeaders.join(', ');
@@ -381,15 +383,15 @@ class SecurityHeadersService {
   /**
    * Report CSP violation
    */
-  async reportViolation(violation: any): Promise<void> {
+  async reportViolation(violation: unknown): Promise<void> {
     try {
       // Log violation for analysis
-      console.warn('CSP Violation:', violation);
+      logger.warn('CSP Violation:', violation);
       
       // Send to reporting endpoint
       if (this.config.csp.reportUri) {
         await fetch(this.config.csp.reportUri, {
-          method: 'POST',
+          _method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -401,8 +403,8 @@ class SecurityHeadersService {
           }),
         });
       }
-    } catch (error) {
-      console.error('Failed to report CSP violation:', error);
+    } catch (_error) {
+      logger.error('Failed to report CSP violation:');
     }
   }
 

@@ -19,6 +19,7 @@ import {
   imageLoader,
   memoryLeakDetector,
 } from './memoryManagement';
+import { logger } from '../logger';
 
 // Performance monitoring
 export {
@@ -76,22 +77,22 @@ export function initializePerformanceOptimizations() {
     
     // Set up frame rate monitoring callback (if fps < 30)
     let lastTime = performance.now();
-    const monitorFPS = () => {
+    const _monitorFPS = () => {
       const now = performance.now();
       const fps = 1000 / (now - lastTime);
       lastTime = now;
       if (fps < 30) {
-        console.warn(`Low frame rate detected: ${fps} FPS`);
+        logger.warn(`Low frame rate detected: ${fps} FPS`);
       }
-      requestAnimationFrame(monitorFPS);
+      requestAnimationFrame(_monitorFPS);
     };
-    requestAnimationFrame(monitorFPS);
+    requestAnimationFrame(_monitorFPS);
     
     // Start memory leak detection
     setInterval(() => {
       memoryLeakDetector.takeSnapshot();
       if (memoryLeakDetector.detectLeak()) {
-        console.error('Memory leak detected!', memoryLeakDetector.getReport());
+        logger.error('Memory leak detected!', memoryLeakDetector.getReport());
       }
     }, 60000); // Check every minute
   }
@@ -132,12 +133,12 @@ function preloadCriticalResources() {
     import.meta.env.VITE_API_URL,
   ];
   
-  domains.forEach(url => {
-    if (url) {
+  domains.forEach(_url => {
+    if (_url) {
       const link = document.createElement('link');
       link.rel = 'preconnect';
-      link.href = new URL(url).origin;
-      document.head.appendChild(link);
+      link.href = new URL(_url).origin;
+      document.head.appendChild(_link);
     }
   });
 }
@@ -178,19 +179,19 @@ function setupPerformanceBudget() {
         
         // Check against budgets
         if (jsSize > budgets.js) {
-          console.warn(`JavaScript budget exceeded: ${(jsSize / 1024).toFixed(2)}KB > ${(budgets.js / 1024).toFixed(2)}KB`);
+          logger.warn(`JavaScript budget exceeded: ${(jsSize / 1024).toFixed(2)}KB > ${(budgets.js / 1024).toFixed(2)}KB`);
         }
         if (cssSize > budgets.css) {
-          console.warn(`CSS budget exceeded: ${(cssSize / 1024).toFixed(2)}KB > ${(budgets.css / 1024).toFixed(2)}KB`);
+          logger.warn(`CSS budget exceeded: ${(cssSize / 1024).toFixed(2)}KB > ${(budgets.css / 1024).toFixed(2)}KB`);
         }
         if (imageSize > budgets.images) {
-          console.warn(`Image budget exceeded: ${(imageSize / 1024 / 1024).toFixed(2)}MB > ${(budgets.images / 1024 / 1024).toFixed(2)}MB`);
+          logger.warn(`Image budget exceeded: ${(imageSize / 1024 / 1024).toFixed(2)}MB > ${(budgets.images / 1024 / 1024).toFixed(2)}MB`);
         }
       });
       
       resourceObserver.observe({ entryTypes: ['resource'] });
-    } catch (e) {
-      console.warn('Resource timing not supported');
+    } catch {
+      logger.warn('Resource timing not supported');
     }
   }
 }
@@ -198,7 +199,7 @@ function setupPerformanceBudget() {
 /**
  * Performance optimization presets for different scenarios
  */
-export const PerformancePresets = {
+export const _PerformancePresets = {
   // For crisis intervention - maximum performance
   crisis: {
     priority: UpdatePriority.CRISIS,

@@ -7,12 +7,13 @@
 import { cryptoService } from './cryptoService';
 import { secureStorage } from './secureStorage';
 import { auditLogger } from './auditLogger';
-import { rateLimiter } from './rateLimiter';
-import { fieldEncryption } from './fieldEncryption';
+import { _rateLimiter } from './rateLimiter';
+import { _fieldEncryption } from './fieldEncryption';
+import { logger } from '../../utils/logger';
 
 interface Session {
   sessionId: string;
-  userId: string;
+  _userId: string;
   createdAt: Date;
   lastActivity: Date;
   expiresAt: Date;
@@ -133,20 +134,20 @@ class SessionManagerService {
    * Create a new session
    */
   async createSession(params: {
-    userId: string;
+    _userId: string;
     ipAddress: string;
     userAgent: string;
     loginMethod: string;
     mfaVerified?: boolean;
-    location?: any;
+    location?: unknown;
     deviceId?: string;
   }): Promise<Session> {
     try {
       // Check concurrent session limit
-      await this.enforceSessionLimits(params.userId);
+      await this.enforceSessionLimits(params._userId);
 
       // Generate secure session ID
-      const sessionId = await this.generateSessionId(params.userId);
+      const sessionId = await this.generateSessionId(params._userId);
       
       // Generate browser fingerprint
       const fingerprint = await this.generateFingerprint(params.userAgent, params.ipAddress);
@@ -155,7 +156,7 @@ class SessionManagerService {
       const metadata = this.parseUserAgent(params.userAgent);
       
       // Determine security level based on context
-      const securityLevel = this.determineSecurityLevel(params);
+      const securityLevel = this.determineSecurityLevel(_params);
       
       // Get configuration
       const config = SESSION_CONFIGS[securityLevel];
@@ -166,7 +167,7 @@ class SessionManagerService {
       // Create session
       const session: Session = {
         sessionId,
-        userId: params.userId,
+        _userId: params._userId,
         createdAt: new Date(),
         lastActivity: new Date(),
         expiresAt: new Date(Date.now() + config.absoluteTimeout),
@@ -177,7 +178,7 @@ class SessionManagerService {
         location: params.location,
         securityLevel,
         mfaVerified: params.mfaVerified || false,
-        permissions: await this.getUserPermissions(params.userId),
+        permissions: await this.getUserPermissions(params._userId),
         metadata: {
           ...metadata,
           loginMethod: params.loginMethod,
@@ -200,7 +201,7 @@ class SessionManagerService {
       // Log session creation
       await auditLogger.log({
         event: 'USER_LOGIN',
-        userId: params.userId,
+        _userId: params._userId,
         details: {
           sessionId,
           loginMethod: params.loginMethod,
@@ -215,7 +216,7 @@ class SessionManagerService {
     } catch (error) {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
-        userId: params.userId,
+        _userId: params._userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
         },
@@ -359,11 +360,11 @@ class SessionManagerService {
         isValid: true,
         riskScore,
       };
-    } catch (error) {
-      console.error('Session validation error:', error);
+    } catch (_error) {
+      logger.error('Session validation error: ');
       return {
         isValid: false,
-        reason: 'Validation error',
+        reason: 'Validation undefined',
         requiresAction: 'reauthenticate',
         riskScore: 100,
       };
@@ -403,7 +404,7 @@ class SessionManagerService {
     // Log renewal
     await auditLogger.log({
       event: 'DATA_MODIFICATION',
-      userId: session.userId,
+      _userId: session._userId,
       details: {
         sessionId,
         action: 'session_renewed',
@@ -428,8 +429,8 @@ class SessionManagerService {
     
     // Remove from maps
     this.sessions.delete(sessionId);
-    const userSessions = this.userSessions.get(session.userId);
-    if (userSessions) {
+    const userSessions = this.userSessions.get(session._userId);
+    if (_userSessions) {
       userSessions.delete(sessionId);
     }
     
@@ -439,7 +440,7 @@ class SessionManagerService {
     // Log termination
     await auditLogger.log({
       event: 'USER_LOGOUT',
-      userId: session.userId,
+      _userId: session._userId,
       details: {
         sessionId,
         reason,
@@ -455,15 +456,15 @@ class SessionManagerService {
   /**
    * Terminate all sessions for a user
    */
-  async terminateUserSessions(userId: string, reason: string): Promise<void> {
-    const sessionIds = this.userSessions.get(userId);
+  async terminateUserSessions(_userId: string, reason: string): Promise<void> {
+    const sessionIds = this.userSessions.get(_userId);
     if (!sessionIds) return;
     
     for (const sessionId of sessionIds) {
       await this.terminateSession(sessionId, reason);
     }
     
-    this.userSessions.delete(userId);
+    this.userSessions.delete(_userId);
   }
 
   /**
@@ -503,7 +504,7 @@ class SessionManagerService {
     // Log elevation
     await auditLogger.log({
       event: 'PERMISSION_GRANTED',
-      userId: session.userId,
+      _userId: session._userId,
       details: {
         sessionId,
         action: 'session_elevated',
@@ -518,19 +519,19 @@ class SessionManagerService {
   /**
    * Get active sessions for a user
    */
-  async getUserSessions(userId: string): Promise<Session[]> {
-    const sessionIds = this.userSessions.get(userId);
+  async getUserSessions(_userId: string): Promise<Session[]> {
+    const sessionIds = this.userSessions.get(_userId);
     if (!sessionIds) return [];
     
     const sessions: Session[] = [];
     for (const sessionId of sessionIds) {
       const session = this.sessions.get(sessionId);
       if (session) {
-        // Sanitize sensitive data
+        // Sanitize sensitive _data
         const sanitized = { ...session };
         delete sanitized.accessToken;
         delete sanitized.refreshToken;
-        sessions.push(sanitized);
+        sessions.push(_sanitized);
       }
     }
     
@@ -579,19 +580,19 @@ class SessionManagerService {
   /**
    * Private helper methods
    */
-  private async generateSessionId(userId: string): Promise<string> {
+  private async generateSessionId(_userId: string): Promise<string> {
     const timestamp = Date.now().toString(36);
     const random = cryptoService.generateSecureUUID();
-    const hash = await cryptoService.sha256(`${userId}:${timestamp}:${random}`);
+    const hash = await cryptoService.sha256(`${_userId}:${timestamp}:${random}`);
     return `sess_${timestamp}_${hash.substring(0, 32)}`;
   }
 
   private async generateFingerprint(userAgent: string, ipAddress: string): Promise<string> {
-    const data = `${userAgent}:${ipAddress}:${navigator.language || ''}:${screen.width}x${screen.height}`;
-    return await cryptoService.sha256(data);
+    const _data = `${userAgent}:${ipAddress}:${navigator.language || ''}:${screen.width}x${screen.height}`;
+    return await cryptoService.sha256(_data);
   }
 
-  private parseUserAgent(userAgent: string): any {
+  private parseUserAgent(userAgent: string): unknown {
     // Simple user agent parsing
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const browser = userAgent.match(/(chrome|firefox|safari|edge|opera)/i)?.[0] || 'unknown';
@@ -607,7 +608,7 @@ class SessionManagerService {
     };
   }
 
-  private determineSecurityLevel(params: any): 'basic' | 'elevated' | 'maximum' {
+  private determineSecurityLevel(params: unknown): 'basic' | 'elevated' | 'maximum' {
     // Determine based on context
     if (params.loginMethod === 'emergency') {
       return 'basic'; // Allow quick access in emergencies
@@ -625,7 +626,7 @@ class SessionManagerService {
     return 'basic';
   }
 
-  private async getUserPermissions(userId: string): Promise<string[]> {
+  private async getUserPermissions(_userId: string): Promise<string[]> {
     // In production, fetch from RBAC system
     return ['read', 'write'];
   }
@@ -634,44 +635,44 @@ class SessionManagerService {
     accessToken: string;
     refreshToken: string;
   }> {
-    const accessPayload = {
+    const _accessPayload = {
       sessionId: session.sessionId,
-      userId: session.userId,
+      _userId: session._userId,
       type: 'access',
       exp: Date.now() + 15 * 60 * 1000, // 15 minutes
     };
     
-    const refreshPayload = {
+    const _refreshPayload = {
       sessionId: session.sessionId,
-      userId: session.userId,
+      _userId: session._userId,
       type: 'refresh',
       exp: session.expiresAt.getTime(),
     };
     
-    const accessToken = await this.encodeToken(accessPayload);
-    const refreshToken = await this.encodeToken(refreshPayload);
+    const accessToken = await this.encodeToken(_accessPayload);
+    const refreshToken = await this.encodeToken(_refreshPayload);
     
     return { accessToken, refreshToken };
   }
 
-  private async encodeToken(payload: any): Promise<string> {
-    const header = { alg: 'HS256', typ: 'JWT' };
-    const encodedHeader = btoa(JSON.stringify(header));
-    const encodedPayload = btoa(JSON.stringify(payload));
+  private async encodeToken(_payload: unknown): Promise<string> {
+    const _header = { alg: 'HS256', typ: 'JWT' };
+    const encodedHeader = btoa(JSON.stringify(_header));
+    const encodedPayload = btoa(JSON.stringify(_payload));
     const signature = await cryptoService.signData(`${encodedHeader}.${encodedPayload}`);
     return `${encodedHeader}.${encodedPayload}.${signature}`;
   }
 
-  private async enforceSessionLimits(userId: string): Promise<void> {
-    const userSessions = this.userSessions.get(userId) || new Set();
+  private async enforceSessionLimits(_userId: string): Promise<void> {
+    const userSessions = this.userSessions.get(_userId) || new Set();
     
     // Get maximum allowed sessions for any user
-    const maxSessions = Math.max(...Object.values(SESSION_CONFIGS).map(c => c.maxConcurrentSessions));
+    const maxSessions = Math.max(...Object.values(_SESSION_CONFIGS).map(c => c.maxConcurrentSessions));
     
     if (userSessions.size >= maxSessions) {
       // Terminate oldest session
-      const sessions = Array.from(userSessions)
-        .map(id => this.sessions.get(id))
+      const sessions = Array.from(_userSessions)
+        .map(_id => this.sessions.get(_id))
         .filter(s => s !== undefined)
         .sort((a, b) => a!.createdAt.getTime() - b!.createdAt.getTime());
       
@@ -690,15 +691,15 @@ class SessionManagerService {
       session.flags.suspicious = true;
     }
     
-    console.warn(`Suspicious activity on session ${sessionId}: ${activity}`);
+    logger.warn(`Suspicious activity on session ${sessionId}: ${activity}`);
   }
 
   private async storeSession(session: Session): Promise<void> {
     this.sessions.set(session.sessionId, session);
     
     // Update user sessions map
-    if (!this.userSessions.has(session.userId)) {
-      this.userSessions.set(session.userId, new Set());
+    if (!this.userSessions.has(session._userId)) {
+      this.userSessions.set(session._userId, new Set());
     }
     this.userSessions.get(session.userId)!.add(session.sessionId);
     
@@ -712,7 +713,7 @@ class SessionManagerService {
   private async loadSessions(): Promise<void> {
     try {
       const stored = await secureStorage.getItem(this.SESSION_STORAGE_KEY);
-      if (stored && Array.isArray(stored)) {
+      if (stored && Array.isArray(_stored)) {
         // Restore sessions
         for (const sessionData of stored) {
           const session = {
@@ -727,15 +728,15 @@ class SessionManagerService {
           if (validation.isValid) {
             this.sessions.set(session.sessionId, session);
             
-            if (!this.userSessions.has(session.userId)) {
-              this.userSessions.set(session.userId, new Set());
+            if (!this.userSessions.has(session._userId)) {
+              this.userSessions.set(session._userId, new Set());
             }
             this.userSessions.get(session.userId)!.add(session.sessionId);
           }
         }
       }
-    } catch (error) {
-      console.error('Failed to load sessions:', error);
+    } catch (_error) {
+      logger.error('Failed to load sessions:');
     }
   }
 
@@ -752,8 +753,8 @@ class SessionManagerService {
         encrypted: true,
         expires: new Date(Date.now() + 24 * 3600000), // 24 hours
       });
-    } catch (error) {
-      console.error('Failed to persist sessions:', error);
+    } catch (_error) {
+      logger.error('Failed to persist sessions:');
     }
   }
 

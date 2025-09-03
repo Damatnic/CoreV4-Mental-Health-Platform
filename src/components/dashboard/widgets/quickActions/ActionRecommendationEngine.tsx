@@ -34,65 +34,65 @@ export class ActionRecommendationEngine {
 
   private initializeRules() {
     // Time-based rules
-    this.contextualRules.set('morning_meditation', (ctx) => {
-      if (ctx.timeOfDay === 'morning') return 0.8;
+    this.contextualRules.set('morning_meditation', (_ctx) => {
+      if (_ctx.timeOfDay === 'morning') return 0.8;
       return 0.2;
     });
 
-    this.contextualRules.set('evening_journal', (ctx) => {
-      if (ctx.timeOfDay === 'evening') return 0.9;
-      if (ctx.timeOfDay === 'night') return 0.7;
+    this.contextualRules.set('evening_journal', (_ctx) => {
+      if (_ctx.timeOfDay === 'evening') return 0.9;
+      if (_ctx.timeOfDay === 'night') return 0.7;
       return 0.3;
     });
 
     // Mood-based rules
-    this.contextualRules.set('crisis_low_mood', (ctx) => {
-      const moodScore = this.getMoodScore(ctx.currentMood);
+    this.contextualRules.set('crisis_low_mood', (_ctx) => {
+      const moodScore = this.getMoodScore(_ctx.currentMood);
       if (moodScore < 3) return 1.0; // High priority for crisis actions
       return 0.1;
     });
 
-    this.contextualRules.set('breathing_anxiety', (ctx) => {
-      if (ctx.currentMood?.toLowerCase().includes('anxious') ||
-          ctx.currentMood?.toLowerCase().includes('stressed')) {
+    this.contextualRules.set('breathing_anxiety', (_ctx) => {
+      if (_ctx.currentMood?.toLowerCase().includes('anxious') ||
+          _ctx.currentMood?.toLowerCase().includes('stressed')) {
         return 0.9;
       }
       return 0.4;
     });
 
     // Activity pattern rules
-    this.contextualRules.set('medication_reminder', (ctx) => {
-      const hour = new Date().getHours();
+    this.contextualRules.set('medication_reminder', (_ctx) => {
+      const _hour = new Date().getHours();
       // Common medication times: 8am, 12pm, 6pm, 10pm
-      if ([8, 12, 18, 22].includes(hour)) return 0.8;
+      if ([8, 12, 18, 22].includes(_hour)) return 0.8;
       return 0.2;
     });
 
     // Social connection rules
-    this.contextualRules.set('social_isolation', (ctx) => {
-      if (ctx.socialInteraction && ctx.socialInteraction < 3) return 0.7;
+    this.contextualRules.set('social_isolation', (_ctx) => {
+      if (_ctx.socialInteraction && _ctx.socialInteraction < 3) return 0.7;
       return 0.3;
     });
 
     // Sleep-based rules
-    this.contextualRules.set('sleep_hygiene', (ctx) => {
-      if (ctx.timeOfDay === 'night' && ctx.sleepQuality && ctx.sleepQuality < 5) {
+    this.contextualRules.set('sleep_hygiene', (_ctx) => {
+      if (_ctx.timeOfDay === 'night' && _ctx.sleepQuality && _ctx.sleepQuality < 5) {
         return 0.8;
       }
       return 0.2;
     });
 
     // Weather-based rules
-    this.contextualRules.set('indoor_activities', (ctx) => {
-      if (ctx.weatherCondition === 'rainy' || ctx.weatherCondition === 'stormy') {
+    this.contextualRules.set('indoor_activities', (_ctx) => {
+      if (_ctx.weatherCondition === 'rainy' || _ctx.weatherCondition === 'stormy') {
         return 0.7;
       }
       return 0.4;
     });
 
     // Stress-based rules
-    this.contextualRules.set('stress_relief', (ctx) => {
-      if (ctx.stressLevel && ctx.stressLevel > 7) return 0.9;
+    this.contextualRules.set('stress_relief', (_ctx) => {
+      if (_ctx.stressLevel && _ctx.stressLevel > 7) return 0.9;
       return 0.3;
     });
   }
@@ -202,7 +202,7 @@ export class ActionRecommendationEngine {
         // Check if rule applies to this action
         if (this.doesRuleApply(ruleName, action)) {
           score += ruleScore * 0.3;
-          reasons.push(this.getRuleReason(ruleName));
+          reasons.push(this.getRuleReason(_ruleName));
         }
       }
     }
@@ -247,7 +247,7 @@ export class ActionRecommendationEngine {
     const applicableActions = ruleActionMap[ruleName] || [];
     return applicableActions.some(actionType => 
       action.icon === actionType || 
-      action.label.toLowerCase().includes(actionType)
+      action.label.toLowerCase().includes(_actionType)
     );
   }
 
@@ -269,7 +269,7 @@ export class ActionRecommendationEngine {
 
   public getRecommendations(actions: QuickAction[], limit: number = 5): QuickAction[] {
     const scoredActions: ActionScore[] = actions.map(action => {
-      const baseScore = this.calculateBaseScore(action);
+      const baseScore = this.calculateBaseScore(_action);
       return this.applyContextualBoosts(action, baseScore);
     });
 
@@ -298,10 +298,10 @@ export class ActionRecommendationEngine {
     const frequency = this.context.actionHistory?.filter(id => id === actionId).length || 0;
     
     return {
-      bestTimes: this.getBestTimesForAction(actionId),
-      complementaryActions: this.getComplementaryActions(actionId),
+      bestTimes: this.getBestTimesForAction(_actionId),
+      complementaryActions: this.getComplementaryActions(_actionId),
       frequency,
-      effectiveness: this.calculateEffectiveness(actionId)
+      effectiveness: this.calculateEffectiveness(_actionId)
     };
   }
 

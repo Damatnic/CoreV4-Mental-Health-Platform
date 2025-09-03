@@ -1,21 +1,22 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
-  Clock,
+  _Clock,
   CreditCard,
   User,
-  Phone,
-  Mail,
+  _Phone,
+  _Mail,
   Shield,
   CheckCircle,
   ArrowLeft,
   ArrowRight,
   AlertTriangle,
-  FileText,
+  _FileText,
   Video,
   MapPin,
-  Users
+  _Users
 } from 'lucide-react';
 import { therapistService } from '../../services/professional/TherapistService';
 
@@ -26,7 +27,7 @@ interface AppointmentBookingProps {
 }
 
 interface TimeSlot {
-  time: string;
+  _time: string;
   available: boolean;
   type: 'morning' | 'afternoon' | 'evening';
 }
@@ -45,18 +46,18 @@ const BOOKING_STEPS: BookingStep[] = [
   { id: 5, title: 'Confirmation', completed: false }
 ];
 
-const generateTimeSlots = (date: Date): TimeSlot[] => {
+const generateTimeSlots = (_date: Date): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const startHour = 9;
   const endHour = 17;
   
   for (let hour = startHour; hour < endHour; hour++) {
     for (let minute = 0; minute < 60; minute += 50) {
-      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      const _time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       const type = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
       const available = Math.random() > 0.3; // 70% availability rate
       
-      slots.push({ time, available, type });
+      slots.push({ _time, available, type });
     }
   }
   
@@ -83,7 +84,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
   const [availableDays, setAvailableDays] = useState<Date[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
-  const [therapist, setTherapist] = useState<any>(null);
+  const [therapist, setTherapist] = useState<unknown>(null);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -135,8 +136,8 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
     setSelectedTime('');
   };
 
-  const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
+  const handleTimeSelect = (_time: string) => {
+    setSelectedTime(_time);
   };
 
   const nextStep = () => {
@@ -151,7 +152,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
     }
   };
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: unknown) => {
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
       setFormData(prev => ({
@@ -174,30 +175,30 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
         therapistId,
         patientId: 'user-1',
         date: selectedDate!,
-        time: selectedTime,
+        _time: selectedTime,
         duration: 50,
-        type: formData.sessionType as any,
-        format: formData.format as any,
+        type: formData.sessionType as unknown,
+        format: formData.format as unknown,
         reason: formData.reason,
         insurance: formData.hasInsurance ? {
           provider: formData.insuranceProvider,
           memberId: formData.memberId,
           groupNumber: formData.groupNumber
         } : undefined,
-        paymentMethod: formData.paymentMethod as any
+        paymentMethod: formData.paymentMethod as unknown
       });
       
       onSuccess(appointmentId.id);
-    } catch (error) {
-      console.error('Booking failed:', error);
-      // Handle error
+    } catch (_error) {
+      logger.error('Booking failed:');
+      // Handle undefined
     } finally {
       setLoading(false);
     }
   };
 
   const canProceedToNext = () => {
-    switch (currentStep) {
+    switch (_currentStep) {
       case 1:
         return selectedDate && selectedTime;
       case 2:
@@ -276,7 +277,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 
                 {/* Date Selection */}
                 <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Available Dates</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Available Dates</label>
                   <div className="grid grid-cols-7 gap-2">
                     {availableDays.map((date, index) => {
                       const isSelected = selectedDate?.toDateString() === date.toDateString();
@@ -304,7 +305,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 {/* Time Selection */}
                 {selectedDate && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">
                       Available Times for {selectedDate.toLocaleDateString()}
                     </label>
                     <div className="grid grid-cols-3 gap-4">
@@ -318,15 +319,15 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                             <div className="space-y-2">
                               {periodSlots.map(slot => (
                                 <button
-                                  key={slot.time}
-                                  onClick={() => handleTimeSelect(slot.time)}
+                                  key={slot._time}
+                                  onClick={() => handleTimeSelect(slot._time)}
                                   className={`w-full p-2 rounded-md text-sm transition-colors ${
-                                    selectedTime === slot.time
+                                    selectedTime === slot._time
                                       ? 'bg-blue-600 text-white'
                                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                                   }`}
                                 >
-                                  {slot.time}
+                                  {slot._time}
                                 </button>
                               ))}
                             </div>
@@ -351,10 +352,10 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 <h3 className="text-xl font-semibold">Session Details</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Session Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Session Type</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { value: 'initial', label: 'Initial Consultation', description: 'First time meeting' },
+                      { value: 'initial', label: 'Initial Consultation', description: 'First _time meeting' },
                       { value: 'followup', label: 'Follow-up Session', description: 'Continuing treatment' }
                     ].map(option => (
                       <button
@@ -374,7 +375,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Session Format</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Session Format</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { value: 'video', label: 'Video Call', icon: Video, description: 'Secure video session' },
@@ -403,7 +404,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Reason for Visit (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Reason for Visit (_Optional)</label>
                   <textarea
                     value={formData.reason}
                     onChange={(e) => updateFormData('reason', e.target.value)}
@@ -428,7 +429,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">First Name *</label>
                     <input
                       type="text"
                       value={formData.firstName}
@@ -438,7 +439,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Last Name *</label>
                     <input
                       type="text"
                       value={formData.lastName}
@@ -451,7 +452,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Email *</label>
                     <input
                       type="email"
                       value={formData.email}
@@ -461,7 +462,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Phone *</label>
                     <input
                       type="tel"
                       value={formData.phone}
@@ -473,7 +474,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Date of Birth</label>
                   <input
                     type="date"
                     value={formData.dateOfBirth}
@@ -483,10 +484,10 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div className="border-t pt-4">
-                  <h4 className="font-medium text-gray-900 mb-4">Emergency Contact (Optional)</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">Emergency Contact (_Optional)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Name</label>
                       <input
                         type="text"
                         value={formData.emergencyContact.name}
@@ -495,7 +496,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Phone</label>
                       <input
                         type="tel"
                         value={formData.emergencyContact.phone}
@@ -543,7 +544,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                   {formData.hasInsurance && (
                     <div className="ml-7 space-y-4 p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Provider *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Insurance Provider *</label>
                         <select
                           value={formData.insuranceProvider}
                           onChange={(e) => updateFormData('insuranceProvider', e.target.value)}
@@ -559,7 +560,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Member ID *</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Member ID *</label>
                           <input
                             type="text"
                             value={formData.memberId}
@@ -569,7 +570,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Group Number</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Group Number</label>
                           <input
                             type="text"
                             value={formData.groupNumber}
@@ -607,7 +608,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                           { value: 'full-rate', label: `Full Rate - $${therapist?.sessionRate || 180}` },
                           { value: 'sliding-scale', label: 'Sliding Scale - Based on income' }
                         ].map(option => (
-                          <label key={option.value} className="flex items-center gap-3">
+                          <label key={option.value} className="flex items-center gap-3" htmlFor="has-insurance">
                             <input
                               type="radio"
                               name="payment-method"

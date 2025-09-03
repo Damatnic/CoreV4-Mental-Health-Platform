@@ -79,13 +79,13 @@ export class CrisisDetectionService {
    */
   public async analyzeCrisisRisk(
     userId: string,
-    behaviorData: BehaviorData
+    _behaviorData: BehaviorData
   ): Promise<CrisisProfile> {
     try {
       const profile = this.getOrCreateProfile(userId);
       
       // Analyze current indicators
-      const currentIndicators = await this.detectIndicators(behaviorData);
+      const currentIndicators = await this.detectIndicators(_behaviorData);
       
       // Update profile with new indicators
       profile.indicators.push(...currentIndicators);
@@ -107,7 +107,7 @@ export class CrisisDetectionService {
       // Store updated profile (encrypted locally)
       this.patterns.set(userId, profile);
       
-      // Log for crisis analytics (anonymized)
+      // Log for crisis analytics (_anonymized)
       logger.logCrisisIntervention('risk_analysis_complete', undefined, {
         riskLevel: profile.riskLevel,
         indicatorCount: profile.indicators.length,
@@ -274,7 +274,7 @@ export class CrisisDetectionService {
     
     // Analyze usage patterns over time
     const hourlyUsage = this.groupByHour(timestamps);
-    const dailyUsage = this.groupByDay(timestamps);
+    const _dailyUsage = this.groupByDay(timestamps);
 
     // Unusual late-night activity patterns
     const lateNightActivity = hourlyUsage.slice(0, 6).reduce((sum, count) => sum + count, 0);
@@ -332,20 +332,20 @@ export class CrisisDetectionService {
       'nothing matters', 'no future', 'stuck', 'trapped'
     ];
 
-    const foundCrisisKeywords = crisisKeywords.filter(keyword => 
-      text.toLowerCase().includes(keyword)
+    const foundCrisisKeywords = crisisKeywords.filter(_keyword => 
+      text.toLowerCase().includes(_keyword)
     );
 
-    const foundHopelessnessWords = hopelessnessWords.filter(word =>
-      words.includes(word)
+    const foundHopelessnessWords = hopelessnessWords.filter(_word =>
+      words.includes(_word)
     );
 
     // Simple sentiment analysis (can be enhanced with more sophisticated NLP)
     const negativeWords = ['sad', 'angry', 'hurt', 'pain', 'suffering', 'terrible', 'awful'];
     const positiveWords = ['happy', 'good', 'great', 'wonderful', 'amazing', 'better'];
     
-    const negativeCount = negativeWords.filter(word => words.includes(word)).length;
-    const positiveCount = positiveWords.filter(word => words.includes(word)).length;
+    const negativeCount = negativeWords.filter(_word => words.includes(_word)).length;
+    const positiveCount = positiveWords.filter(_word => words.includes(_word)).length;
     
     const sentiment = (positiveCount - negativeCount) / Math.max(words.length, 1);
     const hopelessnessScore = foundHopelessnessWords.length / Math.max(words.length, 1) * 10;
@@ -501,18 +501,18 @@ export class CrisisDetectionService {
     logger.info('Crisis detection models initialized', { category: LogCategory.CRISIS });
   }
 
-  private detectPatterns(indicators: CrisisIndicator[]): Promise<CrisisPattern[]> {
+  private detectPatterns(_indicators: CrisisIndicator[]): Promise<CrisisPattern[]> {
     // Implement pattern detection algorithm
     // This is a simplified version - production would use more sophisticated ML
     return Promise.resolve([]);
   }
 
-  private analyzeMoodPatterns(moodData: MoodData[], timestamp: Date): CrisisIndicator[] {
+  private analyzeMoodPatterns(_moodData: MoodData[], _timestamp: Date): CrisisIndicator[] {
     // Implement mood pattern analysis
     return [];
   }
 
-  private analyzeSocialPatterns(socialData: SocialData, timestamp: Date): CrisisIndicator[] {
+  private analyzeSocialPatterns(_socialData: SocialData, _timestamp: Date): CrisisIndicator[] {
     // Implement social interaction pattern analysis  
     return [];
   }
@@ -575,4 +575,4 @@ interface SocialData {
   isolationIndicators: number;
 }
 
-export const crisisDetectionService = CrisisDetectionService.getInstance();
+export const _crisisDetectionService = CrisisDetectionService.getInstance();

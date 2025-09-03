@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, _useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Calendar, 
-  TrendingUp, 
+  _Calendar, 
+  _TrendingUp, 
   Heart, 
-  Target, 
+  _Target, 
   Award, 
   Flame, 
-  Star, 
-  Clock,
+  _Star, 
+  _Clock,
   Activity,
-  Zap,
-  Shield,
+  _Zap,
+  _Shield,
   Sunrise,
   Brain,
   Smile

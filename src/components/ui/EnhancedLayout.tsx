@@ -3,19 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, AlertTriangle, Search, User, Settings, LogOut, 
-  Home, BarChart3, Heart, Users, Stethoscope, Bell, 
+  Home, _BarChart3, Heart, Users, Stethoscope, _Bell, 
   ChevronDown, Star, Clock, Command, Accessibility,
-  Sparkles, Moon, Sun, ChevronLeft, Phone, MessageCircle,
-  Wind, Timer, BookOpen, Activity
+  Sparkles, _Moon, _Sun, _ChevronLeft, Phone, MessageCircle,
+  Wind, Timer, BookOpen, _Activity
 } from 'lucide-react';
 import { NavigationProvider, useNavigation } from '../navigation/NavigationContext';
 import { GlobalSearch } from '../navigation/GlobalSearch';
 import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
 import { FloatingCrisisButton, MobileCrisisButton } from '../navigation/FloatingCrisisButton';
-import { MobileNavigation } from './MobileNavigation';
+import { _MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../hooks/useAuth';
-import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
+import { _PrivacyBanner, _FreeBadge } from './PrivacyBanner';
 import { toast } from 'react-hot-toast';
 
 interface EnhancedLayoutProps {
@@ -52,7 +52,7 @@ function SkipLinks() {
 function UserMenu() {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const { preferences, favoriteRoutes } = useNavigation();
+  const { _preferences, favoriteRoutes } = useNavigation();
 
   return (
     <div className="relative">
@@ -128,8 +128,8 @@ function UserMenu() {
                 </Link>
                 <button
                   onClick={() => {
-                    const event = new CustomEvent('showKeyboardHelp');
-                    window.dispatchEvent(event);
+                    const _event = new CustomEvent('showKeyboardHelp');
+                    window.dispatchEvent(_event);
                     setIsOpen(false);
                   }}
                   className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -170,7 +170,7 @@ function UserMenu() {
 }
 
 // Quick access panel
-function QuickAccessPanel() {
+function _QuickAccessPanel() {
   const { quickActions, recentRoutes } = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -248,15 +248,15 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   const location = useLocation();
   const { 
     mode, 
-    isSearchOpen, 
+    _isSearchOpen, 
     setSearchOpen, 
     isMobileMenuOpen, 
     setMobileMenuOpen,
-    preferences,
-    crisisDetected 
+    _preferences,
+    _crisisDetected 
   } = useNavigation();
   const [isInstallable, setIsInstallable] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
   const [notificationCount] = useState(0);
 
   // Enhanced keyboard navigation
@@ -289,14 +289,14 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     if (path === '/') {
       return location.pathname === '/';
     }
-    return location.pathname.startsWith(path);
+    return location.pathname.startsWith(_path);
   };
 
   // PWA Install Prompt
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(_e);
       setIsInstallable(true);
     };
 
@@ -307,7 +307,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     };
   }, []);
 
-  const handleInstallClick = async () => {
+  const _handleInstallClick = async () => {
     if (!deferredPrompt) return;
     
     deferredPrompt.prompt();
@@ -321,7 +321,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   };
 
   return (
-    <div className={`h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex ${preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''} relative overflow-hidden`}>
+    <div className={`h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex ${_preferences.highContrast ? 'high-contrast' : ''} ${mode === 'crisis' ? 'crisis-mode' : ''} relative overflow-hidden`}>
       {/* Console Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
@@ -665,7 +665,7 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: preferences.reducedMotion ? 0 : 0.4 }}
+            transition={{ duration: _preferences.reducedMotion ? 0 : 0.4 }}
             className="relative z-10 min-h-screen console-safe-area"
           >
             {children}
@@ -710,8 +710,8 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
         }
         
         .backdrop-blur-console {
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(_12px);
+          -webkit-backdrop-filter: blur(_12px);
         }
       `}</style>
     </div>

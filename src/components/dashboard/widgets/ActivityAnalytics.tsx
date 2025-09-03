@@ -4,9 +4,9 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  Calendar,
+  _Calendar,
   BarChart3,
-  PieChart,
+  _PieChart,
   Clock,
   Zap,
   Heart,
@@ -18,31 +18,31 @@ import {
   Cloud,
   Award,
   AlertCircle,
-  Filter,
+  _Filter,
   Download,
   ChevronLeft,
   ChevronRight,
-  Info
+  _Info
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, subDays, addDays, isToday } from 'date-fns';
+import { format, startOfWeek, _endOfWeek, eachDayOfInterval, subDays, addDays, isToday } from 'date-fns';
 
 interface ActivityAnalyticsProps {
-  onExportData?: () => void;
-  onViewDetails?: (activityId: string) => void;
+  _onExportData?: () => void;
+  _onViewDetails?: (activityId: string) => void;
 }
 
 export function ActivityAnalytics({
-  onExportData,
-  onViewDetails
+  _onExportData,
+  _onViewDetails
 }: ActivityAnalyticsProps) {
   const {
     activityHistory,
-    activities,
-    goals,
-    habits,
+    _activities,
+    _goals,
+    _habits,
     correlateActivitiesWithMood,
-    analyzeActivityEffectiveness,
+    _analyzeActivityEffectiveness,
     exportProgressReport
   } = useActivityStore();
 
@@ -56,7 +56,7 @@ export function ActivityAnalytics({
     const end = currentDate;
     let start;
     
-    switch (selectedPeriod) {
+    switch (_selectedPeriod) {
       case 'week':
         start = startOfWeek(currentDate);
         break;
@@ -180,7 +180,7 @@ export function ActivityAnalytics({
         date: day,
         completed,
         avgMood,
-        isToday: isToday(day)
+        isToday: isToday(_day)
       };
     });
   }, [filteredActivities, selectedPeriod, currentDate]);
@@ -194,14 +194,14 @@ export function ActivityAnalytics({
       insights.push({
         type: 'success',
         title: 'Excellent Completion Rate',
-        message: `You're completing ${Math.round(stats.completionRate)}% of your activities!`,
+        message: `You&apos;re completing ${Math.round(stats.completionRate)}% of your activities!`,
         icon: Award
       });
     } else if (stats.completionRate < 50) {
       insights.push({
         type: 'warning',
         title: 'Low Completion Rate',
-        message: 'Consider reducing activities or adjusting your schedule',
+        message: 'Consider reducing _activities or adjusting your schedule',
         icon: AlertCircle
       });
     }
@@ -211,14 +211,14 @@ export function ActivityAnalytics({
       insights.push({
         type: 'success',
         title: 'Positive Mood Impact',
-        message: 'Your activities are significantly improving your mood',
+        message: 'Your _activities are significantly improving your mood',
         icon: Heart
       });
     } else if (stats.avgMoodImpact < -1) {
       insights.push({
         type: 'warning',
         title: 'Negative Mood Trend',
-        message: 'Some activities may be affecting your mood negatively',
+        message: 'Some _activities may be affecting your mood negatively',
         icon: TrendingDown
       });
     }
@@ -231,7 +231,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'info',
         title: 'Peak Activity Time',
-        message: `You're most active in the ${maxTimeOfDay.time}`,
+        message: `You&apos;re most active in the ${maxTimeOfDay.time}`,
         icon: Clock
       });
     }
@@ -241,7 +241,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'info',
         title: 'Low Energy Pattern',
-        message: 'Most activities are low energy - consider adding energizing activities',
+        message: 'Most _activities are low energy - consider adding energizing _activities',
         icon: Zap
       });
     }
@@ -258,13 +258,13 @@ export function ActivityAnalytics({
   // Export data
   const handleExport = () => {
     const report = exportProgressReport();
-    const blob = new Blob([report], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const _blob = new Blob([report], { type: 'application/json' });
+    const url = URL.createObjectURL(_blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `activity-report-${format(new Date(), 'yyyy-MM-dd')}.json`;
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(_url);
   };
 
   return (
@@ -299,7 +299,7 @@ export function ActivityAnalytics({
             {(['week', 'month', 'year'] as const).map((period) => (
               <button
                 key={period}
-                onClick={() => setSelectedPeriod(period)}
+                onClick={() => setSelectedPeriod(_period)}
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedPeriod === period
                     ? 'bg-primary-100 text-primary-700'
@@ -359,7 +359,7 @@ export function ActivityAnalytics({
           </div>
         </div>
 
-        {/* Category Filter */}
+        {/* Category _Filter */}
         <div className="flex space-x-2 overflow-x-auto pb-2">
           <button
             onClick={() => setSelectedCategory('all')}
@@ -374,7 +374,7 @@ export function ActivityAnalytics({
           {Array.from(stats.categoryBreakdown.entries()).map(([category, count]) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(_category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -434,9 +434,9 @@ export function ActivityAnalytics({
           <h4 className="font-medium text-gray-900 mb-3">Category Distribution</h4>
           <div className="space-y-2">
             {Array.from(stats.categoryBreakdown.entries()).map(([category, count]) => {
-              const percentage = (count / stats.total) * 100;
+              const _percentage = (count / stats.total) * 100;
               const getCategoryIcon = () => {
-                switch (category) {
+                switch (_category) {
                   case 'therapy': return Brain;
                   case 'wellness': return Heart;
                   case 'social': return Users;
@@ -463,13 +463,13 @@ export function ActivityAnalytics({
                           'bg-gray-500'
                         }`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
+                        animate={{ width: `${_percentage}%` }}
                         transition={{ duration: 0.5 }}
                       />
                     </div>
                   </div>
                   <span className="text-sm text-gray-700 font-medium">
-                    {count} ({Math.round(percentage)}%)
+                    {count} ({Math.round(_percentage)}%)
                   </span>
                 </div>
               );
@@ -483,7 +483,7 @@ export function ActivityAnalytics({
           <div className="grid grid-cols-4 gap-2">
             {Object.entries(stats.timeOfDayBreakdown).map(([time, count]) => {
               const getTimeIcon = () => {
-                switch (time) {
+                switch (_time) {
                   case 'morning': return Sun;
                   case 'afternoon': return Sun;
                   case 'evening': return Cloud;
@@ -492,7 +492,7 @@ export function ActivityAnalytics({
                 }
               };
               const Icon = getTimeIcon();
-              const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+              const _percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
               
               return (
                 <div key={time} className="text-center p-2 bg-gray-50 rounded-lg">
@@ -501,7 +501,7 @@ export function ActivityAnalytics({
                     {time.charAt(0).toUpperCase() + time.slice(1)}
                   </div>
                   <div className="text-lg font-bold text-gray-900">{count}</div>
-                  <div className="text-xs text-gray-500">{Math.round(percentage)}%</div>
+                  <div className="text-xs text-gray-500">{Math.round(_percentage)}%</div>
                 </div>
               );
             })}
@@ -513,9 +513,9 @@ export function ActivityAnalytics({
           <h4 className="font-medium text-gray-900 mb-3">Energy Level Distribution</h4>
           <div className="space-y-2">
             {Object.entries(stats.energyBreakdown).map(([level, count]) => {
-              const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+              const _percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
               const getColor = () => {
-                switch (level) {
+                switch (_level) {
                   case 'low': return 'bg-blue-500';
                   case 'medium': return 'bg-yellow-500';
                   case 'high': return 'bg-red-500';
@@ -538,13 +538,13 @@ export function ActivityAnalytics({
                       <motion.div
                         className={`h-4 rounded-full ${getColor()}`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
+                        animate={{ width: `${_percentage}%` }}
                         transition={{ duration: 0.5 }}
                       />
                     </div>
                   </div>
                   <span className="text-sm text-gray-700 font-medium">
-                    {count} ({Math.round(percentage)}%)
+                    {count} ({Math.round(_percentage)}%)
                   </span>
                 </div>
               );

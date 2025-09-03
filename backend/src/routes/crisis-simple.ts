@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 /**
  * Simple Crisis Routes for Mental Health Platform
  * Essential crisis intervention endpoints
@@ -96,7 +97,7 @@ router.post('/event', (req: Request, res: Response) => {
       // No user identification stored for privacy
     };
 
-    console.log('Crisis event logged:', {
+    logger.info('Crisis event logged:', {
       type: crisisEvent.type,
       severity: crisisEvent.severity,
       timestamp: crisisEvent.timestamp
@@ -109,8 +110,8 @@ router.post('/event', (req: Request, res: Response) => {
       timestamp: crisisEvent.timestamp
     });
 
-  } catch (error: any) {
-    console.error('Crisis event logging error:', error);
+  } catch {
+    logger.error('Crisis event logging error: ');
     
     // Even if logging fails, still provide crisis resources
     res.status(200).json({

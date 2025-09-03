@@ -4,6 +4,7 @@ import { RealtimeMessage } from '../../services/realtime/websocketService';
 import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';
@@ -59,18 +60,18 @@ export function EnhancedCrisisChat() {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    if (user) {
+    if (_user) {
       initializeWebSocket();
     }
 
     return () => {
-      if (isConnected) {
+      if (_isConnected) {
         mockWebSocketAdapter.leaveRoom(roomId.current);
       }
     };
-  }, [user]);
+  }, [user, initializeWebSocket, isConnected]);
 
-  const initializeWebSocket = async () => {
+  const initializeWebSocket = useCallback(async () => {
     try {
       setConnectionStatus('connecting');
       await mockWebSocketAdapter.connect(user?.id || 'anonymous', user?.token || '');
@@ -88,14 +89,14 @@ export function EnhancedCrisisChat() {
         type: 'system',
       };
       setMessages([welcomeMessage]);
-    } catch (error) {
-      console.error('Failed to connect to chat service:', error);
+    } catch (_error) {
+      logger.error('Failed to connect to chat service:');
       setConnectionStatus('disconnected');
       toast.error('Unable to connect to chat service. Please check your connection.');
     }
-  };
+  }, [user, setupWebSocketListeners]);
 
-  const setupWebSocketListeners = () => {
+  const setupWebSocketListeners = useCallback(() => {
     // Message events
     mockWebSocketAdapter.on('message:new', handleNewMessage);
     mockWebSocketAdapter.on('typing:start', handleCounselorTypingStart);
@@ -114,7 +115,17 @@ export function EnhancedCrisisChat() {
     // Connection events
     mockWebSocketAdapter.on('connection:lost', handleConnectionLost);
     mockWebSocketAdapter.on('connection:established', handleConnectionRestored);
-  };
+  }, [
+    handleNewMessage,
+    handleCounselorTypingStart,
+    handleCounselorTypingStop,
+    handleCounselorAssigned,
+    handleCounselorDisconnected,
+    handleQueueUpdate,
+    handleCrisisEscalated,
+    handleConnectionLost,
+    handleConnectionRestored
+  ]);
 
   const handleNewMessage = useCallback((message: RealtimeMessage) => {
     if (message.roomId === roomId.current) {
@@ -127,20 +138,20 @@ export function EnhancedCrisisChat() {
     }
   }, [user]);
 
-  const handleCounselorTypingStart = useCallback((data: any) => {
+  const handleCounselorTypingStart = useCallback((data: { roomId: string; userId: string }) => {
     if (data.roomId === roomId.current && data.userId !== user?.id) {
       setCounselorTyping(true);
     }
   }, [user]);
 
-  const handleCounselorTypingStop = useCallback((data: any) => {
+  const handleCounselorTypingStop = useCallback((data: { roomId: string; userId: string }) => {
     if (data.roomId === roomId.current && data.userId !== user?.id) {
       setCounselorTyping(false);
     }
   }, [user]);
 
   const handleCounselorAssigned = useCallback((counselor: CounselorInfo) => {
-    setCounselorInfo(counselor);
+    setCounselorInfo(_counselor);
     setQueuePosition(null);
     setEstimatedWaitTime(null);
     setIsConnected(true);
@@ -151,7 +162,7 @@ export function EnhancedCrisisChat() {
       roomId: roomId.current,
       userId: 'system',
       username: 'System',
-      content: `You're now connected with ${counselor.name}, ${counselor.credentials}. They specialize in ${counselor.specialties.join(', ')}.`,
+      content: `You&apos;re now connected with ${counselor.name}, ${counselor.credentials}. They specialize in ${counselor.specialties.join(', ')}.`,
       timestamp: new Date(),
       type: 'system',
     };
@@ -177,7 +188,7 @@ export function EnhancedCrisisChat() {
     
     // Automatically try to reconnect
     handleConnect();
-  }, []);
+  }, [handleConnect]);
 
   const handleQueueUpdate = useCallback((data: { position: number; estimatedWait: number }) => {
     setQueuePosition(data.position);
@@ -217,8 +228,8 @@ export function EnhancedCrisisChat() {
     const lowerText = text.toLowerCase();
     
     for (const crisis of CRISIS_KEYWORDS) {
-      for (const keyword of crisis.keywords) {
-        if (lowerText.includes(keyword)) {
+      for (const _keyword of crisis.keywords) {
+        if (lowerText.includes(_keyword)) {
           return crisis.level as 'low' | 'medium' | 'high' | 'critical';
         }
       }
@@ -227,7 +238,7 @@ export function EnhancedCrisisChat() {
   };
 
   // Handle connecting to counselor
-  const handleConnect = async () => {
+  const handleConnect = useCallback(async () => {
     if (connectionStatus !== 'connected') {
       toast.error('Please wait for connection to establish');
       return;
@@ -254,21 +265,21 @@ export function EnhancedCrisisChat() {
         type: 'system',
       };
       setMessages(prev => [...prev, queueMessage]);
-    } catch (error) {
-      console.error('Failed to connect to counselor:', error);
+    } catch (_error) {
+      logger.error('Failed to connect to counselor:');
       setIsConnecting(false);
       toast.error('Failed to connect. Please try again.');
     }
-  };
+  }, [connectionStatus, detectedCrisisLevel]);
 
   // Handle sending message
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !isConnected) return;
 
     // Check for crisis keywords
-    const crisisLevel = detectCrisisLevel(inputMessage);
-    if (crisisLevel) {
-      setDetectedCrisisLevel(crisisLevel);
+    const crisisLevel = detectCrisisLevel(_inputMessage);
+    if (_crisisLevel) {
+      setDetectedCrisisLevel(_crisisLevel);
       if (crisisLevel === 'critical') {
         setShowEmergencyPrompt(true);
         // Immediately escalate to crisis team
@@ -344,7 +355,7 @@ export function EnhancedCrisisChat() {
         roomId: roomId.current,
         userId: counselorInfo?.id || 'counselor',
         username: counselorInfo?.name || 'Crisis Counselor',
-        content: "I'm staying here with you. Your safety is my top priority. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let's focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
+        content: "I&apos;m staying here with you. Your safety is my top priority. Remember, you can always call 988 or text HOME to 741741 if you need immediate support. Let&apos;s focus on keeping you safe right now. What would help you feel a bit safer in this moment?",
         timestamp: new Date(),
         type: 'text',
       };
@@ -442,7 +453,7 @@ export function EnhancedCrisisChat() {
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  {message.metadata?.edited && ' (edited)'}
+                  {message.metadata?.edited && ' (_edited)'}
                 </p>
               </div>
             </div>
@@ -562,7 +573,7 @@ export function EnhancedCrisisChat() {
               <h3 className="text-lg font-semibold text-gray-900">Immediate Support Available</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Based on what you've shared, I want to make sure you get the best support possible. 
+              Based on what you&apos;ve shared, I want to make sure you get the best support possible. 
               Would you like to speak with someone on the phone right now?
             </p>
             <div className="space-y-3">
@@ -582,7 +593,7 @@ export function EnhancedCrisisChat() {
                 onClick={() => handleEmergencyResponse('dismiss')}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                I'm Okay For Now
+                I&apos;m Okay For Now
               </button>
             </div>
           </div>

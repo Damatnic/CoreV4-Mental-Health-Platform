@@ -137,10 +137,10 @@ export const DBT_PROMPTS: TherapeuticPrompt[] = [
     type: 'dbt',
     category: 'Mindfulness',
     title: 'Wise Mind',
-    description: 'Balance emotion mind and reasonable mind',
+    description: 'Balance _emotion mind and reasonable mind',
     prompt: 'Take a moment to connect with your wise mind. What does your intuition tell you about this situation?',
     followUpQuestions: [
-      'What is your emotion mind saying?',
+      'What is your _emotion mind saying?',
       'What is your reasonable mind saying?',
       'Where do these two perspectives overlap?',
       'What feels true and right in your gut?',
@@ -150,7 +150,7 @@ export const DBT_PROMPTS: TherapeuticPrompt[] = [
     skillLevel: 'intermediate',
     estimatedTime: 15,
     benefits: [
-      'Integrates logic and emotion',
+      'Integrates logic and _emotion',
       'Improves decision-making',
       'Builds inner wisdom'
     ]
@@ -202,7 +202,7 @@ export const DBT_PROMPTS: TherapeuticPrompt[] = [
     ]
   },
   {
-    id: 'dbt-emotion-regulation',
+    id: 'dbt-_emotion-regulation',
     type: 'dbt',
     category: 'Emotion Regulation',
     title: 'PLEASE Skills',
@@ -546,8 +546,8 @@ export function getPersonalizedPrompts(
   // Score prompts based on emotion relevance
   const scoredPrompts = filteredPrompts.map(prompt => {
     let score = 0;
-    emotions.forEach(emotion => {
-      if (prompt.relatedEmotions.includes(emotion)) {
+    emotions.forEach(_emotion => {
+      if (prompt.relatedEmotions.includes(_emotion)) {
         score += 2;
       }
     });

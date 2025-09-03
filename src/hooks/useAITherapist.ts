@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Therapist } from '../components/ai/TherapistSelector';
 import { detectCrisisLevel, CrisisLevel } from '../utils/crisis';
+import { logger } from '../utils/logger';
 
 export interface TherapistMessage {
   id: string;
@@ -40,24 +41,24 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   // Initialize or load session
   useEffect(() => {
     initializeSession();
-  }, [therapist.id, sessionId]);
+  }, [therapist.id, sessionId, initializeSession]);
 
   // Auto-save session
   useEffect(() => {
     if (session && autoSave) {
       saveSession();
     }
-  }, [session, autoSave]);
+  }, [session, autoSave, saveSession]);
 
-  const initializeSession = async () => {
+  const initializeSession = useCallback(async () => {
     try {
       let existingSession: TherapySession | null = null;
 
       // Try to load existing session
       if (sessionId) {
-        const savedSession = localStorage.getItem(`therapy-session-${sessionId}`);
-        if (savedSession) {
-          existingSession = JSON.parse(savedSession);
+        const _savedSession = localStorage.getItem(`therapy-session-${sessionId}`);
+        if (_savedSession) {
+          existingSession = JSON.parse(_savedSession);
         }
       }
 
@@ -75,19 +76,19 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
         };
 
         // Add welcome message based on therapist personality
-        const welcomeMessage = generateWelcomeMessage(therapist);
-        newSession.messages.push(welcomeMessage);
+        const _welcomeMessage = generateWelcomeMessage(_therapist);
+        newSession.messages.push(_welcomeMessage);
         
         existingSession = newSession;
       }
 
-      setSession(existingSession);
+      setSession(_existingSession);
       setIsConnected(true);
-    } catch (error) {
-      console.error('Failed to initialize therapy session:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize therapy session:');
       setIsConnected(false);
     }
-  };
+  }, [therapist.id, therapist.name, sessionId]);
 
   const generateWelcomeMessage = (therapist: Therapist): TherapistMessage => {
     const welcomeMessages = {
@@ -115,7 +116,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   const sendMessage = useCallback(async (text: string) => {
     if (!session || !text.trim()) return;
 
-    const userMessage: TherapistMessage = {
+    const _userMessage: TherapistMessage = {
       id: `msg-${Date.now()}-user`,
       sender: 'user',
       text: text.trim(),
@@ -127,7 +128,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     // Add user message immediately
     setSession(prev => prev ? {
       ...prev,
-      messages: [...prev.messages, userMessage],
+      messages: [...prev.messages, _userMessage],
       lastActivity: new Date()
     } : null);
 
@@ -139,7 +140,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
       
       // Generate therapist response
       const therapistResponse = await generateTherapistResponse(
-        [...session.messages, userMessage], 
+        [...session.messages, _userMessage], 
         therapist
       );
 
@@ -161,10 +162,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
         setIsTyping(false);
       }, typingDelay);
 
-    } catch (error) {
-      console.error('Failed to generate therapist response:', error);
+    } catch (_error) {
+      logger.error('Failed to generate therapist response:');
       
-      // Add error recovery message
+      // Add undefined recovery message
       const errorMessage: TherapistMessage = {
         id: `msg-${Date.now()}-error`,
         sender: 'therapist',
@@ -182,9 +183,9 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
       
       setIsTyping(false);
     }
-  }, [session, therapist]);
+  }, [session, therapist, generateTherapistResponse]);
 
-  const generateTherapistResponse = async (
+  const generateTherapistResponse = useCallback(async (
     messages: TherapistMessage[], 
     therapist: Therapist
   ): Promise<TherapistMessage> => {
@@ -238,7 +239,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
       mood,
       techniques
     };
-  };
+  }, []);
 
   // Helper function to check for crisis indicators
   const checkForCrisisIndicators = (message: string): CrisisLevel => {
@@ -258,11 +259,11 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   };
 
   // Response generators for different specialties with evidence-based techniques
-  const generateAnxietyDepressionResponse = (userMessage: string, length: number, mood: string): string => {
+  const generateAnxietyDepressionResponse = (_userMessage: string, length: number, mood: string): string => {
     // Check for crisis keywords first
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
 
     const responses = {
@@ -297,7 +298,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this difficult time.";
   };
 
-  const generateTraumaResponse = (userMessage: string, length: number, mood: string): string => {
+  const generateTraumaResponse = (_userMessage: string, length: number, mood: string): string => {
     const responses = {
       supportive: [
         "I want to acknowledge your courage in sharing this. Trauma can make it feel unsafe to be vulnerable, yet here you are, trusting me with your experience.",
@@ -322,10 +323,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   };
 
   // Helper function for response generators missing in the switch statement
-  const generateRelationshipResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateRelationshipResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "Relationships can be our greatest source of joy and our deepest source of pain. What you're describing sounds challenging. Can you help me understand what this relationship means to you?",
@@ -336,10 +337,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const generateGrowthResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateGrowthResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "Life transitions can feel overwhelming and exciting at the same time. What you're experiencing is a natural part of growth. What aspect of this change feels most significant to you?",
@@ -350,10 +351,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const generateStressResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateStressResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "Burnout is your body and mind's way of telling you that something needs to change. You're not weak for feeling overwhelmed - you're human. What would taking care of yourself look like right now?",
@@ -364,10 +365,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const generateRecoveryResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateRecoveryResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "Recovery is a journey with ups and downs, and every step forward counts, no matter how small. Your commitment to healing is evident in being here. What's helping you stay motivated today?",
@@ -378,10 +379,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const generateYouthResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateYouthResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "Being young doesn't make your feelings any less real or important. What you're going through matters, and I'm here to listen without judgment. What's been weighing on you?",
@@ -392,10 +393,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const generateMensHealthResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateMensHealthResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "I appreciate you opening up - I know society often tells men they shouldn't talk about feelings. That's nonsense. Your emotions are valid and important. What's been on your mind?",
@@ -407,10 +408,10 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   };
 
   // General response generator
-  const generateGeneralResponse = (userMessage: string, length: number, mood: string): string => {
-    const crisisLevel = checkForCrisisIndicators(userMessage);
+  const generateGeneralResponse = (_userMessage: string, _length: number, _mood: string): string => {
+    const crisisLevel = checkForCrisisIndicators(_userMessage);
     if (crisisLevel === 'high' || crisisLevel === 'critical') {
-      return generateCrisisResponse(crisisLevel);
+      return generateCrisisResponse(_crisisLevel);
     }
     const responses = [
       "I'm here to listen and support you. Can you tell me more about what you're experiencing?",
@@ -423,19 +424,19 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     return selectedResponse || "I'm here to support you through this important moment.";
   };
 
-  const determineResponseMood = (userMessage: string, therapist: Therapist, messageCount: number): 'supportive' | 'challenging' | 'analytical' | 'empathetic' => {
+  const determineResponseMood = (_userMessage: string, therapist: Therapist, messageCount: number): 'supportive' | 'challenging' | 'analytical' | 'empathetic' => {
     // Enhanced sentiment analysis with therapeutic consideration
-    const lowerMessage = userMessage.toLowerCase();
+    const lowerMessage = _userMessage.toLowerCase();
     
     // Priority 1: Check for emotional distress
     const distressWords = ['hurt', 'pain', 'trauma', 'abuse', 'scared', 'terrified', 'alone', 'suicide', 'death', 'die'];
-    if (distressWords.some(word => lowerMessage.includes(word))) {
+    if (distressWords.some(_word => lowerMessage.includes(_word))) {
       return 'empathetic';
     }
     
     // Priority 2: Check for cognitive distortions (good for challenging)
     const distortionWords = ['always', 'never', "can't", 'should', 'must', 'everyone', 'no one', 'worst', 'terrible'];
-    if (distortionWords.some(word => lowerMessage.includes(word))) {
+    if (distortionWords.some(_word => lowerMessage.includes(_word))) {
       // Only challenge if relationship is established and therapist uses CBT
       if (messageCount > 3 && therapist.approach.includes('CBT')) {
         return 'challenging';
@@ -445,7 +446,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     
     // Priority 3: Check for analytical needs
     const analyticalWords = ['why', 'understand', 'pattern', 'reason', 'cause', 'explain', 'analyze', 'figure out'];
-    if (analyticalWords.some(word => lowerMessage.includes(word))) {
+    if (analyticalWords.some(_word => lowerMessage.includes(_word))) {
       return 'analytical';
     }
     
@@ -453,7 +454,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
     const sadWords = ['sad', 'depressed', 'hopeless', 'empty', 'numb', 'worthless'];
     const anxiousWords = ['anxious', 'worried', 'panic', 'nervous', 'stressed', 'overwhelmed'];
     
-    if (sadWords.some(word => lowerMessage.includes(word)) || anxiousWords.some(word => lowerMessage.includes(word))) {
+    if (sadWords.some(_word => lowerMessage.includes(_word)) || anxiousWords.some(word => lowerMessage.includes(_word))) {
       return 'empathetic';
     }
     
@@ -469,7 +470,7 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
   };
 
   const selectTechniques = (therapist: Therapist, message: string, length: number): string[] => {
-    const availableTechniques = therapist.approach.split(', ');
+    const _availableTechniques = therapist.approach.split(', ');
     const selectedTechniques: string[] = [];
     const lowerMessage = message.toLowerCase();
     
@@ -520,36 +521,36 @@ export const useAITherapist = ({ therapist, sessionId, autoSave = true }: UseAIT
       selectedTechniques.push('Mindfulness');
     }
     
-    return [...new Set(selectedTechniques)]; // Remove duplicates
+    return [...new Set(_selectedTechniques)]; // Remove duplicates
   };
 
   const updateTechniques = (existing: string[], newTechniques: string[]): string[] => {
-    const combined = [...existing, ...newTechniques];
-    return [...new Set(combined)]; // Remove duplicates
+    const _combined = [...existing, ...newTechniques];
+    return [...new Set(_combined)]; // Remove duplicates
   };
 
-  const saveSession = async () => {
+  const saveSession = useCallback(async () => {
     if (!session) return;
     
     try {
       localStorage.setItem(`therapy-session-${session.id}`, JSON.stringify(session));
-    } catch (error) {
-      console.error('Failed to save therapy session:', error);
+    } catch (_error) {
+      logger.error('Failed to save therapy session:');
     }
-  };
+  }, [session]);
 
   const endSession = useCallback(async () => {
     if (!session) return;
 
-    // Generate session summary
-    const summary = {
+    // Generate session _summary
+    const _summary = {
       ...session,
       endTime: new Date(),
       sessionNotes: `Session with ${therapist.name} - ${session.messages.length} messages exchanged. Techniques used: ${session.techniques.join(', ')}`
     };
 
     // Save final session state
-    localStorage.setItem(`therapy-session-completed-${session.id}`, JSON.stringify(summary));
+    localStorage.setItem(`therapy-session-completed-${session.id}`, JSON.stringify(_summary));
     
     // Clear current session
     setSession(null);

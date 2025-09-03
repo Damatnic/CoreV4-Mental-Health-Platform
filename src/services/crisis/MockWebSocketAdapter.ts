@@ -4,6 +4,7 @@
 import { RealtimeMessage } from '../realtime/websocketService';
 import { mockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
 import { toast } from 'react-hot-toast';
+import { logger } from '../../utils/logger';
 
 // Mock WebSocket Adapter that mimics the real WebSocketService interface
 export class MockWebSocketAdapter {
@@ -27,14 +28,14 @@ export class MockWebSocketAdapter {
 
   // Setup mock crisis server event handlers
   private setupMockCrisisServer(): void {
-    mockCrisisServer.onEmergency((action: string, data: any) => {
+    mockCrisisServer.onEmergency((action: string, data: unknown) => {
       this.handleEmergencyProtocol(action, data);
     });
   }
 
   // Simulate WebSocket connection
-  public async connect(userId: string, token: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+  public async connect(userId: string, _token: string): Promise<void> {
+    return new Promise((resolve, _reject) => {
       if (this.isConnected) {
         resolve();
         return;
@@ -45,7 +46,7 @@ export class MockWebSocketAdapter {
       // Simulate connection delay
       this.connectionSimulationTimeout = setTimeout(() => {
         this.isConnected = true;
-        console.log('🟢 Mock WebSocket connected successfully');
+        logger.info('Mock WebSocket connected successfully', 'MockWebSocketAdapter');
         
         this.emit('connection:established', { userId });
         toast.success('Connected to crisis support system');
@@ -56,7 +57,7 @@ export class MockWebSocketAdapter {
   }
 
   // Simulate joining a crisis room
-  public async joinRoom(roomId: string): Promise<void> {
+  public async joinRoom(_roomId: string): Promise<void> {
     return new Promise((resolve) => {
       if (!this.isConnected) {
         throw new Error('Not connected to server');
@@ -64,31 +65,31 @@ export class MockWebSocketAdapter {
 
       // Simulate join delay
       setTimeout(() => {
-        this.emit('room:joined', roomId);
-        console.log(`Joined room: ${roomId}`);
+        this.emit('room:joined', _roomId);
+        logger.info(`Joined room: ${_roomId}`, 'MockWebSocketAdapter');
         resolve();
       }, 500);
     });
   }
 
   // Simulate leaving a room
-  public leaveRoom(roomId: string): void {
+  public leaveRoom(_roomId: string): void {
     if (!this.isConnected) return;
     
     // End any active crisis sessions
-    const session = this.activeSessions.get(roomId);
+    const session = this.activeSessions.get(_roomId);
     if (session) {
       session.end();
-      this.activeSessions.delete(roomId);
+      this.activeSessions.delete(_roomId);
     }
 
-    this.emit('room:left', roomId);
-    console.log(`Left room: ${roomId}`);
+    this.emit('room:left', _roomId);
+    logger.info(`Left room: ${_roomId}`, 'MockWebSocketAdapter');
   }
 
   // Create and join a crisis session
   public async createCrisisSession(priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): Promise<{
-    sessionId: string;
+    _sessionId: string;
     counselor: MockCounselor;
   }> {
     if (!this.currentUserId) {
@@ -104,24 +105,24 @@ export class MockWebSocketAdapter {
       this.emit('message:new', message);
     });
 
-    session.onTyping((isTyping: boolean) => {
-      if (isTyping) {
+    session.onTyping((_isTyping: boolean) => {
+      if (_isTyping) {
         this.emit('typing:start', {
           userId: session.counselor.id,
           username: session.counselor.name,
-          roomId: session.sessionId
+          _roomId: session._sessionId
         });
       } else {
         this.emit('typing:stop', {
           userId: session.counselor.id,
           username: session.counselor.name,
-          roomId: session.sessionId
+          _roomId: session._sessionId
         });
       }
     });
 
-    session.onEmergency((action: string, data: any) => {
-      this.emit('crisis:escalated', { action, data, sessionId: session.sessionId });
+    session.onEmergency((action: string, data: unknown) => {
+      this.emit('crisis:escalated', { action, data, _sessionId: session._sessionId });
     });
 
     // Join the room
@@ -142,13 +143,13 @@ export class MockWebSocketAdapter {
     this.simulateQueueUpdates(session.sessionId);
 
     return {
-      sessionId: session.sessionId,
+      _sessionId: session._sessionId,
       counselor: session.counselor
     };
   }
 
   // Simulate queue position updates before counselor assignment
-  private simulateQueueUpdates(sessionId: string): void {
+  private simulateQueueUpdates(_sessionId: string): void {
     let position = Math.floor(Math.random() * 5) + 1; // 1-5 position
     let estimatedWait = position * 30; // 30 seconds per position
 
@@ -173,28 +174,28 @@ export class MockWebSocketAdapter {
   }
 
   // Send message to crisis session
-  public sendMessage(roomId: string, content: string, type: 'text' | 'system' = 'text'): void {
-    const session = this.activeSessions.get(roomId);
+  public sendMessage(_roomId: string, content: string, _type: 'text' | 'system' = 'text'): void {
+    const session = this.activeSessions.get(_roomId);
     if (!session) {
-      console.warn(`No active session found for room: ${roomId}`);
+      logger.warn(`No active session found for room: ${_roomId}`);
       return;
     }
 
     // Send message to mock crisis session
-    session.sendMessage(content);
+    session.sendMessage(_content);
   }
 
   // Send typing indicator
-  public sendTypingIndicator(roomId: string, isTyping: boolean): void {
+  public sendTypingIndicator(_roomId: string, _isTyping: boolean): void {
     // Mock typing indicators are handled automatically by the crisis session
     // This is a no-op in the mock implementation
   }
 
   // Handle emergency protocols
-  private handleEmergencyProtocol(action: string, data: any): void {
-    console.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
+  private handleEmergencyProtocol(action: string, data: unknown): void {
+    logger.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
 
-    switch (action) {
+    switch (_action) {
       case 'auto_dial_988':
         this.triggerEmergencyCall('988', 'Suicide & Crisis Lifeline', data);
         break;
@@ -205,7 +206,7 @@ export class MockWebSocketAdapter {
         this.handleCrisisEscalation(data);
         break;
       default:
-        console.warn('Unknown emergency action:', action);
+        logger.warn('Unknown emergency action:', action);
     }
 
     // Emit crisis event for UI handling
@@ -213,16 +214,16 @@ export class MockWebSocketAdapter {
   }
 
   // Trigger emergency call
-  private triggerEmergencyCall(number: string, service: string, data: any): void {
+  private triggerEmergencyCall(number: string, service: string, data: unknown): void {
     // Show immediate emergency modal
     const emergencyMessage = {
       id: `emergency-${Date.now()}`,
-      roomId: data.sessionId || 'system',
+      _roomId: data.sessionId || 'system',
       userId: 'system',
       username: 'Emergency System',
       content: `🚨 EMERGENCY PROTOCOL ACTIVATED\n\nI'm initiating an emergency call to ${service} (${number}) based on your situation. This is for your immediate safety.\n\nIf you're in immediate danger, please call ${number} directly or go to your nearest emergency room.`,
       timestamp: new Date(),
-      type: 'crisis-alert' as const
+      _type: 'crisis-alert' as const
     };
 
     this.emit('message:new', emergencyMessage);
@@ -230,9 +231,9 @@ export class MockWebSocketAdapter {
     // Simulate emergency call initiation after brief delay
     setTimeout(() => {
       // Show browser alert with emergency information
-      const alertMessage = `🚨 EMERGENCY CALL INITIATED\n\nService: ${service}\nNumber: ${number}\n\n⚠️ IMPORTANT: This is a demonstration system.\nIn a real emergency, please call ${number} immediately.\n\nPressing OK will simulate dialing ${number}.`;
+      const _alertMessage = `🚨 EMERGENCY CALL INITIATED\n\nService: ${service}\nNumber: ${number}\n\n⚠️ IMPORTANT: This is a demonstration system.\nIn a real emergency, please call ${number} immediately.\n\nPressing OK will simulate dialing ${number}.`;
       
-      if (confirm(alertMessage)) {
+      if (confirm(_alertMessage)) {
         // Actually initiate the phone call
         if (typeof window !== 'undefined') {
           window.location.href = `tel:${number}`;
@@ -241,19 +242,19 @@ export class MockWebSocketAdapter {
     }, 2000);
 
     // Log emergency event
-    console.error(`📞 EMERGENCY CALL: ${service} (${number}) - Session: ${data.sessionId}`);
+    logger.error(`📞 EMERGENCY CALL: ${service} (${number}) - Session: ${data._sessionId}`);
   }
 
   // Handle crisis escalation
-  private handleCrisisEscalation(data: any): void {
+  private handleCrisisEscalation(data: unknown): void {
     const escalationMessage = {
       id: `escalation-${Date.now()}`,
-      roomId: data.sessionId || 'system',
+      _roomId: data.sessionId || 'system',
       userId: 'system',
       username: 'Crisis Team',
       content: '🆘 CRISIS ESCALATION: Your situation has been escalated to our emergency response team. A crisis specialist is being notified immediately. Please stay on the line.',
       timestamp: new Date(),
-      type: 'crisis-alert' as const
+      _type: 'crisis-alert' as const
     };
 
     this.emit('message:new', escalationMessage);
@@ -262,12 +263,12 @@ export class MockWebSocketAdapter {
     setTimeout(() => {
       const specialistMessage = {
         id: `specialist-${Date.now()}`,
-        roomId: data.sessionId || 'system',
+        _roomId: data.sessionId || 'system',
         userId: 'crisis-specialist',
         username: 'Dr. Crisis Specialist',
         content: 'Hello, I\'m Dr. Martinez, a crisis intervention specialist. I\'ve been notified of your situation and I\'m here to help. Your safety is our absolute priority. Can you tell me your current location?',
         timestamp: new Date(),
-        type: 'text' as const
+        _type: 'text' as const
       };
 
       this.emit('message:new', specialistMessage);
@@ -289,8 +290,8 @@ export class MockWebSocketAdapter {
       toast.success('Connection restored');
       
       // Re-establish active sessions
-      this.activeSessions.forEach((session, sessionId) => {
-        this.emit('room:joined', sessionId);
+      this.activeSessions.forEach((session, _sessionId) => {
+        this.emit('room:joined', _sessionId);
       });
     }, 3000 + Math.random() * 5000);
   }
@@ -310,14 +311,14 @@ export class MockWebSocketAdapter {
     }
   }
 
-  public emit(event: string, data: any): void {
+  public emit(event: string, data: unknown): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (error) {
-          console.error(`Error in event handler for ${event}:`, error);
+        } catch (_error) {
+          logger.error(`Error in event handler for ${event}`);
         }
       });
     }
@@ -328,11 +329,11 @@ export class MockWebSocketAdapter {
     return this.isConnected;
   }
 
-  public getSocket(): any {
+  public getSocket(): unknown {
     // Return a mock socket object with limited functionality
     return {
       connected: this.isConnected,
-      emit: (event: string, data: any, callback?: Function) => {
+      emit: (event: string, data: unknown, callback?: Function) => {
         // Handle specific socket events
         switch (event) {
           case 'crisis:request-counselor':
@@ -342,7 +343,7 @@ export class MockWebSocketAdapter {
             this.handleCrisisEscalation(data);
             break;
           default:
-            console.log(`Mock socket emit: ${event}`, data);
+            logger.debug(`Mock socket emit: ${event}`, 'MockWebSocketAdapter', data);
         }
         
         if (callback) {
@@ -353,8 +354,8 @@ export class MockWebSocketAdapter {
   }
 
   // Handle counselor request
-  private handleCounselorRequest(data: any): void {
-    console.log('Crisis counselor requested:', data);
+  private handleCounselorRequest(data: unknown): void {
+    logger.crisis('Crisis counselor requested', 'high', 'MockWebSocketAdapter', data);
     
     // This is handled automatically when creating a crisis session
     // The MockCrisisServer manages counselor assignment
@@ -374,12 +375,12 @@ export class MockWebSocketAdapter {
     this.currentUserId = null;
     this.eventHandlers.clear();
     
-    console.log('🔴 Mock WebSocket disconnected');
+    logger.info('Mock WebSocket disconnected', 'MockWebSocketAdapter');
   }
 
   // Get current session for a room
-  public getSession(roomId: string): MockCrisisSession | undefined {
-    return this.activeSessions.get(roomId);
+  public getSession(_roomId: string): MockCrisisSession | undefined {
+    return this.activeSessions.get(_roomId);
   }
 
   // Get mock server statistics
@@ -392,20 +393,20 @@ export class MockWebSocketAdapter {
   }
 
   // Test emergency protocols (for demo purposes)
-  public testEmergencyProtocol(type: 'suicide_risk' | 'medical_emergency' | 'connection_loss'): void {
-    console.log(`🧪 Testing emergency protocol: ${type}`);
+  public testEmergencyProtocol(_type: 'suicide_risk' | 'medical_emergency' | 'connection_loss'): void {
+    logger.crisis(`Testing emergency protocol: ${_type}`, 'critical', 'MockWebSocketAdapter');
     
-    switch (type) {
+    switch (_type) {
       case 'suicide_risk':
         this.handleEmergencyProtocol('auto_dial_988', {
           reason: 'Test suicide risk protocol',
-          sessionId: 'test-session'
+          _sessionId: 'test-session'
         });
         break;
       case 'medical_emergency':
         this.handleEmergencyProtocol('auto_dial_911', {
           reason: 'Test medical emergency protocol',
-          sessionId: 'test-session'
+          _sessionId: 'test-session'
         });
         break;
       case 'connection_loss':
@@ -416,14 +417,14 @@ export class MockWebSocketAdapter {
 
   // End call functionality for testing
   public endCall(): void {
-    console.log('📞 Ending mock crisis call session');
+    logger.info('Ending mock crisis call session', 'MockWebSocketAdapter');
     
     // Clear all active sessions
-    for (const [sessionId, session] of this.activeSessions.entries()) {
-      console.log(`Ending session: ${sessionId}`);
+    for (const [_sessionId, session] of this.activeSessions.entries()) {
+      logger.info(`Ending session: ${_sessionId}`, 'MockWebSocketAdapter');
       // Emit session end event
       this.emit('session:ended', {
-        sessionId,
+        _sessionId,
         counselorId: session.counselor.id,
         timestamp: new Date()
       });
@@ -441,4 +442,4 @@ export class MockWebSocketAdapter {
 }
 
 // Export singleton instance
-export const mockWebSocketAdapter = MockWebSocketAdapter.getInstance();
+export const _mockWebSocketAdapter = MockWebSocketAdapter.getInstance();

@@ -6,12 +6,23 @@
 import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '../../../src/utils/logger';
 
 const router = express.Router();
 
 // Simple in-memory storage (replace with database in production)
-const users = new Map<string, any>();
-const sessions = new Map<string, any>();
+interface User {
+  id: string;
+  isAnonymous: boolean;
+  createdAt: string;
+  lastActive: string;
+  preferences: {
+    theme: string;
+    notifications: boolean;
+  };
+}
+
+const users = new Map<string, User>();
 
 // Helper function to get JWT secret
 const getJWTSecret = (): string => {
@@ -56,8 +67,8 @@ router.post('/register/anonymous', async (req: Request, res: Response) => {
       message: 'Anonymous user registered successfully'
     });
 
-  } catch (error: any) {
-    console.error('Anonymous registration error:', error);
+  } catch (error) {
+    logger.error('Anonymous registration error: ', error);
     res.status(500).json({
       success: false,
       error: 'Registration failed',
@@ -78,7 +89,7 @@ router.post('/validate', async (req: Request, res: Response) => {
       });
     }
 
-    const decoded = jwt.verify(token, getJWTSecret()) as any;
+    const decoded = jwt.verify(token, getJWTSecret()) as { userId: string; isAnonymous: boolean };
     const user = users.get(decoded.userId);
 
     if (!user) {
@@ -102,8 +113,8 @@ router.post('/validate', async (req: Request, res: Response) => {
       valid: true
     });
 
-  } catch (error: any) {
-    console.error('Token validation error:', error);
+  } catch (error) {
+    logger.error('Token validation error: ', error);
     res.status(401).json({
       success: false,
       error: 'Invalid token',
@@ -124,7 +135,7 @@ router.get('/me', async (req: Request, res: Response) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, getJWTSecret()) as any;
+    const decoded = jwt.verify(token, getJWTSecret()) as { userId: string; isAnonymous: boolean };
     const user = users.get(decoded.userId);
 
     if (!user) {
@@ -145,8 +156,8 @@ router.get('/me', async (req: Request, res: Response) => {
       }
     });
 
-  } catch (error: any) {
-    console.error('Get user error:', error);
+  } catch (error) {
+    logger.error('Get user error: ', error);
     res.status(401).json({
       success: false,
       error: 'Authentication failed'

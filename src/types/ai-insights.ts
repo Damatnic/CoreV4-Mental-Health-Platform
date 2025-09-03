@@ -5,8 +5,8 @@ export interface CrisisProfile {
   userId: string;
   riskLevel: 'stable' | 'elevated' | 'high' | 'critical';
   indicators: string[];
-  patterns: any[];
-  recommendations: any[];
+  patterns: unknown[];
+  recommendations: unknown[];
   lastUpdated: Date;
 }
 
@@ -23,9 +23,9 @@ export interface AIInsightsDashboard {
   progressMetrics: ProgressMetrics;
   aiConfidence: number; // 0-1 confidence in insights
   crisisRiskPrediction?: CrisisProfile; // Optional crisis risk prediction data
-  moodAnalysis?: any; // Optional mood analysis data  
-  personalizedInterventions?: any; // Optional personalized interventions
-  therapeuticContent?: any; // Optional therapeutic content
+  moodAnalysis?: unknown; // Optional mood analysis data  
+  personalizedInterventions?: unknown; // Optional personalized interventions
+  therapeuticContent?: unknown; // Optional therapeutic content
 }
 
 // Core AI Insight Types

@@ -97,20 +97,20 @@ const WELLNESS_TIPS = [
 ];
 
 interface WellnessToolsSuiteProps {
-  initialTool?: string;
-  onToolChange?: (toolId: string) => void;
+  _initialTool?: string;
+  onToolChange?: (_toolId: string) => void;
   showNavigation?: boolean;
   compactMode?: boolean;
 }
 
 export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
-  initialTool = 'dashboard',
+  _initialTool = 'dashboard',
   onToolChange,
   showNavigation = true,
   compactMode = false
 }) => {
-  const [selectedTool, setSelectedTool] = useState(initialTool);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(compactMode);
+  const [selectedTool, setSelectedTool] = useState(_initialTool);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(_compactMode);
   const [showTips, setShowTips] = useState(true);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -120,10 +120,10 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
   const CurrentComponent = currentToolData?.component || (() => null);
 
   // Handle tool selection
-  const handleToolSelect = (toolId: string) => {
-    setSelectedTool(toolId);
-    if (onToolChange) {
-      onToolChange(toolId);
+  const handleToolSelect = (_toolId: string) => {
+    setSelectedTool(_toolId);
+    if (_onToolChange) {
+      onToolChange(_toolId);
     }
   };
 
@@ -296,7 +296,7 @@ export const WellnessToolsSuite: React.FC<WellnessToolsSuiteProps> = ({
                   <span className="text-gray-600 dark:text-gray-400">Active Session</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
-                  Today's Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
+                  Today&apos;s Wellness Score: <span className="font-semibold text-gray-900 dark:text-white">85/100</span>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
                   Streak: <span className="font-semibold text-orange-500">7 days</span>

@@ -54,7 +54,7 @@ const defaultPreferences: NavigationPreferences = {
 };
 
 // Create context
-const NavigationContext = createContext<NavigationContextState | undefined>(undefined);
+const NavigationContext = createContext<NavigationContextState | undefined>(_undefined);
 
 // Provider component
 export function NavigationProvider({ children }: { children: ReactNode }) {
@@ -63,7 +63,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const [preferences, setPreferences] = useState<NavigationPreferences>(() => {
     // Load preferences from localStorage if available
     const saved = localStorage.getItem('navigationPreferences');
-    return saved ? { ...defaultPreferences, ...JSON.parse(saved) } : defaultPreferences;
+    return saved ? { ...defaultPreferences, ...JSON.parse(_saved) } : defaultPreferences;
   });
   const [isSearchOpen, setSearchOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,7 +73,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 
   // Update breadcrumbs based on current path
   useEffect(() => {
-    const pathSegments = location.pathname.split('/').filter(Boolean);
+    const pathSegments = location.pathname.split('/').filter(_Boolean);
     const newBreadcrumbs: Array<{ label: string; path: string }> = [
       { label: 'Home', path: '/' }
     ];
@@ -85,7 +85,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       newBreadcrumbs.push({ label, path: currentPath });
     });
 
-    setBreadcrumbs(newBreadcrumbs);
+    setBreadcrumbs(_newBreadcrumbs);
   }, [location]);
 
   // Save preferences to localStorage when they change
@@ -126,11 +126,11 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       setMode('crisis');
     } else if (crisisDetected && !location.pathname.includes('/crisis')) {
       // Keep crisis mode active for a period after leaving crisis page
-      const timeout = setTimeout(() => {
+      const _timeout = setTimeout(() => {
         setCrisisDetected(false);
         setMode('normal');
       }, 5 * 60 * 1000); // 5 minutes
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(_timeout);
     }
   }, [location, crisisDetected]);
 
@@ -168,7 +168,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const quickActions = React.useMemo(() => {
     const actions = [];
     
-    if (crisisDetected) {
+    if (_crisisDetected) {
       actions.push(
         { label: 'Call Hotline', action: () => window.location.href = 'tel:988', icon: '📞' },
         { label: 'Text Support', action: () => window.location.href = 'sms:741741', icon: '💬' },
@@ -216,7 +216,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 
 // Hook to use navigation context
 export function useNavigation() {
-  const context = useContext(NavigationContext);
+  const context = useContext(_NavigationContext);
   if (!context) {
     throw new Error('useNavigation must be used within NavigationProvider');
   }

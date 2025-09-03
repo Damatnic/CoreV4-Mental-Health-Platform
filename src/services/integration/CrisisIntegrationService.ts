@@ -10,6 +10,7 @@ import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
 import { dataIntegrationService } from './DataIntegrationService';
+import { logger } from '../utils/logger';
 
 // Crisis severity levels
 export enum CrisisSeverity {
@@ -25,7 +26,7 @@ export enum CrisisEventType {
   ASSESSMENT_COMPLETED = 'assessment:completed',
   SUPPORT_REQUESTED = 'support:requested',
   COUNSELOR_CONNECTED = 'counselor:connected',
-  SAFETY_PLAN_ACTIVATED = 'safety:plan:activated',
+  SAFETY_PLAN_ACTIVATED = 'safety:_plan:activated',
   EMERGENCY_CONTACT_NOTIFIED = 'emergency:contact:notified',
   CRISIS_RESOLVED = 'crisis:resolved',
   FOLLOW_UP_SCHEDULED = 'follow:up:scheduled'
@@ -36,7 +37,7 @@ interface CrisisAssessment {
   id: string;
   userId: string;
   timestamp: Date;
-  severity: CrisisSeverity;
+  _severity: CrisisSeverity;
   riskFactors: string[];
   protectiveFactors: string[];
   suicidalIdeation: boolean;
@@ -90,7 +91,7 @@ interface ProfessionalContact {
 interface EmergencyContact {
   id: string;
   name: string;
-  type: 'hotline' | 'emergency' | 'hospital';
+  _type: 'hotline' | 'emergency' | 'hospital';
   phone: string;
   available247: boolean;
 }
@@ -102,7 +103,7 @@ interface CrisisSession {
   counselorId?: string;
   startTime: Date;
   endTime?: Date;
-  severity: CrisisSeverity;
+  _severity: CrisisSeverity;
   status: 'waiting' | 'connected' | 'escalated' | 'resolved';
   messages: CrisisMessage[];
   assessment?: CrisisAssessment;
@@ -116,16 +117,16 @@ interface CrisisMessage {
   senderId: string;
   content: string;
   timestamp: Date;
-  type: 'text' | 'system' | 'resource';
-  metadata?: any;
+  _type: 'text' | 'system' | 'resource';
+  metadata?: unknown;
 }
 
 // Crisis trigger analysis
 interface CrisisTrigger {
-  type: string;
+  _type: string;
   source: string;
   timestamp: Date;
-  data: any;
+  data: unknown;
   confidence: number;
 }
 
@@ -181,7 +182,7 @@ class CrisisIntegrationService extends EventEmitter {
     realtimeSyncService.subscribe({
       channel: 'crisis',
       events: ['alert', 'trigger', 'escalation'],
-      handler: (data) => this.handleRealtimeCrisisEvent(data)
+      handler: (_data) => this.handleRealtimeCrisisEvent(_data)
     });
     
     // Start periodic risk assessment
@@ -192,13 +193,13 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Analyze mood entries for crisis indicators
    */
-  private analyzeMoodForCrisis(moodEntry: any) {
+  private analyzeMoodForCrisis(moodEntry: unknown) {
     const triggers: CrisisTrigger[] = [];
     
     // Check mood score threshold
     if (moodEntry.moodScore <= this.RISK_THRESHOLDS.moodScore) {
       triggers.push({
-        type: 'low_mood',
+        _type: 'low_mood',
         source: 'mood_tracker',
         timestamp: new Date(),
         data: { score: moodEntry.moodScore },
@@ -209,7 +210,7 @@ class CrisisIntegrationService extends EventEmitter {
     // Check stress and anxiety levels
     if (moodEntry.stressLevel >= this.RISK_THRESHOLDS.stressLevel) {
       triggers.push({
-        type: 'high_stress',
+        _type: 'high_stress',
         source: 'mood_tracker',
         timestamp: new Date(),
         data: { level: moodEntry.stressLevel },
@@ -219,7 +220,7 @@ class CrisisIntegrationService extends EventEmitter {
     
     if (moodEntry.anxietyLevel >= this.RISK_THRESHOLDS.anxietyLevel) {
       triggers.push({
-        type: 'high_anxiety',
+        _type: 'high_anxiety',
         source: 'mood_tracker',
         timestamp: new Date(),
         data: { level: moodEntry.anxietyLevel },
@@ -232,9 +233,9 @@ class CrisisIntegrationService extends EventEmitter {
     const emotions = moodEntry.emotions || [];
     
     for (const trigger of this.RISK_THRESHOLDS.negativeTriggers) {
-      if (notes.includes(trigger) || emotions.includes(trigger)) {
+      if (notes.includes(_trigger) || emotions.includes(_trigger)) {
         triggers.push({
-          type: 'crisis_keyword',
+          _type: 'crisis_keyword',
           source: 'mood_tracker',
           timestamp: new Date(),
           data: { keyword: trigger },
@@ -245,14 +246,14 @@ class CrisisIntegrationService extends EventEmitter {
     
     // Assess combined risk
     if (triggers.length > 0) {
-      this.assessCrisisRisk(triggers);
+      this.assessCrisisRisk(_triggers);
     }
   }
   
   /**
    * Analyze activity patterns for crisis indicators
    */
-  private analyzeActivityPatterns(activities: any[]) {
+  private analyzeActivityPatterns(activities: unknown[]) {
     const now = new Date();
     const recentActivities = activities.filter(a => {
       const activityDate = new Date(a.completedAt || a.scheduledTime);
@@ -261,16 +262,16 @@ class CrisisIntegrationService extends EventEmitter {
     });
     
     // Check for inactivity
-    const lastActivityDate = recentActivities
+    const _lastActivityDate = recentActivities
       .filter(a => a.completed)
       .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0]?.completedAt;
     
-    if (lastActivityDate) {
-      const inactiveDays = (now.getTime() - new Date(lastActivityDate).getTime()) / (1000 * 60 * 60 * 24);
+    if (_lastActivityDate) {
+      const inactiveDays = (now.getTime() - new Date(_lastActivityDate).getTime()) / (1000 * 60 * 60 * 24);
       
       if (inactiveDays >= this.RISK_THRESHOLDS.inactivityDays) {
         this.assessCrisisRisk([{
-          type: 'inactivity',
+          _type: 'inactivity',
           source: 'activity_tracker',
           timestamp: now,
           data: { days: inactiveDays },
@@ -285,7 +286,7 @@ class CrisisIntegrationService extends EventEmitter {
     
     if (missedMedications.length >= this.RISK_THRESHOLDS.missedMedications) {
       this.assessCrisisRisk([{
-        type: 'missed_medications',
+        _type: 'missed_medications',
         source: 'medication_tracker',
         timestamp: now,
         data: { count: missedMedications.length },
@@ -302,16 +303,16 @@ class CrisisIntegrationService extends EventEmitter {
     const riskScore = triggers.reduce((sum, trigger) => sum + trigger.confidence, 0) / triggers.length;
     const highConfidenceTriggers = triggers.filter(t => t.confidence >= 0.8);
     
-    let severity: CrisisSeverity;
+    let _severity: CrisisSeverity;
     
-    if (highConfidenceTriggers.some(t => t.type === 'crisis_keyword')) {
-      severity = CrisisSeverity.CRITICAL;
+    if (highConfidenceTriggers.some(t => t._type === 'crisis_keyword')) {
+      _severity = CrisisSeverity.CRITICAL;
     } else if (riskScore >= 0.8 || highConfidenceTriggers.length >= 2) {
-      severity = CrisisSeverity.HIGH;
+      _severity = CrisisSeverity.HIGH;
     } else if (riskScore >= 0.6) {
-      severity = CrisisSeverity.MEDIUM;
+      _severity = CrisisSeverity.MEDIUM;
     } else {
-      severity = CrisisSeverity.LOW;
+      _severity = CrisisSeverity.LOW;
     }
     
     // Create assessment
@@ -319,7 +320,7 @@ class CrisisIntegrationService extends EventEmitter {
       id: `assessment-${Date.now()}`,
       userId: 'current-user', // Get from auth context
       timestamp: new Date(),
-      severity,
+      _severity,
       riskFactors: triggers.map(t => t.type),
       protectiveFactors: this.identifyProtectiveFactors(),
       suicidalIdeation: triggers.some(t => t.data?.keyword?.includes('suicidal')),
@@ -330,17 +331,17 @@ class CrisisIntegrationService extends EventEmitter {
       previousAttempts: 0, // From user history
       substanceUse: false, // From user data
       socialSupport: true, // From community engagement
-      recommendations: this.generateRecommendations(severity, triggers)
+      recommendations: this.generateRecommendations(_severity, triggers)
     };
     
     // Queue assessment
-    this.assessmentQueue.push(assessment);
+    this.assessmentQueue.push(_assessment);
     
     // Emit event
     this.emit(CrisisEventType.RISK_DETECTED, assessment);
     
     // Take action based on severity
-    this.handleCrisisDetection(assessment);
+    this.handleCrisisDetection(_assessment);
   }
   
   /**
@@ -374,20 +375,20 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Generate recommendations based on assessment
    */
-  private generateRecommendations(severity: CrisisSeverity, triggers: CrisisTrigger[]): string[] {
+  private generateRecommendations(_severity: CrisisSeverity, triggers: CrisisTrigger[]): string[] {
     const recommendations: string[] = [];
     
-    switch (severity) {
+    switch (_severity) {
       case CrisisSeverity.CRITICAL:
         recommendations.push('Immediate crisis support recommended');
         recommendations.push('Contact emergency services if in immediate danger');
-        recommendations.push('Activate safety plan');
+        recommendations.push('Activate safety _plan');
         recommendations.push('Reach out to emergency contact');
         break;
         
       case CrisisSeverity.HIGH:
         recommendations.push('Connect with crisis counselor');
-        recommendations.push('Review and update safety plan');
+        recommendations.push('Review and update safety _plan');
         recommendations.push('Contact support person');
         recommendations.push('Use crisis coping strategies');
         break;
@@ -395,7 +396,7 @@ class CrisisIntegrationService extends EventEmitter {
       case CrisisSeverity.MEDIUM:
         recommendations.push('Practice coping strategies');
         recommendations.push('Reach out to support network');
-        recommendations.push('Schedule therapy session');
+        recommendations.push('Schedule therapy _session');
         recommendations.push('Engage in self-care activities');
         break;
         
@@ -423,20 +424,20 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private async handleCrisisDetection(assessment: CrisisAssessment) {
     // Log crisis event
-    console.log('Crisis detected:', assessment);
+    logger.info('Crisis detected:', assessment);
     
     // Update stores
     useWellnessStore.getState().recordCrisisEvent({
-      severity: assessment.severity === CrisisSeverity.CRITICAL ? 'critical' : 
-                assessment.severity === CrisisSeverity.HIGH ? 'high' : 
-                assessment.severity === CrisisSeverity.MEDIUM ? 'medium' : 'low',
+      _severity: assessment._severity === CrisisSeverity.CRITICAL ? 'critical' : 
+                assessment._severity === CrisisSeverity.HIGH ? 'high' : 
+                assessment._severity === CrisisSeverity.MEDIUM ? 'medium' : 'low',
       triggers: [],
       copingStrategiesUsed: [],
       supportContactsReached: [],
       outcome: 'in_progress',
       duration: 0,
       followUpNeeded: true,
-      notes: `Crisis assessment detected: ${assessment.severity}`
+      notes: `Crisis assessment detected: ${assessment._severity}`
     });
     
     // Send real-time alert
@@ -459,18 +460,18 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Start crisis support session
    */
-  public async startCrisisSession(severity: CrisisSeverity = CrisisSeverity.HIGH): Promise<CrisisSession> {
-    // End existing session if any
+  public async startCrisisSession(_severity: CrisisSeverity = CrisisSeverity.HIGH): Promise<CrisisSession> {
+    // End existing _session if any
     if (this.currentSession && this.currentSession.status !== 'resolved') {
       await this.endCrisisSession('new_session_started');
     }
     
     // Create new session
     this.currentSession = {
-      id: `session-${Date.now()}`,
+      id: `_session-${Date.now()}`,
       userId: 'current-user',
       startTime: new Date(),
-      severity,
+      _severity,
       status: 'waiting',
       messages: [],
       safetyPlanActivated: false,
@@ -483,7 +484,7 @@ class CrisisIntegrationService extends EventEmitter {
     // Request counselor connection
     realtimeSyncService.send('crisis', 'request_support', {
       sessionId: this.currentSession.id,
-      severity,
+      _severity,
       userId: this.currentSession.userId
     });
     
@@ -493,7 +494,7 @@ class CrisisIntegrationService extends EventEmitter {
       senderId: 'system',
       content: 'Connecting you with crisis support. You are not alone.',
       timestamp: new Date(),
-      type: 'system'
+      _type: 'system'
     });
     
     return this.currentSession;
@@ -502,16 +503,16 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Add message to crisis session
    */
-  public addSessionMessage(message: CrisisMessage) {
+  public addSessionMessage(_message: CrisisMessage) {
     if (!this.currentSession) return;
     
-    this.currentSession.messages.push(message);
+    this.currentSession.messages.push(_message);
     
     // Send via real-time if connected
     if (this.currentSession.status === 'connected') {
-      realtimeSyncService.send('crisis', 'message', {
+      realtimeSyncService.send('crisis', '_message', {
         sessionId: this.currentSession.id,
-        message
+        _message
       });
     }
   }
@@ -535,7 +536,7 @@ class CrisisIntegrationService extends EventEmitter {
       senderId: 'system',
       content: 'A crisis counselor has joined the session.',
       timestamp: new Date(),
-      type: 'system'
+      _type: 'system'
     });
   }
   
@@ -544,7 +545,7 @@ class CrisisIntegrationService extends EventEmitter {
    */
   public activateSafetyPlan() {
     if (!this.safetyPlan) {
-      console.warn('No safety plan available');
+      logger.warn('No safety _plan available');
       return;
     }
     
@@ -569,11 +570,11 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Contact emergency services
    */
-  public async contactEmergencyServices(contactId: string) {
-    const contact = this.safetyPlan?.emergencyContacts.find(c => c.id === contactId);
+  public async contactEmergencyServices(_contactId: string) {
+    const contact = this.safetyPlan?.emergencyContacts.find(c => c.id === _contactId);
     
     if (!contact) {
-      console.error('Emergency contact not found');
+      logger.error('Emergency contact not found');
       return;
     }
     
@@ -588,21 +589,21 @@ class CrisisIntegrationService extends EventEmitter {
     });
     
     // In real implementation, would trigger actual contact
-    console.log('Contacting emergency services:', contact);
+    logger.info('Contacting emergency services:', contact);
   }
   
   /**
    * End crisis session
    */
-  public async endCrisisSession(reason: string = 'resolved') {
+  public async endCrisisSession(_reason: string = 'resolved') {
     if (!this.currentSession) return;
     
     this.currentSession.endTime = new Date();
     this.currentSession.status = 'resolved';
     
     // Schedule follow-up if needed
-    if (this.currentSession.severity === CrisisSeverity.HIGH || 
-        this.currentSession.severity === CrisisSeverity.CRITICAL) {
+    if (this.currentSession._severity === CrisisSeverity.HIGH || 
+        this.currentSession._severity === CrisisSeverity.CRITICAL) {
       const followUpDate = new Date();
       followUpDate.setHours(followUpDate.getHours() + 24); // 24 hours later
       this.currentSession.followUpScheduled = followUpDate;
@@ -615,7 +616,7 @@ class CrisisIntegrationService extends EventEmitter {
     
     this.emit(CrisisEventType.CRISIS_RESOLVED, {
       sessionId: this.currentSession.id,
-      reason,
+      _reason,
       duration: this.currentSession.endTime.getTime() - this.currentSession.startTime.getTime()
     });
     
@@ -628,11 +629,11 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Store session history - SECURITY: Using secure storage
    */
-  private storeSessionHistory(session: CrisisSession) {
+  private storeSessionHistory(_session: CrisisSession) {
     // Store in secure storage (encrypted for sensitive crisis data)
     const history = JSON.parse(secureStorage.getItem('crisis_sessions') || '[]');
-    history.push(session);
-    secureStorage.setItem('crisis_sessions', JSON.stringify(history));
+    history.push(_session);
+    secureStorage.setItem('crisis_sessions', JSON.stringify(_history));
   }
   
   /**
@@ -640,19 +641,19 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private loadSafetyPlan() {
     // Load from secure storage (crisis safety plans are sensitive data)
-    const stored = secureStorage.getItem('safety_plan');
-    if (stored) {
-      this.safetyPlan = JSON.parse(stored);
+    const _stored = secureStorage.getItem('safety_plan');
+    if (_stored) {
+      this.safetyPlan = JSON.parse(_stored);
     }
   }
   
   /**
    * Update safety plan
    */
-  public updateSafetyPlan(plan: Partial<SafetyPlan>) {
+  public updateSafetyPlan(_plan: Partial<SafetyPlan>) {
     this.safetyPlan = {
       ...this.safetyPlan,
-      ...plan,
+      ..._plan,
       lastUpdated: new Date()
     } as SafetyPlan;
     
@@ -693,10 +694,10 @@ class CrisisIntegrationService extends EventEmitter {
     
     // Declining mood pattern
     if (recentMoods.length >= 3) {
-      const trend = this.calculateMoodTrend(recentMoods);
+      const trend = this.calculateMoodTrend(_recentMoods);
       if (trend < -0.5) {
         triggers.push({
-          type: 'declining_mood_trend',
+          _type: 'declining_mood_trend',
           source: 'periodic_assessment',
           timestamp: new Date(),
           data: { trend },
@@ -709,7 +710,7 @@ class CrisisIntegrationService extends EventEmitter {
     const socialActivities = recentActivities.filter(a => a.category === 'social');
     if (socialActivities.length === 0) {
       triggers.push({
-        type: 'social_isolation',
+        _type: 'social_isolation',
         source: 'periodic_assessment',
         timestamp: new Date(),
         data: { hours: 24 },
@@ -718,14 +719,14 @@ class CrisisIntegrationService extends EventEmitter {
     }
     
     if (triggers.length > 0) {
-      this.assessCrisisRisk(triggers);
+      this.assessCrisisRisk(_triggers);
     }
   }
   
   /**
    * Calculate mood trend
    */
-  private calculateMoodTrend(moods: any[]): number {
+  private calculateMoodTrend(moods: unknown[]): number {
     if (moods.length < 2) return 0;
     
     const scores = moods.map(m => m.moodScore);
@@ -741,10 +742,10 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Handle real-time crisis event
    */
-  private handleRealtimeCrisisEvent(data: any) {
-    const { type, payload } = data;
+  private handleRealtimeCrisisEvent(data: unknown) {
+    const { _type, payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'counselor_available':
         if (this.currentSession && this.currentSession.status === 'waiting') {
           this.connectCounselor(payload.counselorId);
@@ -753,14 +754,14 @@ class CrisisIntegrationService extends EventEmitter {
         
       case 'message_received':
         if (this.currentSession) {
-          this.currentSession.messages.push(payload.message);
+          this.currentSession.messages.push(payload._message);
         }
         break;
         
       case 'escalation_required':
         if (this.currentSession) {
           this.currentSession.status = 'escalated';
-          this.contactEmergencyServices(payload.contactId);
+          this.contactEmergencyServices(payload._contactId);
         }
         break;
     }
@@ -786,10 +787,10 @@ class CrisisIntegrationService extends EventEmitter {
    */
   public cleanup() {
     // Clear timers
-    this.riskMonitors.forEach(timer => clearInterval(timer));
+    this.riskMonitors.forEach(_timer => clearInterval(_timer));
     this.riskMonitors.clear();
     
-    // End session if active
+    // End _session if active
     if (this.currentSession) {
       this.endCrisisSession('service_cleanup');
     }
@@ -799,21 +800,21 @@ class CrisisIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const crisisIntegrationService = CrisisIntegrationService.getInstance();
+export const _crisisIntegrationService = CrisisIntegrationService.getInstance();
 
 // Export React hook
 export function useCrisisIntegration() {
   const service = CrisisIntegrationService.getInstance();
   
   return {
-    startSession: (severity?: CrisisSeverity) => service.startCrisisSession(severity),
-    endSession: (reason?: string) => service.endCrisisSession(reason),
+    startSession: (_severity?: CrisisSeverity) => service.startCrisisSession(_severity),
+    endSession: (_reason?: string) => service.endCrisisSession(_reason),
     activateSafetyPlan: () => service.activateSafetyPlan(),
-    updateSafetyPlan: (plan: Partial<SafetyPlan>) => service.updateSafetyPlan(plan),
-    contactEmergency: (contactId: string) => service.contactEmergencyServices(contactId),
-    sendMessage: (message: CrisisMessage) => service.addSessionMessage(message),
+    updateSafetyPlan: (_plan: Partial<SafetyPlan>) => service.updateSafetyPlan(_plan),
+    contactEmergency: (_contactId: string) => service.contactEmergencyServices(_contactId),
+    sendMessage: (_message: CrisisMessage) => service.addSessionMessage(_message),
     getStatus: () => service.getCrisisStatus(),
-    on: (event: CrisisEventType, callback: (...args: any[]) => void) => {
+    on: (event: CrisisEventType, callback: (...args: unknown[]) => void) => {
       service.on(event, callback);
       return () => service.off(event, callback);
     }

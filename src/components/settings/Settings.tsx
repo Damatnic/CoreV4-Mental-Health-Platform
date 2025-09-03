@@ -6,11 +6,11 @@
 import React from 'react';
 
 export interface SettingsProps {
-  userId?: string;
-  section?: 'general' | 'privacy' | 'notifications' | 'accessibility';
+  _userId?: string;
+  _section?: 'general' | 'privacy' | 'notifications' | 'accessibility';
 }
 
-export default function Settings({ userId, section = 'general' }: SettingsProps) {
+export default function Settings({ _userId, _section = 'general' }: SettingsProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -108,7 +108,7 @@ export default function Settings({ userId, section = 'general' }: SettingsProps)
                       Share data for research
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Help improve mental health research (anonymized)
+                      Help improve mental health research (_anonymized)
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">

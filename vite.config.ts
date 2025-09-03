@@ -5,7 +5,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ command: _command, mode }) => {
   const isProduction = mode === 'production';
   
   return {
@@ -185,7 +185,7 @@ export default defineConfig(({ command, mode }) => {
       module: true,
     } : undefined,
     rollupOptions: {
-      external: (id) => {
+      external: (_id) => {
         // Don't externalize scheduler - keep it bundled with React
         return false;
       },
@@ -324,7 +324,6 @@ export default defineConfig(({ command, mode }) => {
           }
         },
         chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
           return `assets/js/${chunkInfo.name}-[hash].js`;
         },
         entryFileNames: 'assets/js/[name]-[hash].js',

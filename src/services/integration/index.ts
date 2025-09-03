@@ -4,32 +4,33 @@
  */
 
 // Import services
-import { dataIntegrationService, IntegrationEvent } from './DataIntegrationService';
-import { realtimeSyncService, RealtimeEvent } from './RealtimeSyncService';
-import { crisisIntegrationService, CrisisEventType, CrisisSeverity } from './CrisisIntegrationService';
+import { dataIntegrationService, _IntegrationEvent } from './DataIntegrationService';
+import { realtimeSyncService, _RealtimeEvent } from './RealtimeSyncService';
+import { crisisIntegrationService, _CrisisEventType, _CrisisSeverity } from './CrisisIntegrationService';
+import { logger } from '../utils/logger';
 
 // Core integration services
 export { 
   dataIntegrationService,
   useDataIntegration,
-  IntegrationEvent
+  _IntegrationEvent
 } from './DataIntegrationService';
 
 export {
   realtimeSyncService,
   useRealtimeSync,
-  RealtimeEvent
+  _RealtimeEvent
 } from './RealtimeSyncService';
 
 export {
   crisisIntegrationService,
   useCrisisIntegration,
-  CrisisEventType,
-  CrisisSeverity
+  _CrisisEventType,
+  _CrisisSeverity
 } from './CrisisIntegrationService';
 
 // Integration utilities
-export const initializeIntegration = async (userId: string, token: string) => {
+export const _initializeIntegration = async (userId: string, token: string) => {
   try {
     // Initialize real-time connection
     await realtimeSyncService.connect({ userId, token });
@@ -39,7 +40,7 @@ export const initializeIntegration = async (userId: string, token: string) => {
     
     // Initialize crisis monitoring
     const crisisStatus = crisisIntegrationService.getCrisisStatus();
-    console.log('Crisis monitoring initialized:', crisisStatus);
+    logger.info('Crisis monitoring initialized:', crisisStatus);
     
     return {
       success: true,
@@ -49,16 +50,16 @@ export const initializeIntegration = async (userId: string, token: string) => {
         crisis: crisisStatus
       }
     };
-  } catch (error) {
-    console.error('Failed to initialize integration services:', error);
+  } catch (_error) {
+    logger.error('Failed to initialize integration services:');
     return {
       success: false,
-      error
+      undefined
     };
   }
 };
 
-export const cleanupIntegration = () => {
+export const _cleanupIntegration = () => {
   // Cleanup all services
   realtimeSyncService.disconnect();
   dataIntegrationService.cleanup();

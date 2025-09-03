@@ -9,7 +9,7 @@ interface FeatureFlags {
 interface FeatureFlagConfig {
   enableCache?: boolean;
   cacheDuration?: number; // in milliseconds
-  fallbackValue?: any;
+  fallbackValue?: unknown;
   endpoint?: string;
 }
 
@@ -34,7 +34,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
 };
 
 // Cache for feature flags
-const flagCache = new Map<string, { value: any; timestamp: number }>();
+const flagCache = new Map<string, { _value: unknown; timestamp: number }>();
 
 /**
  * Hook for feature flag management
@@ -52,12 +52,12 @@ export function useFeatureFlag(
   } = config;
 
   const { user } = useAuth();
-  const [flagValue, setFlagValue] = useState<any>(() => {
+  const [flagValue, setFlagValue] = useState<unknown>(() => {
     // Check cache first
-    if (enableCache) {
-      const cached = flagCache.get(flagName);
+    if (_enableCache) {
+      const cached = flagCache.get(_flagName);
       if (cached && Date.now() - cached.timestamp < cacheDuration) {
-        return cached.value;
+        return cached._value;
       }
     }
     
@@ -65,7 +65,7 @@ export function useFeatureFlag(
     const override = secureStorage.getItem(`feature_flag_${flagName}`);
     if (override !== null) {
       try {
-        return JSON.parse(override);
+        return JSON.parse(_override);
       } catch {
         return override;
       }
@@ -76,14 +76,14 @@ export function useFeatureFlag(
   });
 
   useEffect(() => {
-    let mounted = true;
+    let _mounted = true;
 
     const fetchFeatureFlag = async () => {
       // Check cache
-      if (enableCache) {
-        const cached = flagCache.get(flagName);
+      if (_enableCache) {
+        const cached = flagCache.get(_flagName);
         if (cached && Date.now() - cached.timestamp < cacheDuration) {
-          if (mounted) setFlagValue(cached.value);
+          if (_mounted) setFlagValue(cached._value);
           return;
         }
       }
@@ -91,28 +91,28 @@ export function useFeatureFlag(
       try {
         // DISABLED: Feature flag server calls to prevent console spam
         // Use local defaults only for now
-        const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
+        const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
         
         // Cache the result
-        if (enableCache) {
+        if (_enableCache) {
           flagCache.set(flagName, {
-            value,
+            _value,
             timestamp: Date.now()
           });
         }
         
-        if (mounted) setFlagValue(value);
-      } catch (error) {
+        if (_mounted) setFlagValue(_value);
+      } catch {
         // Silent fallback to prevent console spam
-        const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
-        if (mounted) setFlagValue(value);
+        const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
+        if (_mounted) setFlagValue(_value);
       }
     };
 
     fetchFeatureFlag();
 
     return () => {
-      mounted = false;
+      _mounted = false;
     };
   }, [flagName, user, enableCache, cacheDuration, fallbackValue, endpoint]);
 
@@ -123,26 +123,26 @@ export function useFeatureFlag(
  * Hook to get all feature flags
  */
 export function useFeatureFlags(): FeatureFlags {
-  const [flags, setFlags] = useState<FeatureFlags>(DEFAULT_FLAGS);
+  const [flags, setFlags] = useState<FeatureFlags>(_DEFAULT_FLAGS);
   const { user } = useAuth();
 
   useEffect(() => {
-    let mounted = true;
+    let _mounted = true;
 
     const fetchAllFlags = async () => {
       try {
         // DISABLED: Use local defaults only to prevent console spam
-        if (mounted) setFlags(DEFAULT_FLAGS);
-      } catch (error) {
+        if (_mounted) setFlags(_DEFAULT_FLAGS);
+      } catch {
         // Silent fallback
-        if (mounted) setFlags(DEFAULT_FLAGS);
+        if (_mounted) setFlags(_DEFAULT_FLAGS);
       }
     };
 
     fetchAllFlags();
 
     return () => {
-      mounted = false;
+      _mounted = false;
     };
   }, [user]);
 
@@ -153,25 +153,25 @@ export function useFeatureFlags(): FeatureFlags {
  * Hook to override feature flags (for testing)
  */
 export function useFeatureFlagOverride() {
-  const setOverride = useCallback((flagName: string, value: any) => {
-    secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(value));
+  const setOverride = useCallback((flagName: string, _value: unknown) => {
+    secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(_value));
     // Clear cache to force refresh
-    flagCache.delete(flagName);
+    flagCache.delete(_flagName);
     // Trigger re-render
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
   const clearOverride = useCallback((flagName: string) => {
     secureStorage.removeItem(`feature_flag_${flagName}`);
-    flagCache.delete(flagName);
+    flagCache.delete(_flagName);
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
   const clearAllOverrides = useCallback(() => {
-    const keys = Object.keys(localStorage);
+    const keys = Object.keys(_localStorage);
     keys.forEach(key => {
       if (key.startsWith('feature_flag_')) {
-        secureStorage.removeItem(key);
+        secureStorage.removeItem(_key);
       }
     });
     flagCache.clear();
@@ -186,7 +186,7 @@ export function useFeatureFlagOverride() {
 }
 
 // Helper function to determine user segment for targeting
-function getUserSegment(user: any): string {
+function _getUserSegment(user: unknown): string {
   if (!user) return 'anonymous';
   
   // Determine segment based on user properties

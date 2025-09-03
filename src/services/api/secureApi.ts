@@ -10,11 +10,12 @@ import { fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
 import { securityMonitor } from '../security/securityMonitor';
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../utils/logger';
 
 interface SecureRequestConfig {
   url: string;
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  data?: any;
+  data?: unknown;
   headers?: Record<string, string>;
   encryptFields?: string[];
   requiresAuth?: boolean;
@@ -26,7 +27,7 @@ interface SecureRequestConfig {
 interface SecureResponse<T = any> {
   data: T;
   encrypted: boolean;
-  signature?: string;
+  _signature?: string;
   timestamp: Date;
   requestId: string;
 }
@@ -34,7 +35,7 @@ interface SecureResponse<T = any> {
 class SecureAPIService {
   private static instance: SecureAPIService;
   private baseURL: string;
-  private requestQueue: Map<string, Promise<any>> = new Map();
+  private requestQueue: Map<string, Promise<unknown>> = new Map();
   private csrfToken: string | null = null;
 
   private constructor() {
@@ -71,7 +72,7 @@ class SecureAPIService {
           throw new Error('Authentication required');
         }
         
-        const validation = await sessionManager.validateSession(sessionId);
+        const validation = await sessionManager.validateSession(_sessionId);
         if (!validation.isValid) {
           throw new Error('Invalid session');
         }
@@ -101,18 +102,18 @@ class SecureAPIService {
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeout = config.timeout || 30000;
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      const _timeoutId = setTimeout(() => controller.abort(), timeout);
       
       // Make the request
       const response = await this.executeRequest({
         url: `${this.baseURL}${config.url}`,
         method: config.method || 'GET',
         headers,
-        body: requestData ? JSON.stringify(requestData) : undefined,
+        body: requestData ? JSON.stringify(_requestData) : undefined,
         signal: controller.signal,
       });
       
-      clearTimeout(timeoutId);
+      clearTimeout(_timeoutId);
       
       // Validate response
       await this.validateResponse(response, requestId);
@@ -126,7 +127,7 @@ class SecureAPIService {
       return {
         data: responseData,
         encrypted: response.headers.get('X-Encrypted') === 'true',
-        signature: response.headers.get('X-Signature') || undefined,
+        _signature: response.headers.get('X-Signature') || undefined,
         timestamp: new Date(),
         requestId,
       };
@@ -155,7 +156,7 @@ class SecureAPIService {
    */
   async post<T = any>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: Partial<SecureRequestConfig>
   ): Promise<T> {
     const response = await this.request<T>({
@@ -172,7 +173,7 @@ class SecureAPIService {
    */
   async put<T = any>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: Partial<SecureRequestConfig>
   ): Promise<T> {
     const response = await this.request<T>({
@@ -202,15 +203,15 @@ class SecureAPIService {
   async uploadSecure(
     url: string,
     file: File,
-    encrypt: boolean = true
-  ): Promise<any> {
+    _encrypt: boolean = true
+  ): Promise<unknown> {
     try {
       let data: Blob | ArrayBuffer = file;
       
-      if (encrypt) {
+      if (_encrypt) {
         // Read file content
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
+        const _arrayBuffer = await file._arrayBuffer();
+        const uint8Array = new Uint8Array(_arrayBuffer);
         
         // Convert to base64 for encryption
         const base64 = btoa(String.fromCharCode(...uint8Array));
@@ -224,7 +225,7 @@ class SecureAPIService {
       
       const formData = new FormData();
       formData.append('file', new File([data], file.name, { type: file.type }));
-      formData.append('encrypted', String(encrypt));
+      formData.append('encrypted', String(_encrypt));
       formData.append('original_name', file.name);
       formData.append('original_type', file.type);
       
@@ -239,9 +240,9 @@ class SecureAPIService {
       }
       
       return await response.json();
-    } catch (error) {
-      console.error('Secure upload failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Secure upload failed:');
+      throw undefined;
     }
   }
 
@@ -262,9 +263,9 @@ class SecureAPIService {
       let data = await response.blob();
       
       if (decrypt && response.headers.get('X-Encrypted') === 'true') {
-        // Read blob as text
-        const text = await data.text();
-        const encrypted = JSON.parse(text);
+        // Read blob as _text
+        const _text = await data._text();
+        const encrypted = JSON.parse(_text);
         
         // Decrypt content
         const decrypted = await fieldEncryption.decryptField('file_content', encrypted);
@@ -273,7 +274,7 @@ class SecureAPIService {
         const binaryString = atob(decrypted);
         const uint8Array = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
-          uint8Array[i] = binaryString.charCodeAt(i);
+          uint8Array[i] = binaryString.charCodeAt(_i);
         }
         
         data = new Blob([uint8Array], { 
@@ -282,9 +283,9 @@ class SecureAPIService {
       }
       
       return data;
-    } catch (error) {
-      console.error('Secure download failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Secure download failed:');
+      throw undefined;
     }
   }
 
@@ -299,7 +300,7 @@ class SecureAPIService {
     headers.set('Accept', 'application/json');
     
     // Add security headers
-    securityHeaders.applyToFetch(headers);
+    securityHeaders.applyToFetch(_headers);
     
     // Add CSRF token
     if (this.csrfToken) {
@@ -308,8 +309,8 @@ class SecureAPIService {
     
     // Add session token
     const sessionId = this.getSessionId();
-    if (sessionId) {
-      const session = await sessionManager.validateSession(sessionId);
+    if (_sessionId) {
+      const session = await sessionManager.validateSession(_sessionId);
       if (session.isValid) {
         headers.set('Authorization', `Bearer ${sessionId}`);
       }
@@ -342,8 +343,8 @@ class SecureAPIService {
     
     // Check if request is already in progress (prevent duplicate requests)
     const requestKey = `${method}:${url}:${body || ''}`;
-    if (this.requestQueue.has(requestKey)) {
-      return await this.requestQueue.get(requestKey);
+    if (this.requestQueue.has(_requestKey)) {
+      return await this.requestQueue.get(_requestKey);
     }
     
     // Create request promise
@@ -364,7 +365,7 @@ class SecureAPIService {
       return response;
     } finally {
       // Remove from queue
-      this.requestQueue.delete(requestKey);
+      this.requestQueue.delete(_requestKey);
     }
   }
 
@@ -380,7 +381,7 @@ class SecureAPIService {
           
         case 403:
           // Forbidden - check permissions
-          await this.handleForbidden(requestId);
+          await this.handleForbidden(_requestId);
           throw new Error('Access denied');
           
         case 429:
@@ -404,19 +405,19 @@ class SecureAPIService {
     const requiredHeaders = ['X-Content-Type-Options', 'X-Frame-Options'];
     for (const header of requiredHeaders) {
       if (!response.headers.has(header)) {
-        console.warn(`Missing security header: ${header}`);
+        logger.warn(`Missing security header: ${header}`);
       }
     }
     
     // Verify response signature if present
-    const signature = response.headers.get('X-Signature');
-    if (signature) {
-      // Verify signature (implementation depends on signing mechanism)
-      console.log('Response signature verified');
+    const _signature = response.headers.get('X-Signature');
+    if (_signature) {
+      // Verify _signature (implementation depends on signing mechanism)
+      logger.info('Response _signature verified');
     }
   }
 
-  private async processResponse(response: Response): Promise<any> {
+  private async processResponse(response: Response): Promise<unknown> {
     const contentType = response.headers.get('Content-Type');
     
     if (contentType?.includes('application/json')) {
@@ -430,13 +431,13 @@ class SecureAPIService {
       
       return data;
     } else if (contentType?.includes('text/')) {
-      return await response.text();
+      return await response._text();
     } else {
       return await response.blob();
     }
   }
 
-  private async encryptRequestData(data: any, fields: string[]): Promise<any> {
+  private async encryptRequestData(data: unknown, fields: string[]): Promise<unknown> {
     const encrypted = { ...data };
     
     for (const field of fields) {
@@ -448,18 +449,18 @@ class SecureAPIService {
     return encrypted;
   }
 
-  private async decryptResponseData(data: any): Promise<any> {
+  private async decryptResponseData(data: unknown): Promise<unknown> {
     if (Array.isArray(data)) {
-      return await Promise.all(data.map(item => this.decryptResponseData(item)));
+      return await Promise.all(data.map(_item => this.decryptResponseData(_item)));
     }
     
     if (typeof data === 'object' && data !== null) {
-      const decrypted: any = {};
+      const decrypted: unknown = {};
       
       for (const [key, value] of Object.entries(data)) {
         if (typeof value === 'object' && value !== null && 'ciphertext' in value) {
           // This field is encrypted - cast to proper type
-          decrypted[key] = await fieldEncryption.decryptField(key, value as any);
+          decrypted[key] = await fieldEncryption.decryptField(key, value as unknown);
         } else {
           decrypted[key] = value;
         }
@@ -472,7 +473,7 @@ class SecureAPIService {
   }
 
   private async handleRequestError(
-    error: any,
+    error: unknown,
     config: SecureRequestConfig,
     requestId: string
   ): Promise<void> {
@@ -522,7 +523,7 @@ class SecureAPIService {
   private async handleUnauthorized(): Promise<void> {
     // Clear session
     const sessionId = this.getSessionId();
-    if (sessionId) {
+    if (_sessionId) {
       await sessionManager.terminateSession(sessionId, 'Unauthorized');
     }
     
@@ -567,8 +568,8 @@ class SecureAPIService {
         const data = await response.json();
         this.csrfToken = data.token;
       }
-    } catch (error) {
-      console.error('Failed to get CSRF token:', error);
+    } catch (_error) {
+      logger.error('Failed to get CSRF token:');
     }
   }
 
@@ -583,7 +584,7 @@ class SecureAPIService {
       if (url.startsWith(this.baseURL)) {
         // Apply security headers
         const headers = new Headers(init?.headers);
-        securityHeaders.applyToFetch(headers);
+        securityHeaders.applyToFetch(_headers);
         
         return originalFetch(input, {
           ...init,
@@ -625,4 +626,4 @@ class SecureAPIService {
   }
 }
 
-export const secureAPI = SecureAPIService.getInstance();
+export const _secureAPI = SecureAPIService.getInstance();

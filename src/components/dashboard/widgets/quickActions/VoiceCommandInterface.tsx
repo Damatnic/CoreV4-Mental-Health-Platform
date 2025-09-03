@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface VoiceCommandInterfaceProps {
   isActive: boolean;
@@ -22,7 +23,7 @@ export function VoiceCommandInterface({
   const [errorMessage, setErrorMessage] = useState('');
   const [volume, setVolume] = useState(0);
   
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<unknown>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -41,7 +42,7 @@ export function VoiceCommandInterface({
   useEffect(() => {
     if (!isActive) return;
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
       setErrorMessage('Voice commands not supported in this browser');
@@ -61,8 +62,8 @@ export function VoiceCommandInterface({
       initializeAudioAnalyzer();
     };
 
-    recognition.onresult = (event: any) => {
-      let interim = '';
+    recognition.onresult = (event: unknown) => {
+      let _interim = '';
       let final = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -70,7 +71,7 @@ export function VoiceCommandInterface({
         if (event.results[i].isFinal) {
           final += `${transcript  } `;
         } else {
-          interim += transcript;
+          _interim += transcript;
         }
       }
 
@@ -79,11 +80,11 @@ export function VoiceCommandInterface({
         processCommand(final.trim());
       }
       
-      setInterimTranscript(interim);
+      setInterimTranscript(_interim);
     };
 
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
+    recognition.onerror = (event: unknown) => {
+      logger.error('Speech recognition error:', event.error);
       setStatus('error');
       setIsListening(false);
       
@@ -122,17 +123,17 @@ export function VoiceCommandInterface({
   // Initialize audio analyzer for volume visualization
   const initializeAudioAnalyzer = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const _stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioContextRef.current = new AudioContext();
       analyserRef.current = audioContextRef.current.createAnalyser();
-      microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      microphoneRef.current = audioContextRef.current.createMediaStreamSource(_stream);
       
       analyserRef.current.fftSize = 256;
       microphoneRef.current.connect(analyserRef.current);
       
       updateVolume();
-    } catch (error) {
-      console.error('Error initializing audio analyzer:', error);
+    } catch (_error) {
+      logger.error('Error initializing audio analyzer:');
     }
   };
 
@@ -146,7 +147,7 @@ export function VoiceCommandInterface({
     const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
     setVolume(average / 255);
     
-    animationFrameRef.current = requestAnimationFrame(updateVolume);
+    animationFrameRef.current = requestAnimationFrame(_updateVolume);
   };
 
   // Stop audio analyzer
@@ -176,14 +177,14 @@ export function VoiceCommandInterface({
       lowerCommand.includes(cmd.toLowerCase())
     );
     
-    if (matchedCommand) {
+    if (_matchedCommand) {
       setStatus('success');
-      onCommand(lowerCommand);
+      onCommand(_lowerCommand);
       
       // Provide audio feedback
       const utterance = new SpeechSynthesisUtterance(`Executing ${matchedCommand}`);
       utterance.rate = 1.2;
-      window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(_utterance);
       
       setTimeout(() => {
         setStatus('idle');
@@ -204,7 +205,7 @@ export function VoiceCommandInterface({
   const toggleListening = () => {
     if (!recognitionRef.current) return;
 
-    if (isListening) {
+    if (_isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
       setStatus('idle');
@@ -219,7 +220,7 @@ export function VoiceCommandInterface({
     const commandList = commands.join(', ');
     const utterance = new SpeechSynthesisUtterance(`Available commands are: ${commandList}`);
     utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(_utterance);
   };
 
   if (!isActive) return null;

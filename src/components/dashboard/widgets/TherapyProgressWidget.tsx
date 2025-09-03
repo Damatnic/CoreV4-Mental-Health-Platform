@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Calendar, Target, CheckCircle, Clock, ChevronRight } from 'lucide-react';
+import { Users, Calendar, _Target, CheckCircle, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -9,7 +9,7 @@ interface TherapySession {
   therapistName: string;
   type: string;
   topics: string[];
-  homework: any[];
+  homework: unknown[];
   progress: number;
   notes?: string;
 }
@@ -22,7 +22,7 @@ interface TherapyProgressWidgetProps {
 export function TherapyProgressWidget({ progress, error }: TherapyProgressWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -48,7 +48,7 @@ export function TherapyProgressWidget({ progress, error }: TherapyProgressWidget
   const latestSession = progress[0];
   const totalSessions = progress.length;
   const completedHomework = progress.reduce((acc, session) => 
-    acc + session.homework.filter((hw: any) => hw.completed).length, 0
+    acc + session.homework.filter((hw: unknown) => hw.completed).length, 0
   );
   const totalHomework = progress.reduce((acc, session) => 
     acc + session.homework.length, 0
@@ -139,7 +139,7 @@ export function TherapyProgressWidget({ progress, error }: TherapyProgressWidget
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Active Homework</p>
           {progress.slice(0, 2).map(session => 
-            session.homework.filter((hw: any) => !hw.completed).slice(0, 2).map((hw: any) => (
+            session.homework.filter((hw: unknown) => !hw.completed).slice(0, 2).map((hw: unknown) => (
               <div
                 key={hw.id}
                 className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"

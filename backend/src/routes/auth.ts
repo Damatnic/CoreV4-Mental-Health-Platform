@@ -13,6 +13,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService } from '../services/DatabaseService';
 import { AuditService } from '../services/AuditService';
 import { EncryptionService } from '../services/EncryptionService';
+import winston from 'winston';
+
+// Configure logger for this module
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'auth-routes' },
+  transports: [
+    new winston.transports.Console()
+  ]
+});
 
 const router = express.Router();
 const db = new DatabaseService();
@@ -31,9 +45,9 @@ const getJWTSecret = (): string => {
 // CRITICAL SECURITY: Validate JWT secret on startup
 try {
   getJWTSecret();
-  console.log('✅ JWT Secret validation passed');
+  logger.info('✅ JWT Secret validation passed');
 } catch (error) {
-  console.error('❌ JWT Secret validation failed:', error);
+  logger.error('❌ JWT Secret validation failed:', error);
   process.exit(1); // Prevent insecure startup
 }
 
@@ -183,7 +197,7 @@ router.post('/register', registerValidation, async (req: Request, res: Response,
 
   } catch (error) {
     await audit.logEvent(req.ip, 'auth', 'register_error', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -321,7 +335,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response, next:
 
   } catch (error) {
     await audit.logEvent(req.ip, 'auth', 'login_error', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -343,7 +357,7 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
 
     // Verify existing token (even if expired)
     try {
-      const decoded = jwt.verify(token, getJWTSecret(), { ignoreExpiration: true }) as any;
+      const decoded = jwt.verify(token, getJWTSecret(), { ignoreExpiration: true }) as { userId: string; isAnonymous: boolean; email?: string };
       
       // Generate new token
       const newToken = jwt.sign(
@@ -362,7 +376,7 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
         message: 'Token refreshed successfully'
       });
 
-    } catch (jwtError) {
+    } catch {
       await audit.logEvent(req.ip, 'auth', 'token_refresh_invalid');
       
       res.status(401).json({
@@ -372,7 +386,7 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
 
   } catch (error) {
     await audit.logEvent(req.ip, 'auth', 'token_refresh_error', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -396,7 +410,7 @@ router.post('/logout', async (req: Request, res: Response, next: NextFunction) =
 
   } catch (error) {
     await audit.logEvent(req.ip, 'auth', 'logout_error', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -406,7 +420,7 @@ router.post('/logout', async (req: Request, res: Response, next: NextFunction) =
  * GET /api/auth/me
  * Get current user info
  */
-router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/me', async (req: Request, res: Response, _next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -416,7 +430,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, getJWTSecret()) as any;
+    const decoded = jwt.verify(token, getJWTSecret()) as { userId: string; isAnonymous: boolean; email?: string };
 
     const user = await db.getUserById(decoded.userId);
     if (!user) {
@@ -436,7 +450,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
       }
     });
 
-  } catch (error) {
+  } catch {
     res.status(401).json({
       error: 'Invalid token'
     });

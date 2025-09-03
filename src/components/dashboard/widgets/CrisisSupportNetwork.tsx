@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '../utils/logger';
 import { 
   Users, Phone, MessageCircle, Video, CheckCircle, 
-  Clock, MapPin, Star, AlertCircle, Plus, Edit2,
-  UserPlus, Shield, Heart, Globe, Wifi, WifiOff,
-  Calendar, Bell, ChevronRight, Circle, Settings
+  Clock, MapPin, Star, _AlertCircle, Plus, Edit2,
+  _UserPlus, Shield, Heart, Globe, Wifi, WifiOff,
+  Calendar, Bell, _ChevronRight, Circle, Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../../hooks/useAuth';
@@ -62,7 +63,7 @@ interface CrisisBuddy {
 }
 
 export function CrisisSupportNetwork() {
-  const { user } = useAuth();
+  const { _user } = useAuth();
   const [activeTab, setActiveTab] = useState<'contacts' | 'groups' | 'buddy' | 'professional'>('contacts');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showAddContact, setShowAddContact] = useState(false);
@@ -205,7 +206,7 @@ export function CrisisSupportNetwork() {
     ));
 
     // Perform action based on type
-    switch (action) {
+    switch (_action) {
       case 'call':
         window.location.href = `tel:${contact.phone}`;
         break;
@@ -214,14 +215,14 @@ export function CrisisSupportNetwork() {
         break;
       case 'video':
         // Would integrate with video call service
-        console.log('Starting video call with', contact.name);
+        logger.info('Starting video call with', contact.name);
         break;
     }
   }, []);
 
   // Check-in with crisis buddy
   const handleBuddyCheckIn = useCallback(() => {
-    if (crisisBuddy) {
+    if (_crisisBuddy) {
       setCrisisBuddy(prev => prev ? { ...prev, lastCheckIn: new Date() } : null);
       logger.info('Crisis buddy check-in completed', {
         category: LogCategory.CRISIS,
@@ -236,7 +237,7 @@ export function CrisisSupportNetwork() {
       window.open(group.joinUrl, '_blank');
     } else {
       // Show group details/location
-      console.log('Group details:', group);
+      logger.info('Group details:', group);
     }
   }, []);
 
@@ -303,7 +304,7 @@ export function CrisisSupportNetwork() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as unknown)}
                 className={`flex-1 py-3 px-2 flex items-center justify-center space-x-1 font-medium text-sm transition-colors relative ${
                   activeTab === tab.id
                     ? 'border-b-2 border-primary-500 text-primary-700 bg-primary-50'

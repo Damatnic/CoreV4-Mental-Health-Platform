@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Clock, Calendar, Save, Star, TrendingUp, Target, 
-  Brain, Heart, CheckCircle, Plus, Minus, FileText,
-  MessageSquare, Lightbulb, AlertTriangle, Award,
-  BarChart3, PieChart, LineChart, Activity, Users,
-  PlayCircle, PauseCircle, RotateCcw, Timer,
-  Mic, MicOff, Video, VideoOff, Settings, X, Square
+  Clock, _Calendar, Save, Star, _TrendingUp, Target, 
+  Brain, _Heart, CheckCircle, Plus, _Minus, FileText,
+  _MessageSquare, Lightbulb, AlertTriangle, Award,
+  BarChart3, _PieChart, _LineChart, Activity, _Users,
+  PlayCircle, PauseCircle, _RotateCcw, _Timer,
+  Mic, MicOff, Video, VideoOff, _Settings, X, Square
 } from 'lucide-react';
 
 interface TherapySession {
@@ -47,7 +47,7 @@ interface SessionGoal {
 interface TherapeuticTechnique {
   id: string;
   name: string;
-  category: 'CBT' | 'DBT' | 'ACT' | 'Mindfulness' | 'EMDR' | 'Psychodynamic' | 'Behavioral' | 'Other';
+  _category: 'CBT' | 'DBT' | 'ACT' | 'Mindfulness' | 'EMDR' | 'Psychodynamic' | 'Behavioral' | 'Other';
   description?: string;
   effectiveness: number; // 1-10
   clientReaction: 'positive' | 'neutral' | 'negative';
@@ -73,7 +73,7 @@ interface SessionNote {
   timestamp: Date;
   type: 'observation' | 'intervention' | 'client_response' | 'breakthrough' | 'concern' | 'plan';
   content: string;
-  category?: string;
+  _category?: string;
   important: boolean;
   private: boolean; // Provider-only notes
 }
@@ -106,7 +106,7 @@ interface RiskAssessment {
 
 interface TherapySessionLoggerProps {
   session: TherapySession;
-  onUpdateSession?: (session: TherapySession) => void;
+  _onUpdateSession?: (session: TherapySession) => void;
   onStartSession?: (sessionId: string) => void;
   onEndSession?: (sessionId: string) => void;
   onSaveNotes?: (sessionId: string, notes: SessionNote[]) => void;
@@ -117,7 +117,7 @@ interface TherapySessionLoggerProps {
 
 export function TherapySessionLogger({
   session,
-  onUpdateSession,
+  _onUpdateSession,
   onStartSession,
   onEndSession,
   onSaveNotes,
@@ -128,22 +128,22 @@ export function TherapySessionLogger({
   const [activeTab, setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
   const [sessionTimer, setSessionTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [currentSession, setCurrentSession] = useState<TherapySession>(session);
+  const [currentSession, setCurrentSession] = useState<TherapySession>(_session);
   const [newNote, setNewNote] = useState('');
   const [noteType, setNoteType] = useState<SessionNote['type']>('observation');
   const [showRiskAssessment, setShowRiskAssessment] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
 
-  // Timer effect
+  // _Timer effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isTimerRunning) {
-      interval = setInterval(() => {
+    let _interval: NodeJS.Timeout;
+    if (_isTimerRunning) {
+      _interval = setInterval(() => {
         setSessionTimer(prev => prev + 1);
       }, 1000);
     }
-    return () => clearInterval(interval);
+    return () => clearInterval(_interval);
   }, [isTimerRunning]);
 
   // Format timer display
@@ -159,12 +159,12 @@ export function TherapySessionLogger({
   // Handle session start
   const handleStartSession = () => {
     setIsTimerRunning(true);
-    const updatedSession = {
+    const _updatedSession = {
       ...currentSession,
       status: 'in-progress' as const,
       actualDuration: 0
     };
-    setCurrentSession(updatedSession);
+    setCurrentSession(_updatedSession);
     onStartSession?.(session.id);
   };
 
@@ -176,12 +176,12 @@ export function TherapySessionLogger({
   // Handle session end
   const handleEndSession = () => {
     setIsTimerRunning(false);
-    const updatedSession = {
+    const _updatedSession = {
       ...currentSession,
       status: 'completed' as const,
       actualDuration: sessionTimer / 60 // Convert to minutes
     };
-    setCurrentSession(updatedSession);
+    setCurrentSession(_updatedSession);
     onEndSession?.(session.id);
   };
 
@@ -199,12 +199,12 @@ export function TherapySessionLogger({
     };
 
     const updatedNotes = [...(currentSession.notes || []), note];
-    const updatedSession = {
+    const _updatedSession = {
       ...currentSession,
       notes: updatedNotes
     };
 
-    setCurrentSession(updatedSession);
+    setCurrentSession(_updatedSession);
     setNewNote('');
     onSaveNotes?.(session.id, updatedNotes);
   };
@@ -234,7 +234,7 @@ export function TherapySessionLogger({
   };
 
   // Get progress color
-  const getProgressColor = (progress: number) => {
+  const _getProgressColor = (progress: number) => {
     if (progress >= 80) return 'text-green-600 bg-green-100';
     if (progress >= 60) return 'text-blue-600 bg-blue-100';
     if (progress >= 40) return 'text-yellow-600 bg-yellow-100';
@@ -242,8 +242,8 @@ export function TherapySessionLogger({
   };
 
   // Get technique category color
-  const getTechniqueColor = (category: string) => {
-    switch (category) {
+  const getTechniqueColor = (_category: string) => {
+    switch (_category) {
       case 'CBT': return 'bg-blue-100 text-blue-800';
       case 'DBT': return 'bg-green-100 text-green-800';
       case 'ACT': return 'bg-purple-100 text-purple-800';
@@ -270,10 +270,10 @@ export function TherapySessionLogger({
           
           {/* Session Controls */}
           <div className="flex items-center space-x-4">
-            {/* Timer Display */}
+            {/* _Timer Display */}
             <div className="text-center">
               <div className="text-3xl font-mono font-bold">
-                {formatTime(sessionTimer)}
+                {formatTime(_sessionTimer)}
               </div>
               <div className="text-xs text-primary-200">
                 {currentSession.duration} min scheduled
@@ -371,7 +371,7 @@ export function TherapySessionLogger({
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as any)}
+              onClick={() => setActiveTab(id as unknown)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-all flex items-center space-x-2 ${
                 activeTab === id
                   ? 'text-primary-600 border-primary-600'
@@ -635,8 +635,8 @@ export function TherapySessionLogger({
                       <h4 className="font-medium text-gray-900">{technique.name}</h4>
                       <p className="text-sm text-gray-600 mt-1">{technique.description}</p>
                       <div className="flex items-center space-x-2 mt-2">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getTechniqueColor(technique.category)}`}>
-                          {technique.category}
+                        <span className={`px-2 py-1 text-xs rounded-full ${getTechniqueColor(technique._category)}`}>
+                          {technique._category}
                         </span>
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           technique.clientReaction === 'positive' ? 'bg-green-100 text-green-700' :
@@ -801,7 +801,7 @@ export function TherapySessionLogger({
                         <Star className="h-4 w-4 text-yellow-500 fill-current" />
                       )}
                       {note.private && (
-                        <span className="text-xs text-gray-500">(Private)</span>
+                        <span className="text-xs text-gray-500">(_Private)</span>
                       )}
                     </div>
                     <span className="text-xs text-gray-500">

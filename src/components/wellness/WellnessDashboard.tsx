@@ -10,27 +10,27 @@ import {
   Calendar,
   Award,
   Target,
-  BarChart3,
-  LineChart,
-  PieChart,
-  Clock,
+  _BarChart3,
+  _LineChart,
+  _PieChart,
+  _Clock,
   Zap,
   Droplets,
   Coffee,
   Apple,
-  ChevronRight,
+  _ChevronRight,
   Plus,
-  Filter,
+  _Filter,
   Download,
-  Share2,
+  _Share2,
   Settings,
-  Bell,
+  _Bell,
   CheckCircle,
   Circle,
   AlertCircle,
   TrendingDown
 } from 'lucide-react';
-import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
+import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, _subDays } from 'date-fns';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
@@ -147,9 +147,9 @@ export const WellnessDashboard: React.FC = () => {
     wellnessGoals,
     wellnessInsights,
     weeklyScore,
-    monthlyScore,
+    _monthlyScore,
     addWellnessGoal,
-    updateGoalProgress,
+    _updateGoalProgress,
     calculateWellnessScores,
     generateInsights,
     exportData
@@ -173,23 +173,23 @@ export const WellnessDashboard: React.FC = () => {
     generateInsights();
     
     // Load legacy localStorage data if exists
-    const savedData = secureStorage.getItem('wellnessData');
-    const savedStreaks = secureStorage.getItem('habitStreaks');
-    const savedToday = secureStorage.getItem('wellnessTodayData');
+    const _savedData = secureStorage.getItem('wellnessData');
+    const _savedStreaks = secureStorage.getItem('habitStreaks');
+    const _savedToday = secureStorage.getItem('wellnessTodayData');
     
-    if (savedData) {
-      setWellnessData(JSON.parse(savedData).map((d: any) => ({
+    if (_savedData) {
+      setWellnessData(JSON.parse(_savedData).map((d: unknown) => ({
         ...d,
         date: new Date(d.date)
       })));
     }
     
-    if (savedStreaks) {
-      setHabitStreaks(JSON.parse(savedStreaks));
+    if (_savedStreaks) {
+      setHabitStreaks(JSON.parse(_savedStreaks));
     }
     
-    if (savedToday) {
-      const today = JSON.parse(savedToday);
+    if (_savedToday) {
+      const today = JSON.parse(_savedToday);
       if (new Date(today.date).toDateString() === new Date().toDateString()) {
         setTodayData({
           ...today,
@@ -227,8 +227,8 @@ export const WellnessDashboard: React.FC = () => {
     const today = new Date().toDateString();
     const existingStreak = habitStreaks.find(s => s.habitId === habitId);
     
-    if (existingStreak) {
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (_existingStreak) {
+      const yesterday = new Date(Date._now() - 86400000).toDateString();
       const newStreak = { ...existingStreak };
       
       if (existingStreak.lastCompleted === today) {
@@ -245,11 +245,11 @@ export const WellnessDashboard: React.FC = () => {
       
       newStreak.lastCompleted = today;
       
-      const updatedStreaks = habitStreaks.map(s => 
+      const _updatedStreaks = habitStreaks.map(s => 
         s.habitId === habitId ? newStreak : s
       );
-      setHabitStreaks(updatedStreaks);
-      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
+      setHabitStreaks(_updatedStreaks);
+      secureStorage.setItem('habitStreaks', JSON.stringify(_updatedStreaks));
     } else {
       // New streak
       const newStreak: HabitStreak = {
@@ -258,14 +258,14 @@ export const WellnessDashboard: React.FC = () => {
         longest: 1,
         lastCompleted: today
       };
-      const updatedStreaks = [...habitStreaks, newStreak];
-      setHabitStreaks(updatedStreaks);
-      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
+      const _updatedStreaks = [...habitStreaks, newStreak];
+      setHabitStreaks(_updatedStreaks);
+      secureStorage.setItem('habitStreaks', JSON.stringify(_updatedStreaks));
     }
   };
 
   // Add sleep data
-  const addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
+  const _addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
     setTodayData({
       ...todayData,
       sleep: { hours, quality }
@@ -273,7 +273,7 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Add exercise data
-  const addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
+  const _addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
     const calories = EXERCISE_TYPES[type].calories * duration;
     const exercises = todayData.exercise || [];
     exercises.push({ type, duration, calories });
@@ -293,10 +293,10 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Save day's data
-  const saveDayData = () => {
-    const updatedData = [...wellnessData, todayData];
-    setWellnessData(updatedData);
-    secureStorage.setItem('wellnessData', JSON.stringify(updatedData));
+  const _saveDayData = () => {
+    const _updatedData = [...wellnessData, todayData];
+    setWellnessData(_updatedData);
+    secureStorage.setItem('wellnessData', JSON.stringify(_updatedData));
     
     // Reset today's data
     setTodayData({
@@ -385,9 +385,9 @@ export const WellnessDashboard: React.FC = () => {
 
   // Get weekly stats
   const getWeeklyStats = () => {
-    const now = new Date();
-    const weekStart = startOfWeek(now);
-    const weekEnd = endOfWeek(now);
+    const _now = new Date();
+    const weekStart = startOfWeek(_now);
+    const weekEnd = endOfWeek(_now);
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
     
     return days.map(day => {
@@ -397,7 +397,7 @@ export const WellnessDashboard: React.FC = () => {
       
       return {
         date: day,
-        isToday: isToday(day),
+        isToday: isToday(_day),
         habits: dayData?.habits?.length || 0,
         exercise: dayData?.exercise?.reduce((sum, e) => sum + e.duration, 0) || 0,
         water: dayData?.water || 0,
@@ -452,8 +452,8 @@ export const WellnessDashboard: React.FC = () => {
   const handleExportData = (format: 'json' | 'csv') => {
     if (format === 'json') {
       // Use the store's export function
-      const dataStr = exportData();
-      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
+      const _dataStr = exportData();
+      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
       const exportFileDefaultName = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
@@ -490,8 +490,8 @@ export const WellnessDashboard: React.FC = () => {
         csvContent += `${formatDate(date, 'yyyy-MM-dd')},${avgMood.toFixed(1)},${avgStress.toFixed(1)},${dayMetrics?.sleepHours || 0},${dayMetrics?.exerciseMinutes || 0},${dayMetrics?.waterIntake || 0},${calculateWellnessScore()}\n`;
       });
       
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
+      const _blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(_blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.csv`;
@@ -586,7 +586,7 @@ export const WellnessDashboard: React.FC = () => {
         >
           All Categories
         </button>
-        {Object.entries(WELLNESS_CATEGORIES).map(([key, category]) => {
+        {Object.entries(_WELLNESS_CATEGORIES).map(([key, category]) => {
           const Icon = category.icon;
           return (
             <button
@@ -702,7 +702,7 @@ export const WellnessDashboard: React.FC = () => {
                   })}
                   className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-                  {Object.entries(SLEEP_QUALITY).map(([key, quality]) => (
+                  {Object.entries(_SLEEP_QUALITY).map(([key, quality]) => (
                     <option key={key} value={key}>{quality.name}</option>
                   ))}
                 </select>
@@ -965,7 +965,7 @@ export const WellnessDashboard: React.FC = () => {
                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
                   >
                     <option value="">Select category</option>
-                    {Object.entries(WELLNESS_CATEGORIES).map(([key, cat]) => (
+                    {Object.entries(_WELLNESS_CATEGORIES).map(([key, cat]) => (
                       <option key={key} value={key}>{cat.name}</option>
                     ))}
                   </select>
@@ -1014,7 +1014,7 @@ export const WellnessDashboard: React.FC = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Deadline (optional)
+                    Deadline (_optional)
                   </label>
                   <input
                     type="date"

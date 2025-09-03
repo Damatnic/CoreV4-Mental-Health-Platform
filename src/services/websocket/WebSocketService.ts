@@ -3,7 +3,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import {
-  WebSocketEvent,
+  _WebSocketEvent,
   CrisisWebSocketEvent,
   CommunityWebSocketEvent,
   NotificationWebSocketEvent,
@@ -11,6 +11,7 @@ import {
   User
 } from '../api/types';
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 // WebSocket Configuration
 const WS_CONFIG = {
@@ -94,7 +95,7 @@ interface ConnectionState {
 // Message queue for offline support
 interface QueuedMessage {
   event: string;
-  data: any;
+  data: unknown;
   timestamp: number;
   retries: number;
 }
@@ -130,7 +131,7 @@ export class WebSocketService {
   // Initialize WebSocket connection
   public connect(token: string, user: User): void {
     if (this.socket?.connected) {
-      console.log('WebSocket already connected');
+      logger.debug('WebSocket already connected', 'WebSocketService');
       return;
     }
 
@@ -165,38 +166,38 @@ export class WebSocketService {
 
     // Connection events
     this.socket.on(WSEventType.CONNECT, () => {
-      console.log('WebSocket connected');
+      logger.info('WebSocket connected', 'WebSocketService');
       this.connectionState.isConnected = true;
       this.connectionState.reconnectAttempts = 0;
       this.processQueuedMessages();
       this.emit(WSEventType.CONNECT, { timestamp: new Date() });
       
       // Rejoin rooms after reconnection
-      this.activeRooms.forEach(room => {
-        this.joinRoom(room);
+      this.activeRooms.forEach(_room => {
+        this.joinRoom(_room);
       });
     });
 
-    this.socket.on(WSEventType.DISCONNECT, (reason: any) => {
-      console.log('WebSocket disconnected:', reason);
+    this.socket.on(WSEventType.DISCONNECT, (reason: unknown) => {
+      logger.info('WebSocket disconnected', 'WebSocketService', { reason });
       this.connectionState.isConnected = false;
       this.emit(WSEventType.DISCONNECT, { reason, timestamp: new Date() });
     });
 
-    this.socket.on(WSEventType.ERROR, (error: any) => {
-      console.error('WebSocket error:', error);
+    this.socket.on(WSEventType.ERROR, (error: unknown) => {
+      logger.error('WebSocket error:', error);
       this.connectionState.lastError = error;
       this.emit(WSEventType.ERROR, { error, timestamp: new Date() });
     });
 
     // Authentication events
-    this.socket.on(WSEventType.AUTH_SUCCESS, (data: any) => {
-      console.log('WebSocket authentication successful');
+    this.socket.on(WSEventType.AUTH_SUCCESS, (data: unknown) => {
+      logger.info('WebSocket authentication successful', 'WebSocketService');
       this.emit(WSEventType.AUTH_SUCCESS, data);
     });
 
-    this.socket.on(WSEventType.AUTH_FAILURE, (data: any) => {
-      console.error('WebSocket authentication failed:', data);
+    this.socket.on(WSEventType.AUTH_FAILURE, (data: unknown) => {
+      logger.error('WebSocket authentication failed:', data);
       this.emit(WSEventType.AUTH_FAILURE, data);
       this.disconnect();
     });
@@ -215,17 +216,17 @@ export class WebSocketService {
     if (!this.socket) return;
 
     this.socket.on(WSEventType.CRISIS_ALERT, (data: CrisisWebSocketEvent) => {
-      console.log('Crisis alert received:', data);
+      logger.crisis('Crisis alert received', 'high', 'WebSocketService', data);
       this.emit(WSEventType.CRISIS_ALERT, data);
       
-      // Auto-join crisis room if it's for current user
+      // Auto-join crisis _room if it's for current user
       if (data.userId === this.currentUser?.id) {
         this.joinCrisisSession(data.sessionId);
       }
     });
 
     this.socket.on(WSEventType.CRISIS_COUNSELOR_ASSIGNED, (data: CrisisWebSocketEvent) => {
-      console.log('Counselor assigned:', data);
+      logger.crisis('Counselor assigned to crisis session', 'medium', 'WebSocketService', data);
       this.emit(WSEventType.CRISIS_COUNSELOR_ASSIGNED, data);
     });
 
@@ -234,13 +235,13 @@ export class WebSocketService {
     });
 
     this.socket.on(WSEventType.CRISIS_SESSION_ENDED, (data: CrisisWebSocketEvent) => {
-      console.log('Crisis session ended:', data);
+      logger.info('Crisis session ended', 'WebSocketService', data);
       this.emit(WSEventType.CRISIS_SESSION_ENDED, data);
       this.leaveCrisisSession(data.sessionId);
     });
 
     this.socket.on(WSEventType.CRISIS_ESCALATION, (data: CrisisWebSocketEvent) => {
-      console.log('Crisis escalated:', data);
+      logger.crisis('Crisis escalated', 'critical', 'WebSocketService', data);
       this.emit(WSEventType.CRISIS_ESCALATION, data);
       
       // Trigger emergency protocols
@@ -365,31 +366,31 @@ export class WebSocketService {
   }
 
   // Room management
-  public joinRoom(room: string): void {
+  public joinRoom(_room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('join:room', { room });
-      this.activeRooms.add(room);
+      this.socket.emit('join:_room', { _room });
+      this.activeRooms.add(_room);
     }
   }
 
-  public leaveRoom(room: string): void {
+  public leaveRoom(_room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('leave:room', { room });
-      this.activeRooms.delete(room);
+      this.socket.emit('leave:_room', { _room });
+      this.activeRooms.delete(_room);
     }
   }
 
   // Crisis session management
   public joinCrisisSession(sessionId: string): void {
-    const room = `crisis:${sessionId}`;
-    this.joinRoom(room);
+    const _room = `crisis:${sessionId}`;
+    this.joinRoom(_room);
     this.emit('crisis:joined', { sessionId });
   }
 
   public leaveCrisisSession(sessionId: string): void {
-    const room = `crisis:${sessionId}`;
-    this.leaveRoom(room);
-    this.typingUsers.delete(room);
+    const _room = `crisis:${sessionId}`;
+    this.leaveRoom(_room);
+    this.typingUsers.delete(_room);
   }
 
   public sendCrisisMessage(sessionId: string, message: string): void {
@@ -412,20 +413,20 @@ export class WebSocketService {
 
   // Group session management
   public joinGroupSession(groupId: string, sessionId: string): void {
-    const room = `group:${groupId}:${sessionId}`;
-    this.joinRoom(room);
+    const _room = `group:${groupId}:${sessionId}`;
+    this.joinRoom(_room);
   }
 
   public leaveGroupSession(groupId: string, sessionId: string): void {
-    const room = `group:${groupId}:${sessionId}`;
-    this.leaveRoom(room);
+    const _room = `group:${groupId}:${sessionId}`;
+    this.leaveRoom(_room);
   }
 
   // Typing indicators
-  public sendTypingIndicator(room: string, isTyping: boolean): void {
+  public sendTypingIndicator(_room: string, isTyping: boolean): void {
     if (this.socket?.connected) {
       this.socket.emit('typing', {
-        room,
+        _room,
         userId: this.currentUser?.id,
         username: this.currentUser?.username,
         isTyping
@@ -433,15 +434,15 @@ export class WebSocketService {
     }
   }
 
-  private handleTypingIndicator(room: string, userId: string, isTyping: boolean, username?: string): void {
+  private handleTypingIndicator(_room: string, userId: string, isTyping: boolean, username?: string): void {
     if (isTyping && userId !== this.currentUser?.id) {
-      this.typingUsers.set(`${room}:${userId}`, {
+      this.typingUsers.set(`${_room}:${userId}`, {
         userId,
         username: username || 'User',
         timestamp: Date.now()
       });
     } else {
-      this.typingUsers.delete(`${room}:${userId}`);
+      this.typingUsers.delete(`${_room}:${userId}`);
     }
 
     // Clean up old typing indicators (> 5 seconds)
@@ -453,7 +454,7 @@ export class WebSocketService {
     });
 
     this.emit('typing:update', {
-      room,
+      _room,
       typingUsers: Array.from(this.typingUsers.values()).filter(u => 
         u.userId !== this.currentUser?.id
       )
@@ -463,7 +464,7 @@ export class WebSocketService {
   // Crisis escalation handling
   private handleCrisisEscalation(event: CrisisWebSocketEvent): void {
     // Trigger emergency protocols
-    console.error('CRISIS ESCALATION:', event);
+    logger.error('CRISIS ESCALATION:', event);
     
     // Show critical notification
     this.showNotification(
@@ -480,15 +481,15 @@ export class WebSocketService {
   }
 
   // Message queue management for offline support
-  private queueMessage(event: string, data: any): void {
-    const queuedMessage: QueuedMessage = {
+  private queueMessage(event: string, data: unknown): void {
+    const _queuedMessage: QueuedMessage = {
       event,
       data,
       timestamp: Date.now(),
       retries: 0
     };
 
-    this.messageQueue.push(queuedMessage);
+    this.messageQueue.push(_queuedMessage);
     this.saveQueuedMessages();
   }
 
@@ -501,8 +502,8 @@ export class WebSocketService {
     for (const message of messages) {
       try {
         this.socket.emit(message.event, message.data);
-      } catch (error) {
-        console.error('Failed to send queued message:', error);
+      } catch (_error) {
+        logger.error('Failed to send queued message:');
         
         // Re-queue if not expired (24 hours) and under retry limit
         if (Date.now() - message.timestamp < 86400000 && message.retries < 3) {
@@ -518,19 +519,19 @@ export class WebSocketService {
   private saveQueuedMessages(): void {
     try {
       secureStorage.setItem('ws_message_queue', JSON.stringify(this.messageQueue));
-    } catch (error) {
-      console.error('Failed to save message queue:', error);
+    } catch (_error) {
+      logger.error('Failed to save message queue:');
     }
   }
 
   private loadQueuedMessages(): void {
     try {
-      const saved = secureStorage.getItem('ws_message_queue');
-      if (saved) {
-        this.messageQueue = JSON.parse(saved);
+      const _saved = secureStorage.getItem('ws_message_queue');
+      if (_saved) {
+        this.messageQueue = JSON.parse(_saved);
       }
-    } catch (error) {
-      console.error('Failed to load message queue:', error);
+    } catch (_error) {
+      logger.error('Failed to load message queue:');
       this.messageQueue = [];
     }
   }
@@ -583,14 +584,14 @@ export class WebSocketService {
     }
   }
 
-  public emit(event: string, data: any): void {
+  public emit(event: string, data: unknown): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach(handler => {
         try {
           handler(data);
-        } catch (error) {
-          console.error(`Error in event handler for ${event}:`, error);
+        } catch (_error) {
+          logger.error(`Error in event handler for ${event}`);
         }
       });
     }
@@ -601,11 +602,11 @@ export class WebSocketService {
     return { ...this.connectionState };
   }
 
-  public getTypingUsers(room: string): TypingUser[] {
+  public getTypingUsers(_room: string): TypingUser[] {
     const users: TypingUser[] = [];
     this.typingUsers.forEach((user, key) => {
-      if (key.startsWith(`${room}:`)) {
-        users.push(user);
+      if (key.startsWith(`${_room}:`)) {
+        users.push(_user);
       }
     });
     return users;
@@ -620,7 +621,7 @@ export class WebSocketService {
   }
 
   // Critical event logging for audit trail
-  private logCriticalEvent(type: string, data: any): void {
+  private logCriticalEvent(type: string, data: unknown): void {
     const logEntry = {
       timestamp: new Date().toISOString(),
       type,
@@ -629,21 +630,21 @@ export class WebSocketService {
     };
 
     // In production, send to secure logging service
-    console.log('Critical Event Log:', logEntry);
+    logger.crisis('Critical Event Log', 'high', 'WebSocketService', logEntry);
     
     // Also store locally for offline access
     try {
       const logs = JSON.parse(secureStorage.getItem('critical_events') || '[]');
-      logs.push(logEntry);
+      logs.push(_logEntry);
       
       // Keep only last 100 events
       if (logs.length > 100) {
         logs.splice(0, logs.length - 100);
       }
       
-      secureStorage.setItem('critical_events', JSON.stringify(logs));
-    } catch (error) {
-      console.error('Failed to log critical event:', error);
+      secureStorage.setItem('critical_events', JSON.stringify(_logs));
+    } catch (_error) {
+      logger.error('Failed to log critical event:');
     }
   }
 }

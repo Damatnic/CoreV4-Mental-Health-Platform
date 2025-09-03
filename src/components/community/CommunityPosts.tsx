@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, _useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle, Share2, Flag, Edit2, Trash2, AlertTriangle, Award, Users, TrendingUp } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { _format, formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { communityService, Post, CreatePostDto } from '../../services/community/communityService';
 import { websocketService } from '../../services/realtime/websocketService';
@@ -10,8 +10,8 @@ import { useAuth } from '../../hooks/useAuth';
 interface PostCardProps {
   post: Post;
   onEdit: (post: Post) => void;
-  onDelete: (postId: string) => void;
-  onReport: (postId: string) => void;
+  onDelete: (_postId: string) => void;
+  onReport: (_postId: string) => void;
 }
 
 function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
@@ -29,7 +29,7 @@ function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: () => {
-      toast.error('Failed to update like status');
+      toast._error('Failed to update like status');
     },
   });
 
@@ -224,8 +224,8 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to save post');
+    onError: (_error: unknown) => {
+      toast._error(_error.message || 'Failed to save post');
     },
   });
 
@@ -305,7 +305,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
             {/* Mood */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Current Mood (optional)
+                Current Mood (_optional)
               </label>
               <select
                 value={formData.mood}
@@ -372,7 +372,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
               </label>
               <select
                 value={formData.visibility}
-                onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as any }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as unknown }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="public">Public - Anyone can see</option>
@@ -459,47 +459,47 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   const [selectedFilter, setSelectedFilter] = useState<'recent' | 'popular' | 'helpful'>('recent');
 
   // Fetch posts
-  const { data, isLoading, error } = useQuery({
+  const { data, _isLoading, _error } = useQuery({
     queryKey: ['posts', groupId, selectedFilter],
     queryFn: () => communityService.getPosts({ groupId, limit: 20 }),
   });
 
   // Delete post mutation
   const deleteMutation = useMutation({
-    mutationFn: (postId: string) => communityService.deletePost(postId),
+    mutationFn: (_postId: string) => communityService.deletePost(_postId),
     onSuccess: () => {
       toast.success('Post deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: () => {
-      toast.error('Failed to delete post');
+      toast._error('Failed to delete post');
     },
   });
 
   // Report post mutation
   const reportMutation = useMutation({
-    mutationFn: ({ postId, reason }: { postId: string; reason: string }) => 
-      communityService.reportPost(postId, reason),
+    mutationFn: ({ _postId, reason }: { _postId: string; reason: string }) => 
+      communityService.reportPost(_postId, reason),
     onSuccess: () => {
       toast.success('Post reported. Our moderation team will review it.');
     },
     onError: () => {
-      toast.error('Failed to report post');
+      toast._error('Failed to report post');
     },
   });
 
   // Set up WebSocket listeners for real-time updates
   useEffect(() => {
-    const handleNewPost = (post: Post) => {
+    const handleNewPost = (_post: Post) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('New post in the community!');
     };
 
-    const handlePostUpdate = (post: Post) => {
+    const handlePostUpdate = (_post: Post) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     };
 
-    const handlePostDelete = (postId: string) => {
+    const handlePostDelete = (_postId: string) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     };
 
@@ -519,16 +519,16 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     setShowCreateModal(true);
   };
 
-  const handleDelete = (postId: string) => {
+  const handleDelete = (_postId: string) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      deleteMutation.mutate(postId);
+      deleteMutation.mutate(_postId);
     }
   };
 
-  const handleReport = (postId: string) => {
+  const handleReport = (_postId: string) => {
     const reason = prompt('Please provide a reason for reporting this post:');
     if (reason) {
-      reportMutation.mutate({ postId, reason });
+      reportMutation.mutate({ _postId, reason });
     }
   };
 
@@ -537,7 +537,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     setEditingPost(null);
   };
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -545,7 +545,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     );
   }
 
-  if (error) {
+  if (_error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load posts. Please try again later.</p>

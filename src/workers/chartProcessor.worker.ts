@@ -1,13 +1,17 @@
+/// <reference lib="webworker" />
 /**
  * Web Worker for Heavy Chart Calculations
  * Offloads intensive data processing from main thread
  */
 
+// @ts-expect-error - DedicatedWorkerGlobalScope is a global API
+declare const self: DedicatedWorkerGlobalScope;
+
 interface ChartDataPoint {
   date: string;
   value: number;
   label?: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 interface ProcessingRequest {
@@ -23,7 +27,7 @@ interface ProcessingRequest {
 
 interface ProcessingResponse {
   type: string;
-  result: any;
+  result: unknown;
   processingTime: number;
 }
 
@@ -62,7 +66,7 @@ const dataProcessors = {
   /**
    * Aggregate wellness metrics
    */
-  aggregateWellness(data: ChartDataPoint[], options: any = {}) {
+  aggregateWellness(data: ChartDataPoint[], _options: any = {}) {
     const startTime = performance.now();
     
     // Calculate rolling averages
@@ -86,7 +90,7 @@ const dataProcessors = {
   /**
    * Calculate trend lines and predictions
    */
-  calculateTrends(data: ChartDataPoint[], options: any = {}) {
+  calculateTrends(data: ChartDataPoint[], _options: any = {}) {
     const startTime = performance.now();
     
     // Linear regression for trend line
@@ -425,7 +429,7 @@ self.addEventListener('message', (event: MessageEvent<ProcessingRequest>) => {
   const { type, data, options } = event.data;
   const startTime = performance.now();
   
-  let result: any;
+  let result: unknown;
   
   try {
     switch (type) {
@@ -459,7 +463,7 @@ self.addEventListener('message', (event: MessageEvent<ProcessingRequest>) => {
   } catch (error) {
     self.postMessage({
       type: 'ERROR',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : 'Processing error',
       processingTime: performance.now() - startTime,
     });
   }

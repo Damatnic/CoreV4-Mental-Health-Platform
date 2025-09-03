@@ -13,7 +13,7 @@ import MoodTracker from '../../components/wellness/MoodTracker';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Extend matchers
-expect.extend(toHaveNoViolations);
+expect.extend(_toHaveNoViolations);
 
 // Test wrapper
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -45,8 +45,8 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(_results).toHaveNoViolations();
     });
 
     it('mood tracker should have no accessibility violations', async () => {
@@ -56,8 +56,8 @@ describe('Crisis Intervention Accessibility', () => {
         </TestWrapper>
       );
       
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(_results).toHaveNoViolations();
     });
 
     it('crisis modal should have no accessibility violations when open', async () => {
@@ -70,13 +70,13 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       // Wait for modal to open
       await screen.findByRole('dialog');
       
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
+      const results = await axe(_container);
+      expect(_results).toHaveNoViolations();
     });
   });
 
@@ -90,8 +90,8 @@ describe('Crisis Intervention Accessibility', () => {
       
       const button = screen.getByRole('button', { name: /crisis help/i });
       
-      expect(button).toHaveAttribute('aria-label');
-      expect(button).toHaveAttribute('aria-describedby');
+      expect(_button).toHaveAttribute('aria-label');
+      expect(_button).toHaveAttribute('aria-describedby');
       
       const description = document.getElementById(button.getAttribute('aria-describedby')!);
       expect(description?.textContent).toMatch(/immediate.*support/i);
@@ -107,11 +107,11 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       const alertRegion = await screen.findByRole('alert');
-      expect(alertRegion).toHaveAttribute('aria-live', 'assertive');
-      expect(alertRegion).toHaveTextContent(/crisis resources/i);
+      expect(_alertRegion).toHaveAttribute('aria-live', 'assertive');
+      expect(_alertRegion).toHaveTextContent(/crisis resources/i);
     });
 
     it('should provide context for mood levels', () => {
@@ -123,11 +123,11 @@ describe('Crisis Intervention Accessibility', () => {
       
       const slider = screen.getByRole('slider');
       
-      expect(slider).toHaveAttribute('aria-label');
-      expect(slider).toHaveAttribute('aria-valuemin', '1');
-      expect(slider).toHaveAttribute('aria-valuemax', '10');
-      expect(slider).toHaveAttribute('aria-valuenow');
-      expect(slider).toHaveAttribute('aria-valuetext');
+      expect(_slider).toHaveAttribute('aria-label');
+      expect(_slider).toHaveAttribute('aria-valuemin', '1');
+      expect(_slider).toHaveAttribute('aria-valuemax', '10');
+      expect(_slider).toHaveAttribute('aria-valuenow');
+      expect(_slider).toHaveAttribute('aria-valuetext');
     });
 
     it('should announce mood changes to screen readers', async () => {
@@ -142,7 +142,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // Check for live region update
       const statusRegion = screen.getByRole('status');
-      expect(statusRegion).toHaveTextContent(/mood.*3/i);
+      expect(_statusRegion).toHaveTextContent(/mood.*3/i);
     });
   });
 
@@ -160,7 +160,7 @@ describe('Crisis Intervention Accessibility', () => {
       await userEvent.tab();
       
       // Button should be focusable
-      expect(button).toHaveProperty('tabIndex');
+      expect(_button).toHaveProperty('tabIndex');
       expect(button.tabIndex).toBeGreaterThanOrEqual(0);
     });
 
@@ -174,7 +174,7 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       const modal = await screen.findByRole('dialog');
       const focusableElements = modal.querySelectorAll(
@@ -185,7 +185,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // First element should receive focus
       const firstElement = focusableElements[0] as HTMLElement;
-      expect(document.activeElement).toBe(firstElement);
+      expect(document.activeElement).toBe(_firstElement);
     });
 
     it('should close modal with Escape key', async () => {
@@ -198,7 +198,7 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       await screen.findByRole('dialog');
       
@@ -219,24 +219,24 @@ describe('Crisis Intervention Accessibility', () => {
       // Tab to slider
       await user.tab();
       const slider = screen.getByRole('slider');
-      expect(document.activeElement).toBe(slider);
+      expect(document.activeElement).toBe(_slider);
       
       // Adjust with arrow keys
       await user.keyboard('{ArrowRight}');
-      expect(slider).toHaveAttribute('aria-valuenow', '6');
+      expect(_slider).toHaveAttribute('aria-valuenow', '6');
       
       await user.keyboard('{ArrowLeft}');
-      expect(slider).toHaveAttribute('aria-valuenow', '5');
+      expect(_slider).toHaveAttribute('aria-valuenow', '5');
       
       // Tab to notes field
       await user.tab();
       const notesField = screen.getByPlaceholderText(/add notes/i);
-      expect(document.activeElement).toBe(notesField);
+      expect(document.activeElement).toBe(_notesField);
       
       // Tab to submit button
       await user.tab();
       const submitButton = screen.getByRole('button', { name: /log mood/i });
-      expect(document.activeElement).toBe(submitButton);
+      expect(document.activeElement).toBe(_submitButton);
     });
   });
 
@@ -286,7 +286,7 @@ describe('Crisis Intervention Accessibility', () => {
       const button = screen.getByRole('button', { name: /crisis help/i });
       button.focus();
       
-      const styles = window.getComputedStyle(button);
+      const styles = window.getComputedStyle(_button);
       
       // Should have visible focus indicator
       expect(styles.outline).not.toBe('none');
@@ -329,7 +329,7 @@ describe('Crisis Intervention Accessibility', () => {
         
         // At least 8px spacing (simplified check)
         const minGap = Math.min(verticalGap, horizontalGap);
-        expect(minGap).toBeGreaterThanOrEqual(8);
+        expect(_minGap).toBeGreaterThanOrEqual(8);
       }
     });
   });
@@ -345,7 +345,7 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       // Check for clear, simple instructions
       expect(screen.getByText('988')).toBeInTheDocument();
@@ -353,7 +353,7 @@ describe('Crisis Intervention Accessibility', () => {
       
       // No complex medical jargon in crisis mode
       const modalText = screen.getByRole('dialog').textContent;
-      expect(modalText).not.toMatch(/psychiatric|psychological assessment/i);
+      expect(_modalText).not.toMatch(/psychiatric|psychological assessment/i);
     });
 
     it('should provide clear error messages', async () => {
@@ -369,7 +369,7 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const submitButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(submitButton);
+      await user.click(_submitButton);
       
       const errorMessage = await screen.findByText(/failed.*try again/i);
       expect(errorMessage).toBeInTheDocument();
@@ -436,7 +436,7 @@ describe('Crisis Intervention Accessibility', () => {
       render(<CrisisButton />);
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       // Crisis resources should still be accessible
       expect(await screen.findByText('988')).toBeInTheDocument();
@@ -452,12 +452,12 @@ describe('Crisis Intervention Accessibility', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       const images = screen.getAllByRole('img');
       
       images.forEach(img => {
-        expect(img).toHaveAttribute('alt');
+        expect(_img).toHaveAttribute('alt');
         expect(img.getAttribute('alt')).not.toBe('');
       });
     });

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { TrendingUp, TrendingDown, Activity, Calendar } from 'lucide-react';
+import { useMemo } from 'react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import {
@@ -88,7 +88,7 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => `Mood: ${context.parsed.y}/5`
+          label: (context: unknown) => `Mood: ${context.parsed.y}/5`
         }
       }
     },
@@ -134,13 +134,13 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       }
     });
     
-    return Object.entries(emotionCounts)
+    return Object.entries(_emotionCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([emotion]) => emotion);
   };
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>

@@ -1,0 +1,573 @@
+/**
+ * Secure Storage Service
+ * Provides encrypted storage for sensitive data with HIPAA compliance
+ * Implements defense-in-depth with multiple layers of security
+ */
+
+import { cryptoService } from './cryptoService';
+import { secureStorage as _localSecureStorage } from './SecureLocalStorage';
+import { logger } from '../../utils/logger';
+
+interface StorageOptions {
+  persistent?: boolean;
+  expires?: Date;
+  encrypted?: boolean;
+  compress?: boolean;
+}
+
+interface StorageItem {
+  _value: unknown;
+  metadata: {
+    created: Date;
+    updated: Date;
+    expires?: Date;
+    encrypted: boolean;
+    _compressed: boolean;
+    checksum: string;
+  };
+}
+
+class SecureStorageService {
+  private static instance: SecureStorageService;
+  private memoryCache: Map<string, StorageItem> = new Map();
+  private readonly STORAGE_PREFIX = 'mh_secure_';
+  private readonly MAX_STORAGE_SIZE = 10 * 1024 * 1024; // 10MB limit per user
+
+  private constructor() {
+    this.initializeStorage();
+  }
+
+  static getInstance(): SecureStorageService {
+    if (!SecureStorageService.instance) {
+      SecureStorageService.instance = new SecureStorageService();
+    }
+    return SecureStorageService.instance;
+  }
+
+  private initializeStorage(): void {
+    // Clean up expired items on initialization
+    this.cleanupExpiredItems();
+    
+    // Set up periodic cleanup
+    setInterval(() => {
+      this.cleanupExpiredItems();
+    }, 60 * 60 * 1000); // Clean up every hour
+
+    // Listen for storage quota errors
+    this.setupStorageQuotaHandling();
+  }
+
+  /**
+   * Store an item securely
+   */
+  async setItem(
+    _key: string,
+    _value: unknown,
+    options: StorageOptions = {}
+  ): Promise<void> {
+    try {
+      const {
+        persistent = true,
+        expires,
+        encrypted = true,
+        compress = false,
+      } = options;
+
+      // Validate storage quota
+      await this.checkStorageQuota();
+
+      // Serialize value
+      let serialized = JSON.stringify(_value);
+
+      // Compress if requested and beneficial
+      if (compress && serialized.length > 1024) {
+        serialized = await this.compress(_serialized);
+      }
+
+      // Encrypt if requested
+      if (_encrypted) {
+        serialized = await cryptoService.encrypt(_serialized);
+      }
+
+      // Calculate checksum for integrity verification
+      const checksum = await this.calculateChecksum(_serialized);
+
+      // Create storage item
+      const storageItem: StorageItem = {
+        _value: serialized,
+        metadata: {
+          created: new Date(),
+          updated: new Date(),
+          expires,
+          encrypted,
+          _compressed: compress,
+          checksum,
+        },
+      };
+
+      // Store in memory cache
+      this.memoryCache.set(_key, storageItem);
+
+      // Store persistently if requested
+      if (_persistent) {
+        const _storageKey = this.getStorageKey(_key);
+        
+        try {
+          localStorage.setItem(_storageKey, JSON.stringify(storageItem));
+        } catch {
+          // Try IndexedDB as fallback for larger _data
+          await this.storeInIndexedDB(_storageKey, storageItem);
+        }
+      }
+
+      // Log storage event for audit
+      this.logStorageEvent('SET', _key, { encrypted, persistent });
+    } catch (_error) {
+      logger.error(`Failed to store _item ${_key}:`, error);
+      throw new Error(`Storage failed: ${error instanceof Error ? error.message : String(_error)}`);
+    }
+  }
+
+  /**
+   * Retrieve an item from secure storage
+   */
+  async getItem(_key: string): Promise<unknown> {
+    try {
+      // Check memory cache first
+      let storageItem = this.memoryCache.get(_key);
+
+      // If not in memory, check persistent storage
+      if (!storageItem) {
+        const _storageKey = this.getStorageKey(_key);
+        
+        // Try localStorage first
+        const _stored = localStorage.getItem(_storageKey);
+        if (_stored) {
+          storageItem = JSON.parse(_stored) as StorageItem;
+        } else {
+          // Try IndexedDB as fallback
+          storageItem = await this.getFromIndexedDB(_storageKey) || undefined;
+        }
+
+        // Cache in memory if found
+        if (storageItem) {
+          this.memoryCache.set(_key, storageItem);
+        }
+      }
+
+      if (!storageItem) {
+        return null;
+      }
+
+      // Check expiration
+      if (storageItem.metadata.expires && 
+          new Date() > new Date(storageItem.metadata.expires)) {
+        await this.removeItem(_key);
+        return null;
+      }
+
+      // Verify integrity
+      const checksum = await this.calculateChecksum(storageItem.value);
+      if (checksum !== storageItem.metadata.checksum) {
+        logger.error(`Integrity check failed for ${_key}`);
+        await this.removeItem(_key);
+        throw new Error('Data integrity verification failed');
+      }
+
+      let _value = storageItem.value;
+
+      // Decrypt if encrypted
+      if (storageItem.metadata.encrypted) {
+        _value = await cryptoService.decrypt(_value);
+      }
+
+      // Decompress if compressed
+      if (storageItem.metadata.compressed) {
+        _value = await this.decompress(_value);
+      }
+
+      // Deserialize
+      return JSON.parse(_value);
+    } catch (_error) {
+      logger.error(`Failed to retrieve _item ${_key}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Remove an item from storage
+   */
+  async removeItem(_key: string): Promise<void> {
+    try {
+      // Remove from memory cache
+      this.memoryCache.delete(_key);
+
+      // Remove from localStorage
+      const _storageKey = this.getStorageKey(_key);
+      localStorage.removeItem(_storageKey);
+
+      // Remove from IndexedDB
+      await this.removeFromIndexedDB(_storageKey);
+
+      // Log removal event
+      this.logStorageEvent('REMOVE', _key);
+    } catch (_error) {
+      logger.error(`Failed to remove _item ${_key}:`, error);
+    }
+  }
+
+  /**
+   * Clear all stored items
+   */
+  async clear(): Promise<void> {
+    try {
+      // Clear memory cache
+      this.memoryCache.clear();
+
+      // Clear localStorage items with our prefix
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const _key = localStorage.key(i);
+        if (_key?.startsWith(this.STORAGE_PREFIX)) {
+          keysToRemove.push(_key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(_key));
+
+      // Clear IndexedDB
+      await this.clearIndexedDB();
+
+      // Log clear event
+      this.logStorageEvent('CLEAR', 'all');
+    } catch (_error) {
+      logger.error('Failed to clear storage:');
+    }
+  }
+
+  /**
+   * Get all keys in storage
+   */
+  async getAllKeys(): Promise<string[]> {
+    const keys = new Set<string>();
+
+    // Get keys from memory cache
+    this.memoryCache.forEach((_, _key) => keys.add(_key));
+
+    // Get keys from localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const _storageKey = localStorage.key(i);
+      if (_storageKey?.startsWith(this.STORAGE_PREFIX)) {
+        const _key = _storageKey.replace(this.STORAGE_PREFIX, '');
+        keys.add(_key);
+      }
+    }
+
+    // Get keys from IndexedDB
+    const idbKeys = await this.getKeysFromIndexedDB();
+    idbKeys.forEach(key => keys.add(key.replace(this.STORAGE_PREFIX, '')));
+
+    return Array.from(_keys);
+  }
+
+  /**
+   * Get storage size information
+   */
+  async getStorageInfo(): Promise<{
+    used: number;
+    available: number;
+    quota: number;
+  }> {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const estimate = await navigator.storage.estimate();
+      return {
+        used: estimate.usage || 0,
+        available: (estimate.quota || 0) - (estimate.usage || 0),
+        quota: estimate.quota || 0,
+      };
+    }
+
+    // Fallback for browsers without storage API
+    let used = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const _key = localStorage.key(i);
+      if (_key) {
+        used += (localStorage.getItem(_key) || '').length;
+      }
+    }
+
+    return {
+      used,
+      available: this.MAX_STORAGE_SIZE - used,
+      quota: this.MAX_STORAGE_SIZE,
+    };
+  }
+
+  /**
+   * Private helper methods
+   */
+  private getStorageKey(_key: string): string {
+    return `${this.STORAGE_PREFIX}${_key}`;
+  }
+
+  private async calculateChecksum(_data: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(_data);
+    const _hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(_hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private async compress(_data: string): Promise<string> {
+    // Simple compression using browser's CompressionStream API if available
+    if ('CompressionStream' in window) {
+      const encoder = new TextEncoder();
+      const stream = new Response(
+        new Blob([encoder.encode(_data)])
+          .stream()
+          .pipeThrough(new (window as unknown).CompressionStream('gzip'))
+      );
+      const _compressed = await stream.arrayBuffer();
+      return btoa(String.fromCharCode(...new Uint8Array(_compressed)));
+    }
+    return data; // Return uncompressed if API not available
+  }
+
+  private async decompress(_data: string): Promise<string> {
+    try {
+      // Validate base64 input
+      if (!_data || typeof _data !== 'string') {
+        logger.warn('[SecureStorage] Invalid _data for decompression');
+        return '';
+      }
+      
+      // Check if data is already decompressed (not base64)
+      if (!this.isBase64(_data)) {
+        return _data;
+      }
+      
+      // Decompress using browser's DecompressionStream API if available
+      if ('DecompressionStream' in window) {
+        const _compressed = Uint8Array.from(atob(_data), c => c.charCodeAt(0));
+        const stream = new Response(
+          new Blob([_compressed])
+            .stream()
+            .pipeThrough(new (window as unknown).DecompressionStream('gzip'))
+        );
+        const decompressed = await stream.text();
+        return decompressed;
+      }
+      return data; // Return as-is if API not available
+    } catch (_error) {
+      logger.error('[SecureStorage] Decompression failed:');
+      return ''; // Return empty string instead of throwing
+    }
+  }
+
+  private isBase64(str: string): boolean {
+    try {
+      // Basic base64 validation
+      return btoa(atob(_str)) === str;
+    } catch {
+      return false;
+    }
+  }
+
+  private async checkStorageQuota(): Promise<void> {
+    const info = await this.getStorageInfo();
+    if (info.available < 1024 * 1024) { // Less than 1MB available
+      // Clean up old items
+      await this.cleanupOldItems();
+      
+      // Check again
+      const newInfo = await this.getStorageInfo();
+      if (newInfo.available < 1024 * 1024) {
+        throw new Error('Storage quota exceeded');
+      }
+    }
+  }
+
+  private async cleanupExpiredItems(): Promise<void> {
+    const keys = await this.getAllKeys();
+    for (const key of keys) {
+      const _item = await this.getItem(_key);
+      // getItem automatically removes expired items
+    }
+  }
+
+  private async cleanupOldItems(): Promise<void> {
+    // Remove items older than 30 days that aren't marked as persistent
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const keys = await this.getAllKeys();
+    
+    for (const key of keys) {
+      const _storageKey = this.getStorageKey(_key);
+      const _stored = localStorage.getItem(_storageKey);
+      if (_stored) {
+        const _item = JSON.parse(_stored) as StorageItem;
+        if (new Date(_item.metadata.created) < thirtyDaysAgo) {
+          await this.removeItem(_key);
+        }
+      }
+    }
+  }
+
+  private setupStorageQuotaHandling(): void {
+    window.addEventListener('storage', (event) => {
+      if (event._key && event._key.startsWith(this.STORAGE_PREFIX)) {
+        // Invalidate memory cache for changed items
+        const _key = event._key.replace(this.STORAGE_PREFIX, '');
+        this.memoryCache.delete(_key);
+      }
+    });
+  }
+
+  private logStorageEvent(
+    action: string,
+    _key: string,
+    details?: Record<string, any>
+  ): void {
+    // In production, this would log to audit service
+    logger.debug(`Storage ${action}: ${_key}`, 'SecureStorage', details);
+  }
+
+  /**
+   * IndexedDB fallback methods for larger data
+   */
+  private async storeInIndexedDB(_key: string, _value: StorageItem): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('SecureStorage', 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = () => {
+        const db = request.result;
+        const transaction = db.transaction(['items'], 'readwrite');
+        const store = transaction.objectStore('items');
+        store.put({ _key, _value });
+        
+        transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        
+        transaction.onerror = () => {
+          db.close();
+          reject(transaction.error);
+        };
+      };
+      
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains('items')) {
+          db.createObjectStore('items', { keyPath: '_key' });
+        }
+      };
+    });
+  }
+
+  private async getFromIndexedDB(_key: string): Promise<StorageItem | null> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('SecureStorage', 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = () => {
+        const db = request.result;
+        
+        if (!db.objectStoreNames.contains('items')) {
+          db.close();
+          resolve(null);
+          return;
+        }
+        
+        const transaction = db.transaction(['items'], 'readonly');
+        const store = transaction.objectStore('items');
+        const getRequest = store.get(_key);
+        
+        getRequest.onsuccess = () => {
+          db.close();
+          resolve(getRequest.result?._value || null);
+        };
+        
+        getRequest.onerror = () => {
+          db.close();
+          reject(getRequest.error);
+        };
+      };
+    });
+  }
+
+  private async removeFromIndexedDB(_key: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('SecureStorage', 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = () => {
+        const db = request.result;
+        
+        if (!db.objectStoreNames.contains('items')) {
+          db.close();
+          resolve();
+          return;
+        }
+        
+        const transaction = db.transaction(['items'], 'readwrite');
+        const store = transaction.objectStore('items');
+        store.delete(_key);
+        
+        transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        
+        transaction.onerror = () => {
+          db.close();
+          reject(transaction.error);
+        };
+      };
+    });
+  }
+
+  private async getKeysFromIndexedDB(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('SecureStorage', 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = () => {
+        const db = request.result;
+        
+        if (!db.objectStoreNames.contains('items')) {
+          db.close();
+          resolve([]);
+          return;
+        }
+        
+        const transaction = db.transaction(['items'], 'readonly');
+        const store = transaction.objectStore('items');
+        const getAllKeysRequest = store.getAllKeys();
+        
+        getAllKeysRequest.onsuccess = () => {
+          db.close();
+          resolve(getAllKeysRequest.result as string[]);
+        };
+        
+        getAllKeysRequest.onerror = () => {
+          db.close();
+          reject(getAllKeysRequest.error);
+        };
+      };
+    });
+  }
+
+  private async clearIndexedDB(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const deleteRequest = indexedDB.deleteDatabase('SecureStorage');
+      deleteRequest.onsuccess = () => resolve();
+      deleteRequest.onerror = () => reject(deleteRequest.error);
+    });
+  }
+}
+
+export const secureStorage = SecureStorageService.getInstance();

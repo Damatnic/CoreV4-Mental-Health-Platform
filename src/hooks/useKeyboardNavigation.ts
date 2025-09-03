@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '../utils/logger';
 
 interface KeyboardShortcut {
   key: string;
@@ -8,7 +9,7 @@ interface KeyboardShortcut {
   shift?: boolean;
   action: () => void;
   description?: string;
-  global?: boolean; // Whether shortcut works everywhere or only in dashboard
+  global?: boolean; // Whether _shortcut works everywhere or only in dashboard
 }
 
 // Predefined dashboard keyboard shortcuts
@@ -83,8 +84,8 @@ const dashboardShortcuts: KeyboardShortcut[] = [
     ctrl: true,
     action: () => {
       // Show keyboard shortcuts help
-      const event = new CustomEvent('showKeyboardHelp');
-      window.dispatchEvent(event);
+      const _event = new CustomEvent('showKeyboardHelp');
+      window.dispatchEvent(_event);
     },
     description: 'Show Keyboard Shortcuts',
     global: true,
@@ -92,27 +93,27 @@ const dashboardShortcuts: KeyboardShortcut[] = [
 ];
 
 export function useKeyboardNavigation(customShortcuts?: KeyboardShortcut[]) {
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const shortcuts = useRef<KeyboardShortcut[]>([...dashboardShortcuts, ...(customShortcuts || [])]);
 
-  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+  const handleKeyPress = useCallback((_event: KeyboardEvent) => {
     // Don't trigger shortcuts when typing in input fields
-    const target = event.target as HTMLElement;
+    const target = _event.target as HTMLElement;
     if (target.tagName === 'INPUT' || 
         target.tagName === 'TEXTAREA' || 
         target.contentEditable === 'true') {
       return;
     }
 
-    shortcuts.current.forEach(shortcut => {
-      const ctrlMatch = shortcut.ctrl ? event.ctrlKey || event.metaKey : !event.ctrlKey && !event.metaKey;
-      const altMatch = shortcut.alt ? event.altKey : !event.altKey;
-      const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
-      const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
+    shortcuts.current.forEach(_shortcut => {
+      const ctrlMatch = _shortcut.ctrl ? _event.ctrlKey || _event.metaKey : !_event.ctrlKey && !_event.metaKey;
+      const altMatch = _shortcut.alt ? _event.altKey : !_event.altKey;
+      const shiftMatch = _shortcut.shift ? _event.shiftKey : !_event.shiftKey;
+      const keyMatch = _event.key.toLowerCase() === _shortcut.key.toLowerCase();
 
       if (ctrlMatch && altMatch && shiftMatch && keyMatch) {
-        event.preventDefault();
-        shortcut.action();
+        _event.preventDefault();
+        _shortcut.action();
       }
     });
   }, []);
@@ -125,8 +126,8 @@ export function useKeyboardNavigation(customShortcuts?: KeyboardShortcut[]) {
   // Return shortcuts for displaying help
   return {
     shortcuts: shortcuts.current,
-    addShortcut: (shortcut: KeyboardShortcut) => {
-      shortcuts.current.push(shortcut);
+    addShortcut: (_shortcut: KeyboardShortcut) => {
+      shortcuts.current.push(_shortcut);
     },
     removeShortcut: (key: string) => {
       shortcuts.current = shortcuts.current.filter(s => s.key !== key);
@@ -162,14 +163,15 @@ export function useFocusManagement() {
           return aIndex - bIndex;
         }
         
-        return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        return a.compareDocumentPosition(_b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
       });
     };
 
     updateFocusableElements();
     
     // Update on DOM changes
-    const observer = new MutationObserver(updateFocusableElements);
+// @ts-expect-error - MutationObserver is a global API
+    const observer = new MutationObserver(_updateFocusableElements);
     observer.observe(document.body, { 
       childList: true, 
       subtree: true,
@@ -180,15 +182,15 @@ export function useFocusManagement() {
     return () => observer.disconnect();
   }, []);
 
-  const moveFocus = useCallback((direction: 'next' | 'previous' | 'first' | 'last') => {
+  const moveFocus = useCallback((_direction: 'next' | 'previous' | 'first' | 'last') => {
     const elements = focusableElements.current;
     if (elements.length === 0) return;
 
-    const currentElement = document.activeElement as HTMLElement;
-    const currentIndex = elements.indexOf(currentElement);
+    const _currentElement = document.activeElement as HTMLElement;
+    const currentIndex = elements.indexOf(_currentElement);
 
     let newIndex: number;
-    switch (direction) {
+    switch (_direction) {
       case 'next':
         newIndex = currentIndex >= 0 ? (currentIndex + 1) % elements.length : 0;
         break;
@@ -209,13 +211,13 @@ export function useFocusManagement() {
 
   // Tab navigation enhancement
   useEffect(() => {
-    const handleTabKey = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
+    const handleTabKey = (_event: KeyboardEvent) => {
+      if (_event.key === 'Tab') {
         // Let browser handle normal tab navigation
         // but track the current focus index
         setTimeout(() => {
-          const currentElement = document.activeElement as HTMLElement;
-          const index = focusableElements.current.indexOf(currentElement);
+          const _currentElement = document.activeElement as HTMLElement;
+          const index = focusableElements.current.indexOf(_currentElement);
           if (index >= 0) {
             currentFocusIndex.current = index;
           }
@@ -253,7 +255,7 @@ export function useScreenReaderAnnouncement() {
       height: 1px;
       overflow: hidden;
     `;
-    document.body.appendChild(div);
+    document.body.appendChild(_div);
     announcementRef.current = div;
 
     return () => {
@@ -286,9 +288,9 @@ export function useReducedMotion() {
   const prefersReducedMotion = mediaQuery.matches;
 
   useEffect(() => {
-    const handleChange = (event: MediaQueryListEvent) => {
+    const handleChange = (_event: MediaQueryListEvent) => {
       // Could trigger a state update here if needed
-      console.log('Motion preference changed:', event.matches ? 'reduced' : 'normal');
+      logger.info('Motion preference changed:', _event.matches ? 'reduced' : 'normal');
     };
 
     mediaQuery.addEventListener('change', handleChange);

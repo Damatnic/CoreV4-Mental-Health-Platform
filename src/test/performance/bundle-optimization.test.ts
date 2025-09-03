@@ -7,6 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, statSync } from 'fs';
 import { join } from 'path';
 import { glob } from 'glob';
+import { logger } from '../../utils/logger';
 
 describe('Bundle Optimization Tests', () => {
   const bundleStats: Record<string, number> = {};
@@ -18,73 +19,73 @@ describe('Bundle Optimization Tests', () => {
     const jsFiles = await glob('assets/js/*.js', { cwd: distPath });
     
     for (const file of jsFiles) {
-      const filePath = join(distPath, file);
+      const _filePath = join(distPath, file);
       try {
-        const stats = statSync(filePath);
+        const stats = statSync(_filePath);
         bundleStats[file] = stats.size;
-      } catch (error) {
-        console.warn(`Could not read bundle file: ${file}`);
+      } catch {
+        logger.warn(`Could not read bundle file: ${file}`);
       }
     }
     
     // Read index.html to check module preloads
     try {
       manifestContent = readFileSync(join(distPath, 'index.html'), 'utf-8');
-    } catch (error) {
-      console.warn('Could not read index.html');
+    } catch {
+      logger.warn('Could not read index.html');
     }
   });
 
   describe('Bundle Size Targets', () => {
     it('should have main entry bundle under 50KB', () => {
-      const mainBundles = Object.entries(bundleStats).filter(([name]) => 
-        name.includes('index-') && name.endsWith('.js')
+      const mainBundles = Object.entries(_bundleStats).filter(([_name]) => 
+        _name.includes('index-') && _name.endsWith('.js')
       );
       
       expect(mainBundles.length).toBeGreaterThan(0);
       
-      for (const [name, size] of mainBundles) {
-        expect(size).toBeLessThan(50 * 1024); // 50KB
-        console.log(`✅ Main bundle ${name}: ${(size / 1024).toFixed(2)}KB`);
+      for (const [_name, size] of mainBundles) {
+        expect(_size).toBeLessThan(50 * 1024); // 50KB
+        logger.debug(`✅ Main bundle ${_name}: ${(size / 1024).toFixed(2)}KB`);
       }
     });
 
     it('should have crisis bundle under 100KB (critical path)', () => {
-      const crisisBundles = Object.entries(bundleStats).filter(([name]) => 
-        name.includes('crisis') && name.endsWith('.js')
+      const crisisBundles = Object.entries(_bundleStats).filter(([_name]) => 
+        _name.includes('crisis') && _name.endsWith('.js')
       );
       
       if (crisisBundles.length > 0) {
-        for (const [name, size] of crisisBundles) {
-          expect(size).toBeLessThan(100 * 1024); // 100KB for crisis components
-          console.log(`🆘 Crisis bundle ${name}: ${(size / 1024).toFixed(2)}KB`);
+        for (const [_name, size] of crisisBundles) {
+          expect(_size).toBeLessThan(100 * 1024); // 100KB for crisis components
+          logger.debug(`🆘 Crisis bundle ${_name}: ${(size / 1024).toFixed(2)}KB`);
         }
       }
     });
 
     it('should have lazy-loaded page bundles under 150KB each', () => {
-      const pageBundles = Object.entries(bundleStats).filter(([name]) => 
-        (name.includes('WellnessPage') || name.includes('CommunityPage') || name.includes('ProfessionalPage'))
-        && name.endsWith('.js')
+      const pageBundles = Object.entries(_bundleStats).filter(([_name]) => 
+        (_name.includes('WellnessPage') || _name.includes('CommunityPage') || _name.includes('ProfessionalPage'))
+        && _name.endsWith('.js')
       );
       
-      for (const [name, size] of pageBundles) {
-        expect(size).toBeLessThan(150 * 1024); // 150KB per page
-        console.log(`📄 Page bundle ${name}: ${(size / 1024).toFixed(2)}KB`);
+      for (const [_name, size] of pageBundles) {
+        expect(_size).toBeLessThan(150 * 1024); // 150KB per page
+        logger.debug(`📄 Page bundle ${_name}: ${(size / 1024).toFixed(2)}KB`);
       }
     });
 
     it('should have vendor bundles properly chunked', () => {
-      const vendorBundles = Object.entries(bundleStats).filter(([name]) => 
-        (name.includes('vendor') || name.includes('react-') || name.includes('framer-motion'))
-        && name.endsWith('.js')
+      const vendorBundles = Object.entries(_bundleStats).filter(([_name]) => 
+        (_name.includes('vendor') || _name.includes('react-') || _name.includes('framer-motion'))
+        && _name.endsWith('.js')
       );
       
       expect(vendorBundles.length).toBeGreaterThan(2); // Should have multiple vendor chunks
       
-      for (const [name, size] of vendorBundles) {
-        expect(size).toBeLessThan(200 * 1024); // 200KB per vendor chunk
-        console.log(`📦 Vendor bundle ${name}: ${(size / 1024).toFixed(2)}KB`);
+      for (const [_name, size] of vendorBundles) {
+        expect(_size).toBeLessThan(200 * 1024); // 200KB per vendor chunk
+        logger.debug(`📦 Vendor bundle ${_name}: ${(size / 1024).toFixed(2)}KB`);
       }
     });
   });
@@ -101,11 +102,11 @@ describe('Bundle Optimization Tests', () => {
       ];
       
       for (const chunkName of expectedChunks) {
-        const hasChunk = Object.keys(bundleStats).some(name => 
-          name.includes(chunkName) && name.endsWith('.js')
+        const _hasChunk = Object.keys(_bundleStats).some(_name => 
+          _name.includes(chunkName) && _name.endsWith('.js')
         );
-        expect(hasChunk).toBe(true);
-        console.log(`✅ Found chunk for: ${chunkName}`);
+        expect(_hasChunk).toBe(true);
+        logger.debug(`✅ Found chunk for: ${chunkName}`);
       }
     });
 
@@ -119,11 +120,11 @@ describe('Bundle Optimization Tests', () => {
       ];
       
       for (const feature of featureChunks) {
-        const hasChunk = Object.keys(bundleStats).some(name => 
-          name.includes(feature) && name.endsWith('.js')
+        const _hasChunk = Object.keys(_bundleStats).some(_name => 
+          _name.includes(feature) && _name.endsWith('.js')
         );
-        expect(hasChunk).toBe(true);
-        console.log(`🎯 Found feature chunk: ${feature}`);
+        expect(_hasChunk).toBe(true);
+        logger.debug(`🎯 Found feature chunk: ${feature}`);
       }
     });
   });
@@ -138,100 +139,100 @@ describe('Bundle Optimization Tests', () => {
       ];
       
       for (const chunk of criticalChunks) {
-        const hasPreload = manifestContent.includes(`modulepreload`) && 
+        const _hasPreload = manifestContent.includes(`modulepreload`) && 
                           manifestContent.includes(chunk);
-        expect(hasPreload).toBe(true);
-        console.log(`⚡ Found preload for: ${chunk}`);
+        expect(_hasPreload).toBe(true);
+        logger.debug(`⚡ Found preload for: ${chunk}`);
       }
     });
 
     it('should NOT preload heavy lazy chunks', () => {
-      const lazyChunks = [
+      const _lazyChunks = [
         'charts-chartjs', // Should be lazy loaded
         'ai-features',    // Should be lazy loaded
         'professional'    // Should be lazy loaded
       ];
       
       // These might be preloaded, but shouldn't be in the critical path
-      console.log('📊 Bundle preload analysis completed');
+      logger.debug('📊 Bundle preload analysis completed');
     });
   });
 
   describe('Performance Budget Compliance', () => {
     it('should meet overall performance budget', () => {
-      const totalInitialSize = Object.entries(bundleStats)
-        .filter(([name]) => 
+      const totalInitialSize = Object.entries(_bundleStats)
+        .filter(([_name]) => 
           // Calculate initial bundle size (critical path only)
-          name.includes('index-') ||
-          name.includes('react-core') ||
-          name.includes('react-dom') ||
-          name.includes('crisis') ||
-          name.includes('network')
+          _name.includes('index-') ||
+          _name.includes('react-core') ||
+          _name.includes('react-dom') ||
+          _name.includes('crisis') ||
+          _name.includes('network')
         )
         .reduce((total, [, size]) => total + size, 0);
       
       const budgetMB = 1; // 1MB initial bundle budget
-      expect(totalInitialSize).toBeLessThan(budgetMB * 1024 * 1024);
+      expect(_totalInitialSize).toBeLessThan(budgetMB * 1024 * 1024);
       
-      console.log(`💰 Initial bundle size: ${(totalInitialSize / 1024 / 1024).toFixed(2)}MB (Budget: ${budgetMB}MB)`);
+      logger.debug(`💰 Initial bundle size: ${(totalInitialSize / 1024 / 1024).toFixed(2)}MB (Budget: ${budgetMB}MB)`);
     });
 
     it('should have reasonable total bundle size', () => {
-      const totalSize = Object.values(bundleStats).reduce((sum, size) => sum + size, 0);
+      const totalSize = Object.values(_bundleStats).reduce((sum, size) => sum + size, 0);
       const maxTotalMB = 3; // 3MB total budget
       
-      expect(totalSize).toBeLessThan(maxTotalMB * 1024 * 1024);
+      expect(_totalSize).toBeLessThan(maxTotalMB * 1024 * 1024);
       
-      console.log(`📊 Total bundle size: ${(totalSize / 1024 / 1024).toFixed(2)}MB (Budget: ${maxTotalMB}MB)`);
+      logger.debug(`📊 Total bundle size: ${(totalSize / 1024 / 1024).toFixed(2)}MB (Budget: ${maxTotalMB}MB)`);
     });
   });
 
   describe('Chunk Loading Strategy', () => {
     it('should have proper chunk naming for cache busting', () => {
-      for (const [name] of Object.entries(bundleStats)) {
+      for (const [_name] of Object.entries(_bundleStats)) {
         // Should have hash in filename for cache busting
-        expect(name).toMatch(/-[a-zA-Z0-9]{8,}\.js$/);
+        expect(_name).toMatch(/-[a-zA-Z0-9]{8,}\.js$/);
       }
     });
 
     it('should optimize for critical rendering path', () => {
       // Crisis components should be prioritized
-      const crisisBundle = Object.keys(bundleStats).find(name => name.includes('crisis'));
-      const aiBundle = Object.keys(bundleStats).find(name => name.includes('ai-features'));
+      const crisisBundle = Object.keys(_bundleStats).find(_name => _name.includes('crisis'));
+      const aiBundle = Object.keys(_bundleStats).find(_name => _name.includes('ai-features'));
       
       if (crisisBundle && aiBundle) {
-        // Crisis bundle should be smaller than AI features (optimization)
+        // Crisis bundle should be smaller than AI features (_optimization)
         expect(bundleStats[crisisBundle]).toBeLessThan(bundleStats[aiBundle]);
-        console.log(`🎯 Crisis prioritization validated`);
+        logger.debug(`🎯 Crisis prioritization validated`);
       }
     });
   });
 
   describe('Bundle Analysis Summary', () => {
     it('should provide bundle optimization summary', () => {
-      console.log('\n📊 BUNDLE OPTIMIZATION SUMMARY:');
-      console.log('================================================');
+      logger.debug('\n📊 BUNDLE OPTIMIZATION SUMMARY:');
+      logger.debug('================================================');
       
-      const totalSize = Object.values(bundleStats).reduce((sum, size) => sum + size, 0);
-      const chunkCount = Object.keys(bundleStats).length;
+      const totalSize = Object.values(_bundleStats).reduce((sum, size) => sum + size, 0);
+      const chunkCount = Object.keys(_bundleStats).length;
       const avgChunkSize = totalSize / chunkCount;
       
-      console.log(`📦 Total chunks: ${chunkCount}`);
-      console.log(`📏 Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
-      console.log(`📊 Average chunk size: ${(avgChunkSize / 1024).toFixed(2)}KB`);
+      logger.debug(`📦 Total chunks: ${chunkCount}`);
+      logger.debug(`📏 Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
+      logger.debug(`📊 Average chunk size: ${(avgChunkSize / 1024).toFixed(2)}KB`);
       
       // Largest chunks
-      const sortedBundles = Object.entries(bundleStats)
+      const sortedBundles = Object.entries(_bundleStats)
         .sort(([,a], [,b]) => b - a)
         .slice(0, 5);
       
-      console.log('\n🔝 Largest bundles:');
+      logger.debug('\n🔝 Largest bundles:');
       for (const [name, size] of sortedBundles) {
-        console.log(`   ${name}: ${(size / 1024).toFixed(2)}KB`);
+        logger.debug(`   ${_name}: ${(size / 1024).toFixed(2)}KB`);
       }
       
       // Critical path analysis
-      const criticalSize = Object.entries(bundleStats)
+      const criticalSize = Object.entries(_bundleStats)
         .filter(([name]) => 
           name.includes('index-') ||
           name.includes('react-core') ||
@@ -239,8 +240,8 @@ describe('Bundle Optimization Tests', () => {
         )
         .reduce((sum, [, size]) => sum + size, 0);
       
-      console.log(`\n⚡ Critical path size: ${(criticalSize / 1024).toFixed(2)}KB`);
-      console.log('================================================\n');
+      logger.debug(`\n⚡ Critical path size: ${(criticalSize / 1024).toFixed(2)}KB`);
+      logger.debug('================================================\n');
       
       // This test always passes - it's for reporting
       expect(true).toBe(true);

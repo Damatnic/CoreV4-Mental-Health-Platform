@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { AlertCircle, Phone, MessageCircle, MapPin, Heart, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAnalytics } from '../../hooks/useAnalytics';
+import { logger } from '@/utils/logger';
 
 interface CrisisResource {
   name: string;
@@ -11,6 +12,12 @@ interface CrisisResource {
   distance?: string;
   url?: string;
   available?: boolean;
+}
+
+interface CrisisResources {
+  hotlines: CrisisResource[];
+  localResources: CrisisResource[];
+  onlineSupport: CrisisResource[];
 }
 
 interface CrisisButtonProps {
@@ -27,7 +34,7 @@ const OFFLINE_RESOURCES: CrisisResource[] = [
   { name: 'SAMHSA National Helpline', number: '1-800-662-4357', available: true },
 ];
 
-const CrisisButton: React.FC<CrisisButtonProps> = ({ 
+const _CrisisButton: React.FC<CrisisButtonProps> = ({ 
   className = '', 
   size = 'medium',
   variant = 'primary',
@@ -35,7 +42,7 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [resources, setResources] = useState<any>(null);
+  const [resources, setResources] = useState<CrisisResources | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [professionalAlerted, setProfessionalAlerted] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -77,12 +84,12 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
           action: 'button_clicked',
           label: 'crisis_support_activated'
         });
-      } catch (err) {
-        console.error('Failed to track event:', err);
+      } catch (_error) {
+        logger.error('Failed to track event:', err);
       }
 
       // Trigger crisis callback if provided
-      if (onCrisisActivated) {
+      if (_onCrisisActivated) {
         onCrisisActivated();
       }
 
@@ -100,9 +107,9 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
         setResources(resourcesResponse.data);
         setProfessionalAlerted(alertResponse.data.professionalAlerted);
         setIsLoading(false);
-      } catch (err) {
-        console.error('Crisis API error:', err);
-        setError('Network error - showing offline resources');
+      } catch (_error) {
+        logger.error('Crisis API error: ', err);
+        setError('Network undefined - showing offline resources');
         setResources({
           hotlines: OFFLINE_RESOURCES,
           localResources: [],
@@ -309,4 +316,4 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
 };
 
 // Export memoized component for critical performance
-export default React.memo(CrisisButton);
+export default React.memo(_CrisisButton);

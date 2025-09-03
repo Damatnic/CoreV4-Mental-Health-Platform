@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Phone, 
   MessageSquare, 
@@ -11,6 +11,7 @@ import {
   Battery,
   BatteryLow
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useBatteryStatus } from '../../hooks/useBatteryStatus';
@@ -192,13 +193,24 @@ export function MobileCrisisInterface() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => setLocation(position.coords),
-        (error) => console.error('Location error:', error),
+        (_error) => logger.error('Location error:', error),
         { 
           enableHighAccuracy: false, // Save battery
           timeout: 10000,
           maximumAge: 300000 // Cache for 5 minutes
         }
       );
+    }
+  }, []);
+
+  // Store crisis interactions for offline sync
+  const storeCrisisInteraction = useCallback(async (_data: Record<string, unknown>) => {
+    try {
+      const db = await openCrisisDB();
+      const tx = db.transaction('interactions', 'readwrite');
+      await tx.objectStore('interactions').add(_data);
+    } catch (_error) {
+      logger.error('Failed to store crisis interaction:');
     }
   }, []);
 
@@ -209,7 +221,7 @@ export function MobileCrisisInterface() {
     // Store crisis interaction in IndexedDB for offline sync
     if ('indexedDB' in window) {
       const timestamp = new Date().toISOString();
-      const data = {
+      const _data = {
         action: 'emergency_call',
         service,
         number,
@@ -222,23 +234,12 @@ export function MobileCrisisInterface() {
       };
       
       // Store for later sync
-      storeCrisisInteraction(data);
+      storeCrisisInteraction(_data);
     }
     
     // Make the call
     window.location.href = `tel:${number}`;
-  }, [location, isOnline, vibrate]);
-
-  // Store crisis interactions for offline sync
-  const storeCrisisInteraction = async (data: any) => {
-    try {
-      const db = await openCrisisDB();
-      const tx = db.transaction('interactions', 'readwrite');
-      await tx.objectStore('interactions').add(data);
-    } catch (error) {
-      console.error('Failed to store crisis interaction:', error);
-    }
-  };
+  }, [location, isOnline, vibrate, storeCrisisInteraction]);
 
   // Open IndexedDB for crisis data
   const openCrisisDB = (): Promise<IDBDatabase> => {
@@ -287,7 +288,7 @@ export function MobileCrisisInterface() {
                     Crisis Support
                   </h1>
                   <p className="text-sm text-gray-600 mt-1">
-                    Help is available 24/7. You're not alone.
+                    Help is available 24/7. You&apos;re not alone.
                   </p>
                 </div>
               </div>

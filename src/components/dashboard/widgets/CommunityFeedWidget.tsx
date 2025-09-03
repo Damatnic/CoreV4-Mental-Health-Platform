@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, MessageCircle, Heart, UserPlus, Globe, Lock } from 'lucide-react';
+import { Users, MessageCircle, Heart, UserPlus, _Globe, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRealtimeSync, RealtimeEvent } from '../../../services/integration/RealtimeSyncService';
@@ -25,14 +25,14 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Load initial posts
     loadPosts();
 
     // Subscribe to real-time updates
-    const unsubPost = realtimeSync.on(RealtimeEvent.COMMUNITY_POST_CREATED, (post) => {
+    const unsubPost = realtimeSync.on(RealtimeEvent.COMMUNITY_POST_CREATED, (_post) => {
       setPosts(prev => [post, ...prev].slice(0, 5));
     });
 
@@ -67,7 +67,7 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
 
   const loadPosts = async () => {
     // Mock data for demonstration
-    const mockPosts: CommunityPost[] = [
+    const _mockPosts: CommunityPost[] = [
       {
         id: '1',
         author: 'Alex',
@@ -97,12 +97,12 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
       }
     ];
 
-    setPosts(mockPosts);
+    setPosts(_mockPosts);
     setOnlineUsers(Math.floor(Math.random() * 50) + 10);
     setLoading(false);
   };
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -110,7 +110,7 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
     );
   }
 
-  if (loading) {
+  if (_loading) {
     return (
       <div className="animate-pulse space-y-3">
         <div className="h-16 bg-gray-200 rounded-lg"></div>

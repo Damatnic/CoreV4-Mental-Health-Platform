@@ -38,7 +38,7 @@ export function KeyboardShortcutsHelp() {
 
   const shortcuts: KeyboardShortcut[] = [
     // Crisis & Emergency
-    { key: 'H', modifiers: ['Alt'], description: 'Open Crisis Help (Global)', category: 'Emergency' },
+    { key: 'H', modifiers: ['Alt'], description: 'Open Crisis Help (_Global)', category: 'Emergency' },
     
     // Navigation
     { key: 'C', modifiers: ['Alt'], description: 'Focus Crisis Panel', category: 'Navigation' },
@@ -61,11 +61,11 @@ export function KeyboardShortcutsHelp() {
   ];
 
   // Group shortcuts by category
-  const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
+  const _groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
     if (!acc[shortcut.category]) {
       acc[shortcut.category] = [];
     }
-    acc[shortcut.category]?.push(shortcut);
+    acc[shortcut.category]?.push(_shortcut);
     return acc;
   }, {} as Record<string, KeyboardShortcut[]>);
 
@@ -148,7 +148,7 @@ export function KeyboardShortcutsHelp() {
 
               {/* Content */}
               <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-                {Object.entries(groupedShortcuts).map(([category, categoryShortcuts]) => (
+                {Object.entries(_groupedShortcuts).map(([category, categoryShortcuts]) => (
                   <div key={category} className="mb-6 last:mb-0">
                     <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">
                       {category}

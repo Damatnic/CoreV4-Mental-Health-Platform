@@ -88,7 +88,7 @@ export interface WellnessInsight {
   actions?: {
     label: string;
     type: string;
-    data: any;
+    data: unknown;
   }[];
   relatedMetrics: string[];
   confidence: number;
@@ -330,13 +330,13 @@ const generateWellnessInsights = (
   
   if (recentAvg > 0 && previousAvg > 0) {
     const change = ((recentAvg - previousAvg) / previousAvg) * 100;
-    if (Math.abs(change) > 10) {
+    if (Math.abs(_change) > 10) {
       insights.push({
         id: `insight-mood-trend-${Date.now()}`,
         type: change > 0 ? 'trend' : 'warning',
         title: change > 0 ? 'Mood Improvement Detected' : 'Mood Decline Alert',
-        description: `Your average mood has ${change > 0 ? 'improved' : 'declined'} by ${Math.abs(change).toFixed(0)}% over the past week.`,
-        priority: Math.abs(change) > 20 ? 'high' : 'medium',
+        description: `Your average mood has ${change > 0 ? 'improved' : 'declined'} by ${Math.abs(_change).toFixed(0)}% over the past week.`,
+        priority: Math.abs(_change) > 20 ? 'high' : 'medium',
         category: 'mood',
         createdAt: now,
         actionable: true,
@@ -401,14 +401,14 @@ const generateWellnessInsights = (
   // Stress correlation insights
   const stressedEntries = entries.filter(e => e.stressLevel && e.stressLevel > 7);
   if (stressedEntries.length > 3) {
-    const commonTriggers = stressedEntries
+    const _commonTriggers = stressedEntries
       .flatMap(e => e.triggers)
       .reduce((acc, trigger) => {
         acc[trigger] = (acc[trigger] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
     
-    const topTrigger = Object.entries(commonTriggers)
+    const topTrigger = Object.entries(_commonTriggers)
       .sort((a, b) => b[1] - a[1])[0];
     
     if (topTrigger && topTrigger[1] > 2) {
@@ -473,12 +473,12 @@ export const useWellnessStore = create<WellnessState>()(
       
       // Actions
       addMoodEntry: (entry) => set((state) => {
-        const newEntry: MoodEntry = {
+        const _newEntry: MoodEntry = {
           ...entry,
           id: `mood-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           timestamp: new Date()
         };
-        state.moodEntries.push(newEntry);
+        state.moodEntries.push(_newEntry);
         
         // Trigger pattern analysis after adding entry
         get().analyzeMoodPatterns();
@@ -497,11 +497,11 @@ export const useWellnessStore = create<WellnessState>()(
       }),
       
       addWellnessMetric: (metric) => set((state) => {
-        const newMetric: WellnessMetrics = {
+        const _newMetric: WellnessMetrics = {
           ...metric,
           date: new Date()
         };
-        state.wellnessMetrics.push(newMetric);
+        state.wellnessMetrics.push(_newMetric);
       }),
       
       updateWellnessMetric: (date, updates) => set((state) => {
@@ -514,13 +514,13 @@ export const useWellnessStore = create<WellnessState>()(
       }),
       
       addWellnessGoal: (goal) => set((state) => {
-        const newGoal: WellnessGoal = {
+        const _newGoal: WellnessGoal = {
           ...goal,
           id: `goal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           progress: 0,
           status: 'active'
         };
-        state.wellnessGoals.push(newGoal);
+        state.wellnessGoals.push(_newGoal);
       }),
       
       updateWellnessGoal: (id, updates) => set((state) => {
@@ -541,7 +541,7 @@ export const useWellnessStore = create<WellnessState>()(
           }
           
           // Check for milestones
-          goal.milestones.forEach((milestone: any) => {
+          goal.milestones.forEach((milestone: unknown) => {
             if (!milestone.achieved && value >= milestone.value) {
               milestone.achieved = true;
               milestone.date = new Date();
@@ -559,16 +559,16 @@ export const useWellnessStore = create<WellnessState>()(
       }),
       
       recordCrisisEvent: (event) => set((state) => {
-        const newEvent: CrisisEvent = {
+        const _newEvent: CrisisEvent = {
           ...event,
           id: `crisis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           timestamp: new Date()
         };
-        state.crisisEvents.push(newEvent);
+        state.crisisEvents.push(_newEvent);
       }),
       
       analyzeMoodPatterns: () => set((state) => {
-        const entries = state.moodEntries.map((e: any) => ({
+        const entries = state.moodEntries.map((e: unknown) => ({
           ...e,
           timestamp: e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp)
         }));
@@ -576,7 +576,7 @@ export const useWellnessStore = create<WellnessState>()(
       }),
       
       generateInsights: () => set((state) => {
-        const entries = state.moodEntries.map((e: any) => ({
+        const entries = state.moodEntries.map((e: unknown) => ({
           ...e,
           timestamp: e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp)
         }));
@@ -651,9 +651,9 @@ export const useWellnessStore = create<WellnessState>()(
         }, null, 2);
       },
       
-      importData: (data) => set((state) => {
+      importData: (_data) => set((state) => {
         try {
-          const parsed = JSON.parse(data);
+          const parsed = JSON.parse(_data);
           if (parsed.moodEntries) state.moodEntries = parsed.moodEntries;
           if (parsed.wellnessMetrics) state.wellnessMetrics = parsed.wellnessMetrics;
           if (parsed.wellnessGoals) state.wellnessGoals = parsed.wellnessGoals;
@@ -664,8 +664,9 @@ export const useWellnessStore = create<WellnessState>()(
           get().analyzeMoodPatterns();
           get().generateInsights();
           get().calculateWellnessScores();
-        } catch (error) {
-          console.error('Failed to import data:', error);
+        } catch (_error) {
+          logger.error('Failed to import data:');
+import { logger } from '../utils/logger';
         }
       })
     })),

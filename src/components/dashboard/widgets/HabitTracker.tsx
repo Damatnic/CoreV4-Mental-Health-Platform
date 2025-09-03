@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame,
-  Calendar,
+  _Calendar,
   CheckCircle2,
   Circle,
-  TrendingUp,
-  Award,
+  _TrendingUp,
+  _Award,
   Plus,
   Pause,
-  Play,
+  _Play,
   RefreshCw,
-  Bell,
+  _Bell,
   ChevronRight,
   Star,
   Zap,
@@ -26,19 +26,19 @@ import {
   Book,
   Edit2,
   BarChart3,
-  Target
+  _Target
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, startOfWeek, addDays, isSameDay, isToday, subDays } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay, isToday, _subDays } from 'date-fns';
 
 interface HabitTrackerProps {
-  onHabitClick?: (habit: any) => void;
+  _onHabitClick?: (habit: unknown) => void;
   onAddHabit?: () => void;
   onViewAnalytics?: (habitId: string) => void;
 }
 
 export function HabitTracker({
-  onHabitClick,
+  _onHabitClick,
   onAddHabit,
   onViewAnalytics
 }: HabitTrackerProps) {
@@ -47,7 +47,7 @@ export function HabitTracker({
     completeHabit,
     resetHabitStreak,
     pauseHabit,
-    updateHabit,
+    _updateHabit,
     stackHabits
   } = useActivityStore();
 
@@ -71,8 +71,8 @@ export function HabitTracker({
   const longestStreak = Math.max(...activeHabits.map(h => h.longestStreak), 0);
 
   // Get category icon
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
+  const getCategoryIcon = (_category: string) => {
+    switch (_category) {
       case 'physical': return Coffee;
       case 'mental': return Brain;
       case 'emotional': return Heart;
@@ -83,7 +83,7 @@ export function HabitTracker({
   };
 
   // Get habit icon based on name/description
-  const getHabitIcon = (habit: any) => {
+  const getHabitIcon = (habit: unknown) => {
     const name = habit.name.toLowerCase();
     if (name.includes('water') || name.includes('hydrat')) return Droplets;
     if (name.includes('sleep') || name.includes('bed')) return Moon;
@@ -92,7 +92,7 @@ export function HabitTracker({
     if (name.includes('exercise') || name.includes('workout')) return Zap;
     if (name.includes('read') || name.includes('journal')) return Book;
     if (name.includes('eat') || name.includes('meal')) return Apple;
-    return getCategoryIcon(habit.category);
+    return getCategoryIcon(habit._category);
   };
 
   // Get streak fire color
@@ -105,13 +105,13 @@ export function HabitTracker({
   };
 
   // Check if habit was completed today
-  const isCompletedToday = (habit: any) => {
+  const isCompletedToday = (habit: unknown) => {
     if (!habit.lastCompleted) return false;
     return isSameDay(new Date(habit.lastCompleted), new Date());
   };
 
   // Get habit completion history for the week
-  const getWeekHistory = (habit: any) => {
+  const getWeekHistory = (habit: unknown) => {
     const weekStart = startOfWeek(new Date());
     const days = [];
     
@@ -122,7 +122,7 @@ export function HabitTracker({
       days.push({
         date: day,
         completed,
-        isToday: isToday(day)
+        isToday: isToday(_day)
       });
     }
     
@@ -130,7 +130,7 @@ export function HabitTracker({
   };
 
   // Calculate habit effectiveness
-  const getHabitEffectiveness = (habit: any) => {
+  const getHabitEffectiveness = (habit: unknown) => {
     if (!habit.correlatedMoodImprovement) return null;
     const effectiveness = habit.correlatedMoodImprovement * 20; // Scale to 0-100
     return Math.min(100, Math.max(0, effectiveness));
@@ -139,7 +139,7 @@ export function HabitTracker({
   // Handle habit stacking
   const handleStackHabits = () => {
     if (selectedForStacking.length >= 2) {
-      stackHabits(selectedForStacking);
+      stackHabits(_selectedForStacking);
       setSelectedForStacking([]);
       setShowStackingMode(false);
     }
@@ -218,21 +218,21 @@ export function HabitTracker({
           >
             All ({activeHabits.length})
           </button>
-          {['physical', 'mental', 'emotional', 'social', 'spiritual'].map((category) => {
-            const count = activeHabits.filter(h => h.category === category).length;
-            const Icon = getCategoryIcon(category);
+          {['physical', 'mental', 'emotional', 'social', 'spiritual'].map((_category) => {
+            const count = activeHabits.filter(h => h._category === _category).length;
+            const Icon = getCategoryIcon(_category);
             return (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={_category}
+                onClick={() => setSelectedCategory(_category)}
                 className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors flex items-center space-x-1 ${
-                  selectedCategory === category
+                  selectedCategory === _category
                     ? 'bg-primary-100 text-primary-700'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Icon className="h-3 w-3" />
-                <span>{category.charAt(0).toUpperCase() + category.slice(1)} ({count})</span>
+                <span>{_category.charAt(0).toUpperCase() + _category.slice(1)} ({count})</span>
               </button>
             );
           })}
@@ -279,9 +279,9 @@ export function HabitTracker({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <AnimatePresence mode="popLayout">
               {filteredHabits.map((habit) => {
-                const Icon = getHabitIcon(habit);
-                const completed = isCompletedToday(habit);
-                const effectiveness = getHabitEffectiveness(habit);
+                const Icon = getHabitIcon(_habit);
+                const completed = isCompletedToday(_habit);
+                const effectiveness = getHabitEffectiveness(_habit);
                 const isSelected = selectedForStacking.includes(habit.id);
                 
                 return (
@@ -298,7 +298,7 @@ export function HabitTracker({
                       hover:shadow-md
                     `}
                     onClick={() => {
-                      if (showStackingMode) {
+                      if (_showStackingMode) {
                         toggleStackingSelection(habit.id);
                       } else if (!completed) {
                         completeHabit(habit.id);
@@ -346,7 +346,7 @@ export function HabitTracker({
 
                     {/* Week Overview */}
                     <div className="flex items-center justify-between mb-2">
-                      {getWeekHistory(habit).map((day, index) => (
+                      {getWeekHistory(_habit).map((day, index) => (
                         <div
                           key={index}
                           className={`
@@ -360,7 +360,7 @@ export function HabitTracker({
                       ))}
                     </div>
 
-                    {/* Target Frequency */}
+                    {/* _Target Frequency */}
                     <div className="flex items-center justify-between text-xs text-gray-600">
                       <span>
                         Target: {habit.targetCount}x {habit.targetFrequency}
@@ -412,8 +412,8 @@ export function HabitTracker({
           <div className="space-y-2">
             <AnimatePresence mode="popLayout">
               {filteredHabits.map((habit) => {
-                const Icon = getHabitIcon(habit);
-                const completed = isCompletedToday(habit);
+                const Icon = getHabitIcon(_habit);
+                const completed = isCompletedToday(_habit);
                 const isExpanded = expandedHabit === habit.id;
                 
                 return (
@@ -482,7 +482,7 @@ export function HabitTracker({
                         >
                           {/* Week History */}
                           <div className="flex items-center justify-between mb-3">
-                            {getWeekHistory(habit).map((day, index) => (
+                            {getWeekHistory(_habit).map((day, index) => (
                               <div key={index} className="text-center">
                                 <div className="text-xs text-gray-500 mb-1">
                                   {format(day.date, 'EEE')}

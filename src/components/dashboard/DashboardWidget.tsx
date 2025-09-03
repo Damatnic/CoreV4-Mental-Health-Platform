@@ -40,13 +40,13 @@ export function DashboardWidget({
   // Auto-refresh functionality
   useEffect(() => {
     if (widget.refreshInterval && onRefresh && !loading) {
-      const interval = setInterval(async () => {
+      const _interval = setInterval(async () => {
         setIsRefreshing(true);
         await onRefresh();
         setIsRefreshing(false);
       }, widget.refreshInterval * 1000);
 
-      return () => clearInterval(interval);
+      return () => clearInterval(_interval);
     }
   }, [widget.refreshInterval, onRefresh, loading]);
 
@@ -82,7 +82,7 @@ export function DashboardWidget({
 
   const toggleCollapse = () => {
     const newState = !isCollapsed;
-    setIsCollapsed(newState);
+    setIsCollapsed(_newState);
     if (newState && onCollapse) onCollapse();
     if (!newState && onExpand) onExpand();
   };

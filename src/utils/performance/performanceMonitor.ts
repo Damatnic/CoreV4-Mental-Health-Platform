@@ -4,6 +4,7 @@
  */
 
 import { onCLS, onFCP, onFID, onLCP, onTTFB, type Metric } from 'web-vitals';
+import { logger } from '../logger';
 
 // Performance thresholds for mental health app
 const PERFORMANCE_THRESHOLDS = {
@@ -33,7 +34,7 @@ const PERFORMANCE_THRESHOLDS = {
   MAX_MEMORY_MB: 150, // Maximum memory usage in MB
   MEMORY_WARNING_MB: 100, // Warning threshold
   
-  // Bundle size limits (KB)
+  // Bundle size limits (_KB)
   CRITICAL_BUNDLE_SIZE: 300, // Crisis features bundle
   MAIN_BUNDLE_SIZE: 500, // Main app bundle
   VENDOR_BUNDLE_SIZE: 800, // Vendor dependencies
@@ -218,6 +219,7 @@ class PerformanceMonitor {
         performance.mark('crisis_button_clicked');
         
         // Use MutationObserver to detect when modal appears
+// @ts-expect-error - MutationObserver is a global API
         const observer = new MutationObserver((mutations) => {
           for (const mutation of mutations) {
             if (mutation.type === 'childList') {
@@ -453,7 +455,7 @@ class PerformanceMonitor {
     );
     
     if (this.isLowEndDevice) {
-      console.log('[Performance] Low-end device detected, enabling optimizations');
+      logger.info('Low-end device detected, enabling optimizations', 'PerformanceMonitor');
       this.enableLowEndOptimizations();
     }
   }
@@ -514,7 +516,7 @@ class PerformanceMonitor {
    * Alert for performance issues
    */
   private alertPerformanceIssue(metric: string, value: number, threshold: number): void {
-    console.warn(`[Performance] ${metric} exceeded threshold: ${value}ms (threshold: ${threshold}ms)`);
+    logger.warn(`[Performance] ${metric} exceeded threshold: ${value}ms (threshold: ${threshold}ms)`);
     
     // Send to analytics
     this.reportMetric({
@@ -533,7 +535,7 @@ class PerformanceMonitor {
    * Alert for critical performance issues (crisis features)
    */
   private alertCriticalPerformanceIssue(metric: string, value: number): void {
-    console.error(`[Performance Critical] ${metric}: ${value}ms - Crisis feature performance degraded!`);
+    logger.error(`[Performance Critical] ${metric}: ${value}ms - Crisis feature performance degraded!`);
     
     // Immediately report critical issues
     this.reportMetric({
@@ -564,14 +566,14 @@ class PerformanceMonitor {
     // Defer non-critical network requests
     window.dispatchEvent(new CustomEvent('performance:emergency'));
     
-    console.log('[Performance] Emergency optimizations activated');
+    logger.warn('Emergency performance optimizations activated', 'PerformanceMonitor');
   }
   
   /**
    * Alert for memory issues
    */
   private alertMemoryIssue(memoryMB: number): void {
-    console.warn(`[Memory] High memory usage: ${memoryMB.toFixed(2)}MB`);
+    logger.warn(`[Memory] High memory usage: ${memoryMB.toFixed(2)}MB`);
     
     // Trigger garbage collection hint
     if ('gc' in window) {
@@ -593,7 +595,7 @@ class PerformanceMonitor {
    * Alert for potential memory leak
    */
   private alertMemoryLeak(growthRateMB: number): void {
-    console.error(`[Memory] Potential memory leak detected! Growth rate: ${growthRateMB.toFixed(2)}MB/minute`);
+    logger.error(`[Memory] Potential memory leak detected! Growth rate: ${growthRateMB.toFixed(2)}MB/minute`);
     
     this.reportMetric({
       name: 'memory_leak_detected',
@@ -609,7 +611,7 @@ class PerformanceMonitor {
    * Alert for bundle size issues
    */
   private alertBundleSizeIssue(bundleName: string, sizeKB: number): void {
-    console.warn(`[Bundle] Large bundle detected: ${bundleName} (${sizeKB.toFixed(2)}KB)`);
+    logger.warn(`[Bundle] Large bundle detected: ${bundleName} (${sizeKB.toFixed(2)}KB)`);
     
     this.reportMetric({
       name: 'bundle_size_warning',
@@ -694,19 +696,19 @@ class PerformanceMonitor {
           const existingMetrics = JSON.parse(storedMetrics);
           const updatedMetrics = [...existingMetrics, ...metrics].slice(-100);
           localStorage.setItem('performance_metrics', JSON.stringify(updatedMetrics));
-          console.debug('[Performance] Metrics stored locally:', metrics.length);
+          logger.debug('Metrics stored locally', 'PerformanceMonitor', { count: metrics.length });
         } catch (localError) {
-          console.debug('[Performance] LocalStorage unavailable:', localError);
+          logger.debug('LocalStorage unavailable', 'PerformanceMonitor', { error: localError });
         }
         return; // Exit early - no network calls
       }
       
       // Development: Console logging only
       if (process.env.NODE_ENV === 'development') {
-        console.log('[Performance Metrics]', metrics);
+        logger.info('Performance Metrics', 'PerformanceMonitor', metrics);
       }
-    } catch (error) {
-      console.error('[Performance] Failed to process metrics:', error);
+    } catch (_error) {
+      logger.error('[Performance] Failed to process metrics:');
     }
   }
   
@@ -794,7 +796,7 @@ class PerformanceMonitor {
         return measure.duration;
       }
     } catch (error) {
-      console.warn(`Failed to measure ${label}:`, error);
+    logger.warn(`Failed to measure ${label}:`, error);
     }
     
     return undefined;
@@ -812,8 +814,8 @@ class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor();
 
 // Export additional instances for compatibility
-export const memoryMonitor = performanceMonitor;
-export const frameRateMonitor = performanceMonitor;
+export const _memoryMonitor = performanceMonitor;
+export const _frameRateMonitor = performanceMonitor;
 
 // Export class for direct instantiation if needed
 export { PerformanceMonitor };

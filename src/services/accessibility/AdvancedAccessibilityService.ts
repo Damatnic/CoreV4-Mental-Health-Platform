@@ -56,13 +56,13 @@ export interface VoiceNavigationAction {
   description: string;
   aliases: string[];
   priority: 'crisis' | 'high' | 'medium' | 'low';
-  execute: (parameters?: any) => Promise<void>;
+  execute: (parameters?: unknown) => Promise<void>;
 }
 
 export class AdvancedAccessibilityService {
   private recognition: SpeechRecognition | null = null;
   private synthesis: SpeechSynthesis | null = null;
-  private eyeTracker: any = null;
+  private eyeTracker: unknown = null;
   private isVoiceActive = false;
   private isEyeTrackingActive = false;
   private currentProfile: AccessibilityProfile | null = null;
@@ -78,7 +78,7 @@ export class AdvancedAccessibilityService {
     try {
       // Initialize Speech Recognition
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
         this.recognition = new SpeechRecognition();
         this.setupSpeechRecognition();
       }
@@ -328,7 +328,7 @@ export class AdvancedAccessibilityService {
     if (!this.isEyeTrackingActive) return;
 
     // Simulate eye tracking data
-    const mockEyeData: EyeTrackingData = {
+    const _mockEyeData: EyeTrackingData = {
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       timestamp: Date.now(),
@@ -337,8 +337,8 @@ export class AdvancedAccessibilityService {
     };
 
     // Notify callbacks
-    this.eyeTrackingCallbacks.forEach(callback => {
-      callback(mockEyeData);
+    this.eyeTrackingCallbacks.forEach(_callback => {
+      _callback(_mockEyeData);
     });
 
     // Continue simulation
@@ -350,16 +350,16 @@ export class AdvancedAccessibilityService {
     return element?.id || element?.className || undefined;
   }
 
-  public onEyeTracking(callback: (data: EyeTrackingData) => void): () => void {
-    this.eyeTrackingCallbacks.add(callback);
-    return () => this.eyeTrackingCallbacks.delete(callback);
+  public onEyeTracking(_callback: (data: EyeTrackingData) => void): () => void {
+    this.eyeTrackingCallbacks.add(_callback);
+    return () => this.eyeTrackingCallbacks.delete(_callback);
   }
 
   private async processVoiceCommand(command: VoiceCommand): Promise<void> {
     try {
       const action = this.findMatchingCommand(command.phrase);
       
-      if (action) {
+      if (_action) {
         logger.info(`Executing voice command: ${command.phrase}`);
         command.action = action.command;
         
@@ -367,7 +367,7 @@ export class AdvancedAccessibilityService {
         await action.execute();
         
         // Log command usage
-        await this.logCommandUsage(command);
+        await this.logCommandUsage(_command);
         
       } else {
         await this.speak('Command not recognized. Try saying "emergency help", "navigate home", or "mood tracker".');
@@ -393,7 +393,7 @@ export class AdvancedAccessibilityService {
       const phraseWords = normalizedPhrase.split(' ');
       
       const matches = keywords.filter(keyword => 
-        phraseWords.some(word => word.includes(keyword) || keyword.includes(word))
+        phraseWords.some(word => word.includes(keyword) || keyword.includes(_word))
       );
 
       // If more than 50% of keywords match, consider it a match
@@ -416,10 +416,10 @@ export class AdvancedAccessibilityService {
         this.synthesis.cancel();
       }
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(_text);
       
       // Configure voice settings based on priority
-      switch (priority) {
+      switch (_priority) {
         case 'emergency':
           utterance.rate = 1.2;
           utterance.pitch = 1.1;
@@ -443,14 +443,14 @@ export class AdvancedAccessibilityService {
         voice.lang.startsWith('en') && voice.name.includes('Female')
       ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
       
-      if (preferredVoice) {
+      if (_preferredVoice) {
         utterance.voice = preferredVoice;
       }
 
       return new Promise((resolve, reject) => {
         utterance.onend = () => resolve();
-        utterance.onerror = (error) => reject(error);
-        this.synthesis!.speak(utterance);
+        utterance.onerror = (_error) => reject(error);
+        this.synthesis!.speak(_utterance);
       });
 
     } catch (error) {
@@ -460,8 +460,8 @@ export class AdvancedAccessibilityService {
 
   private async readPageContent(): Promise<void> {
     try {
-      const mainContent = document.querySelector('main') || document.body;
-      const textContent = this.extractReadableText(mainContent);
+      const _mainContent = document.querySelector('main') || document.body;
+      const textContent = this.extractReadableText(_mainContent);
       
       if (textContent.length > 0) {
         await this.speak(`Reading page content: ${textContent.substring(0, 500)}...`);
@@ -497,7 +497,7 @@ export class AdvancedAccessibilityService {
     while (node = walker.nextNode()) {
       const text = node.textContent?.trim();
       if (text && text.length > 2) {
-        textParts.push(text);
+        textParts.push(_text);
       }
     }
 
@@ -514,7 +514,7 @@ export class AdvancedAccessibilityService {
     const body = document.body;
     const hasHighContrast = body.classList.contains('high-contrast');
     
-    if (hasHighContrast) {
+    if (_hasHighContrast) {
       body.classList.remove('high-contrast');
     } else {
       body.classList.add('high-contrast');
@@ -529,7 +529,7 @@ export class AdvancedAccessibilityService {
 
   private async logCommandUsage(command: VoiceCommand): Promise<void> {
     try {
-      const usage = {
+      const _usage = {
         command: command.phrase,
         action: command.action,
         confidence: command.confidence,
@@ -538,14 +538,14 @@ export class AdvancedAccessibilityService {
 
       // Store usage data for analytics (privacy-preserving)
       const usageLog = await secureStorage.getItem('voice_command_usage') || [];
-      usageLog.push(usage);
+      usageLog.push(_usage);
       
       // Keep only last 100 commands
       const recentUsage = usageLog.slice(-100);
       await secureStorage.setItem('voice_command_usage', recentUsage);
 
     } catch (error) {
-      logger.error('Failed to log command usage:', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Failed to log command _usage:', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -553,9 +553,9 @@ export class AdvancedAccessibilityService {
     try {
       const profile = await secureStorage.getItem('accessibility_profile');
       
-      if (profile) {
+      if (_profile) {
         this.currentProfile = profile;
-        await this.applyAccessibilitySettings(profile);
+        await this.applyAccessibilitySettings(_profile);
         return profile;
       } else {
         // Create default profile

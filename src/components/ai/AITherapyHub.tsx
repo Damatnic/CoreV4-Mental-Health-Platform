@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TherapistSelector, Therapist } from './TherapistSelector';
 import TherapistChat from './TherapistChat';
-import { Brain, ArrowLeft, Sparkles, Heart, Shield } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface AITherapyHubProps {
   onClose?: () => void;
@@ -12,8 +12,8 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
   const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
   const [currentView, setCurrentView] = useState<'selector' | 'chat'>('selector');
 
-  const handleTherapistSelect = (therapist: Therapist) => {
-    setSelectedTherapist(therapist);
+  const handleTherapistSelect = (_therapist: Therapist) => {
+    setSelectedTherapist(_therapist);
     setCurrentView('chat');
   };
 
@@ -61,7 +61,7 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
           >
             {selectedTherapist && (
               <TherapistChat
-                therapist={selectedTherapist}
+                _therapist={selectedTherapist}
                 onBack={handleBackToSelector}
                 fullScreen={true}
               />

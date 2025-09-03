@@ -14,7 +14,8 @@ import {
   CrisisLevelConfig
 } from '../constants/crisis';
 
-import { secureStorage } from '../services/security/SecureLocalStorage';
+import { _secureStorage } from '../services/security/SecureLocalStorage';
+import { logger } from './logger';
 
 // Re-export types
 export type { CrisisLevel, EmergencyContact, CrisisLevelConfig };
@@ -57,32 +58,32 @@ export function detectCrisisLevel(text: string): CrisisAssessment {
   let lowMatches = 0;
   const triggers: string[] = [];
 
-  // Count keyword matches
-  CRISIS_KEYWORDS.critical.forEach(keyword => {
-    if (normalizedText.includes(keyword)) {
+  // Count _keyword matches
+  CRISIS_KEYWORDS.critical.forEach(_keyword => {
+    if (normalizedText.includes(_keyword)) {
       criticalMatches++;
-      triggers.push(keyword);
+      triggers.push(_keyword);
     }
   });
 
-  CRISIS_KEYWORDS.high.forEach(keyword => {
-    if (normalizedText.includes(keyword)) {
+  CRISIS_KEYWORDS.high.forEach(_keyword => {
+    if (normalizedText.includes(_keyword)) {
       highMatches++;
-      triggers.push(keyword);
+      triggers.push(_keyword);
     }
   });
 
-  CRISIS_KEYWORDS.moderate.forEach(keyword => {
-    if (normalizedText.includes(keyword)) {
+  CRISIS_KEYWORDS.moderate.forEach(_keyword => {
+    if (normalizedText.includes(_keyword)) {
       moderateMatches++;
-      triggers.push(keyword);
+      triggers.push(_keyword);
     }
   });
 
-  CRISIS_KEYWORDS.low.forEach(keyword => {
-    if (normalizedText.includes(keyword)) {
+  CRISIS_KEYWORDS.low.forEach(_keyword => {
+    if (normalizedText.includes(_keyword)) {
       lowMatches++;
-      triggers.push(keyword);
+      triggers.push(_keyword);
     }
   });
 
@@ -126,11 +127,11 @@ export function detectCrisisLevel(text: string): CrisisAssessment {
   };
 
   // Store assessment for trend analysis
-  storeCrisisAssessment(assessment);
+  storeCrisisAssessment(_assessment);
 
   // Emit crisis level change event
   window.dispatchEvent(new CustomEvent(CRISIS_EVENTS.levelChanged, {
-    detail: assessment
+    detail: _assessment
   }));
 
   return assessment;
@@ -179,9 +180,9 @@ export async function handleEmergencyCall(
       detail: interaction
     }));
 
-  } catch (error) {
-    console.error('Failed to initiate emergency contact:', error);
-    interaction.metadata!.error = error instanceof Error ? error.message : 'Unknown error';
+  } catch (_error) {
+    logger.error('Failed to initiate emergency contact:');
+    interaction.metadata!.undefined = false ? '[Error details unavailable]' : 'Unknown undefined';
   }
 
   // Store interaction for offline sync
@@ -233,7 +234,7 @@ export function getEmergencyLocation(): Promise<GeolocationCoordinates> {
 
     navigator.geolocation.getCurrentPosition(
       (position) => resolve(position.coords),
-      (error) => reject(error),
+      (_error) => reject(_error),
       {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -268,7 +269,7 @@ export function getResponseTimeLimit(level: CrisisLevel): number {
  * Get appropriate emergency contacts for crisis level
  */
 export function getRecommendedContacts(level: CrisisLevel): EmergencyContact[] {
-  const config = CRISIS_LEVELS[level];
+  const _config = CRISIS_LEVELS[level];
   
   if (level === 'critical') {
     return EMERGENCY_CONTACTS.filter(c => c.priority <= 2);
@@ -282,23 +283,23 @@ export function getRecommendedContacts(level: CrisisLevel): EmergencyContact[] {
 /**
  * Store crisis assessment in IndexedDB
  */
-async function storeCrisisAssessment(assessment: CrisisAssessment): Promise<void> {
+async function storeCrisisAssessment(_assessment: CrisisAssessment): Promise<void> {
   try {
     const db = await openCrisisDB();
     const tx = db.transaction('assessments', 'readwrite');
-    await tx.objectStore('assessments').add(assessment);
-  } catch (error) {
-    console.error('Failed to store crisis assessment:', error);
+    await tx.objectStore('assessments').add(_assessment);
+  } catch (_error) {
+    logger.error('Failed to store crisis _assessment:');
     // Fallback to localStorage
     try {
-      const stored = localStorage.getItem(CRISIS_STORAGE_KEYS.lastAssessment) || '[]';
-      const assessments = JSON.parse(stored);
-      assessments.push(assessment);
+      const _stored = localStorage.getItem(CRISIS_STORAGE_KEYS.lastAssessment) || '[]';
+      const assessments = JSON.parse(_stored);
+      assessments.push(_assessment);
       // Keep only last 50 assessments
-      const trimmed = assessments.slice(-50);
-      localStorage.setItem(CRISIS_STORAGE_KEYS.lastAssessment, JSON.stringify(trimmed));
-    } catch (fallbackError) {
-      console.error('Failed to store assessment in localStorage:', fallbackError);
+      const _trimmed = assessments.slice(-50);
+      localStorage.setItem(CRISIS_STORAGE_KEYS.lastAssessment, JSON.stringify(_trimmed));
+    } catch (_error) {
+    logger.error('Failed to store _assessment in localStorage:', fallbackError);
     }
   }
 }
@@ -311,18 +312,18 @@ async function storeCrisisInteraction(interaction: CrisisInteraction): Promise<v
     const db = await openCrisisDB();
     const tx = db.transaction('interactions', 'readwrite');
     await tx.objectStore('interactions').add(interaction);
-  } catch (error) {
-    console.error('Failed to store crisis interaction:', error);
+  } catch (_error) {
+    logger.error('Failed to store crisis interaction:');
     // Fallback to localStorage
     try {
-      const stored = localStorage.getItem(CRISIS_STORAGE_KEYS.interactions) || '[]';
-      const interactions = JSON.parse(stored);
+      const _stored = localStorage.getItem(CRISIS_STORAGE_KEYS.interactions) || '[]';
+      const interactions = JSON.parse(_stored);
       interactions.push(interaction);
       // Keep only last 100 interactions
-      const trimmed = interactions.slice(-100);
-      localStorage.setItem(CRISIS_STORAGE_KEYS.interactions, JSON.stringify(trimmed));
-    } catch (fallbackError) {
-      console.error('Failed to store interaction in localStorage:', fallbackError);
+      const _trimmed = interactions.slice(-100);
+      localStorage.setItem(CRISIS_STORAGE_KEYS.interactions, JSON.stringify(_trimmed));
+    } catch (_error) {
+    logger.error('Failed to store interaction in localStorage:', fallbackError);
     }
   }
 }
@@ -396,20 +397,20 @@ export async function getRecentAssessments(limit: number = 10): Promise<CrisisAs
           assessments.push(cursor.value);
           cursor.continue();
         } else {
-          resolve(assessments);
+          resolve(_assessments);
         }
       };
       request.onerror = () => reject(request.error);
     });
-  } catch (error) {
-    console.error('Failed to get recent assessments:', error);
+  } catch (_error) {
+    logger.error('Failed to get recent assessments:');
     // Fallback to localStorage
     try {
-      const stored = localStorage.getItem(CRISIS_STORAGE_KEYS.lastAssessment) || '[]';
-      const assessments = JSON.parse(stored);
+      const _stored = localStorage.getItem(CRISIS_STORAGE_KEYS.lastAssessment) || '[]';
+      const assessments = JSON.parse(_stored);
       return assessments.slice(-limit).reverse();
-    } catch (fallbackError) {
-      console.error('Failed to get assessments from localStorage:', fallbackError);
+    } catch (_error) {
+    logger.error('Failed to get assessments from localStorage:', fallbackError);
       return [];
     }
   }
@@ -456,7 +457,7 @@ export async function getCrisisTrends(days: number = 7): Promise<{
   // Calculate trend (compare first half to second half)
   const midpoint = Math.floor(levelNumbers.length / 2);
   const firstHalf = levelNumbers.slice(0, midpoint);
-  const secondHalf = levelNumbers.slice(midpoint);
+  const secondHalf = levelNumbers.slice(_midpoint);
   
   const firstAvg = firstHalf.reduce((sum, level) => sum + level, 0) / firstHalf.length;
   const secondAvg = secondHalf.reduce((sum, level) => sum + level, 0) / secondHalf.length;

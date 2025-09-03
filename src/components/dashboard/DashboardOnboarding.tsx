@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, ChevronRight, ChevronLeft, Check, 
-  Shield, Brain, Heart, Users, Target, 
-  Sparkles, Bell, MapPin, Phone, Settings,
-  HelpCircle, Award, TrendingUp
+  Shield, Brain, _Heart, _Users, _Target, 
+  Sparkles, _Bell, _MapPin, Phone, Settings,
+  _HelpCircle, Award, TrendingUp
 } from 'lucide-react';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useAuth } from '../../hooks/useAuth';
@@ -13,7 +13,7 @@ interface OnboardingStep {
   id: string;
   title: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<unknown>;
   content: React.ReactNode;
   action?: () => void;
   actionLabel?: string;
@@ -232,13 +232,13 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
       userId: user?.id,
       totalSteps: steps.length
     });
-  }, []);
+  }, [trackEvent, user?.id, steps.length]);
 
   const handleNext = () => {
     const step = steps[currentStep];
     if (!step) return;
     
-    setCompletedSteps(prev => new Set(prev).add(step.id));
+    setCompletedSteps(_prev => new Set(_prev).add(step.id));
     
     trackEvent('onboarding_step_completed', {
       stepId: step.id,
@@ -262,7 +262,7 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
     localStorage.setItem('dashboard_onboarding_completed', 'true');
     trackEvent('onboarding_completed', {
       userId: user?.id,
-      completedSteps: Array.from(completedSteps)
+      _completedSteps: Array.from(_completedSteps)
     });
     onComplete();
   };
@@ -272,7 +272,7 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
       userId: user?.id,
       skippedAtStep: currentStep
     });
-    if (onSkip) {
+    if (_onSkip) {
       onSkip();
     } else {
       handleComplete();

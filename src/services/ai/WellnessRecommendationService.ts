@@ -184,8 +184,8 @@ export class WellnessRecommendationService {
    * Generate crisis intervention recommendations
    */
   private getCrisisInterventionRecommendations(
-    crisisProfile: CrisisProfile,
-    userProfile: UserWellnessProfile
+    _crisisProfile: CrisisProfile,
+    _userProfile: UserWellnessProfile
   ): WellnessRecommendation[] {
     const recommendations: WellnessRecommendation[] = [];
 
@@ -249,8 +249,8 @@ export class WellnessRecommendationService {
     context?: RecommendationContext
   ): Promise<WellnessRecommendation[]> {
     const recommendations: WellnessRecommendation[] = [];
-    const currentTime = new Date();
-    const timeOfDay = this.getTimeOfDay(currentTime);
+    const _currentTime = new Date();
+    const timeOfDay = this.getTimeOfDay(_currentTime);
 
     // Time-based recommendations
     if (timeOfDay === 'morning') {
@@ -431,7 +431,7 @@ export class WellnessRecommendationService {
   private personalizeAndRankRecommendations(
     recommendations: WellnessRecommendation[],
     userProfile: UserWellnessProfile,
-    crisisProfile: CrisisProfile
+    _crisisProfile: CrisisProfile
   ): WellnessRecommendation[] {
     // Apply personalization based on user preferences and history
     const personalized = recommendations.map(rec => ({
@@ -490,7 +490,7 @@ export class WellnessRecommendationService {
     return 'night';
   }
 
-  private getMoodLiftingResources(preferences: WellnessPreferences): WellnessResource[] {
+  private getMoodLiftingResources(_preferences: WellnessPreferences): WellnessResource[] {
     return [{
       type: 'exercise',
       title: 'Gentle Mood Boosters',
@@ -574,12 +574,12 @@ export class WellnessRecommendationService {
     logger.info('Wellness recommendation engine initialized', { category: LogCategory.AI });
   }
 
-  private updateRecommendationModel(userId: string, recommendations: WellnessRecommendation[]): void {
+  private updateRecommendationModel(_userId: string, _recommendations: WellnessRecommendation[]): void {
     // Implementation for learning from user interactions
     // This would update ML models in production
   }
 
-  private async getAdaptiveRecommendations(userProfile: UserWellnessProfile): Promise<WellnessRecommendation[]> {
+  private async getAdaptiveRecommendations(_userProfile: UserWellnessProfile): Promise<WellnessRecommendation[]> {
     // Implementation for adaptive recommendations based on user patterns
     return [];
   }
@@ -590,8 +590,8 @@ export class WellnessRecommendationService {
  */
 class EvidenceBasedInterventions {
   getRecommendations(
-    userProfile: UserWellnessProfile,
-    crisisProfile: CrisisProfile
+    _userProfile: UserWellnessProfile,
+    _crisisProfile: CrisisProfile
   ): WellnessRecommendation[] {
     // Implementation of evidence-based intervention recommendations
     // Based on clinical research and best practices
@@ -610,4 +610,4 @@ interface RecommendationContext {
   recentActivity?: string;
 }
 
-export const wellnessRecommendationService = WellnessRecommendationService.getInstance();
+export const _wellnessRecommendationService = WellnessRecommendationService.getInstance();

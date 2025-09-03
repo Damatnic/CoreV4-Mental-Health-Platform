@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useNavigation } from './NavigationContext';
 
 export function Breadcrumbs() {
-  const { breadcrumbs, mode, preferences } = useNavigation();
+  const { breadcrumbs, mode, _preferences } = useNavigation();
   
   // Don't show breadcrumbs in crisis mode to reduce cognitive load
   if (mode === 'crisis') {

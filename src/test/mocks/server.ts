@@ -5,7 +5,7 @@ import { http, HttpResponse, delay } from 'msw';
 // Crisis response handlers
 const crisisHandlers = [
   http.post('/api/crisis/alert', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     // Simulate fast crisis response
     await delay(50);
@@ -46,7 +46,7 @@ const crisisHandlers = [
 // Authentication handlers
 const authHandlers = [
   http.post('/api/auth/login', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     await delay(100);
     
@@ -101,7 +101,7 @@ const authHandlers = [
 // Wellness tracking handlers
 const wellnessHandlers = [
   http.post('/api/wellness/mood', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     await delay(50);
     
@@ -165,7 +165,7 @@ const professionalHandlers = [
   }),
   
   http.post('/api/appointments/book', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     await delay(150);
     
@@ -208,14 +208,14 @@ const communityHandlers = [
   }),
   
   http.post('/api/community/message', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     // Simulate content moderation
     await delay(100);
     
-    const hasTriggerWords = /suicide|self-harm|crisis/i.test(body.message);
+    const _hasTriggerWords = /suicide|self-harm|crisis/i.test(body.message);
     
-    if (hasTriggerWords) {
+    if (_hasTriggerWords) {
       return HttpResponse.json({
         id: `msg-${  Date.now()}`,
         status: 'flagged',
@@ -235,7 +235,7 @@ const communityHandlers = [
 // Analytics handlers
 const analyticsHandlers = [
   http.post('/api/analytics/event', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as unknown;
     
     await delay(20);
     
@@ -305,7 +305,7 @@ export const handlers = [
 export const server = setupServer(...handlers);
 
 // Test utilities for modifying handlers
-export const mockServerUtils = {
+export const _mockServerUtils = {
   // Simulate server downtime
   simulateDowntime: () => {
     server.use(
@@ -316,10 +316,10 @@ export const mockServerUtils = {
   },
   
   // Simulate slow responses
-  simulateSlowNetwork: (delayMs: number = 3000) => {
+  simulateSlowNetwork: (_delayMs: number = 3000) => {
     server.use(
       http.all('*', async () => {
-        await delay(delayMs);
+        await delay(_delayMs);
         return HttpResponse.json({ delayed: true });
       })
     );

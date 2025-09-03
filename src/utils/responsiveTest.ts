@@ -143,8 +143,8 @@ export const DEVICE_PROFILES: DeviceProfile[] = [
 export const BREAKPOINTS = {
   xs: 0,     // Extra small devices (portrait phones)
   sm: 640,   // Small devices (landscape phones)
-  md: 768,   // Medium devices (tablets)
-  lg: 1024,  // Large devices (desktops)
+  md: 768,   // Medium devices (_tablets)
+  lg: 1024,  // Large devices (_desktops)
   xl: 1280,  // Extra large devices (large desktops)
   '2xl': 1536 // 2X large devices (larger desktops)
 } as const;
@@ -215,8 +215,8 @@ export class ResponsiveLayoutTester {
     let error: Error | undefined;
     
     try {
-      passed = await testFn(device);
-    } catch (e) {
+      passed = await testFn(_device);
+    } catch (_error) {
       error = e as Error;
       passed = false;
     }
@@ -329,9 +329,9 @@ export function validateMediaQueries(): MediaQueryValidation[] {
   const validations: MediaQueryValidation[] = [];
   
   // Check common breakpoints
-  for (const [name, minWidth] of Object.entries(BREAKPOINTS)) {
+  for (const [name, minWidth] of Object.entries(_BREAKPOINTS)) {
     const query = `(min-width: ${minWidth}px)`;
-    const matches = window.matchMedia(query).matches;
+    const matches = window.matchMedia(_query).matches;
     
     validations.push({
       breakpoint: name,
@@ -442,4 +442,4 @@ interface AccessibilityTest {
 }
 
 // Export test runner for use in components
-export const responsiveTester = new ResponsiveLayoutTester();
+export const _responsiveTester = new ResponsiveLayoutTester();

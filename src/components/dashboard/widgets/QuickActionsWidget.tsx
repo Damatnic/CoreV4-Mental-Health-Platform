@@ -1,6 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '../utils/logger';
 import { 
   Heart, 
   Brain, 
@@ -39,7 +39,7 @@ export function QuickActionsWidget({ actions, error }: QuickActionsWidgetProps) 
     return iconMap[icon] || <Heart className="h-5 w-5" />;
   };
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -70,7 +70,7 @@ export function QuickActionsWidget({ actions, error }: QuickActionsWidgetProps) 
       window.open(action.action, '_blank');
     } else {
       // Custom action handler
-      console.log('Custom action:', action.action);
+      logger.info('Custom action:', action.action);
     }
   };
 

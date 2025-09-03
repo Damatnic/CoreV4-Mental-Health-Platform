@@ -28,7 +28,7 @@ export interface CrisisAssessmentResult {
   protectiveFactors: string[];
   recommendedActions: string[];
   requiresImmediate: boolean;
-  confidenceLevel: number;
+  _confidenceLevel: number;
 }
 
 export interface GeolocationResult {
@@ -244,7 +244,7 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
   });
 
   // Advanced risk pattern recognition
-  const riskPatterns = analyzeRiskPatterns(responses);
+  const riskPatterns = analyzeRiskPatterns(_responses);
   riskPatterns.forEach(pattern => {
     riskFactors.push(pattern.description);
     totalScore *= pattern.multiplier;
@@ -258,7 +258,7 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
   let requiresImmediate = false;
 
   // Multi-tier critical assessment system
-  if (hasCriticalRiskCombination(responses) || criticalFactors >= 3 || severityPercentage >= 95) {
+  if (hasCriticalRiskCombination(_responses) || criticalFactors >= 3 || severityPercentage >= 95) {
     severity = 'critical';
     requiresImmediate = true;
     recommendedActions.push('🚨 IMMEDIATE EMERGENCY RESPONSE REQUIRED');
@@ -266,7 +266,7 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
     recommendedActions.push('Remove all means of self-harm immediately');
     recommendedActions.push('Ensure continuous supervision until help arrives');
     recommendedActions.push('Contact emergency contact network');
-  } else if (hasHighRiskIndicators(responses) || severityPercentage >= 80) {
+  } else if (hasHighRiskIndicators(_responses) || severityPercentage >= 80) {
     severity = 'high';
     requiresImmediate = true;
     recommendedActions.push('⚠️ URGENT INTERVENTION NEEDED');
@@ -274,7 +274,7 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
     recommendedActions.push('Go to emergency room or call 911');
     recommendedActions.push('Contact trusted support person now');
     recommendedActions.push('Create immediate safety plan');
-  } else if (hasMediumRiskIndicators(responses) || severityPercentage >= 60) {
+  } else if (hasMediumRiskIndicators(_responses) || severityPercentage >= 60) {
     severity = 'medium';
     recommendedActions.push('📞 Immediate professional support recommended');
     recommendedActions.push('Call crisis text line (text HOME to 741741)');
@@ -300,7 +300,7 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
   addContextualRiskFactors(responses, riskFactors);
 
   // Calculate confidence level with enhanced accuracy scoring
-  const answeredQuestions = Object.keys(responses).length;
+  const answeredQuestions = Object.keys(_responses).length;
   const relevantQuestions = CRISIS_ASSESSMENT_QUESTIONS.filter(q => 
     !q.dependsOn || responses[q.dependsOn] !== 0
   ).length;
@@ -311,16 +311,16 @@ export function assessCrisisSeverity(responses: Record<string, number>): CrisisA
     .filter(id => responses[id] !== undefined).length;
   const criticalCompleteness = (criticalQuestionsAnswered / 4) * 100;
   
-  const confidenceLevel = (completenessScore * 0.6 + criticalCompleteness * 0.4);
+  const _confidenceLevel = (completenessScore * 0.6 + criticalCompleteness * 0.4);
 
   return {
     severity,
-    score: Math.round(totalScore),
+    score: Math.round(_totalScore),
     riskFactors,
     protectiveFactors,
     recommendedActions,
     requiresImmediate,
-    confidenceLevel: Math.round(confidenceLevel)
+    _confidenceLevel: Math.round(_confidenceLevel)
   };
 }
 
@@ -442,7 +442,7 @@ export async function getCurrentLocation(): Promise<GeolocationResult> {
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const result: GeolocationResult = {
+        const _result: GeolocationResult = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
@@ -453,14 +453,14 @@ export async function getCurrentLocation(): Promise<GeolocationResult> {
         try {
           // In production, use a geocoding API like Google Maps or OpenStreetMap
           // For now, we'll return the coordinates
-          resolve(result);
-        } catch (error) {
-          // Return result without city/state if geocoding fails
-          resolve(result);
+          resolve(_result);
+        } catch {
+          // Return _result without city/state if geocoding fails
+          resolve(_result);
         }
       },
-      (error) => {
-        reject(error);
+      (_error) => {
+        reject(_error);
       },
       {
         enableHighAccuracy: true,
@@ -474,7 +474,7 @@ export async function getCurrentLocation(): Promise<GeolocationResult> {
 // Find nearby emergency services
 export async function findNearbyEmergencyServices(
   location: GeolocationResult,
-  radius: number = 10 // miles
+  _radius: number = 10 // miles
 ): Promise<EmergencyService[]> {
   // In production, this would call Google Places API or similar
   // For now, return mock data based on common US services
@@ -731,7 +731,7 @@ export function generateCrisisPreventionPlan(
       .filter(s => s);
     
     if (successfulStrategies.length > 0) {
-      copingStrategies.unshift(...[...new Set(successfulStrategies)]);
+      copingStrategies.unshift(...[...new Set(_successfulStrategies)]);
     }
   }
   

@@ -5,10 +5,11 @@
  * Executes all test suites and generates comprehensive reports
  */
 
-import { exec, execSync } from 'child_process';
+import { exec, _execSync } from 'child_process';
 import { promises as fs } from 'fs';
-import path from 'path';
+import _path from 'path';
 import chalk from 'chalk';
+import { logger } from '../utils/logger';
 
 // Test suite configurations
 const TEST_SUITES = {
@@ -75,7 +76,7 @@ function log(message: string, type: 'info' | 'success' | 'error' | 'warning' = '
     warning: chalk.yellow,
   };
   
-  console.log(`[${timestamp}] ${colors[type](message)}`);
+  logger.info(`[${timestamp}] ${colors[type](_message)}`);
 }
 
 async function ensureDirectories() {
@@ -101,7 +102,7 @@ async function runTest(suite: string, config: typeof TEST_SUITES[keyof typeof TE
       const duration = Date.now() - startTime;
       const passed = !error;
       
-      if (passed) {
+      if (_passed) {
         log(`✓ ${config.name} passed in ${(duration / 1000).toFixed(2)}s`, 'success');
       } else {
         log(`✗ ${config.name} failed after ${(duration / 1000).toFixed(2)}s`, 'error');
@@ -125,8 +126,8 @@ async function checkCrisisResponseTime() {
   log('Validating crisis response time requirements...', 'info');
   
   try {
-    const perfResults = await fs.readFile('test-results/performance-metrics.json', 'utf-8');
-    const metrics = JSON.parse(perfResults);
+    const _perfResults = await fs.readFile('test-results/performance-metrics.json', 'utf-8');
+    const metrics = JSON.parse(_perfResults);
     
     if (metrics.crisisResponseTime > 200) {
       log(`Crisis response time ${metrics.crisisResponseTime}ms exceeds 200ms threshold!`, 'error');
@@ -135,7 +136,7 @@ async function checkCrisisResponseTime() {
     
     log(`Crisis response time: ${metrics.crisisResponseTime}ms ✓`, 'success');
     return true;
-  } catch (error) {
+  } catch {
     log('Could not validate crisis response time', 'warning');
     return true;
   }
@@ -289,14 +290,14 @@ async function generateReport() {
 }
 
 async function main() {
-  console.log(chalk.bold.blue('\n🧪 CoreV4 Mental Health Platform - Comprehensive Test Suite\n'));
+  logger.info(chalk.bold.blue('\n🧪 CoreV4 Mental Health Platform - Comprehensive Test Suite\n'));
   
   try {
     // Ensure test directories exist
     await ensureDirectories();
     
     // Run all test suites
-    for (const [suite, config] of Object.entries(TEST_SUITES)) {
+    for (const [suite, config] of Object.entries(_TEST_SUITES)) {
       const result = await runTest(suite, config);
       results.push(result);
       
@@ -322,29 +323,29 @@ async function main() {
     await generateReport();
     
     // Summary
-    console.log(chalk.bold.blue('\n📊 Test Summary\n'));
-    console.log(`Total Suites: ${results.length}`);
-    console.log(`Passed: ${chalk.green(results.filter(r => r.passed).length)}`);
-    console.log(`Failed: ${chalk.red(results.filter(r => !r.passed).length)}`);
+    logger.info(chalk.bold.blue('\n📊 Test Summary\n'));
+    logger.info(`Total Suites: ${results.length}`);
+    logger.info(`Passed: ${chalk.green(results.filter(r => r.passed).length)}`);
+    logger.info(`Failed: ${chalk.red(results.filter(r => !r.passed).length)}`);
     
     const criticalFailures = results.filter(r => !r.passed && TEST_SUITES[r.suite as keyof typeof TEST_SUITES]?.critical);
     if (criticalFailures.length > 0) {
-      console.log(chalk.bold.red(`\n⚠️  ${criticalFailures.length} CRITICAL FAILURES DETECTED:`));
+      logger.info(chalk.bold.red(`\n⚠️  ${criticalFailures.length} CRITICAL FAILURES DETECTED:`));
       criticalFailures.forEach(failure => {
-        console.log(chalk.red(`  - ${TEST_SUITES[failure.suite as keyof typeof TEST_SUITES].name}`));
+        logger.info(chalk.red(`  - ${TEST_SUITES[failure.suite as keyof typeof TEST_SUITES].name}`));
       });
       process.exit(1);
     } else if (results.some(r => !r.passed)) {
-      console.log(chalk.yellow('\n⚠️  Some tests failed, but no critical failures'));
+      logger.info(chalk.yellow('\n⚠️  Some tests failed, but no critical failures'));
       process.exit(0);
     } else {
-      console.log(chalk.bold.green('\n✅ All tests passed successfully!'));
-      console.log(chalk.green('The CoreV4 Mental Health Platform is ready for deployment.'));
+      logger.info(chalk.bold.green('\n✅ All tests passed successfully!'));
+      logger.info(chalk.green('The CoreV4 Mental Health Platform is ready for deployment.'));
       process.exit(0);
     }
     
-  } catch (error) {
-    console.error(chalk.red('Fatal error during test execution:'), error);
+  } catch (_error) {
+    logger.error(chalk.red('Fatal undefined during test execution:'), undefined);
     process.exit(1);
   }
 }

@@ -4,9 +4,10 @@
 
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
 import { 
   ApiResponse, 
-  ApiError, 
+  _ApiError, 
   User, 
   LoginRequest, 
   LoginResponse,
@@ -51,10 +52,10 @@ export class ApiServiceError extends Error {
   constructor(
     public code: ErrorCode,
     public override message: string,
-    public details?: any,
+    public details?: unknown,
     public statusCode?: number
   ) {
-    super(message);
+    super(_message);
     this.name = 'ApiServiceError';
   }
 }
@@ -105,7 +106,7 @@ export class ApiService {
         
         return config;
       },
-      (error) => Promise.reject(error)
+      (_error) => Promise.reject(error)
     );
 
     // Response interceptor for error handling
@@ -124,8 +125,8 @@ export class ApiService {
           
           try {
             await this.refreshAccessToken();
-            return this.axiosInstance(originalRequest);
-          } catch (refreshError) {
+            return this.axiosInstance(_originalRequest);
+          } catch {
             this.handleLogout();
             throw new ApiServiceError(
               ErrorCode.AUTHENTICATION_ERROR,
@@ -163,7 +164,7 @@ export class ApiService {
     // In production, send to secure logging service
     if (import.meta.env.PROD) {
       // TODO: Implement secure logging service integration
-      console.log('API Audit Log:', logEntry);
+      logger.debug('API Audit Log', 'ApiService', logEntry);
     }
   }
 
@@ -179,9 +180,9 @@ export class ApiService {
     }
 
     const status = error.response.status;
-    const data = error.response.data as any;
+    const data = error.response.data as unknown;
 
-    switch (status) {
+    switch (_status) {
       case 400:
         return new ApiServiceError(
           ErrorCode.VALIDATION_ERROR,
@@ -255,8 +256,8 @@ export class ApiService {
       // Use secure storage for sensitive authentication tokens
       this.accessToken = secureStorage.getItem('access_token');
       this.refreshToken = secureStorage.getItem('refresh_token');
-    } catch (error) {
-      console.error('Failed to load tokens from secure storage:', error);
+    } catch (_error) {
+      logger.error('Failed to load tokens from secure storage:');
     }
   }
 
@@ -267,8 +268,8 @@ export class ApiService {
       secureStorage.setItem('refresh_token', refreshToken);
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
-    } catch (error) {
-      console.error('Failed to save tokens to secure storage:', error);
+    } catch (_error) {
+      logger.error('Failed to save tokens to secure storage:');
     }
   }
 
@@ -279,8 +280,8 @@ export class ApiService {
       secureStorage.removeItem('refresh_token');
       this.accessToken = null;
       this.refreshToken = null;
-    } catch (error) {
-      console.error('Failed to clear tokens from secure storage:', error);
+    } catch (_error) {
+      logger.error('Failed to clear tokens from secure storage:');
     }
   }
 
@@ -319,13 +320,13 @@ export class ApiService {
 
   private getCurrentUserId(): string | null {
     try {
-      const userStr = secureStorage.getItem('current_user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        return user.id;
+      const _userStr = secureStorage.getItem('current_user');
+      if (_userStr) {
+        const _user = JSON.parse(_userStr);
+        return _user.id;
       }
-    } catch (error) {
-      console.error('Failed to get current user ID:', error);
+    } catch (_error) {
+      logger.error('Failed to get current _user ID:');
     }
     return null;
   }
@@ -335,7 +336,7 @@ export class ApiService {
     requestFn: () => Promise<T>,
     attempts: number = API_CONFIG.retryAttempts
   ): Promise<T> {
-    let lastError: any;
+    let lastError: unknown;
     
     for (let i = 0; i < attempts; i++) {
       try {
@@ -379,9 +380,9 @@ export class ApiService {
         { headers: { 'Skip-Auth': 'true' } }
       );
       
-      const { accessToken, refreshToken, user } = response.data;
+      const { accessToken, refreshToken, _user } = response.data;
       this.saveTokensToStorage(accessToken, refreshToken);
-      secureStorage.setItem('current_user', JSON.stringify(user));
+      secureStorage.setItem('current_user', JSON.stringify(_user));
       
       return response.data;
     } catch (error) {
@@ -406,8 +407,8 @@ export class ApiService {
   public async logout(): Promise<void> {
     try {
       await this.axiosInstance.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (_error) {
+      logger.error('Logout error: ');
     } finally {
       this.handleLogout();
     }

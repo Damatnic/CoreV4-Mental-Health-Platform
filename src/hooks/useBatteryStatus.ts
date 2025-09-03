@@ -17,9 +17,9 @@ export function useBatteryStatus(): BatteryStatus {
   });
 
   useEffect(() => {
-    let battery: any = null;
+    let battery: unknown = null;
 
-    const updateBatteryStatus = (batteryManager: any) => {
+    const updateBatteryStatus = (batteryManager: unknown) => {
       setBatteryStatus({
         level: batteryManager.level,
         charging: batteryManager.charging,
@@ -51,7 +51,7 @@ export function useBatteryStatus(): BatteryStatus {
       try {
         // Check if Battery API is available
         if ('getBattery' in navigator) {
-          battery = await (navigator as any).getBattery();
+          battery = await (navigator as unknown).getBattery();
           
           // Initial update
           updateBatteryStatus(battery);
@@ -62,8 +62,8 @@ export function useBatteryStatus(): BatteryStatus {
           battery.addEventListener('chargingtimechange', () => updateBatteryStatus(battery));
           battery.addEventListener('dischargingtimechange', () => updateBatteryStatus(battery));
         }
-      } catch (error) {
-        console.error('Battery API not available:', error);
+      } catch (_error) {
+        console.error('Battery API not available:');
       }
     };
 

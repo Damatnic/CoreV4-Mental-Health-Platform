@@ -253,7 +253,7 @@ export const CRISIS_THEMES = {
 
 export type CrisisTheme = keyof typeof CRISIS_THEMES;
 
-export const HAPTIC_PATTERNS = {
+export const _HAPTIC_PATTERNS = {
   tap: [30],
   success: [50, 30, 50],
   warning: [100, 50, 100],

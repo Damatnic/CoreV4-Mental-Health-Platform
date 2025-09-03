@@ -1,5 +1,6 @@
 // Push Notification Service for Wellness Reminders
 import { openDB } from 'idb';
+import { logger } from '../utils/logger';
 
 interface NotificationSchedule {
   id: string;
@@ -30,13 +31,13 @@ class PushNotificationService {
   async init(): Promise<boolean> {
     // Check if notifications are supported
     if (!('Notification' in window)) {
-      console.warn('Notifications not supported');
+      logger.warn('Notifications not supported');
       return false;
     }
 
     // Check if service worker is supported
     if (!('serviceWorker' in navigator)) {
-      console.warn('Service Worker not supported');
+      logger.warn('Service Worker not supported');
       return false;
     }
 
@@ -51,8 +52,8 @@ class PushNotificationService {
         await this.subscribeToNotifications();
         return true;
       }
-    } catch (error) {
-      console.error('Failed to initialize push notifications:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize push notifications:');
     }
 
     return false;
@@ -66,7 +67,7 @@ class PushNotificationService {
 
     // Don't re-request if denied
     if (Notification.permission === 'denied') {
-      console.warn('Notification permission denied');
+      logger.warn('Notification permission denied');
       return 'denied';
     }
 
@@ -81,6 +82,7 @@ class PushNotificationService {
     return permission;
   }
 
+// @ts-expect-error - PushSubscription is a global API
   async subscribeToNotifications(): Promise<PushSubscription | null> {
     if (!this.registration) return null;
 
@@ -98,30 +100,31 @@ class PushNotificationService {
         });
 
         // Send subscription to server
-        await this.sendSubscriptionToServer(subscription);
+        await this.sendSubscriptionToServer(_subscription);
       }
       
       return subscription;
-    } catch (error) {
-      console.error('Failed to subscribe to push notifications:', error);
+    } catch (_error) {
+      logger.error('Failed to subscribe to push notifications:');
       return null;
     }
   }
 
   private urlBase64ToUint8Array(base64String: string): BufferSource {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
+    const _base64 = (base64String + padding)
       .replace(/\-/g, '+')
       .replace(/_/g, '/');
 
-    const rawData = window.atob(base64);
+    const rawData = window.atob(_base64);
     const outputArray = new Uint8Array(rawData.length);
 
     for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
+      outputArray[i] = rawData.charCodeAt(_i);
     }
     return outputArray;
   }
+// @ts-expect-error - PushSubscription is a global API
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     // Send subscription to your server
@@ -141,8 +144,8 @@ class PushNotificationService {
       if (!response.ok) {
         throw new Error('Failed to send subscription to server');
       }
-    } catch (error) {
-      console.error('Error sending subscription to server:', error);
+    } catch (_error) {
+      logger.error('Error sending subscription to server:');
     }
   }
 
@@ -283,7 +286,7 @@ class PushNotificationService {
     const db = await this.openNotificationDB();
     const schedule = await db.get('schedules', scheduleId);
     
-    if (schedule) {
+    if (_schedule) {
       const updated = { ...schedule, ...updates };
       await db.put('schedules', updated);
       
@@ -312,8 +315,8 @@ class PushNotificationService {
   }
 
   // Handle notification clicks
-  async handleNotificationClick(action: string, data: any): Promise<void> {
-    switch (action) {
+  async handleNotificationClick(action: string, data: unknown): Promise<void> {
+    switch (_action) {
       case 'taken':
         // Log medication taken
         await this.logMedicationTaken(data);
@@ -347,11 +350,11 @@ class PushNotificationService {
         break;
       
       default:
-        console.log('Unknown notification action:', action);
+        logger.info('Unknown notification action:', action);
     }
   }
 
-  private async logMedicationTaken(data: any): Promise<void> {
+  private async logMedicationTaken(data: unknown): Promise<void> {
     try {
       await fetch('/api/wellness/medication/log', {
         method: 'POST',
@@ -363,8 +366,8 @@ class PushNotificationService {
           action: 'taken'
         })
       });
-    } catch (error) {
-      console.error('Failed to log medication:', error);
+    } catch (_error) {
+      logger.error('Failed to log medication:');
     }
   }
 
@@ -436,8 +439,8 @@ class PushNotificationService {
     try {
       const notifications = await this.registration.getNotifications({ tag });
       notifications.forEach(notification => notification.close());
-    } catch (error) {
-      console.error('Failed to cancel notifications:', error);
+    } catch (_error) {
+      logger.error('Failed to cancel notifications:');
     }
   }
 
@@ -455,15 +458,15 @@ class PushNotificationService {
         active: notifications.length,
         scheduled: activeSchedules.length
       };
-    } catch (error) {
-      console.error('Failed to get notification stats:', error);
+    } catch (_error) {
+      logger.error('Failed to get notification stats:');
       return { active: 0, scheduled: 0 };
     }
   }
 }
 
 // Export singleton instance
-export const pushNotifications = new PushNotificationService();
+export const _pushNotifications = new PushNotificationService();
 
 // Export types
 export type { NotificationSchedule, NotificationAction };

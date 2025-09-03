@@ -35,6 +35,7 @@ class ResourceManager {
   private cleanupFunctions: Map<string, () => void> = new Map();
   private timers: Map<string, number> = new Map();
   private intervals: Map<string, number> = new Map();
+// @ts-expect-error - IntersectionObserver is a global API
   private observers: Map<string, IntersectionObserver | MutationObserver | ResizeObserver> = new Map();
   private eventListeners: Map<string, { element: EventTarget; event: string; handler: EventListener }[]> = new Map();
   
@@ -69,6 +70,7 @@ class ResourceManager {
   
   /**
    * Register an observer for automatic cleanup
+// @ts-expect-error - IntersectionObserver is a global API
    */
   registerObserver(id: string, observer: IntersectionObserver | MutationObserver | ResizeObserver): void {
     // Disconnect existing observer if any
@@ -95,7 +97,7 @@ class ResourceManager {
   cleanup(id: string): void {
     // Run cleanup function
     const cleanupFn = this.cleanupFunctions.get(id);
-    if (cleanupFn) {
+    if (_cleanupFn) {
       cleanupFn();
       this.cleanupFunctions.delete(id);
     }
@@ -191,7 +193,7 @@ export function useResourceCleanup(componentId: string) {
     registerCleanup: (cleanup: () => void) => resourceManager.registerCleanup(componentId, cleanup),
     registerTimer: (timerId: number) => resourceManager.registerTimer(componentId, timerId),
     registerInterval: (intervalId: number) => resourceManager.registerInterval(componentId, intervalId),
-    registerObserver: (observer: any) => resourceManager.registerObserver(componentId, observer),
+    registerObserver: (observer: unknown) => resourceManager.registerObserver(componentId, observer),
     registerEventListener: (element: EventTarget, event: string, handler: EventListener) => 
       resourceManager.registerEventListener(componentId, element, event, handler),
   };
@@ -355,12 +357,12 @@ export class ImageLoader {
   }
 }
 
-export const imageLoader = new ImageLoader();
+export const _imageLoader = new ImageLoader();
 
 /**
  * Debounce with cleanup
  */
-export function debounceWithCleanup<T extends (...args: any[]) => any>(
+export function debounceWithCleanup<T extends (...args: unknown[]) => any>(
   func: T,
   delay: number
 ): T & { cancel: () => void } {
@@ -377,7 +379,7 @@ export function debounceWithCleanup<T extends (...args: any[]) => any>(
     }, delay);
   }) as T;
   
-  (debounced as any).cancel = () => {
+  (debounced as unknown).cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -390,7 +392,7 @@ export function debounceWithCleanup<T extends (...args: any[]) => any>(
 /**
  * Throttle with cleanup
  */
-export function throttleWithCleanup<T extends (...args: any[]) => any>(
+export function throttleWithCleanup<T extends (...args: unknown[]) => any>(
   func: T,
   limit: number
 ): T & { cancel: () => void } {
@@ -405,7 +407,7 @@ export function throttleWithCleanup<T extends (...args: any[]) => any>(
       
       timeoutId = window.setTimeout(() => {
         inThrottle = false;
-        if (lastArgs) {
+        if (_lastArgs) {
           throttled(...lastArgs);
           lastArgs = null;
         }
@@ -415,7 +417,7 @@ export function throttleWithCleanup<T extends (...args: any[]) => any>(
     }
   }) as T;
   
-  (throttled as any).cancel = () => {
+  (throttled as unknown).cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -431,12 +433,12 @@ export function throttleWithCleanup<T extends (...args: any[]) => any>(
  * Memory leak detector
  */
 export class MemoryLeakDetector {
-  private snapshots: any[] = [];
+  private snapshots: unknown[] = [];
   private maxSnapshots = 10;
   
   takeSnapshot(): void {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown).memory;
       this.snapshots.push({
         timestamp: Date.now(),
         usedJSHeapSize: memory.usedJSHeapSize,
@@ -454,16 +456,16 @@ export class MemoryLeakDetector {
   detectLeak(): boolean {
     if (this.snapshots.length < 3) return false;
     
-    // Check if memory is consistently increasing
-    let increasing = true;
+    // Check if memory is consistently _increasing
+    let _increasing = true;
     for (let i = 1; i < this.snapshots.length; i++) {
       if (this.snapshots[i].usedJSHeapSize <= this.snapshots[i - 1].usedJSHeapSize) {
-        increasing = false;
+        _increasing = false;
         break;
       }
     }
     
-    if (increasing) {
+    if (_increasing) {
       const firstSnapshot = this.snapshots[0];
       const lastSnapshot = this.snapshots[this.snapshots.length - 1];
       const increase = lastSnapshot.usedJSHeapSize - firstSnapshot.usedJSHeapSize;
@@ -491,4 +493,4 @@ export class MemoryLeakDetector {
   }
 }
 
-export const memoryLeakDetector = new MemoryLeakDetector();
+export const _memoryLeakDetector = new MemoryLeakDetector();

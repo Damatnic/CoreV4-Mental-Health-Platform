@@ -12,7 +12,7 @@ interface TodaysScheduleWidgetProps {
 export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -30,8 +30,8 @@ export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps)
     );
   }
 
-  const getItemIcon = (type: string) => {
-    switch (type) {
+  const getItemIcon = (_type: string) => {
+    switch (_type) {
       case 'therapy':
         return <Users className="h-4 w-4" />;
       case 'medication':
@@ -43,8 +43,8 @@ export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps)
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (_status: string) => {
+    switch (_status) {
       case 'completed':
         return 'bg-green-100 text-green-700';
       case 'in-progress':
@@ -68,8 +68,8 @@ export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps)
     return null;
   };
 
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString([], { 
+  const formatTime = (_date: Date) => {
+    return new Date(_date).toLocaleTimeString([], { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
@@ -102,16 +102,16 @@ export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps)
               transition={{ delay: index * 0.1 }}
               className="relative bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
-                if (item.type === 'therapy') navigate('/professional/therapy');
-                else if (item.type === 'medication') navigate('/wellness/medications');
+                if (item._type === 'therapy') navigate('/professional/therapy');
+                else if (item._type === 'medication') navigate('/wellness/medications');
                 else navigate('/schedule');
               }}
             >
               {getPriorityIndicator(item.priority)}
               
               <div className="flex items-start space-x-3 pl-2">
-                <div className={`p-2 rounded-lg ${getStatusColor(item.status)}`}>
-                  {getItemIcon(item.type)}
+                <div className={`p-2 rounded-lg ${getStatusColor(item._status)}`}>
+                  {getItemIcon(item._type)}
                 </div>
                 
                 <div className="flex-1 min-w-0">

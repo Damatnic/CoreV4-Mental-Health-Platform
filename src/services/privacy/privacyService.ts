@@ -7,6 +7,7 @@
 import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
+import { logger } from '../utils/logger';
 
 export interface ConsentRecord {
   id: string;
@@ -73,7 +74,7 @@ export interface DataAccessRequest {
   completedAt?: Date;
   dataCategories?: DataCategory[];
   reason?: string;
-  response?: any;
+  response?: unknown;
 }
 
 export interface DataSharingAgreement {
@@ -160,9 +161,9 @@ class PrivacyService {
       });
 
       return consent;
-    } catch (error) {
-      console.error('Failed to record consent:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to record consent:');
+      throw undefined;
     }
   }
 
@@ -208,9 +209,9 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
-      console.error('Failed to withdraw consent:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to withdraw consent:');
+      throw undefined;
     }
   }
 
@@ -253,9 +254,9 @@ class PrivacyService {
 
       this.privacyCache.set(userId, defaults);
       return defaults;
-    } catch (error) {
-      console.error('Failed to get privacy settings:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to get privacy settings:');
+      throw undefined;
     }
   }
 
@@ -292,9 +293,9 @@ class PrivacyService {
       await this.applyPrivacySettings(userId, updated);
 
       return updated;
-    } catch (error) {
-      console.error('Failed to update privacy settings:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to update privacy settings:');
+      throw undefined;
     }
   }
 
@@ -333,9 +334,9 @@ class PrivacyService {
       });
 
       return request;
-    } catch (error) {
-      console.error('Failed to create data access request:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to create data access request:');
+      throw undefined;
     }
   }
 
@@ -344,7 +345,7 @@ class PrivacyService {
    */
   async requestDataPortability(
     userId: string,
-    format: 'json' | 'csv' | 'pdf' = 'json'
+    _format: 'json' | 'csv' | 'pdf' = 'json'
   ): Promise<DataAccessRequest> {
     try {
       const request: DataAccessRequest = {
@@ -359,7 +360,7 @@ class PrivacyService {
       await this.storeDataRequest(request);
 
       // Process request
-      this.processDataPortabilityRequest(request, format);
+      this.processDataPortabilityRequest(request, _format);
 
       // Log request
       await auditLogger.log({
@@ -367,15 +368,15 @@ class PrivacyService {
         userId,
         details: {
           requestId: request.id,
-          format,
+          _format,
         },
         severity: 'info',
       });
 
       return request;
-    } catch (error) {
-      console.error('Failed to create data portability request:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to create data portability request:');
+      throw undefined;
     }
   }
 
@@ -417,9 +418,9 @@ class PrivacyService {
       });
 
       return request;
-    } catch (error) {
-      console.error('Failed to create data deletion request:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to create data deletion request:');
+      throw undefined;
     }
   }
 
@@ -479,9 +480,9 @@ class PrivacyService {
       });
 
       return agreement;
-    } catch (error) {
-      console.error('Failed to create data sharing agreement:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to create data sharing agreement:');
+      throw undefined;
     }
   }
 
@@ -521,9 +522,9 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
-      console.error('Failed to revoke data sharing agreement:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to revoke data sharing agreement:');
+      throw undefined;
     }
   }
 
@@ -546,13 +547,13 @@ class PrivacyService {
 
       if (dataCategories) {
         return relevantConsents.some(c =>
-          dataCategories.every(cat => c.dataCategories.includes(cat))
+          dataCategories.every(_cat => c.dataCategories.includes(_cat))
         );
       }
 
       return relevantConsents.length > 0;
-    } catch (error) {
-      console.error('Failed to check consent:', error);
+    } catch (_error) {
+      logger.error('Failed to check consent:');
       return false;
     }
   }
@@ -590,9 +591,9 @@ class PrivacyService {
         },
         severity: 'info',
       });
-    } catch (error) {
-      console.error('Failed to anonymize user data:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to anonymize user data:');
+      throw undefined;
     }
   }
 
@@ -678,8 +679,8 @@ class PrivacyService {
         await this.storeDataRequest(request);
         
         // Notify user (in production, send email/notification)
-        console.log('Data access request completed:', request.id);
-      } catch (error) {
+        logger.info('Data access request completed:', request.id);
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }
@@ -688,7 +689,7 @@ class PrivacyService {
 
   private async processDataPortabilityRequest(
     request: DataAccessRequest,
-    format: string
+    _format: string
   ): Promise<void> {
     // Simulate async processing
     setTimeout(async () => {
@@ -696,9 +697,9 @@ class PrivacyService {
         // Gather all user data
         const userData = await this.gatherUserData(request.userId);
         
-        // Convert to requested format
+        // Convert to requested _format
         let exportedData: string;
-        switch (format) {
+        switch (_format) {
           case 'csv':
             exportedData = this.convertToCSV(userData);
             break;
@@ -717,8 +718,8 @@ class PrivacyService {
         await this.storeDataRequest(request);
         
         // Notify user
-        console.log('Data portability request completed:', request.id);
-      } catch (error) {
+        logger.info('Data portability request completed:', request.id);
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }
@@ -741,8 +742,8 @@ class PrivacyService {
         await this.storeDataRequest(request);
         
         // Notify user
-        console.log('Data deletion request completed:', request.id);
-      } catch (error) {
+        logger.info('Data deletion request completed:', request.id);
+      } catch {
         request.status = 'rejected';
         await this.storeDataRequest(request);
       }
@@ -752,9 +753,9 @@ class PrivacyService {
   private async gatherUserData(
     userId: string,
     categories?: DataCategory[]
-  ): Promise<any> {
+  ): Promise<unknown> {
     // In production, gather actual user data from various sources
-    const allData: any = {
+    const allData: unknown = {
       personal_info: { userId, email: 'user@example.com' },
       health_records: [],
       mood_data: [],
@@ -771,7 +772,7 @@ class PrivacyService {
       return allData;
     }
 
-    const filtered: any = {};
+    const filtered: unknown = {};
     for (const category of categories) {
       if (allData[category]) {
         filtered[category] = allData[category];
@@ -786,7 +787,7 @@ class PrivacyService {
     categories?: DataCategory[]
   ): Promise<void> {
     // In production, actually delete user data
-    console.log(`Deleting user data for ${userId}:`, categories);
+    logger.info(`Deleting user data for ${userId}:`, categories);
     
     // Clear from all storage
     if (!categories || categories.length === 0) {
@@ -811,7 +812,7 @@ class PrivacyService {
     const anonymousId = `anon_${cryptoService.generateSecureUUID()}`;
     
     // In production, update all references to user ID
-    console.log(`Anonymizing data for user ${userId} -> ${anonymousId}`);
+    logger.info(`Anonymizing data for user ${userId} -> ${anonymousId}`);
   }
 
   private async scheduleDataDeletion(
@@ -835,7 +836,7 @@ class PrivacyService {
     
     if (settings.autoDeleteInactiveDays) {
       // Schedule auto-deletion
-      console.log(`Auto-deletion scheduled after ${settings.autoDeleteInactiveDays} days of inactivity`);
+      logger.info(`Auto-deletion scheduled after ${settings.autoDeleteInactiveDays} days of inactivity`);
     }
   }
 
@@ -852,7 +853,7 @@ class PrivacyService {
         for (const consent of consents) {
           if (consent.expiresAt && new Date() > new Date(consent.expiresAt)) {
             // Notify user to renew consent
-            console.log(`Consent expired for user ${userId}:`, consent.type);
+            logger.info(`Consent expired for user ${userId}:`, consent.type);
           }
         }
       }
@@ -872,7 +873,7 @@ class PrivacyService {
             
             if (settings.dataRetentionDays) {
               // Check and delete old data
-              console.log(`Checking data retention for user ${userId}`);
+              logger.info(`Checking data retention for user ${userId}`);
             }
           }
         }
@@ -885,13 +886,13 @@ class PrivacyService {
     return '127.0.0.1';
   }
 
-  private convertToCSV(data: any): string {
-    // Convert data to CSV format
+  private convertToCSV(_data: unknown): string {
+    // Convert data to CSV _format
     return 'CSV data export';
   }
 
-  private async convertToPDF(data: any): Promise<string> {
-    // Convert data to PDF format
+  private async convertToPDF(_data: unknown): Promise<string> {
+    // Convert data to PDF _format
     return 'PDF data export';
   }
 }

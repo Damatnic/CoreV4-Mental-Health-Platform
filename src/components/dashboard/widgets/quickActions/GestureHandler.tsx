@@ -7,7 +7,7 @@ interface GestureHandlerProps {
   onSwipeDown?: () => void;
   onDoubleTap?: () => void;
   onLongPress?: () => void;
-  onPinch?: (scale: number) => void;
+  onPinch?: (_scale: number) => void;
   onRotate?: (angle: number) => void;
   threshold?: number;
   longPressDelay?: number;
@@ -53,7 +53,7 @@ export function GestureHandler({
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       pinchStartRef.current = Math.sqrt(dx * dx + dy * dy);
 
-      // Calculate initial rotation angle
+      // Calculate initial _rotation angle
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
       rotateStartRef.current = angle;
     }
@@ -93,8 +93,8 @@ export function GestureHandler({
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const scale = distance / pinchStartRef.current;
-      onPinch(scale);
+      const _scale = distance / pinchStartRef.current;
+      onPinch(_scale);
     }
 
     // Handle rotate gesture
@@ -102,8 +102,8 @@ export function GestureHandler({
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-      const rotation = angle - rotateStartRef.current;
-      onRotate(rotation);
+      const _rotation = angle - rotateStartRef.current;
+      onRotate(_rotation);
     }
   }, [onPinch, onRotate]);
 
@@ -140,8 +140,8 @@ export function GestureHandler({
     const deltaTime = endTime - startPos.time;
 
     // Detect swipe gestures
-    const absX = Math.abs(deltaX);
-    const absY = Math.abs(deltaY);
+    const absX = Math.abs(_deltaX);
+    const absY = Math.abs(_deltaY);
     const velocity = Math.sqrt(absX * absX + absY * absY) / deltaTime;
 
     // Only trigger swipe if movement exceeds threshold and velocity is sufficient

@@ -4,9 +4,10 @@
  * Especially critical for users in crisis situations or with motor impairments
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccessibilityStore } from '../../stores/accessibilityStore';
+import { logger } from '../../utils/logger';
 
 interface VoiceCommand {
   phrase: string;
@@ -19,11 +20,22 @@ export const VoiceNavigation: React.FC = () => {
   const navigate = useNavigate();
   const { settings } = useAccessibilityStore();
   const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<any>(null);
+  const [recognition, setRecognition] = useState<unknown>(null);
   const [confidence, setConfidence] = useState(0);
   
   // Voice commands with crisis-focused priority
-  const commands: VoiceCommand[] = [
+  // Announce actions using speech synthesis
+  const announceAction = useCallback((message: string) => {
+    if ('speechSynthesis' in window && settings.voiceFeedback) {
+      const utterance = new (window as unknown).SpeechSynthesisUtterance(message);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = 0.7;
+      (window as unknown).speechSynthesis.speak(utterance);
+    }
+  }, [settings.voiceFeedback]);
+
+  const commands: VoiceCommand[] = useMemo(() => [
     // CRISIS COMMANDS - HIGHEST PRIORITY
     {
       phrase: 'crisis help',
@@ -107,7 +119,7 @@ export const VoiceNavigation: React.FC = () => {
       priority: 'medium',
       description: 'Stop voice recognition'
     }
-  ];
+  ], [navigate]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -115,7 +127,7 @@ export const VoiceNavigation: React.FC = () => {
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
     const recognitionInstance = new SpeechRecognition();
     
     recognitionInstance.continuous = true;
@@ -123,7 +135,7 @@ export const VoiceNavigation: React.FC = () => {
     recognitionInstance.lang = 'en-US';
     recognitionInstance.maxAlternatives = 3;
 
-    recognitionInstance.onresult = (event: any) => {
+    recognitionInstance.onresult = (event: unknown) => {
       const lastResult = event.results[event.results.length - 1];
       if (lastResult.isFinal) {
         const transcript = lastResult[0].transcript.toLowerCase().trim();
@@ -164,17 +176,17 @@ export const VoiceNavigation: React.FC = () => {
         setTimeout(() => {
           try {
             recognitionInstance.start();
-          } catch (error) {
-            console.warn('Voice recognition restart failed:', error);
+          } catch (_error) {
+    logger.warn('Voice recognition restart failed:');
           }
         }, 1000);
       }
     };
 
-    recognitionInstance.onerror = (event: any) => {
-      console.warn('Voice recognition error:', event.error);
+    recognitionInstance.onerror = (event: unknown) => {
+      logger.warn('Voice recognition error:', event.error);
       if (event.error === 'no-speech' || event.error === 'audio-capture') {
-        // These are expected errors, don't show to user
+        // These are expected errors, don&apos;t show to user
         return;
       }
       setIsListening(false);
@@ -185,18 +197,7 @@ export const VoiceNavigation: React.FC = () => {
     return () => {
       recognitionInstance.stop();
     };
-  }, [settings.voiceNavigation, navigate]);
-
-  // Announce actions using speech synthesis
-  const announceAction = useCallback((message: string) => {
-    if ('speechSynthesis' in window && settings.voiceFeedback) {
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.rate = 0.8;
-      utterance.pitch = 1;
-      utterance.volume = 0.7;
-      speechSynthesis.speak(utterance);
-    }
-  }, [settings.voiceFeedback]);
+  }, [settings.voiceNavigation, navigate, commands, announceAction]);
 
   // Start/stop voice recognition
   const toggleVoiceRecognition = useCallback(() => {
@@ -209,8 +210,8 @@ export const VoiceNavigation: React.FC = () => {
       try {
         recognition.start();
         announceAction('Voice navigation started. Say "crisis help" for emergency assistance.');
-      } catch (error) {
-        console.error('Failed to start voice recognition:', error);
+      } catch (_error) {
+        logger.error('Failed to start voice recognition:');
       }
     }
   }, [recognition, isListening, announceAction]);
@@ -264,11 +265,11 @@ export const VoiceNavigation: React.FC = () => {
           <h3 className="font-semibold text-sm mb-2">Voice Commands</h3>
           <div className="space-y-1 text-xs">
             <div className="text-red-600 font-medium">Crisis Commands:</div>
-            <div>"crisis help", "emergency", "help me now"</div>
+            <div>&quot;crisis help&quot;, &quot;emergency&quot;, &quot;help me now&quot;</div>
             <div className="text-blue-600 font-medium mt-2">Navigation:</div>
-            <div>"dashboard", "wellness", "community"</div>
+            <div>&quot;dashboard&quot;, &quot;wellness&quot;, &quot;community&quot;</div>
             <div className="text-gray-600 font-medium mt-2">Accessibility:</div>
-            <div>"high contrast", "larger text", "stop voice"</div>
+            <div>&quot;high contrast&quot;, &quot;larger text&quot;, &quot;stop voice&quot;</div>
           </div>
         </div>
       </div>
@@ -285,7 +286,7 @@ interface SpeechRecognitionResult {
   confidence: number;
 }
 
-interface SpeechRecognitionAlternative {
+interface _SpeechRecognitionAlternative {
   transcript: string;
   confidence: number;
 }
@@ -296,12 +297,12 @@ interface SpeechRecognitionResultList {
   [index: number]: SpeechRecognitionResult;
 }
 
-interface SpeechRecognitionEvent extends Event {
+interface _SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
 }
 
-interface SpeechRecognitionErrorEvent extends Event {
+interface _SpeechRecognitionErrorEvent extends Event {
   error: string;
   message: string;
 }

@@ -1,9 +1,13 @@
 /**
- * Emergency Error Boundary - Critical Runtime Protection
- * Prevents app crash from lexical declaration errors and other runtime issues
+ * Unified Error Boundary Component
+ * Combines crisis-aware features, multiple fallback options, and comprehensive error handling
+ * Ensures users never lose access to critical crisis intervention resources during errors
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { AlertTriangle, Phone, MessageCircle, Home, RefreshCw } from 'lucide-react';
+import { logError } from '../utils/logger';
+import { logger } from '../services/logging/logger';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -15,10 +19,14 @@ interface ErrorBoundaryState {
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  FallbackComponent?: React.ComponentType<unknown>;
+  fallbackRender?: (props: { error: Error; resetErrorBoundary: () => void }) => ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onReset?: () => void;
+  showCrisisResources?: boolean;
 }
 
-export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private retryCount = 0;
   private maxRetries = 3;
 
@@ -46,8 +54,25 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Update state with error info
+    this.setState({ error, errorInfo });
+    
+    // Log error with multiple logging systems
+    logError('Component error caught by ErrorBoundary', 'ErrorBoundary', { error, errorInfo });
+    
+    // Log to crisis-aware logging system if available
+    if (logger?.logCrisisIntervention) {
+      logger.logCrisisIntervention('component_error', undefined, {
+        error: error.message,
+        component: errorInfo.componentStack,
+        severity: 'high',
+        emergency_resources_available: true,
+        errorId: this.state.errorId
+      });
+    }
+
     // Log error details for debugging
-    console.error('🚨 EMERGENCY ERROR BOUNDARY CAUGHT:', {
+    logger.error('🚨 ERROR BOUNDARY CAUGHT:', {
       error: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
@@ -55,12 +80,6 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href
-    });
-
-    // Update state with error info
-    this.setState({
-      error,
-      errorInfo
     });
 
     // Send error to monitoring service
@@ -74,17 +93,8 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
 
   private reportError = async (error: Error, errorInfo: ErrorInfo) => {
     try {
-      // Log to console for immediate debugging
-      console.error('Runtime Error Details:', {
-        message: error.message,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack,
-        errorId: this.state.errorId,
-        timestamp: new Date().toISOString()
-      });
-
       // Store error in localStorage for analysis
-      const errorReport = {
+      const _errorReport = {
         errorId: this.state.errorId,
         message: error.message,
         stack: error.stack,
@@ -94,11 +104,26 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
         userAgent: navigator.userAgent
       };
 
-      localStorage.setItem(`error_${this.state.errorId}`, JSON.stringify(errorReport));
+      localStorage.setItem(`error_${this.state.errorId}`, JSON.stringify(_errorReport));
 
-      // Send to Sentry or error tracking service (if available)
-      if (window.Sentry) {
-        window.Sentry.captureException(error, {
+      // Send to monitoring service in production
+      if (import.meta.env.PROD) {
+        try {
+          fetch('/api/monitoring/crisis-error', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(_errorReport),
+          }).catch(() => {
+            // Fail silently - don't let monitoring failures affect crisis support
+          });
+        } catch {
+          // Fail silently
+        }
+      }
+
+      // Send to Sentry if available
+      if ((window as unknown).Sentry) {
+        (window as unknown).Sentry.captureException(error, {
           tags: {
             component: 'ErrorBoundary',
             errorId: this.state.errorId
@@ -108,15 +133,15 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
           }
         });
       }
-    } catch (reportError) {
-      console.error('Failed to report error:', reportError);
+    } catch (_error) {
+      logger.error('Failed to report error');
     }
   };
 
-  private handleRetry = () => {
+  private handleReset = () => {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++;
-      console.log(`🔄 Retrying... (${this.retryCount}/${this.maxRetries})`);
+      logger.info(`Retrying... (${this.retryCount}/${this.maxRetries})`, 'ErrorBoundary');
       
       this.setState({
         hasError: false,
@@ -124,8 +149,13 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
         errorInfo: null,
         errorId: this.generateErrorId()
       });
+      
+      // Call onReset callback if provided
+      if (this.props.onReset) {
+        this.props.onReset();
+      }
     } else {
-      console.error('❌ Maximum retry attempts reached');
+      logger.error('❌ Maximum retry attempts reached');
     }
   };
 
@@ -133,143 +163,274 @@ export class EmergencyErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
     window.location.reload();
   };
 
+  private handleEmergencyCall = (number: string) => {
+    if (logger?.logCrisisIntervention) {
+      logger.logCrisisIntervention('emergency_call_from_error_boundary', undefined, {
+        number,
+        error_context: this.state.error?.message
+      });
+    }
+    
+    // Try to initiate call
+    window.open(`tel:${number}`, '_self');
+  };
+
+  private renderCrisisResources = () => (
+    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+      <div className="flex items-center mb-3">
+        <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
+        <h3 className="text-lg font-semibold text-red-800">
+          Emergency Resources Available
+        </h3>
+      </div>
+      
+      <p className="text-red-700 mb-4">
+        Even though there&apos;s a technical issue, your safety is our priority. 
+        These resources are always available:
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <button
+          onClick={() => this.handleEmergencyCall('911')}
+          className="flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <Phone className="h-5 w-5 mr-2" />
+          Emergency: 911
+        </button>
+        
+        <button
+          onClick={() => this.handleEmergencyCall('988')}
+          className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Phone className="h-5 w-5 mr-2" />
+          Crisis Hotline: 988
+        </button>
+        
+        <button
+          onClick={() => window.open('sms:741741', '_self')}
+          className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <MessageCircle className="h-5 w-5 mr-2" />
+          Crisis Text: 741741
+        </button>
+        
+        <button
+          onClick={() => window.location.href = '/crisis'}
+          className="flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          <AlertTriangle className="h-5 w-5 mr-2" />
+          Crisis Resources
+        </button>
+      </div>
+    </div>
+  );
+
   private renderErrorUI() {
     const { error, errorInfo, errorId } = this.state;
     const canRetry = this.retryCount < this.maxRetries;
 
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-        backgroundColor: '#fff',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}>
-        <div style={{
-          maxWidth: '600px',
-          textAlign: 'center',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '2rem',
-          backgroundColor: '#f8fafc'
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚨</div>
-          <h1 style={{ color: '#dc2626', marginBottom: '1rem' }}>
-            Application Error Detected
-          </h1>
-          <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-            The application encountered a runtime error and has been safely contained.
-            Our error boundary is protecting you from a complete crash.
-          </p>
-          
-          <div style={{
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '4px',
-            padding: '1rem',
-            marginBottom: '2rem',
-            textAlign: 'left'
-          }}>
-            <h3 style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-              Error Details:
-            </h3>
-            <code style={{ fontSize: '0.8rem', color: '#991b1b' }}>
-              {error?.message || 'Unknown error'}
-            </code>
-            <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '0.5rem' }}>
-              Error ID: {errorId}
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 p-4">
+        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-red-600 to-orange-600 px-6 py-4">
+            <div className="flex items-center">
+              <AlertTriangle className="h-8 w-8 text-white mr-3" />
+              <div>
+                <h1 className="text-xl font-bold text-white">
+                  Technical Issue Detected
+                </h1>
+                <p className="text-red-100">
+                  Your safety resources remain available
+                </p>
+              </div>
             </div>
           </div>
-
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            {canRetry && (
-              <button
-                onClick={this.handleRetry}
-                style={{
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem'
-                }}
-              >
-                🔄 Retry ({this.maxRetries - this.retryCount} attempts left)
-              </button>
-            )}
+          
+          <div className="p-6">
+            {(this.props.showCrisisResources !== false) && this.renderCrisisResources()}
             
-            <button
-              onClick={this.handleReload}
-              style={{
-                backgroundColor: '#10b981',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}
-            >
-              🔄 Reload Page
-            </button>
-          </div>
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                What happened?
+              </h3>
+              <p className="text-gray-700 mb-3">
+                A component on this page encountered an unexpected error. 
+                This doesn&apos;t affect the safety and crisis support features of the application.
+              </p>
+              
+              {import.meta.env.DEV && error && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 mb-2">
+                    Technical Details (Development Mode)
+                  </summary>
+                  <div className="bg-gray-100 rounded p-3 text-xs font-mono overflow-auto max-h-48">
+                    <div className="text-red-600 font-semibold mb-2">Error:</div>
+                    <div className="mb-3">{error.message}</div>
+                    {error.stack && (
+                      <>
+                        <div className="text-red-600 font-semibold mb-2">Stack Trace:</div>
+                        <pre className="whitespace-pre-wrap">{error.stack}</pre>
+                      </>
+                    )}
+                    {errorInfo?.componentStack && (
+                      <>
+                        <div className="text-red-600 font-semibold mb-2 mt-3">Component Stack:</div>
+                        <pre className="whitespace-pre-wrap">{errorInfo.componentStack}</pre>
+                      </>
+                    )}
+                  </div>
+                </details>
+              )}
+              
+              <div className="text-sm text-gray-500 mt-2">
+                Error ID: {errorId}
+              </div>
+            </div>
 
-          <div style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#6b7280' }}>
-            <p>This error has been logged for analysis.</p>
-            <p>If the problem persists, please contact support with Error ID: {errorId}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              {canRetry && (
+                <button
+                  onClick={this.handleReset}
+                  className="flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <RefreshCw className="h-5 w-5 mr-2" />
+                  Try Again ({this.maxRetries - this.retryCount} left)
+                </button>
+              )}
+              
+              <button
+                onClick={() => window.location.href = '/'}
+                className="flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <Home className="h-5 w-5 mr-2" />
+                Go to Home
+              </button>
+              
+              <button
+                onClick={this.handleReload}
+                className="flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <RefreshCw className="h-5 w-5 mr-2" />
+                Reload Page
+              </button>
+              
+              <button
+                onClick={() => window.location.href = '/crisis'}
+                className="flex items-center justify-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Crisis Support
+              </button>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-sm text-gray-600 text-center">
+                If you&apos;re experiencing a mental health emergency, please contact emergency services immediately. 
+                Technical issues never prevent access to crisis support resources.
+              </p>
+            </div>
           </div>
         </div>
-
-        {/* Development error details */}
-        {process.env.NODE_ENV === 'development' && error && (
-          <details style={{ marginTop: '2rem', maxWidth: '800px', width: '100%' }}>
-            <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-              🔍 Debug Information (Development Only)
-            </summary>
-            <pre style={{
-              backgroundColor: '#1f2937',
-              color: '#f9fafb',
-              padding: '1rem',
-              borderRadius: '4px',
-              overflow: 'auto',
-              fontSize: '0.8rem',
-              marginTop: '1rem'
-            }}>
-              <strong>Error Stack:</strong>{'\n'}
-              {error.stack}
-              
-              {errorInfo?.componentStack && (
-                <>
-                  {'\n\n'}<strong>Component Stack:</strong>{'\n'}
-                  {errorInfo.componentStack}
-                </>
-              )}
-            </pre>
-          </details>
-        )}
       </div>
     );
   }
 
   override render() {
     if (this.state.hasError) {
-      // Render custom fallback UI or default error UI
-      return this.props.fallback || this.renderErrorUI();
+      // Support react-error-boundary fallbackRender prop
+      if (this.props.fallbackRender && this.state.error) {
+        return this.props.fallbackRender({
+          error: this.state.error,
+          resetErrorBoundary: this.handleReset
+        });
+      }
+
+      // Support react-error-boundary FallbackComponent prop
+      if (this.props.FallbackComponent && this.state.error) {
+        const FallbackComponent = this.props.FallbackComponent;
+        return <FallbackComponent error={this.state.error} resetErrorBoundary={this.handleReset} />;
+      }
+
+      // Support our own fallback prop
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      // Render default error UI with crisis resources
+      return this.renderErrorUI();
     }
 
     return this.props.children;
   }
 }
 
+// Export alias for backward compatibility
+export class EmergencyErrorBoundary extends ErrorBoundary {}
+export class CrisisErrorBoundary extends ErrorBoundary {}
+
+/**
+ * Higher-Order Component for Crisis Error Boundaries
+ * Automatically wraps crisis-related components with error boundaries
+ */
+export interface WithErrorBoundaryOptions {
+  showCrisisResources?: boolean;
+  fallback?: React.ReactNode;
+  FallbackComponent?: React.ComponentType<unknown>;
+  fallbackRender?: (props: { error: Error; resetErrorBoundary: () => void }) => ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onReset?: () => void;
+}
+
+/**
+ * HOC that wraps components with error boundary
+ */
+export function withErrorBoundary<P extends object>(
+  Component: React.ComponentType<P>,
+  options: WithErrorBoundaryOptions = {}
+) {
+  const WrappedComponent = React.forwardRef<any, P & React.RefAttributes<unknown>>((props, ref) => {
+    const { ...componentProps } = props;
+    return (
+      <ErrorBoundary {...options}>
+        <Component {...componentProps as P} ref={ref} />
+      </ErrorBoundary>
+    );
+  });
+
+  // Set display name for debugging
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
+
+  return WrappedComponent;
+}
+
+/**
+ * Alias for crisis-aware error boundary HOC
+ */
+export const _withCrisisErrorBoundary = withErrorBoundary;
+
+/**
+ * Decorator version for class components
+ */
+export function CrisisProtected(options: WithErrorBoundaryOptions = {}) {
+  return function <P extends object>(Component: React.ComponentType<P>) {
+    return withErrorBoundary(Component, options);
+  };
+}
+
+/**
+ * Hook version for functional components
+ */
+export function useErrorBoundary() {
+  return React.useCallback((component: React.ComponentType<unknown>, options?: WithErrorBoundaryOptions) => {
+    return withErrorBoundary(component, options);
+  }, []);
+}
+
 // Global error handler for uncaught errors
 export const setupGlobalErrorHandling = () => {
   // Handle uncaught JavaScript errors
   window.addEventListener('error', (event) => {
-    console.error('🚨 UNCAUGHT ERROR:', {
+    logger.error('🚨 UNCAUGHT ERROR:', {
       message: event.message,
       source: event.filename,
       line: event.lineno,
@@ -279,7 +440,7 @@ export const setupGlobalErrorHandling = () => {
     });
 
     // Store error for analysis
-    const errorReport = {
+    const _errorReport = {
       type: 'uncaught_error',
       message: event.message,
       source: event.filename,
@@ -290,22 +451,22 @@ export const setupGlobalErrorHandling = () => {
     };
 
     try {
-      localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(errorReport));
-    } catch (e) {
-      console.error('Failed to store error report:', e);
+      localStorage.setItem(`uncaught_error_${Date.now()}`, JSON.stringify(_errorReport));
+    } catch (_error) {
+      logger.error('Failed to store error report');
     }
   });
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    console.error('🚨 UNHANDLED PROMISE REJECTION:', {
+    logger.error('🚨 UNHANDLED PROMISE REJECTION:', {
       reason: event.reason,
       promise: event.promise,
       timestamp: new Date().toISOString()
     });
 
     // Store rejection for analysis
-    const rejectionReport = {
+    const _rejectionReport = {
       type: 'unhandled_rejection',
       reason: event.reason?.toString(),
       stack: event.reason?.stack,
@@ -313,13 +474,13 @@ export const setupGlobalErrorHandling = () => {
     };
 
     try {
-      localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(rejectionReport));
-    } catch (e) {
-      console.error('Failed to store rejection report:', e);
+      localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(_rejectionReport));
+    } catch (_error) {
+      logger.error('Failed to store rejection report');
     }
   });
 
-  console.log('✅ Global error handling initialized');
+  logger.info('Global error handling initialized', 'ErrorBoundary');
 };
 
-export default EmergencyErrorBoundary;
+export default ErrorBoundary;

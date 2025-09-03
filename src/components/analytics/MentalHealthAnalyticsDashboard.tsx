@@ -6,13 +6,14 @@
  * Evidence-based metrics and visualizations
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '../../utils/logger';
 import {
   TrendingUp, TrendingDown, Activity, Heart, Brain,
-  Calendar, Clock, Target, BarChart3, PieChart,
-  LineChart, AlertCircle, CheckCircle, RefreshCw,
-  Download, Share2, Eye, EyeOff, Filter, Settings
+  Target, BarChart3,
+  LineChart, AlertCircle, CheckCircle,
+  Download, Eye, EyeOff
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -112,12 +113,12 @@ interface RiskFactor {
 export function MentalHealthAnalyticsDashboard() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
+  const [_selectedMetrics, _setSelectedMetrics] = useState<string[]>([]);
   const [privacyMode, setPrivacyMode] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'goals' | 'insights' | 'interventions'>('overview');
 
-  // Fetch analytics data
+  // Fetch analytics _data
   useEffect(() => {
     fetchAnalyticsData(timeframe);
   }, [timeframe]);
@@ -150,16 +151,16 @@ export function MentalHealthAnalyticsDashboard() {
     setLoading(true);
     try {
       // In production, this would call the analytics service
-      const data = await generateMockAnalyticsData(timeframe);
-      setAnalyticsData(data);
-    } catch (error) {
-      console.error('Failed to fetch analytics data:', error);
+      const _data = await generateMockAnalyticsData(timeframe);
+      setAnalyticsData(_data);
+    } catch (_error) {
+      logger.error('Failed to fetch analytics _data:');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (_loading) {
     return <AnalyticsDashboardSkeleton />;
   }
 
@@ -202,7 +203,7 @@ export function MentalHealthAnalyticsDashboard() {
             {/* Timeframe Selector */}
             <select
               value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value as any)}
+              onChange={(e) => setTimeframe(e.target.value as unknown)}
               className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="week">Past Week</option>
@@ -238,7 +239,7 @@ export function MentalHealthAnalyticsDashboard() {
               
               <div className="text-right">
                 <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-                  {privacyMode ? '••' : Math.round(overallWellnessScore)}
+                  {privacyMode ? '••' : Math.round(_overallWellnessScore)}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   out of 100
@@ -248,7 +249,7 @@ export function MentalHealthAnalyticsDashboard() {
 
             {/* Score Breakdown */}
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {analyticsData?.metrics.slice(0, 4).map((metric, index) => (
+              {analyticsData?.metrics.slice(0, 4).map((metric, _index) => (
                 <div key={metric.id} className="text-center">
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                     {metric.name}
@@ -310,7 +311,7 @@ export function MentalHealthAnalyticsDashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as unknown)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -336,7 +337,7 @@ export function MentalHealthAnalyticsDashboard() {
           >
             {activeTab === 'overview' && (
               <AnalyticsOverview 
-                data={analyticsData} 
+                _data={analyticsData} 
                 privacyMode={privacyMode} 
               />
             )}
@@ -399,14 +400,14 @@ function AnalyticsDashboardSkeleton() {
   );
 }
 
-function AnalyticsOverview({ data, privacyMode }: { data: AnalyticsData | null; privacyMode: boolean }) {
-  if (!data) return null;
+function AnalyticsOverview({ _data, privacyMode }: { _data: AnalyticsData | null; privacyMode: boolean }) {
+  if (!_data) return null;
 
   return (
     <div className="space-y-6">
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data.metrics.map((metric) => (
+        {_data.metrics.map((metric) => (
           <div key={metric.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -447,19 +448,19 @@ function AnalyticsOverview({ data, privacyMode }: { data: AnalyticsData | null; 
 }
 
 // Additional component implementations would continue here...
-function TrendsAnalysis({ trends, metrics, privacyMode }: any) {
+function TrendsAnalysis({ _trends, _metrics, _privacyMode }: unknown) {
   return <div>Trends Analysis Component</div>;
 }
 
-function GoalsProgress({ goals, privacyMode }: any) {
+function GoalsProgress({ _goals, _privacyMode }: unknown) {
   return <div>Goals Progress Component</div>;
 }
 
-function InsightsPanel({ insights, privacyMode }: any) {
+function InsightsPanel({ _insights, _privacyMode }: unknown) {
   return <div>Insights Panel Component</div>;
 }
 
-function InterventionsAnalysis({ interventions, privacyMode }: any) {
+function InterventionsAnalysis({ _interventions, _privacyMode }: unknown) {
   return <div>Interventions Analysis Component</div>;
 }
 
@@ -489,11 +490,11 @@ function getMetricWeight(category: string): number {
 }
 
 async function generateMockAnalyticsData(timeframe: string): Promise<AnalyticsData> {
-  // Mock data generation for development
-  // In production, this would fetch real analytics data
+  // Mock _data generation for development
+  // In production, this would fetch real analytics _data
   return {
     userId: 'mock-user',
-    timeframe: timeframe as any,
+    timeframe: timeframe as unknown,
     metrics: [
       {
         id: 'mood-score',

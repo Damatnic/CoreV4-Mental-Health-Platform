@@ -26,12 +26,12 @@ export function EmergencyContacts() {
 
   // Load contacts from localStorage on mount
   useEffect(() => {
-    const savedContacts = secureStorage.getItem('emergencyContacts');
-    if (savedContacts) {
-      setContacts(JSON.parse(savedContacts));
+    const _savedContacts = secureStorage.getItem('emergencyContacts');
+    if (_savedContacts) {
+      setContacts(JSON.parse(_savedContacts));
     } else {
       // Set default emergency contacts if none exist
-      const defaultContacts: EmergencyContact[] = [
+      const _defaultContacts: EmergencyContact[] = [
         {
           id: 'default-988',
           name: '988 Suicide & Crisis Lifeline',
@@ -49,8 +49,8 @@ export function EmergencyContacts() {
           notes: 'Text HOME to 741741'
         }
       ];
-      setContacts(defaultContacts);
-      secureStorage.setItem('emergencyContacts', JSON.stringify(defaultContacts));
+      setContacts(_defaultContacts);
+      secureStorage.setItem('emergencyContacts', JSON.stringify(_defaultContacts));
     }
   }, []);
 
@@ -81,7 +81,7 @@ export function EmergencyContacts() {
   const handleUpdateContact = () => {
     if (!editingContact || !formData.name || !formData.phone) return;
 
-    const updatedContacts = contacts.map(contact =>
+    const _updatedContacts = contacts.map(contact =>
       contact.id === editingContact.id
         ? {
             ...contact,
@@ -93,7 +93,7 @@ export function EmergencyContacts() {
         : contact
     );
 
-    setContacts(updatedContacts);
+    setContacts(_updatedContacts);
     setEditingContact(null);
     setFormData({ name: '', phone: '', relationship: '', notes: '' });
   };
@@ -113,24 +113,24 @@ export function EmergencyContacts() {
 
   const handleCallContact = (contact: EmergencyContact) => {
     // Update last contacted time
-    const updatedContacts = contacts.map(c =>
+    const _updatedContacts = contacts.map(c =>
       c.id === contact.id
         ? { ...c, lastContacted: new Date().toISOString() }
         : c
     );
-    setContacts(updatedContacts);
+    setContacts(_updatedContacts);
 
     // Initiate call
     window.location.href = `tel:${contact.phone}`;
   };
 
   const togglePrimary = (id: string) => {
-    const updatedContacts = contacts.map(contact =>
+    const _updatedContacts = contacts.map(contact =>
       contact.id === id
         ? { ...contact, isPrimary: !contact.isPrimary }
         : contact
     );
-    setContacts(updatedContacts);
+    setContacts(_updatedContacts);
   };
 
   const formatPhoneNumber = (phone: string) => {

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * Safety Plan Generator Component
  * Creates personalized crisis safety plans with evidence-based interventions
@@ -6,13 +7,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield, Heart, Phone, MessageSquare, MapPin, Activity,
-  Brain, Users, Home, Sun, Moon, Coffee, Book, Music,
-  Zap, AlertTriangle, CheckCircle, Edit, Save, Download,
-  Plus, X, ChevronRight, Lock, Unlock
+  Shield, Heart, Phone, _MessageSquare, _MapPin, Activity,
+  Brain, _Users, _Home, _Sun, _Moon, _Coffee, _Book, _Music,
+  _Zap, AlertTriangle, CheckCircle, Edit, Save, Download,
+  Plus, X, _ChevronRight, _Lock, _Unlock
 } from 'lucide-react';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
-import { detectCrisisLevel } from '../../utils/crisis';
+import { _detectCrisisLevel } from '../../utils/crisis';
 
 interface SafetyPlanSection {
   id: string;
@@ -60,7 +61,7 @@ interface PersonalizedSafetyPlan {
   isLocked: boolean;
 }
 
-const DEFAULT_SAFETY_PLAN: PersonalizedSafetyPlan = {
+const _DEFAULT_SAFETY_PLAN: PersonalizedSafetyPlan = {
   id: `safety-plan-${Date.now()}`,
   createdAt: new Date(),
   lastUpdated: new Date(),
@@ -137,25 +138,25 @@ const DEFAULT_SAFETY_PLAN: PersonalizedSafetyPlan = {
 };
 
 export const SafetyPlanGenerator: React.FC = () => {
-  const [safetyPlan, setSafetyPlan] = useState<PersonalizedSafetyPlan>(DEFAULT_SAFETY_PLAN);
+  const [safetyPlan, setSafetyPlan] = useState<PersonalizedSafetyPlan>(_DEFAULT_SAFETY_PLAN);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [_activeSection, _setActiveSection] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Load saved safety plan on mount
   useEffect(() => {
-    const savedPlan = secureStorage.getItem('personalSafetyPlan');
-    if (savedPlan) {
+    const _savedPlan = secureStorage.getItem('personalSafetyPlan');
+    if (_savedPlan) {
       try {
-        const parsed = JSON.parse(savedPlan);
+        const parsed = JSON.parse(_savedPlan);
         setSafetyPlan({
           ...parsed,
           createdAt: new Date(parsed.createdAt),
           lastUpdated: new Date(parsed.lastUpdated)
         });
-      } catch (error) {
-        console.error('Failed to load safety plan:', error);
+      } catch (_error) {
+        logger.error('Failed to load safety plan:');
       }
     }
   }, []);
@@ -174,18 +175,18 @@ export const SafetyPlanGenerator: React.FC = () => {
     }
 
     if (errors.length > 0) {
-      setValidationErrors(errors);
+      setValidationErrors(_errors);
       return;
     }
 
     // Save to secure storage
-    const updatedPlan = {
+    const _updatedPlan = {
       ...safetyPlan,
       lastUpdated: new Date()
     };
     
-    secureStorage.setItem('personalSafetyPlan', JSON.stringify(updatedPlan));
-    setSafetyPlan(updatedPlan);
+    secureStorage.setItem('personalSafetyPlan', JSON.stringify(_updatedPlan));
+    setSafetyPlan(_updatedPlan);
     setIsEditing(false);
     setShowSuccess(true);
     setValidationErrors([]);
@@ -195,13 +196,13 @@ export const SafetyPlanGenerator: React.FC = () => {
 
   const exportSafetyPlan = () => {
     const planText = generatePlanText();
-    const blob = new Blob([planText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+    const _blob = new Blob([planText], { type: 'text/plain' });
+    const url = URL.createObjectURL(_blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `safety-plan-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(_url);
   };
 
   const generatePlanText = () => {
@@ -261,11 +262,11 @@ export const SafetyPlanGenerator: React.FC = () => {
     return text;
   };
 
-  const addItem = (section: keyof PersonalizedSafetyPlan, item: any) => {
+  const addItem = (section: keyof PersonalizedSafetyPlan, item: unknown) => {
     setSafetyPlan(prev => ({
       ...prev,
       [section]: Array.isArray(prev[section]) 
-        ? [...(prev[section] as any[]), item]
+        ? [...(prev[section] as unknown[]), item]
         : item
     }));
   };
@@ -273,14 +274,14 @@ export const SafetyPlanGenerator: React.FC = () => {
   const removeItem = (section: keyof PersonalizedSafetyPlan, index: number) => {
     setSafetyPlan(prev => ({
       ...prev,
-      [section]: (prev[section] as any[]).filter((_, i) => i !== index)
+      [section]: (prev[section] as unknown[]).filter((_, i) => i !== index)
     }));
   };
 
-  const updateItem = (section: keyof PersonalizedSafetyPlan, index: number, value: any) => {
+  const updateItem = (section: keyof PersonalizedSafetyPlan, index: number, value: unknown) => {
     setSafetyPlan(prev => ({
       ...prev,
-      [section]: (prev[section] as any[]).map((item, i) => i === index ? value : item)
+      [section]: (prev[section] as unknown[]).map((item, i) => i === index ? value : item)
     }));
   };
 
@@ -532,7 +533,7 @@ const SafetyPlanSection: React.FC<SafetyPlanSectionProps> = ({
                   className="flex-1 bg-transparent text-gray-300 outline-none"
                 />
                 <button
-                  onClick={() => onRemove(index)}
+                  onClick={() => onRemove(_index)}
                   className="text-red-400 hover:text-red-300 ml-2"
                 >
                   <X className="h-4 w-4" />

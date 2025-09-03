@@ -36,7 +36,7 @@ export function ConsoleFocusable({
       elementRef.current.classList.add('console-focusable');
       
       return () => {
-        unregisterFocusable(id);
+        unregisterFocusable(_id);
       };
     }
   }, [id, group, priority, registerFocusable, unregisterFocusable]);

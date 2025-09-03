@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
-  Target,
-  TrendingUp,
-  Award,
-  ChevronRight,
-  Plus,
+  _Target,
+  _TrendingUp,
+  _Award,
+  _ChevronRight,
+  _Plus,
   RefreshCw,
   Calendar,
   Clock,
@@ -25,19 +25,19 @@ import {
   ShoppingBag,
   Utensils,
   TreePine,
-  Star,
+  _Star,
   Info,
-  CheckCircle,
+  _CheckCircle,
   AlertCircle
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, addDays } from 'date-fns';
+import { _format, addDays } from 'date-fns';
 
 interface BehavioralActivationProps {
   currentMood?: number;
   energyLevel?: 'low' | 'medium' | 'high';
-  onScheduleActivity?: (activity: any) => void;
-  onStartExperiment?: (experiment: any) => void;
+  onScheduleActivity?: (activity: unknown) => void;
+  onStartExperiment?: (_experiment: unknown) => void;
 }
 
 export function BehavioralActivation({
@@ -47,7 +47,7 @@ export function BehavioralActivation({
   onStartExperiment
 }: BehavioralActivationProps) {
   const {
-    activities,
+    _activities,
     addActivity,
     getActivityRecommendations,
     adaptScheduleForBadDay
@@ -62,45 +62,45 @@ export function BehavioralActivation({
   // Pleasant activities library
   const pleasantActivities = [
     // Physical
-    { id: 'walk', title: 'Take a walk', category: 'physical', icon: Move, difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
-    { id: 'stretch', title: 'Gentle stretching', category: 'physical', icon: Move, difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 1 },
-    { id: 'dance', title: 'Dance to favorite music', category: 'physical', icon: Music, difficulty: 'medium', energyLevel: 'medium', duration: 20, moodImpact: 3 },
-    { id: 'yoga', title: 'Yoga session', category: 'physical', icon: Heart, difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
-    { id: 'exercise', title: 'Full workout', category: 'physical', icon: Zap, difficulty: 'hard', energyLevel: 'high', duration: 45, moodImpact: 4 },
+    { id: 'walk', title: 'Take a walk', category: 'physical', icon: Move, _difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
+    { id: 'stretch', title: 'Gentle stretching', category: 'physical', icon: Move, _difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 1 },
+    { id: 'dance', title: 'Dance to favorite music', category: 'physical', icon: Music, _difficulty: 'medium', energyLevel: 'medium', duration: 20, moodImpact: 3 },
+    { id: 'yoga', title: 'Yoga session', category: 'physical', icon: Heart, _difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
+    { id: 'exercise', title: 'Full workout', category: 'physical', icon: Zap, _difficulty: 'hard', energyLevel: 'high', duration: 45, moodImpact: 4 },
     
     // Creative
-    { id: 'draw', title: 'Draw or doodle', category: 'creative', icon: Palette, difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 2 },
-    { id: 'music', title: 'Listen to music', category: 'creative', icon: Music, difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
-    { id: 'write', title: 'Creative writing', category: 'creative', icon: Book, difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
-    { id: 'photo', title: 'Take photos', category: 'creative', icon: Camera, difficulty: 'easy', energyLevel: 'medium', duration: 20, moodImpact: 2 },
-    { id: 'craft', title: 'Arts and crafts', category: 'creative', icon: Palette, difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
+    { id: 'draw', title: 'Draw or doodle', category: 'creative', icon: Palette, _difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 2 },
+    { id: 'music', title: 'Listen to music', category: 'creative', icon: Music, _difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
+    { id: 'write', title: 'Creative writing', category: 'creative', icon: Book, _difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
+    { id: 'photo', title: 'Take photos', category: 'creative', icon: Camera, _difficulty: 'easy', energyLevel: 'medium', duration: 20, moodImpact: 2 },
+    { id: 'craft', title: 'Arts and crafts', category: 'creative', icon: Palette, _difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
     
     // Social
-    { id: 'call', title: 'Call a friend', category: 'social', icon: Users, difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 3 },
-    { id: 'text', title: 'Send caring messages', category: 'social', icon: Heart, difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 2 },
-    { id: 'coffee', title: 'Coffee with friend', category: 'social', icon: Coffee, difficulty: 'medium', energyLevel: 'medium', duration: 60, moodImpact: 4 },
-    { id: 'game', title: 'Play online game with friends', category: 'social', icon: Gamepad2, difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
-    { id: 'volunteer', title: 'Volunteer activity', category: 'social', icon: Heart, difficulty: 'hard', energyLevel: 'high', duration: 120, moodImpact: 5 },
+    { id: 'call', title: 'Call a friend', category: 'social', icon: Users, _difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 3 },
+    { id: 'text', title: 'Send caring messages', category: 'social', icon: Heart, _difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 2 },
+    { id: 'coffee', title: 'Coffee with friend', category: 'social', icon: Coffee, _difficulty: 'medium', energyLevel: 'medium', duration: 60, moodImpact: 4 },
+    { id: 'game', title: 'Play online game with friends', category: 'social', icon: Gamepad2, _difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
+    { id: 'volunteer', title: 'Volunteer activity', category: 'social', icon: Heart, _difficulty: 'hard', energyLevel: 'high', duration: 120, moodImpact: 5 },
     
     // Self-care
-    { id: 'bath', title: 'Relaxing bath', category: 'self-care', icon: Home, difficulty: 'easy', energyLevel: 'low', duration: 30, moodImpact: 3 },
-    { id: 'tea', title: 'Make favorite tea/coffee', category: 'self-care', icon: Coffee, difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 1 },
-    { id: 'read', title: 'Read a book', category: 'self-care', icon: Book, difficulty: 'easy', energyLevel: 'low', duration: 30, moodImpact: 2 },
-    { id: 'meditate', title: 'Meditation', category: 'self-care', icon: Brain, difficulty: 'medium', energyLevel: 'low', duration: 15, moodImpact: 3 },
-    { id: 'nature', title: 'Time in nature', category: 'self-care', icon: TreePine, difficulty: 'easy', energyLevel: 'medium', duration: 30, moodImpact: 4 },
+    { id: 'bath', title: 'Relaxing bath', category: 'self-care', icon: Home, _difficulty: 'easy', energyLevel: 'low', duration: 30, moodImpact: 3 },
+    { id: 'tea', title: 'Make favorite tea/coffee', category: 'self-care', icon: Coffee, _difficulty: 'easy', energyLevel: 'low', duration: 10, moodImpact: 1 },
+    { id: 'read', title: 'Read a book', category: 'self-care', icon: Book, _difficulty: 'easy', energyLevel: 'low', duration: 30, moodImpact: 2 },
+    { id: 'meditate', title: 'Meditation', category: 'self-care', icon: Brain, _difficulty: 'medium', energyLevel: 'low', duration: 15, moodImpact: 3 },
+    { id: 'nature', title: 'Time in nature', category: 'self-care', icon: TreePine, _difficulty: 'easy', energyLevel: 'medium', duration: 30, moodImpact: 4 },
     
     // Productive
-    { id: 'organize', title: 'Organize one small area', category: 'productive', icon: Home, difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
-    { id: 'cook', title: 'Cook favorite meal', category: 'productive', icon: Utensils, difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
-    { id: 'shop', title: 'Browse favorite shop', category: 'productive', icon: ShoppingBag, difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 2 },
-    { id: 'learn', title: 'Learn something new', category: 'productive', icon: Brain, difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
-    { id: 'plan', title: 'Plan something exciting', category: 'productive', icon: Calendar, difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 2 },
+    { id: 'organize', title: 'Organize one small area', category: 'productive', icon: Home, _difficulty: 'easy', energyLevel: 'low', duration: 15, moodImpact: 2 },
+    { id: 'cook', title: 'Cook favorite meal', category: 'productive', icon: Utensils, _difficulty: 'medium', energyLevel: 'medium', duration: 45, moodImpact: 3 },
+    { id: 'shop', title: 'Browse favorite shop', category: 'productive', icon: ShoppingBag, _difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 2 },
+    { id: 'learn', title: 'Learn something new', category: 'productive', icon: Brain, _difficulty: 'medium', energyLevel: 'medium', duration: 30, moodImpact: 3 },
+    { id: 'plan', title: 'Plan something exciting', category: 'productive', icon: Calendar, _difficulty: 'easy', energyLevel: 'low', duration: 20, moodImpact: 2 },
   ];
 
   // Filter activities based on current state
   const filteredActivities = pleasantActivities.filter(activity => {
-    const difficultyMatch = selectedDifficulty === 'easy' ? activity.difficulty === 'easy' :
-                           selectedDifficulty === 'medium' ? activity.difficulty !== 'hard' :
+    const difficultyMatch = selectedDifficulty === 'easy' ? activity._difficulty === 'easy' :
+                           selectedDifficulty === 'medium' ? activity._difficulty !== 'hard' :
                            true;
     
     const energyMatch = energyLevel === 'low' ? activity.energyLevel === 'low' :
@@ -113,8 +113,8 @@ export function BehavioralActivation({
   });
 
   // Get mastery and pleasure ratings
-  const getMasteryLevel = (difficulty: string) => {
-    switch (difficulty) {
+  const getMasteryLevel = (_difficulty: string) => {
+    switch (_difficulty) {
       case 'easy': return 1;
       case 'medium': return 2;
       case 'hard': return 3;
@@ -132,9 +132,9 @@ export function BehavioralActivation({
   const createExperiment = () => {
     if (selectedActivities.length === 0) return;
     
-    const experiment = {
+    const _experiment = {
       id: `exp-${Date.now()}`,
-      activities: selectedActivities,
+      _activities: selectedActivities,
       hypothesis: `Testing if these activities improve mood from ${currentMood}/10`,
       startMood: currentMood,
       startEnergy: energyLevel,
@@ -142,30 +142,30 @@ export function BehavioralActivation({
       date: new Date()
     };
     
-    onStartExperiment?.(experiment);
+    onStartExperiment?.(_experiment);
     setShowExperiment(false);
     setSelectedActivities([]);
     setExperimentNotes('');
   };
 
   // Schedule activity
-  const scheduleActivity = (activity: any) => {
-    const newActivity = {
+  const scheduleActivity = (activity: unknown) => {
+    const _newActivity = {
       ...activity,
       scheduledTime: addDays(new Date(), 0), // Today
       flexibility: 'flexible',
       behavioralActivation: true
     };
     
-    addActivity(newActivity);
-    onScheduleActivity?.(newActivity);
+    addActivity(_newActivity);
+    onScheduleActivity?.(_newActivity);
   };
 
   // Toggle activity selection for experiment
-  const toggleActivitySelection = (activity: any) => {
+  const toggleActivitySelection = (activity: unknown) => {
     setSelectedActivities(prev => {
-      const exists = prev.find(a => a.id === activity.id);
-      if (exists) {
+      const _exists = prev.find(a => a.id === activity.id);
+      if (_exists) {
         return prev.filter(a => a.id !== activity.id);
       }
       return [...prev, activity];
@@ -179,12 +179,12 @@ export function BehavioralActivation({
     } else if (currentMood <= 6) {
       return "You're doing great! Let's build on this momentum.";
     } else {
-      return "Fantastic mood! Let's keep it going with engaging activities.";
+      return "Fantastic mood! Let's keep it going with engaging _activities.";
     }
   };
 
   // Get activity recommendations
-  const recommendations = getActivityRecommendations(energyLevel, currentMood);
+  const _recommendations = getActivityRecommendations(energyLevel, currentMood);
 
   return (
     <div className="h-full flex flex-col">
@@ -273,7 +273,7 @@ export function BehavioralActivation({
           {['physical', 'creative', 'social', 'self-care', 'productive'].map(category => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(_category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -349,7 +349,7 @@ export function BehavioralActivation({
           <AnimatePresence mode="popLayout">
             {filteredActivities.map((activity, index) => {
               const Icon = activity.icon;
-              const mastery = getMasteryLevel(activity.difficulty);
+              const mastery = getMasteryLevel(activity._difficulty);
               const pleasure = getPleasureLevel(activity.moodImpact);
               const isSelected = selectedActivities.find(a => a.id === activity.id);
               
@@ -366,10 +366,10 @@ export function BehavioralActivation({
                     ${isSelected ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-500' : 'bg-white border-gray-200 hover:border-primary-300'}
                   `}
                   onClick={() => {
-                    if (showExperiment) {
-                      toggleActivitySelection(activity);
+                    if (_showExperiment) {
+                      toggleActivitySelection(_activity);
                     } else {
-                      scheduleActivity(activity);
+                      scheduleActivity(_activity);
                     }
                   }}
                 >
@@ -437,7 +437,7 @@ export function BehavioralActivation({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            scheduleActivity(activity);
+                            scheduleActivity(_activity);
                           }}
                           className="mt-2 text-xs text-primary-600 hover:text-primary-700 font-medium"
                         >
@@ -468,9 +468,9 @@ export function BehavioralActivation({
           
           <button
             onClick={() => {
-              const randomActivity = filteredActivities[Math.floor(Math.random() * filteredActivities.length)];
-              if (randomActivity) {
-                scheduleActivity(randomActivity);
+              const _randomActivity = filteredActivities[Math.floor(Math.random() * filteredActivities.length)];
+              if (_randomActivity) {
+                scheduleActivity(_randomActivity);
               }
             }}
             className="py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 text-sm font-medium flex items-center justify-center space-x-2"

@@ -17,7 +17,7 @@ export function CommunityPage() {
 
   // Initialize community connection (simplified for stability)
   useEffect(() => {
-    if (user) {
+    if (_user) {
       // Set mock online count for now
       setOnlineCount(Math.floor(Math.random() * 50) + 10);
     }

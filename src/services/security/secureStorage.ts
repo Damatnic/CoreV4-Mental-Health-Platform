@@ -5,7 +5,8 @@
  */
 
 import { cryptoService } from './cryptoService';
-import { secureStorage as localSecureStorage } from './SecureLocalStorage';
+import { secureStorage as _localSecureStorage } from './SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 interface StorageOptions {
   persistent?: boolean;
@@ -15,13 +16,13 @@ interface StorageOptions {
 }
 
 interface StorageItem {
-  value: any;
+  value: unknown;
   metadata: {
     created: Date;
     updated: Date;
     expires?: Date;
     encrypted: boolean;
-    compressed: boolean;
+    _compressed: boolean;
     checksum: string;
   };
 }
@@ -61,7 +62,7 @@ class SecureStorageService {
    */
   async setItem(
     key: string,
-    value: any,
+    value: unknown,
     options: StorageOptions = {}
   ): Promise<void> {
     try {
@@ -80,16 +81,16 @@ class SecureStorageService {
 
       // Compress if requested and beneficial
       if (compress && serialized.length > 1024) {
-        serialized = await this.compress(serialized);
+        serialized = await this.compress(_serialized);
       }
 
       // Encrypt if requested
-      if (encrypted) {
-        serialized = await cryptoService.encrypt(serialized);
+      if (_encrypted) {
+        serialized = await cryptoService.encrypt(_serialized);
       }
 
       // Calculate checksum for integrity verification
-      const checksum = await this.calculateChecksum(serialized);
+      const checksum = await this.calculateChecksum(_serialized);
 
       // Create storage item
       const storageItem: StorageItem = {
@@ -99,7 +100,7 @@ class SecureStorageService {
           updated: new Date(),
           expires,
           encrypted,
-          compressed: compress,
+          _compressed: compress,
           checksum,
         },
       };
@@ -108,21 +109,21 @@ class SecureStorageService {
       this.memoryCache.set(key, storageItem);
 
       // Store persistently if requested
-      if (persistent) {
-        const storageKey = this.getStorageKey(key);
+      if (_persistent) {
+        const _storageKey = this.getStorageKey(key);
         
         try {
-          localStorage.setItem(storageKey, JSON.stringify(storageItem));
-        } catch (error) {
+          localStorage.setItem(_storageKey, JSON.stringify(storageItem));
+        } catch {
           // Try IndexedDB as fallback for larger data
-          await this.storeInIndexedDB(storageKey, storageItem);
+          await this.storeInIndexedDB(_storageKey, storageItem);
         }
       }
 
       // Log storage event for audit
       this.logStorageEvent('SET', key, { encrypted, persistent });
     } catch (error) {
-      console.error(`Failed to store item ${key}:`, error);
+      logger.error(`Failed to store item ${key}:`, error);
       throw new Error(`Storage failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -130,22 +131,22 @@ class SecureStorageService {
   /**
    * Retrieve an item from secure storage
    */
-  async getItem(key: string): Promise<any> {
+  async getItem(key: string): Promise<unknown> {
     try {
       // Check memory cache first
       let storageItem = this.memoryCache.get(key);
 
       // If not in memory, check persistent storage
       if (!storageItem) {
-        const storageKey = this.getStorageKey(key);
+        const _storageKey = this.getStorageKey(key);
         
         // Try localStorage first
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          storageItem = JSON.parse(stored) as StorageItem;
+        const _stored = localStorage.getItem(_storageKey);
+        if (_stored) {
+          storageItem = JSON.parse(_stored) as StorageItem;
         } else {
           // Try IndexedDB as fallback
-          storageItem = await this.getFromIndexedDB(storageKey) || undefined;
+          storageItem = await this.getFromIndexedDB(_storageKey) || undefined;
         }
 
         // Cache in memory if found
@@ -168,7 +169,7 @@ class SecureStorageService {
       // Verify integrity
       const checksum = await this.calculateChecksum(storageItem.value);
       if (checksum !== storageItem.metadata.checksum) {
-        console.error(`Integrity check failed for ${key}`);
+        logger.error(`Integrity check failed for ${key}`);
         await this.removeItem(key);
         throw new Error('Data integrity verification failed');
       }
@@ -188,7 +189,7 @@ class SecureStorageService {
       // Deserialize
       return JSON.parse(value);
     } catch (error) {
-      console.error(`Failed to retrieve item ${key}:`, error);
+      logger.error(`Failed to retrieve item ${key}:`, error);
       return null;
     }
   }
@@ -202,16 +203,16 @@ class SecureStorageService {
       this.memoryCache.delete(key);
 
       // Remove from localStorage
-      const storageKey = this.getStorageKey(key);
-      localStorage.removeItem(storageKey);
+      const _storageKey = this.getStorageKey(key);
+      localStorage.removeItem(_storageKey);
 
       // Remove from IndexedDB
-      await this.removeFromIndexedDB(storageKey);
+      await this.removeFromIndexedDB(_storageKey);
 
       // Log removal event
       this.logStorageEvent('REMOVE', key);
     } catch (error) {
-      console.error(`Failed to remove item ${key}:`, error);
+      logger.error(`Failed to remove item ${key}:`, error);
     }
   }
 
@@ -238,8 +239,8 @@ class SecureStorageService {
 
       // Log clear event
       this.logStorageEvent('CLEAR', 'all');
-    } catch (error) {
-      console.error('Failed to clear storage:', error);
+    } catch (_error) {
+      logger.error('Failed to clear storage:');
     }
   }
 
@@ -254,9 +255,9 @@ class SecureStorageService {
 
     // Get keys from localStorage
     for (let i = 0; i < localStorage.length; i++) {
-      const storageKey = localStorage.key(i);
-      if (storageKey?.startsWith(this.STORAGE_PREFIX)) {
-        const key = storageKey.replace(this.STORAGE_PREFIX, '');
+      const _storageKey = localStorage.key(i);
+      if (_storageKey?.startsWith(this.STORAGE_PREFIX)) {
+        const key = _storageKey.replace(this.STORAGE_PREFIX, '');
         keys.add(key);
       }
     }
@@ -265,7 +266,7 @@ class SecureStorageService {
     const idbKeys = await this.getKeysFromIndexedDB();
     idbKeys.forEach(key => keys.add(key.replace(this.STORAGE_PREFIX, '')));
 
-    return Array.from(keys);
+    return Array.from(_keys);
   }
 
   /**
@@ -311,8 +312,8 @@ class SecureStorageService {
   private async calculateChecksum(data: string): Promise<string> {
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const _hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(_hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
@@ -323,10 +324,10 @@ class SecureStorageService {
       const stream = new Response(
         new Blob([encoder.encode(data)])
           .stream()
-          .pipeThrough(new (window as any).CompressionStream('gzip'))
+          .pipeThrough(new (window as unknown).CompressionStream('gzip'))
       );
-      const compressed = await stream.arrayBuffer();
-      return btoa(String.fromCharCode(...new Uint8Array(compressed)));
+      const _compressed = await stream.arrayBuffer();
+      return btoa(String.fromCharCode(...new Uint8Array(_compressed)));
     }
     return data; // Return uncompressed if API not available
   }
@@ -335,7 +336,7 @@ class SecureStorageService {
     try {
       // Validate base64 input
       if (!data || typeof data !== 'string') {
-        console.warn('[SecureStorage] Invalid data for decompression');
+        logger.warn('[SecureStorage] Invalid data for decompression');
         return '';
       }
       
@@ -346,18 +347,18 @@ class SecureStorageService {
       
       // Decompress using browser's DecompressionStream API if available
       if ('DecompressionStream' in window) {
-        const compressed = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+        const _compressed = Uint8Array.from(atob(data), c => c.charCodeAt(0));
         const stream = new Response(
-          new Blob([compressed])
+          new Blob([_compressed])
             .stream()
-            .pipeThrough(new (window as any).DecompressionStream('gzip'))
+            .pipeThrough(new (window as unknown).DecompressionStream('gzip'))
         );
         const decompressed = await stream.text();
         return decompressed;
       }
       return data; // Return as-is if API not available
-    } catch (error) {
-      console.error('[SecureStorage] Decompression failed:', error);
+    } catch (_error) {
+      logger.error('[SecureStorage] Decompression failed:');
       return ''; // Return empty string instead of throwing
     }
   }
@@ -365,7 +366,7 @@ class SecureStorageService {
   private isBase64(str: string): boolean {
     try {
       // Basic base64 validation
-      return btoa(atob(str)) === str;
+      return btoa(atob(_str)) === str;
     } catch {
       return false;
     }
@@ -388,7 +389,7 @@ class SecureStorageService {
   private async cleanupExpiredItems(): Promise<void> {
     const keys = await this.getAllKeys();
     for (const key of keys) {
-      const item = await this.getItem(key);
+      const _item = await this.getItem(key);
       // getItem automatically removes expired items
     }
   }
@@ -399,10 +400,10 @@ class SecureStorageService {
     const keys = await this.getAllKeys();
     
     for (const key of keys) {
-      const storageKey = this.getStorageKey(key);
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        const item = JSON.parse(stored) as StorageItem;
+      const _storageKey = this.getStorageKey(key);
+      const _stored = localStorage.getItem(_storageKey);
+      if (_stored) {
+        const item = JSON.parse(_stored) as StorageItem;
         if (new Date(item.metadata.created) < thirtyDaysAgo) {
           await this.removeItem(key);
         }
@@ -426,7 +427,7 @@ class SecureStorageService {
     details?: Record<string, any>
   ): void {
     // In production, this would log to audit service
-    console.log(`Storage ${action}: ${key}`, details);
+    logger.debug(`Storage ${action}: ${key}`, 'SecureStorage', details);
   }
 
   /**

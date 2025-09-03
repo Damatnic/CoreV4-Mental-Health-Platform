@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { HomePage } from './pages/HomePage'; // Main entry point
-import { CrisisPage } from './pages/CrisisPage'; // Keep crisis page eager for emergency access
+import { RouteComponents } from './utils/bundleOptimization/lazyLoading';
+// Crisis page is now loaded via lazy loading for better performance
 import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
 import { ConsoleBootSequence } from './components/console/ConsoleBootSequence';
@@ -34,15 +34,15 @@ const NotificationCenterPage = lazyWithPreload(() => import('./pages/Notificatio
 // Preload critical pages immediately
 if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
   // Preload crisis-related content during idle time
-  (window as any).requestIdleCallback(() => {
-    (WellnessPage as any).preload?.();
-    (AITherapyPage as any).preload?.(); // Preload AI Therapy as it's frequently accessed
+  (window as unknown).requestIdleCallback(() => {
+    (WellnessPage as unknown).preload?.();
+    (AITherapyPage as unknown).preload?.(); // Preload AI Therapy as it's frequently accessed
   }, { timeout: 2000 });
   
   // Preload frequently accessed pages
   setTimeout(() => {
-    (CommunityPage as any).preload?.();
-    (SettingsPage as any).preload?.();
+    (CommunityPage as unknown).preload?.();
+    (SettingsPage as unknown).preload?.();
   }, 3000);
 }
 
@@ -68,8 +68,8 @@ const createQueryClient = () => new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: (failureCount, error: any) => {
-        // Don't retry on 4xx errors except 408 (timeout)
+      retry: (failureCount, error: unknown) => {
+        // Don't retry on 4xx errors except 408 (_timeout)
         if (error?.response?.status >= 400 && error?.response?.status < 500 && error?.response?.status !== 408) {
           return false;
         }
@@ -80,7 +80,7 @@ const createQueryClient = () => new QueryClient({
       networkMode: 'online',
     },
     mutations: {
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: unknown) => {
         if (error?.response?.status >= 400 && error?.response?.status < 500) {
           return false;
         }
@@ -143,7 +143,7 @@ const RouteWrapper = memo(({
   priority = UpdatePriority.MEDIUM,
   fallback = <PageLoadingSpinner />
 }: {
-  component: React.ComponentType<any>;
+  component: React.ComponentType<unknown>;
   priority?: UpdatePriority;
   fallback?: React.ReactNode;
 }) => {
@@ -157,12 +157,12 @@ const RouteWrapper = memo(({
 RouteWrapper.displayName = 'RouteWrapper';
 
 function App() {
-  const [showBoot, setShowBoot] = useState(() => {
+  const [_showBoot, setShowBoot] = useState(() => {
     // Show boot sequence only on first visit or if user hasn't seen it in the last hour
     const lastBoot = localStorage.getItem('console-last-boot');
     if (!lastBoot) return true;
     
-    const lastBootTime = parseInt(lastBoot);
+    const lastBootTime = parseInt(_lastBoot);
     const oneHour = 60 * 60 * 1000;
     return Date.now() - lastBootTime > oneHour;
   });
@@ -199,7 +199,7 @@ function App() {
       link.rel = 'preconnect';
       link.href = url;
       link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
+      document.head.appendChild(_link);
     });
   }, []);
 
@@ -216,7 +216,7 @@ function App() {
         border: '1px solid rgba(0, 212, 255, 0.3)',
         padding: '16px',
         fontSize: '14px',
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(_12px)',
         fontFamily: 'Inter, system-ui, sans-serif',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 212, 255, 0.1)',
       },
@@ -224,7 +224,7 @@ function App() {
   }), []);
 
   // Conditional return MUST come after all hooks
-  if (showBoot) {
+  if (_showBoot) {
     return (
       <ConsoleBootSequence 
         onBootComplete={handleBootComplete}
@@ -247,7 +247,7 @@ function App() {
                     path="/" 
                     element={
                       <RouteWrapper 
-                        component={HomePage} 
+                        component={RouteComponents.Dashboard} 
                         priority={UpdatePriority.HIGH}
                         fallback={<LoadingFallbacks.FullPage />}
                       />
@@ -257,7 +257,7 @@ function App() {
                     path="/crisis" 
                     element={
                       <RouteWrapper 
-                        component={CrisisPage} 
+                        component={RouteComponents.Crisis} 
                         priority={UpdatePriority.CRISIS}
                         fallback={<LoadingFallbacks.FullPage />}
                       />

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Lock, Globe, UserPlus, Settings, Calendar, MessageSquare, TrendingUp, Shield, Heart } from 'lucide-react';
+import { Users, Lock, Globe, UserPlus, Settings, _Calendar, MessageSquare, TrendingUp, Shield, Heart } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { communityService, SupportGroup, CreateGroupDto } from '../../services/community/communityService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface GroupCardProps {
   group: SupportGroup;
-  onJoin: (groupId: string) => void;
-  onLeave: (groupId: string) => void;
+  onJoin: (_groupId: string) => void;
+  onLeave: (_groupId: string) => void;
   onManage: (group: SupportGroup) => void;
 }
 
@@ -143,7 +143,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [formData, setFormData] = useState<CreateGroupDto>({
     name: '',
     description: '',
-    category: 'other' as any,
+    category: 'other' as unknown,
     isPrivate: false,
     requiresApproval: false,
     guidelines: [],
@@ -163,8 +163,8 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to create group');
+    onError: (_error: unknown) => {
+      toast._error(_error.message || 'Failed to create group');
     },
   });
 
@@ -238,7 +238,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as unknown }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
@@ -424,7 +424,7 @@ export function SupportGroups() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch groups
-  const { data, isLoading, error } = useQuery({
+  const { data, _isLoading, _error } = useQuery({
     queryKey: ['groups', selectedCategory, searchQuery],
     queryFn: () => communityService.getGroups({
       category: selectedCategory === 'all' ? undefined : selectedCategory,
@@ -435,25 +435,25 @@ export function SupportGroups() {
 
   // Join group mutation
   const joinMutation = useMutation({
-    mutationFn: (groupId: string) => communityService.joinGroup(groupId),
+    mutationFn: (_groupId: string) => communityService.joinGroup(_groupId),
     onSuccess: () => {
       toast.success('Successfully joined the group!');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
     onError: () => {
-      toast.error('Failed to join group');
+      toast._error('Failed to join group');
     },
   });
 
   // Leave group mutation
   const leaveMutation = useMutation({
-    mutationFn: (groupId: string) => communityService.leaveGroup(groupId),
+    mutationFn: (_groupId: string) => communityService.leaveGroup(_groupId),
     onSuccess: () => {
       toast.success('You have left the group');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
     onError: () => {
-      toast.error('Failed to leave group');
+      toast._error('Failed to leave group');
     },
   });
 
@@ -473,7 +473,7 @@ export function SupportGroups() {
     { value: 'self-esteem', label: 'Self-Esteem', icon: TrendingUp },
   ];
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -481,7 +481,7 @@ export function SupportGroups() {
     );
   }
 
-  if (error) {
+  if (_error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load support groups. Please try again later.</p>

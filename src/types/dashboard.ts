@@ -378,7 +378,7 @@ export interface UserStatistics {
 export interface DashboardError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   widgetId?: string;
   recoverable: boolean;
@@ -386,15 +386,15 @@ export interface DashboardError {
 }
 
 // Type guards
-export function isDashboardWidget(obj: any): obj is DashboardWidget {
+export function isDashboardWidget(obj: unknown): obj is DashboardWidget {
   return obj && typeof obj.id === 'string' && typeof obj.type === 'string';
 }
 
-export function isEmergencyContact(obj: any): obj is EmergencyContact {
+export function isEmergencyContact(obj: unknown): obj is EmergencyContact {
   return obj && typeof obj.name === 'string' && typeof obj.phone === 'string';
 }
 
-export function isCrisisHotline(obj: any): obj is CrisisHotline {
+export function isCrisisHotline(obj: unknown): obj is CrisisHotline {
   return obj && typeof obj.name === 'string' && typeof obj.contact === 'string';
 }
 

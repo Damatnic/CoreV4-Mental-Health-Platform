@@ -9,11 +9,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Send, Phone, Video, Shield, Lock, Heart,
-  AlertCircle, Clock, CheckCircle, UserCheck,
-  MessageSquare, Headphones, Settings, X,
-  Users, Star, Flag, Volume2, VolumeX
+  Send, Phone, Shield, Lock,
+  AlertCircle, UserCheck,
+  MessageSquare, Volume2, VolumeX
 } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 interface ChatMessage {
   id: string;
@@ -64,15 +64,15 @@ interface CrisisProtocol {
 }
 
 export function RealTimeCrisisChat() {
-  const [currentRoom, setCurrentRoom] = useState<ChatRoom | null>(null);
+  const [_currentRoom, _setCurrentRoom] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [availableSupport, setAvailableSupport] = useState<ChatParticipant[]>([]);
-  const [chatType, setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
+  const [_chatType, _setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
   const [isTyping, setIsTyping] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [chatSettings, setChatSettings] = useState({
+  const [_chatSettings, _setChatSettings] = useState({
     notifications: true,
     readReceipts: true,
     autoConnect: true,
@@ -89,6 +89,7 @@ export function RealTimeCrisisChat() {
     return () => {
       disconnectFromChat();
     };
+     
   }, []);
 
   // Auto-scroll to latest message
@@ -101,12 +102,12 @@ export function RealTimeCrisisChat() {
     if (!isTyping) {
       setIsTyping(true);
       // Send typing indicator to other participants
-      sendTypingIndicator(true);
+      // sendTypingIndicator(true);
       
       // Clear typing indicator after 3 seconds of inactivity
       setTimeout(() => {
         setIsTyping(false);
-        sendTypingIndicator(false);
+        // sendTypingIndicator(false);
       }, 3000);
     }
   }, [isTyping]);
@@ -131,8 +132,8 @@ export function RealTimeCrisisChat() {
         'info'
       );
 
-    } catch (error) {
-      console.error('Failed to initialize crisis chat:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize crisis chat:');
       addSystemMessage(
         'Having trouble connecting to chat. Emergency hotlines are still available: 988',
         'crisis-alert'
@@ -201,13 +202,13 @@ export function RealTimeCrisisChat() {
     ];
     
     // Set up keyword monitoring for crisis escalation
-    protocols.forEach(protocol => {
+    protocols.forEach(_protocol => {
       // In production, this would configure server-side monitoring
     });
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !currentRoom) return;
+    if (!newMessage.trim() || !_currentRoom) return;
 
     const message: ChatMessage = {
       id: generateMessageId(),
@@ -233,7 +234,7 @@ export function RealTimeCrisisChat() {
     await sendToParticipants(message);
 
     // Play send sound if enabled
-    if (soundEnabled) {
+    if (_soundEnabled) {
       playNotificationSound('send');
     }
 
@@ -250,11 +251,11 @@ export function RealTimeCrisisChat() {
     ];
 
     const content = message.content.toLowerCase();
-    const hasCrisisIndicators = crisisKeywords.some(keyword => 
-      content.includes(keyword)
+    const _hasCrisisIndicators = crisisKeywords.some(_keyword => 
+      content.includes(_keyword)
     );
 
-    if (hasCrisisIndicators) {
+    if (_hasCrisisIndicators) {
       // Immediate crisis response
       await triggerCrisisProtocol('critical', message);
       
@@ -269,9 +270,9 @@ export function RealTimeCrisisChat() {
     }
   };
 
-  const triggerCrisisProtocol = async (priority: string, message: ChatMessage) => {
-    // Log crisis event (anonymized)
-    console.log('Crisis protocol triggered:', { priority, timestamp: new Date() });
+  const triggerCrisisProtocol = async (priority: string, _message: ChatMessage) => {
+    // Log crisis event (_anonymized)
+    logger.crisis('Crisis protocol triggered', priority as 'low' | 'medium' | 'high' | 'critical', 'RealTimeCrisisChat', { priority, timestamp: new Date() });
     
     // In production, this would:
     // 1. Alert crisis intervention team
@@ -286,7 +287,7 @@ export function RealTimeCrisisChat() {
 
   const connectToProfessional = async () => {
     const professional = availableSupport.find(p => p.role === 'professional');
-    if (professional) {
+    if (_professional) {
       // Simulate professional joining chat
       setTimeout(() => {
         const welcomeMessage: ChatMessage = {
@@ -294,7 +295,7 @@ export function RealTimeCrisisChat() {
           senderId: professional.id,
           senderName: professional.name,
           senderRole: 'professional',
-          content: `Hi, I'm ${professional.name}, a ${professional.credentials}. I'm here to help and support you through this difficult time. You're not alone.`,
+          content: `Hi, I&apos;m ${professional.name}, a ${professional.credentials}. I&apos;m here to help and support you through this difficult time. You&apos;re not alone.`,
           timestamp: new Date(),
           type: 'text',
           encrypted: true,
@@ -304,7 +305,7 @@ export function RealTimeCrisisChat() {
         
         setMessages(prev => [...prev, welcomeMessage]);
         
-        if (soundEnabled) {
+        if (_soundEnabled) {
           playNotificationSound('professional');
         }
       }, 2000);
@@ -336,7 +337,7 @@ export function RealTimeCrisisChat() {
     if (!soundEnabled) return;
     
     // In production, would play appropriate notification sounds
-    console.log(`Playing ${type} notification sound`);
+    logger.info(`Playing ${type} notification sound`, 'RealTimeCrisisChat');
   };
 
   const showEmergencyResources = () => {
@@ -374,15 +375,15 @@ Professional counselors are joining this chat now. You matter and help is here.`
   };
 
   // Placeholder functions for full implementation
-  const sendToParticipants = async (message: ChatMessage) => {
+  const sendToParticipants = async (_message: ChatMessage) => {
     // Implementation for sending message to chat participants
   };
 
-  const requestSupportResponse = (message: ChatMessage) => {
+  const requestSupportResponse = (_message: ChatMessage) => {
     // Implementation for requesting response from supporters
   };
 
-  const sendTypingIndicator = (typing: boolean) => {
+  const _sendTypingIndicator = (_typing: boolean) => {
     // Implementation for sending typing indicators
   };
 

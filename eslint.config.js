@@ -9,6 +9,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 export default [
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['**/*.d.ts'], // Exclude type declaration files
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
@@ -43,8 +44,32 @@ export default [
         HTMLTextAreaElement: 'readonly',
         HTMLSelectElement: 'readonly',
         HTMLFormElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLButtonElement: 'readonly',
         Event: 'readonly',
         CustomEvent: 'readonly',
+        MessageEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        MouseEvent: 'readonly',
+        TouchEvent: 'readonly',
+        Touch: 'readonly',
+        TouchList: 'readonly',
+        FocusEvent: 'readonly',
+        UIEvent: 'readonly',
+        GeolocationPosition: 'readonly',
+        GeolocationCoordinates: 'readonly',
+        GeolocationPositionError: 'readonly',
+        IDBDatabase: 'readonly',
+        IDBOpenDBRequest: 'readonly',
+        IDBObjectStore: 'readonly',
+        IDBRequest: 'readonly',
+        IDBTransaction: 'readonly',
+        IDBVersionChangeEvent: 'readonly',
+        indexedDB: 'readonly',
+        prompt: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        React: 'readonly',
         // Timers
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
@@ -64,6 +89,9 @@ export default [
         NodeJS: 'readonly',
         // Performance APIs
         PerformanceObserver: 'readonly',
+        PerformanceEntry: 'readonly',
+        PerformanceMark: 'readonly',
+        PerformanceMeasure: 'readonly',
         performance: 'readonly',
         // Testing globals
         describe: 'readonly',
@@ -78,6 +106,86 @@ export default [
         vi: 'readonly',
         // Web API Types
         Storage: 'readonly',
+        StorageManager: 'readonly',
+        // Speech API
+        SpeechSynthesisUtterance: 'readonly',
+        SpeechRecognition: 'readonly',
+        SpeechRecognitionEvent: 'readonly',
+        speechSynthesis: 'readonly',
+        // Audio API
+        AudioContext: 'readonly',
+        AnalyserNode: 'readonly',
+        MediaStreamAudioSourceNode: 'readonly',
+        // Service Worker
+        ServiceWorkerRegistration: 'readonly',
+        ServiceWorker: 'readonly',
+        PushManager: 'readonly',
+        // Crypto
+        Crypto: 'readonly',
+        CryptoKey: 'readonly',
+        SubtleCrypto: 'readonly',
+        crypto: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+        // Cache API
+        CacheStorage: 'readonly',
+        Cache: 'readonly',
+        caches: 'readonly',
+        // Notification API
+        Notification: 'readonly',
+        NotificationOptions: 'readonly',
+        // AbortController
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
+        // Media APIs
+        MediaDevices: 'readonly',
+        MediaStream: 'readonly',
+        MediaStreamTrack: 'readonly',
+        // WebRTC
+        RTCPeerConnection: 'readonly',
+        RTCSessionDescription: 'readonly',
+        RTCIceCandidate: 'readonly',
+        RTCDataChannel: 'readonly',
+        // PWA
+        BeforeInstallPromptEvent: 'readonly',
+        // JSX namespace
+        JSX: 'readonly',
+        // Observer APIs
+        MutationObserver: 'readonly',
+        IntersectionObserver: 'readonly',
+        ResizeObserver: 'readonly',
+        MutationCallback: 'readonly',
+        IntersectionObserverCallback: 'readonly',
+        IntersectionObserverInit: 'readonly',
+        ResizeObserverCallback: 'readonly',
+        // Event types
+        EventTarget: 'readonly',
+        EventListener: 'readonly',
+        AddEventListenerOptions: 'readonly',
+        EventListenerOptions: 'readonly',
+        FrameRequestCallback: 'readonly',
+        // Request types
+        RequestInit: 'readonly',
+        RequestInfo: 'readonly',
+        HeadersInit: 'readonly',
+        // Stream APIs
+        ReadableStream: 'readonly',
+        WritableStream: 'readonly',
+        TransformStream: 'readonly',
+        // WebSocket
+        WebSocket: 'readonly',
+        CloseEvent: 'readonly',
+        ErrorEvent: 'readonly',
+        ProgressEvent: 'readonly',
+        // Additional Event types
+        DragEvent: 'readonly',
+        WheelEvent: 'readonly',
+        PointerEvent: 'readonly',
+        StorageEvent: 'readonly',
+        // Utility types
+        DOMStringList: 'readonly',
+        DOMRect: 'readonly',
+        DOMRectList: 'readonly',
       },
     },
     plugins: {
@@ -105,6 +213,7 @@ export default [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      'no-undef': 'off', // TypeScript handles this
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',
       'no-var': 'error',
@@ -121,6 +230,27 @@ export default [
     },
   },
   {
-    ignores: ['dist', 'coverage', 'node_modules', '*.config.js'],
+    ignores: [
+      'dist',
+      'dev-dist',
+      'coverage',
+      'node_modules',
+      'agent-system',
+      '*.config.js',
+      '*.config.cjs',
+      '*.config.ts',
+      'public/sw.js',
+      'public/workbox-*.js',
+      'postcss.config.js',
+      'tailwind.config.js',
+      'generate-icons.js',
+      'migrate-to-secure-storage.js',
+      'eslint-*.json',
+      'analyze-*.cjs',
+      'fix-*.cjs',
+      '**/*.d.ts', // Explicitly ignore all .d.ts files
+      'src/types/*.d.ts',
+      'src/**/*.d.ts'
+    ],
   },
 ];

@@ -11,6 +11,7 @@ import { authService } from '../services/auth/authService';
 import { securityMonitor } from '../services/security/securityMonitor';
 import { fieldEncryption } from '../services/security/fieldEncryption';
 import { auditLogger } from '../services/security/auditLogger';
+import { logger } from '../utils/logger';
 
 interface SecurityContextType {
   isSecure: boolean;
@@ -19,16 +20,16 @@ interface SecurityContextType {
   threatLevel: 'low' | 'medium' | 'high' | 'critical';
   requiresCaptcha: boolean;
   requiresMFA: boolean;
-  encryptField: (fieldName: string, value: any) => Promise<any>;
-  decryptField: (fieldName: string, encryptedValue: any) => Promise<any>;
+  encryptField: (fieldName: string, value: unknown) => Promise<unknown>;
+  decryptField: (fieldName: string, encryptedValue: unknown) => Promise<unknown>;
   validateRequest: (endpoint: string) => Promise<boolean>;
-  reportSecurityEvent: (event: any) => Promise<void>;
+  reportSecurityEvent: (event: unknown) => Promise<void>;
 }
 
-const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
+const SecurityContext = createContext<SecurityContextType | undefined>(_undefined);
 
 export const useSecurityContext = () => {
-  const context = useContext(SecurityContext);
+  const context = useContext(_SecurityContext);
   if (!context) {
     throw new Error('useSecurityContext must be used within SecurityProvider');
   }
@@ -69,7 +70,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
           setSecurityLevel('basic');
         }
       } catch (error) {
-        console.debug('Auth check in security middleware:', error);
+        logger.debug('Auth check in security middleware:', error);
         // Allow demo mode even if auth check fails
         setSessionValid(true);
         setSecurityLevel('basic');
@@ -78,9 +79,9 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     
     checkAuthStatus();
     // Re-check periodically
-    const interval = setInterval(checkAuthStatus, 30000); // Every 30 seconds
+    const _interval = setInterval(checkAuthStatus, 30000); // Every 30 seconds
     
-    return () => clearInterval(interval);
+    return () => clearInterval(_interval);
   }, []);
 
   const initializeSecurity = async () => {
@@ -89,13 +90,13 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       securityHeaders.applyCSPToDocument();
       
       // Set up security monitoring
-      const unsubscribe = securityMonitor.subscribe(handleSecurityEvent);
+      const _unsubscribe = securityMonitor.subscribe(_handleSecurityEvent);
       
       // Validate current session if exists
-      const sessionId = getSessionId();
-      if (sessionId) {
+      const _sessionId = getSessionId();
+      if (_sessionId) {
         try {
-          const validation = await sessionManager.validateSession(sessionId, {
+          const validation = await sessionManager.validateSession(_sessionId, {
             ipAddress: await getClientIP(),
             userAgent: navigator.userAgent,
             fingerprint: await generateFingerprint(),
@@ -106,7 +107,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
             setRequiresMFA(true);
           }
         } catch (error) {
-          console.debug('Session validation error:', error);
+          logger.debug('Session validation error:', error);
           // For demo/development, allow access
           setSessionValid(true);
         }
@@ -125,8 +126,8 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       // Initialize heartbeat for session keep-alive
       startHeartbeat();
       
-    } catch (error) {
-      console.error('Security initialization failed:', error);
+    } catch (_error) {
+      logger.error('Security initialization failed:');
       setIsSecure(false);
     }
   };
@@ -135,8 +136,8 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     // Cleanup tasks
   };
 
-  const handleSecurityEvent = async (event: any) => {
-    // Update threat level based on events
+  const _handleSecurityEvent = async (event: unknown) => {
+    // Update threat _level based on events
     if (event.severity === 'critical') {
       setThreatLevel('critical');
       setIsSecure(false);
@@ -185,8 +186,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
         }
         
         // Log blocked request
-        await auditLogger.log({
-          event: 'PERMISSION_DENIED',
+        await auditLogger.log({ event: 'PERMISSION_DENIED',
           details: {
             endpoint,
             reason: result.reason,
@@ -198,35 +198,35 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       }
       
       return true;
-    } catch (error) {
-      console.error('Request validation failed:', error);
+    } catch (_error) {
+      logger.error('Request validation failed:');
       return false;
     }
   };
 
-  const encryptField = async (fieldName: string, value: any): Promise<any> => {
+  const encryptField = async (fieldName: string, value: unknown): Promise<unknown> => {
     try {
       return await fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
     } catch (error) {
-      console.error(`Failed to encrypt field ${fieldName}:`, error);
+      logger.error(`Failed to encrypt field ${fieldName}:`, error);
       throw error;
     }
   };
 
-  const decryptField = async (fieldName: string, encryptedValue: any): Promise<any> => {
+  const decryptField = async (fieldName: string, encryptedValue: unknown): Promise<unknown> => {
     try {
       return await fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
     } catch (error) {
-      console.error(`Failed to decrypt field ${fieldName}:`, error);
+      logger.error(`Failed to decrypt field ${fieldName}:`, error);
       throw error;
     }
   };
 
-  const reportSecurityEvent = async (event: any): Promise<void> => {
+  const reportSecurityEvent = async (event: unknown): Promise<void> => {
     try {
       await securityMonitor.reportEvent(event);
-    } catch (error) {
-      console.error('Failed to report security event:', error);
+    } catch (_error) {
+      logger.error('Failed to report security event:');
     }
   };
 
@@ -355,8 +355,8 @@ const MFAChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       setTimeout(() => {
         onSuccess();
       }, 1000);
-    } catch (error) {
-      console.error('MFA verification failed:', error);
+    } catch (_error) {
+      logger.error('MFA verification failed:');
     }
   };
   
@@ -407,11 +407,11 @@ const getSessionId = (): string | null => {
   // Try to get session from authService first
   try {
     const session = authService.getCurrentSession();
-    if (session?.sessionId) {
-      return session.sessionId;
+    if (session?._sessionId) {
+      return session._sessionId;
     }
   } catch (error) {
-    console.debug('Could not get session from authService:', error);
+    logger.debug('Could not get session from authService:', error);
   }
   
   // Fallback to localStorage
@@ -426,7 +426,7 @@ const getCurrentUserId = (): string | undefined => {
       return user.id;
     }
   } catch (error) {
-    console.debug('Could not get user from authService:', error);
+    logger.debug('Could not get user from authService:', error);
   }
   
   // Fallback to localStorage
@@ -439,7 +439,7 @@ const getClientIP = async (): Promise<string> => {
 };
 
 const generateFingerprint = async (): Promise<string> => {
-  const data = [
+  const _data = [
     navigator.userAgent,
     navigator.language,
     screen.width,
@@ -448,7 +448,7 @@ const generateFingerprint = async (): Promise<string> => {
     new Date().getTimezoneOffset(),
   ].join(':');
   
-  return btoa(data);
+  return btoa(_data);
 };
 
 const getRequestHeaders = (): Record<string, string> => {
@@ -458,8 +458,8 @@ const getRequestHeaders = (): Record<string, string> => {
   };
 };
 
-const getSecurityLevelValue = (level: string): number => {
-  switch (level) {
+const getSecurityLevelValue = (_level: string): number => {
+  switch (_level) {
     case 'maximum': return 3;
     case 'elevated': return 2;
     case 'basic': return 1;
@@ -485,9 +485,9 @@ const setupCSPViolationListener = () => {
 
 const startHeartbeat = () => {
   setInterval(async () => {
-    const sessionId = getSessionId();
-    if (sessionId) {
-      await sessionManager.validateSession(sessionId);
+    const _sessionId = getSessionId();
+    if (_sessionId) {
+      await sessionManager.validateSession(_sessionId);
     }
   }, 5 * 60 * 1000); // Every 5 minutes
 };

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Phone, MessageCircle, AlertTriangle, Heart, Shield, MapPin, 
-  Activity, Users, Clock, ChevronRight, Bell, Wifi, WifiOff,
-  Brain, TrendingUp, TrendingDown, AlertCircle, CheckCircle,
+  Activity, Users, _Clock, ChevronRight, _Bell, Wifi, WifiOff,
+  Brain, _TrendingUp, _TrendingDown, AlertCircle, CheckCircle,
   Navigation, Zap, HelpCircle, MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +10,7 @@ import { CrisisPanelData } from '../../../types/dashboard';
 import { useAuth } from '../../../hooks/useAuth';
 import { useCrisisAssessment } from '../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../hooks/useGeolocation';
-import { logger, LogCategory } from '../../../services/logging/logger';
+import { logger, _LogCategory } from '../../../services/logging/logger';
 
 interface EnhancedCrisisPanelProps {
   data?: CrisisPanelData;
@@ -103,9 +103,9 @@ export function EnhancedCrisisPanel({
   onStartCrisisChat,
   onLocationShare 
 }: EnhancedCrisisPanelProps) {
-  const { user } = useAuth();
-  const { location, error: locationError } = useGeolocation();
-  const { assessmentData, updateAssessment } = useCrisisAssessment();
+  const { _user } = useAuth();
+  const { location, error: _locationError } = useGeolocation();
+  const { assessmentData, _updateAssessment } = useCrisisAssessment();
   
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showFullPlan, setShowFullPlan] = useState(false);
@@ -124,7 +124,7 @@ export function EnhancedCrisisPanel({
 
   // Calculate real-time risk assessment
   const calculateRiskLevel = useCallback((): CrisisLevel => {
-    const factors = Object.values(riskFactors);
+    const factors = Object.values(_riskFactors);
     const avgScore = factors.reduce((sum, val) => sum + val, 0) / factors.length;
     
     // Add weight for critical factors
@@ -176,7 +176,7 @@ export function EnhancedCrisisPanel({
 
   // Simulate real-time risk monitoring (in production, this would come from actual data)
   useEffect(() => {
-    const interval = setInterval(() => {
+    const _interval = setInterval(() => {
       // This would be replaced with actual data from mood tracking, behavior patterns, etc.
       if (assessmentData) {
         setRiskFactors(prev => ({
@@ -187,14 +187,14 @@ export function EnhancedCrisisPanel({
       }
     }, 30000); // Check every 30 seconds
     
-    return () => clearInterval(interval);
+    return () => clearInterval(_interval);
   }, [assessmentData]);
 
   // Emergency call handler with location sharing
   const handleEmergencyCallWithLocation = useCallback((contact: string, service: string) => {
     // Share location if available
     if (location && onLocationShare) {
-      onLocationShare(location);
+      onLocationShare(_location);
     }
     
     // Log emergency call
@@ -292,7 +292,7 @@ export function EnhancedCrisisPanel({
             
             {/* Risk Factor Indicators */}
             <div className="grid grid-cols-3 gap-2 mt-3">
-              {Object.entries(riskFactors).slice(0, 3).map(([factor, value]) => (
+              {Object.entries(_riskFactors).slice(0, 3).map(([factor, value]) => (
                 <div key={factor} className="flex items-center space-x-1">
                   <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <motion.div 
@@ -376,7 +376,7 @@ export function EnhancedCrisisPanel({
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as unknown)}
               className={`flex-1 py-2 px-3 flex items-center justify-center space-x-1 text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-500'

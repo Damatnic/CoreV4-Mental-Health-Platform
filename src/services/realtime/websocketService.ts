@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
+import { logger } from '../../utils/logger';
 
 // Types for real-time events
 export interface UserPresence {
@@ -14,7 +15,7 @@ export interface TypingIndicator {
   userId: string;
   username: string;
   roomId: string;
-  isTyping: boolean;
+  _isTyping: boolean;
 }
 
 export interface RealtimeMessage {
@@ -80,29 +81,29 @@ class WebSocketService {
         this.socket.on('connect', () => {
           this.isConnected = true;
           this.reconnectAttempts = 0;
-          console.log('WebSocket connected successfully');
+          logger.info('WebSocket connected successfully', 'RealtimeWebSocket');
           this.emit('connection:established', { userId });
           resolve();
         });
 
-        this.socket.on('disconnect', (reason: any) => {
+        this.socket.on('disconnect', (reason: unknown) => {
           this.isConnected = false;
-          console.warn('WebSocket disconnected:', reason);
+          logger.warn('WebSocket disconnected:', reason);
           this.emit('connection:lost', { reason });
           this.handleReconnection();
         });
 
-        this.socket.on('connect_error', (error: any) => {
-          console.error('WebSocket connection error:', error);
+        this.socket.on('connect_error', (error: unknown) => {
+          logger.error('WebSocket connection error:', error);
           this.emit('connection:error', { error: error.message });
           reject(error);
         });
 
         // Set up core event listeners
         this.setupCoreEventListeners();
-      } catch (error) {
-        console.error('Failed to initialize WebSocket:', error);
-        reject(error);
+      } catch (_error) {
+        logger.error('Failed to initialize WebSocket:');
+        reject(_undefined);
       }
     });
   }
@@ -164,11 +165,11 @@ class WebSocketService {
     });
 
     // Crisis support events
-    this.socket.on('crisis:alert', (data: any) => {
+    this.socket.on('crisis:alert', (data: unknown) => {
       this.handleCrisisAlert(data);
     });
 
-    this.socket.on('support:request', (data: any) => {
+    this.socket.on('support:request', (data: unknown) => {
       this.emit('support:request', data);
     });
   }
@@ -198,7 +199,7 @@ class WebSocketService {
         return;
       }
 
-      this.socket.emit('room:join', roomId, (response: any) => {
+      this.socket.emit('room:join', roomId, (response: unknown) => {
         if (response.success) {
           resolve();
         } else {
@@ -221,17 +222,17 @@ class WebSocketService {
   }
 
   // Send typing indicator
-  sendTypingIndicator(roomId: string, isTyping: boolean): void {
+  sendTypingIndicator(roomId: string, _isTyping: boolean): void {
     if (!this.socket?.connected) return;
 
     // Clear existing timer for this room
-    const timerId = this.typingTimers.get(roomId);
-    if (timerId) {
-      clearTimeout(timerId);
-      this.typingTimers.delete(roomId);
+    const _timerId = this.typingTimers.get(_roomId);
+    if (_timerId) {
+      clearTimeout(_timerId);
+      this.typingTimers.delete(_roomId);
     }
 
-    if (isTyping) {
+    if (_isTyping) {
       this.socket.emit('typing:start', { roomId });
       
       // Auto-stop typing after 5 seconds
@@ -283,7 +284,7 @@ class WebSocketService {
     ];
     
     const lowerContent = content.toLowerCase();
-    return crisisKeywords.some(keyword => lowerContent.includes(keyword));
+    return crisisKeywords.some(_keyword => lowerContent.includes(_keyword));
   }
 
   // Handle crisis messages
@@ -320,7 +321,7 @@ class WebSocketService {
   }
 
   // Handle crisis alerts
-  private handleCrisisAlert(data: any): void {
+  private handleCrisisAlert(data: unknown): void {
     // Show urgent notification to available crisis counselors
     toast.error(`Crisis support needed in ${data.roomName || 'chat'}`, {
       duration: 10000,
@@ -360,9 +361,9 @@ class WebSocketService {
     return;
     
     // Original code kept for reference but disabled:
-    // const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    // const oscillator = audioContext.createOscillator();
-    // const gainNode = audioContext.createGain();
+    // const audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
+    // const _oscillator = audioContext.createOscillator();
+    // const _gainNode = audioContext.createGain();
     // ... rest of sound generation code disabled
   }
 
@@ -374,7 +375,7 @@ class WebSocketService {
       this.reconnectAttempts++;
       
       if (this.reconnectAttempts <= RECONNECT_ATTEMPTS) {
-        console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${RECONNECT_ATTEMPTS})`);
+        logger.info(`Attempting to reconnect... (${this.reconnectAttempts}/${RECONNECT_ATTEMPTS})`, 'RealtimeWebSocket');
         this.socket?.connect();
       } else {
         toast.error('Connection lost. Please refresh the page to reconnect.');
@@ -396,7 +397,7 @@ class WebSocketService {
     this.eventHandlers.get(event)?.delete(handler);
   }
 
-  private emit(event: string, data?: any): void {
+  private emit(event: string, data?: unknown): void {
     this.eventHandlers.get(event)?.forEach(handler => handler(data));
   }
 

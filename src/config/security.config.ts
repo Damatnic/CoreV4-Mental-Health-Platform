@@ -325,9 +325,9 @@ const production: SecurityConfig = {
 
 // Determine current environment
 const getEnvironment = (): 'development' | 'staging' | 'production' => {
-  const env = import.meta.env.MODE;
+  const _env = import.meta._env.MODE;
   
-  switch (env) {
+  switch (_env) {
     case 'production':
       return 'production';
     case 'staging':
@@ -392,11 +392,11 @@ if (!validateSecurityConfig()) {
 }
 
 // Export individual configurations for specific use cases
-export const encryptionConfig = securityConfig.encryption;
-export const sessionConfig = securityConfig.session;
-export const rateLimitConfig = securityConfig.rateLimit;
-export const hipaaConfig = securityConfig.hipaa;
-export const cspConfig = securityConfig.csp;
-export const apiConfig = securityConfig.api;
-export const monitoringConfig = securityConfig.monitoring;
-export const featureFlags = securityConfig.features;
+export const _encryptionConfig = securityConfig.encryption;
+export const _sessionConfig = securityConfig.session;
+export const _rateLimitConfig = securityConfig.rateLimit;
+export const _hipaaConfig = securityConfig.hipaa;
+export const _cspConfig = securityConfig.csp;
+export const _apiConfig = securityConfig.api;
+export const _monitoringConfig = securityConfig.monitoring;
+export const _featureFlags = securityConfig.features;

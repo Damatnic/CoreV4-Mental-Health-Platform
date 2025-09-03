@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Stethoscope, Calendar, Pill, Brain, Users, FileText,
-  MessageSquare, Shield, Activity, TrendingUp, Bell,
-  Settings, ChevronLeft, ChevronRight, Grid3x3
+  Stethoscope, _Calendar, Pill, Brain, Users, FileText,
+  MessageSquare, _Shield, Activity, TrendingUp, _Bell,
+  _Settings, ChevronLeft, ChevronRight, Grid3x3
 } from 'lucide-react';
 import { DashboardWidget } from './DashboardWidget';
 import { TherapySessionWidget } from './widgets/TherapySessionWidget';
@@ -172,7 +172,7 @@ export function ProfessionalCareDashboard() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveView(item.id as any)}
+                  onClick={() => setActiveView(item.id as unknown)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                     activeView === item.id
                       ? 'bg-primary-100 text-primary-700'

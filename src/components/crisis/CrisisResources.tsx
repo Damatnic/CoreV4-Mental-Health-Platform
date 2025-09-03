@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Phone, Globe, Clock, Filter, Search, Navigation, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { MapPin, Phone, Globe, Clock, Search, Navigation, ExternalLink } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface Resource {
   id: string;
@@ -7,7 +8,7 @@ interface Resource {
   type: 'hospital' | 'clinic' | 'therapist' | 'support_group' | 'crisis_center' | 'emergency';
   phone?: string;
   website?: string;
-  address?: string;
+  _address?: string;
   distance?: number;
   hours?: string;
   services: string[];
@@ -25,7 +26,7 @@ const MOCK_RESOURCES: Resource[] = [
     type: 'crisis_center',
     phone: '555-0100',
     website: 'https://example.com/crisis',
-    address: '123 Main St, City, State 12345',
+    _address: '123 Main St, City, State 12345',
     distance: 2.3,
     hours: '24/7',
     services: ['Crisis Intervention', 'Emergency Assessment', 'Safety Planning', 'Referrals'],
@@ -37,7 +38,7 @@ const MOCK_RESOURCES: Resource[] = [
     name: 'Regional Medical Center - Emergency Psychiatric Services',
     type: 'hospital',
     phone: '555-0200',
-    address: '456 Hospital Blvd, City, State 12345',
+    _address: '456 Hospital Blvd, City, State 12345',
     distance: 3.7,
     hours: '24/7',
     services: ['Emergency Psychiatric Care', 'Inpatient Services', 'Crisis Stabilization'],
@@ -51,7 +52,7 @@ const MOCK_RESOURCES: Resource[] = [
     type: 'clinic',
     phone: '555-0300',
     website: 'https://example.com/mha',
-    address: '789 Wellness Ave, City, State 12345',
+    _address: '789 Wellness Ave, City, State 12345',
     distance: 5.1,
     hours: 'Mon-Fri 8am-6pm, Sat 9am-2pm',
     services: ['Therapy', 'Psychiatry', 'Group Therapy', 'Crisis Counseling'],
@@ -65,7 +66,7 @@ const MOCK_RESOURCES: Resource[] = [
     type: 'support_group',
     phone: '555-0400',
     website: 'https://example.com/support',
-    address: '321 Community Center, City, State 12345',
+    _address: '321 Community Center, City, State 12345',
     distance: 4.2,
     hours: 'Various meeting times',
     services: ['Peer Support Groups', 'Recovery Programs', 'Family Support'],
@@ -79,14 +80,14 @@ interface CrisisResourcesProps {
 }
 
 export function CrisisResources({ location }: CrisisResourcesProps) {
-  const [resources, setResources] = useState<Resource[]>(MOCK_RESOURCES);
-  const [filteredResources, setFilteredResources] = useState<Resource[]>(MOCK_RESOURCES);
+  const [resources, setResources] = useState<Resource[]>(_MOCK_RESOURCES);
+  const [filteredResources, setFilteredResources] = useState<Resource[]>(_MOCK_RESOURCES);
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
-  // Filter resources based on type and search query
+  // Filter resources based on type and search _query
   useEffect(() => {
     let filtered = resources;
 
@@ -95,11 +96,11 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
     }
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const _query = searchQuery.toLowerCase();
       filtered = filtered.filter(r => 
-        r.name.toLowerCase().includes(query) ||
-        r.services.some(s => s.toLowerCase().includes(query)) ||
-        r.address?.toLowerCase().includes(query)
+        r.name.toLowerCase().includes(_query) ||
+        r.services.some(s => s.toLowerCase().includes(_query)) ||
+        r._address?.toLowerCase().includes(_query)
       );
     }
 
@@ -108,34 +109,34 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
       filtered.sort((a, b) => (a.distance || 999) - (b.distance || 999));
     }
 
-    setFilteredResources(filtered);
+    setFilteredResources(_filtered);
   }, [resources, selectedType, searchQuery, location]);
 
   // Fetch real resources (in production, this would call an API)
-  useEffect(() => {
-    if (location) {
-      fetchNearbyResources(location.coords.latitude, location.coords.longitude);
-    }
-  }, [location]);
-
-  const fetchNearbyResources = async (lat: number, lng: number) => {
+  const fetchNearbyResources = useCallback(async (lat: number, lng: number) => {
     setIsLoading(true);
     try {
       // In production, this would make an API call to fetch real resources
       // For now, we'll simulate with mock data and calculated distances
-      const resourcesWithDistance = MOCK_RESOURCES.map(resource => ({
+      const _resourcesWithDistance = MOCK_RESOURCES.map(resource => ({
         ...resource,
         distance: calculateDistance(lat, lng, resource.lat || 0, resource.lng || 0)
       }));
-      setResources(resourcesWithDistance);
-    } catch (error) {
-      console.error('Error fetching resources:', error);
+      setResources(_resourcesWithDistance);
+    } catch (_error) {
+      logger.error('Error fetching resources:');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  useEffect(() => {
+    if (location) {
+      fetchNearbyResources(location.coords.latitude, location.coords.longitude);
+    }
+  }, [location, fetchNearbyResources]);
+
+  const calculateDistance = (_lat1: number, _lon1: number, _lat2: number, _lon2: number) => {
     // Simple distance calculation (in production, use proper geospatial calculations)
     return Math.random() * 10; // Mock distance in miles
   };
@@ -144,8 +145,8 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
     window.location.href = `tel:${phone.replace(/\D/g, '')}`;
   };
 
-  const handleGetDirections = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
+  const handleGetDirections = (_address: string) => {
+    const encodedAddress = encodeURIComponent(_address);
     window.open(`https://maps.google.com/maps?q=${encodedAddress}`, '_blank');
   };
 
@@ -241,7 +242,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
         </div>
       )}
 
-      {/* Map View (Placeholder) */}
+      {/* Map View (_Placeholder) */}
       {!isLoading && showMap && (
         <div className="bg-gray-100 rounded-xl h-96 flex items-center justify-center">
           <div className="text-center">
@@ -289,7 +290,13 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
 }
 
 // Resource Card Component
-function ResourceCard({ resource, onCall, onGetDirections }: any) {
+interface ResourceCardProps {
+  resource: Resource;
+  onCall: (phone: string) => void;
+  onGetDirections: (_address: string) => void;
+}
+
+function ResourceCard({ resource, onCall, onGetDirections }: ResourceCardProps) {
   const getTypeColor = (type: string) => {
     const colors: Record<string, string> = {
       emergency: 'bg-red-100 text-red-700',
@@ -327,8 +334,8 @@ function ResourceCard({ resource, onCall, onGetDirections }: any) {
         )}
       </div>
 
-      {resource.address && (
-        <p className="text-gray-600 mb-2">{resource.address}</p>
+      {resource._address && (
+        <p className="text-gray-600 mb-2">{resource._address}</p>
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
@@ -354,7 +361,7 @@ function ResourceCard({ resource, onCall, onGetDirections }: any) {
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 mb-1">Services:</p>
           <div className="flex flex-wrap gap-1">
-            {resource.services.map((service: any, index: any) => (
+            {resource.services.map((service, index) => (
               <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
                 {service}
               </span>
@@ -373,9 +380,9 @@ function ResourceCard({ resource, onCall, onGetDirections }: any) {
             <span>Call</span>
           </button>
         )}
-        {resource.address && (
+        {resource._address && (
           <button
-            onClick={() => onGetDirections(resource.address)}
+            onClick={() => onGetDirections(resource._address)}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
           >
             <Navigation className="h-4 w-4" />
@@ -397,7 +404,14 @@ function ResourceCard({ resource, onCall, onGetDirections }: any) {
 }
 
 // Hotline Card Component
-function HotlineCard({ name, number, description, onCall }: any) {
+interface HotlineCardProps {
+  name: string;
+  number: string;
+  description: string;
+  onCall: () => void;
+}
+
+function HotlineCard({ name, number, description, onCall }: HotlineCardProps) {
   return (
     <div className="bg-white rounded-lg p-4 flex items-center justify-between">
       <div>

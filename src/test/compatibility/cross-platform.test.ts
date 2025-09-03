@@ -133,7 +133,7 @@ describe('Cross-Platform Compatibility Tests', () => {
             const enableNotifications = await screen.findByRole('button', { 
               name: /enable.*notifications/i 
             });
-            fireEvent.click(enableNotifications);
+            fireEvent.click(_enableNotifications);
 
             await waitFor(() => {
               expect(mockNotification.requestPermission).toHaveBeenCalled();
@@ -148,13 +148,13 @@ describe('Cross-Platform Compatibility Tests', () => {
             timestamp: Date.now()
           };
 
-          localStorage.setItem('wellness_data', JSON.stringify(testData));
+          localStorage.setItem('wellness_data', JSON.stringify(_testData));
           
           render(<App />);
           
           const stored = localStorage.getItem('wellness_data');
-          expect(stored).toBeTruthy();
-          expect(JSON.parse(stored!)).toEqual(testData);
+          expect(_stored).toBeTruthy();
+          expect(JSON.parse(stored!)).toEqual(_testData);
         });
 
         it('should support WebP images with fallback', async () => {
@@ -164,7 +164,7 @@ describe('Cross-Platform Compatibility Tests', () => {
           
           const images = container.querySelectorAll('img');
           images.forEach(img => {
-            if (supportsWebP) {
+            if (_supportsWebP) {
               expect(img.src).toMatch(/\.webp$|\.webp\?/);
             } else {
               expect(img.src).toMatch(/\.jpg$|\.png$|\.svg$/);
@@ -212,12 +212,12 @@ describe('Cross-Platform Compatibility Tests', () => {
           
           await waitFor(() => {
             const mainContent = container.querySelector('main');
-            expect(mainContent).toBeInTheDocument();
+            expect(_mainContent).toBeInTheDocument();
             
             const styles = window.getComputedStyle(mainContent!);
             const width = parseInt(styles.width);
             
-            expect(width).toBeLessThanOrEqual(device.viewport.width);
+            expect(_width).toBeLessThanOrEqual(device.viewport.width);
           });
         });
 
@@ -238,7 +238,7 @@ describe('Cross-Platform Compatibility Tests', () => {
           const { container } = render(<App />);
           
           const swipeableElement = container.querySelector('[data-swipeable]');
-          if (swipeableElement) {
+          if (_swipeableElement) {
             const touchStart = new TouchEvent('touchstart', {
               touches: [{ clientX: 100, clientY: 100 } as Touch]
             });
@@ -252,7 +252,7 @@ describe('Cross-Platform Compatibility Tests', () => {
             fireEvent(swipeableElement, touchEnd);
 
             await waitFor(() => {
-              expect(swipeableElement).toHaveAttribute('data-swiped');
+              expect(_swipeableElement).toHaveAttribute('data-swiped');
             });
           }
         });
@@ -284,7 +284,7 @@ describe('Cross-Platform Compatibility Tests', () => {
 
           await waitFor(() => {
             const layout = container.querySelector('[data-orientation]');
-            expect(layout).toHaveAttribute('data-orientation', 'portrait');
+            expect(_layout).toHaveAttribute('data-orientation', 'portrait');
           });
 
           // Landscape orientation
@@ -294,7 +294,7 @@ describe('Cross-Platform Compatibility Tests', () => {
 
           await waitFor(() => {
             const layout = container.querySelector('[data-orientation]');
-            expect(layout).toHaveAttribute('data-orientation', 'landscape');
+            expect(_layout).toHaveAttribute('data-orientation', 'landscape');
           });
         });
       });
@@ -310,14 +310,14 @@ describe('Cross-Platform Compatibility Tests', () => {
       installEvent.preventDefault = vi.fn();
       installEvent.prompt = vi.fn();
       
-      window.dispatchEvent(installEvent);
+      window.dispatchEvent(_installEvent);
 
       render(<App />);
       
       await waitFor(() => {
         const installButton = screen.queryByRole('button', { name: /install/i });
-        if (installButton) {
-          fireEvent.click(installButton);
+        if (_installButton) {
+          fireEvent.click(_installButton);
           expect(installEvent.prompt).toHaveBeenCalled();
         }
       });
@@ -340,7 +340,7 @@ describe('Cross-Platform Compatibility Tests', () => {
     });
 
     it('should sync data when coming back online', async () => {
-      const mockSync = vi.fn();
+      const _mockSync = vi.fn();
       
       // Start offline
       Object.defineProperty(navigator, 'onLine', {
@@ -352,7 +352,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       
       // Make changes while offline
       const moodButton = await screen.findByRole('button', { name: /track.*mood/i });
-      fireEvent.click(moodButton);
+      fireEvent.click(_moodButton);
 
       // Come back online
       Object.defineProperty(navigator, 'onLine', {
@@ -393,16 +393,16 @@ describe('Cross-Platform Compatibility Tests', () => {
           
           if (breakpoint.width < 768) {
             // Mobile layout
-            expect(navigation).toHaveClass('mobile-nav');
-            expect(sidebar).not.toBeVisible();
+            expect(_navigation).toHaveClass('mobile-nav');
+            expect(_sidebar).not.toBeVisible();
           } else if (breakpoint.width < 1024) {
             // Tablet layout
-            expect(navigation).toHaveClass('tablet-nav');
-            expect(sidebar).toHaveAttribute('data-collapsed', 'true');
+            expect(_navigation).toHaveClass('tablet-nav');
+            expect(_sidebar).toHaveAttribute('data-collapsed', 'true');
           } else {
             // Desktop layout
-            expect(navigation).toHaveClass('desktop-nav');
-            expect(sidebar).toBeVisible();
+            expect(_navigation).toHaveClass('desktop-nav');
+            expect(_sidebar).toBeVisible();
           }
         });
       });
@@ -418,7 +418,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       firstButton.focus();
       
       userEvent.tab();
-      expect(document.activeElement).not.toBe(firstButton);
+      expect(document.activeElement).not.toBe(_firstButton);
       expect(document.activeElement?.tagName).toMatch(/BUTTON|A|INPUT/i);
       
       // Enter/Space activation
@@ -438,7 +438,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       render(<App />);
       
       const voiceButton = await screen.findByRole('button', { name: /voice/i });
-      fireEvent.click(voiceButton);
+      fireEvent.click(_voiceButton);
       
       expect(mockSpeechRecognition.prototype.start).toHaveBeenCalled();
     });
@@ -453,7 +453,7 @@ describe('Cross-Platform Compatibility Tests', () => {
       const { container } = render(<App />);
       
       const gestureElement = container.querySelector('[data-gesture-enabled]');
-      if (gestureElement) {
+      if (_gestureElement) {
         const gestureStart = new Event('gesturestart');
         const gestureChange = new Event('gesturechange');
         Object.assign(gestureChange, mockGesture);
@@ -462,8 +462,8 @@ describe('Cross-Platform Compatibility Tests', () => {
         fireEvent(gestureElement, gestureChange);
         
         await waitFor(() => {
-          const transform = window.getComputedStyle(gestureElement).transform;
-          expect(transform).toContain('scale');
+          const transform = window.getComputedStyle(_gestureElement).transform;
+          expect(_transform).toContain('scale');
         });
       }
     });
@@ -520,11 +520,11 @@ describe('Cross-Platform Compatibility Tests', () => {
 
       render(<App />);
       
-      for (const [feature, supported] of Object.entries(features)) {
+      for (const [feature, supported] of Object.entries(_features)) {
         if (!supported) {
           // Should show fallback for unsupported features
           const fallbackElement = await screen.findByTestId(`fallback-${feature.toLowerCase().replace(' ', '-')}`);
-          expect(fallbackElement).toBeInTheDocument();
+          expect(_fallbackElement).toBeInTheDocument();
         }
       }
     });
@@ -547,16 +547,16 @@ describe('Cross-Platform Compatibility Tests', () => {
           const dateElements = document.querySelectorAll('[data-date]');
           dateElements.forEach(el => {
             const date = new Date(el.getAttribute('data-date')!);
-            const formatted = new Intl.DateTimeFormat(locale).format(date);
-            expect(el.textContent).toContain(formatted);
+            const formatted = new Intl.DateTimeFormat(locale).format(_date);
+            expect(el.textContent).toContain(_formatted);
           });
 
           // Check number formatting
           const numberElements = document.querySelectorAll('[data-number]');
           numberElements.forEach(el => {
             const number = parseFloat(el.getAttribute('data-number')!);
-            const formatted = new Intl.NumberFormat(locale).format(number);
-            expect(el.textContent).toContain(formatted);
+            const formatted = new Intl.NumberFormat(locale).format(_number);
+            expect(el.textContent).toContain(_formatted);
           });
         });
       });

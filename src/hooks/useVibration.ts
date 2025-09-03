@@ -4,17 +4,17 @@ import { consoleHapticFeedback, ActionType } from '../utils/mobile/consoleHaptic
 
 // Enhanced vibration hook with console haptic integration
 export function useVibration() {
-  const vibrate = useCallback((pattern: number | number[]) => {
+  const vibrate = useCallback((_pattern: number | number[]) => {
     // Check if Vibration API is supported
     if ('vibrate' in navigator) {
       // Respect user preferences for haptic feedback
-      const hapticEnabled = secureStorage.getItem('hapticFeedback') !== 'false';
+      const _hapticEnabled = secureStorage.getItem('hapticFeedback') !== 'false';
       
-      if (hapticEnabled) {
+      if (_hapticEnabled) {
         try {
-          navigator.vibrate(pattern);
-        } catch (error) {
-          console.error('Vibration failed:', error);
+          navigator.vibrate(_pattern);
+        } catch (_error) {
+          console.error('Vibration failed:');
         }
       }
     }
@@ -22,13 +22,13 @@ export function useVibration() {
 
   // Console-enhanced vibration with haptic feedback integration
   const consoleVibrate = useCallback((action: ActionType, customPattern?: number | number[]) => {
-    const hapticEnabled = secureStorage.getItem('hapticFeedback') !== 'false';
+    const _hapticEnabled = secureStorage.getItem('hapticFeedback') !== 'false';
     
-    if (hapticEnabled && consoleHapticFeedback.isHapticSupported()) {
+    if (_hapticEnabled && consoleHapticFeedback.isHapticSupported()) {
       if (customPattern) {
         consoleHapticFeedback.triggerHaptic(action, customPattern);
       } else {
-        consoleHapticFeedback.triggerHaptic(action);
+        consoleHapticFeedback.triggerHaptic(_action);
       }
     } else {
       // Fallback to basic vibration

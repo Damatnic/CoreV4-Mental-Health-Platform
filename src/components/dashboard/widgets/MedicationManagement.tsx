@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Pill, Clock, Calendar, AlertTriangle, CheckCircle, XCircle,
-  TrendingUp, TrendingDown, Minus, Info, Bell, RefreshCw,
-  Phone, FileText, Activity, Shield, AlertCircle, ChevronRight,
-  Package, Droplets, Sun, Moon, Coffee, BedDouble
+  Pill, Clock, _Calendar, AlertTriangle, CheckCircle, XCircle,
+  TrendingUp, TrendingDown, Minus, _Info, _Bell, _RefreshCw,
+  _Phone, _FileText, Activity, Shield, AlertCircle, ChevronRight,
+  Package, _Droplets, Sun, Moon, Coffee, BedDouble
 } from 'lucide-react';
 
 interface Medication {
@@ -58,7 +58,7 @@ interface SideEffect {
 
 interface MedicationEffectiveness {
   medicationId: string;
-  effectiveness: number; // 1-10
+  _effectiveness: number; // 1-10
   moodCorrelation?: number; // -1 to 1
   symptomImprovement?: Record<string, number>; // symptom -> improvement %
   qualityOfLife?: number; // 1-10
@@ -68,11 +68,11 @@ interface MedicationEffectiveness {
 interface MedicationManagementProps {
   medications?: Medication[];
   sideEffects?: SideEffect[];
-  effectiveness?: MedicationEffectiveness[];
+  _effectiveness?: MedicationEffectiveness[];
   onTakeMedication?: (medication: Medication, schedule: MedicationSchedule) => void;
   onSkipMedication?: (medication: Medication, schedule: MedicationSchedule, reason: string) => void;
-  onReportSideEffect?: (medicationId: string, effect: SideEffect) => void;
-  onUpdateEffectiveness?: (effectiveness: MedicationEffectiveness) => void;
+  _onReportSideEffect?: (medicationId: string, effect: SideEffect) => void;
+  _onUpdateEffectiveness?: (_effectiveness: MedicationEffectiveness) => void;
   onRefillRequest?: (medication: Medication) => void;
   onContactPharmacy?: () => void;
   onContactPrescriber?: (medication: Medication) => void;
@@ -81,11 +81,11 @@ interface MedicationManagementProps {
 export function MedicationManagement({
   medications = [],
   sideEffects = [],
-  effectiveness = [],
+  _effectiveness = [],
   onTakeMedication,
   onSkipMedication,
-  onReportSideEffect,
-  onUpdateEffectiveness,
+  _onReportSideEffect,
+  _onUpdateEffectiveness,
   onRefillRequest,
   onContactPharmacy,
   onContactPrescriber
@@ -93,8 +93,8 @@ export function MedicationManagement({
   const [activeTab, setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
   const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [showSideEffectReport, setShowSideEffectReport] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  const [_showSideEffectReport, setShowSideEffectReport] = useState(false);
+  const [_timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
   // Get current time period
   useEffect(() => {
@@ -107,7 +107,7 @@ export function MedicationManagement({
 
   // Get today's medication schedule
   const getTodaysMedications = () => {
-    const now = new Date();
+    const _now = new Date();
     const todaySchedule: Array<{
       medication: Medication;
       schedule: MedicationSchedule;
@@ -117,11 +117,11 @@ export function MedicationManagement({
     medications.forEach(med => {
       med.schedule.forEach(sched => {
         if (!sched.time || !sched.time.includes(':')) return;
-        const timeParts = sched.time.split(':').map(Number);
+        const timeParts = sched.time.split(':').map(_Number);
         if (timeParts.length !== 2 || timeParts[0] === undefined || timeParts[1] === undefined) return;
         const hours = timeParts[0];
-        const minutes = timeParts[1];
-        if (isNaN(hours) || isNaN(minutes)) return;
+        const _minutes = timeParts[1];
+        if (isNaN(_hours) || isNaN(_minutes)) return;
         let timeCategory = 'morning';
         
         if (hours < 12) timeCategory = 'morning';
@@ -159,7 +159,7 @@ export function MedicationManagement({
     if (!time || !time.includes(':')) return <Clock className="h-4 w-4" />;
     const hourStr = time.split(':')[0];
     if (!hourStr) return <Clock className="h-4 w-4" />;
-    const hour = parseInt(hourStr);
+    const hour = parseInt(_hourStr);
     if (hour < 6 || hour >= 22) return <Moon className="h-4 w-4" />;
     if (hour < 12) return <Sun className="h-4 w-4" />;
     if (hour < 17) return <Coffee className="h-4 w-4" />;
@@ -222,7 +222,7 @@ export function MedicationManagement({
         {(['today', 'all', 'adherence', 'effects'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => setActiveTab(_tab)}
             className={`px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -285,12 +285,12 @@ export function MedicationManagement({
                     {period}
                   </h4>
                   
-                  {periodMeds.map((item, idx) => (
+                  {periodMeds.map((item, _idx) => (
                     <motion.div
-                      key={`${item.medication.id}-${idx}`}
+                      key={`${item.medication.id}-${_idx}`}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
+                      transition={{ delay: _idx * 0.05 }}
                       className={`p-3 rounded-lg border ${
                         item.schedule.taken 
                           ? 'bg-green-50 border-green-200' 
@@ -397,8 +397,8 @@ export function MedicationManagement({
                     
                     {/* Schedule Times */}
                     <div className="flex space-x-2 mt-2">
-                      {med.schedule.map((sched, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex items-center">
+                      {med.schedule.map((sched, _idx) => (
+                        <span key={_idx} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex items-center">
                           {getTimeIcon(sched.time)}
                           <span className="ml-1">{sched.time}</span>
                         </span>
@@ -451,7 +451,7 @@ export function MedicationManagement({
             <div className="p-4 bg-white border border-gray-200 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-3">Weekly Adherence</h4>
               <div className="space-y-2">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => (
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, _idx) => (
                   <div key={day} className="flex items-center">
                     <span className="text-xs text-gray-600 w-8">{day}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-4 ml-2">
@@ -595,8 +595,8 @@ export function MedicationManagement({
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-1">Possible Side Effects</p>
                     <ul className="list-disc list-inside text-sm text-gray-600">
-                      {selectedMedication.sideEffects.map((effect, idx) => (
-                        <li key={idx}>{effect}</li>
+                      {selectedMedication.sideEffects.map((effect, _idx) => (
+                        <li key={_idx}>{effect}</li>
                       ))}
                     </ul>
                   </div>
@@ -606,8 +606,8 @@ export function MedicationManagement({
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-1">Drug Interactions</p>
                     <ul className="list-disc list-inside text-sm text-gray-600">
-                      {selectedMedication.interactions.map((interaction, idx) => (
-                        <li key={idx}>{interaction}</li>
+                      {selectedMedication.interactions.map((interaction, _idx) => (
+                        <li key={_idx}>{interaction}</li>
                       ))}
                     </ul>
                   </div>
@@ -615,13 +615,13 @@ export function MedicationManagement({
                 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => onRefillRequest?.(selectedMedication)}
+                    onClick={() => onRefillRequest?.(_selectedMedication)}
                     className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     Request Refill
                   </button>
                   <button
-                    onClick={() => onContactPrescriber?.(selectedMedication)}
+                    onClick={() => onContactPrescriber?.(_selectedMedication)}
                     className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Contact Prescriber

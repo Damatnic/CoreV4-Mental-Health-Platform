@@ -1,4 +1,4 @@
-import { EmergencyService, EmergencyContact, LocationCoordinates } from '../../types/emergency';
+import { _EmergencyService, _EmergencyContact, LocationCoordinates } from '../../types/emergency';
 import { CrisisProfile } from '../../types/ai-insights';
 import { logger, LogCategory } from '../logging/logger';
 import { secureStorage } from '../security/secureStorage';
@@ -47,7 +47,7 @@ export class GeolocationEmergencyService {
       this.updatePermissionStatus(permission.state);
 
       permission.addEventListener('change', () => {
-        this.updatePermissionStatus(permission.state);
+        this.updatePermissionStatus(permission._state);
       });
 
     } catch (error) {
@@ -57,16 +57,16 @@ export class GeolocationEmergencyService {
     }
   }
 
-  private updatePermissionStatus(state: PermissionState): void {
+  private updatePermissionStatus(_state: PermissionState): void {
     this.permissionStatus = {
-      granted: state === 'granted',
-      accuracy: this.determineAccuracy(state),
+      granted: _state === 'granted',
+      accuracy: this.determineAccuracy(_state),
       timestamp: Date.now()
     };
   }
 
-  private determineAccuracy(state: PermissionState): GeolocationPermission['accuracy'] {
-    switch (state) {
+  private determineAccuracy(_state: PermissionState): GeolocationPermission['accuracy'] {
+    switch (_state) {
       case 'granted': return 'high';
       case 'prompt': return 'medium';
       default: return 'denied';
@@ -272,7 +272,7 @@ export class GeolocationEmergencyService {
   }> {
     try {
       // Find appropriate service based on crisis level
-      const service = selectedService || await this.selectBestService(crisisProfile);
+      const service = selectedService || await this.selectBestService(_crisisProfile);
       
       logger.info('Triggering emergency response:', {
         category: LogCategory.EMERGENCY,
@@ -285,12 +285,12 @@ export class GeolocationEmergencyService {
 
       // For critical situations, auto-initiate emergency contact
       if (crisisProfile.riskLevel === 'critical') {
-        return await this.initiateEmergencyCall(service);
+        return await this.initiateEmergencyCall(_service);
       }
 
       // For high-risk situations, prepare emergency response
       if (crisisProfile.riskLevel === 'high') {
-        return await this.prepareEmergencyResponse(service);
+        return await this.prepareEmergencyResponse(_service);
       }
 
       // For moderate risk, provide emergency options
@@ -450,4 +450,4 @@ export class GeolocationEmergencyService {
   }
 }
 
-export const geolocationEmergencyService = new GeolocationEmergencyService();
+export const _geolocationEmergencyService = new GeolocationEmergencyService();

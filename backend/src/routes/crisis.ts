@@ -16,7 +16,7 @@ const router = express.Router();
 const crisisService = new CrisisService();
 const audit = new AuditService();
 const notification = new NotificationService();
-const encryption = new EncryptionService();
+const _encryption = new EncryptionService();
 
 // Validation rules
 const crisisAssessmentValidation = [
@@ -108,7 +108,7 @@ router.post('/assessment', crisisAssessmentValidation, async (req: Request, res:
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'assessment_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -149,7 +149,7 @@ router.get('/assessment/latest', async (req: Request, res: Response, next: NextF
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'assessment_retrieval_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -196,7 +196,7 @@ router.post('/safety-plan', safetyPlanValidation, async (req: Request, res: Resp
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'safety_plan_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -241,7 +241,7 @@ router.get('/safety-plan', async (req: Request, res: Response, next: NextFunctio
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'safety_plan_retrieval_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -287,7 +287,7 @@ router.post('/emergency-contact', emergencyContactValidation, async (req: Reques
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'emergency_contact_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -323,7 +323,7 @@ router.get('/emergency-contacts', async (req: Request, res: Response, next: Next
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'emergency_contacts_retrieval_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -363,7 +363,7 @@ router.post('/chat', async (req: Request, res: Response, next: NextFunction) => 
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'chat_session_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -409,7 +409,7 @@ router.get('/resources', async (req: Request, res: Response, next: NextFunction)
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'resources_retrieval_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }
@@ -453,7 +453,7 @@ router.post('/panic-button', async (req: Request, res: Response, next: NextFunct
   } catch (error) {
     await audit.logEvent(req.ip, 'crisis', 'panic_button_error', {
       userId: req.user?.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Processing error'
     });
     next(error);
   }

@@ -8,8 +8,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface EventCardProps {
   event: Event;
-  onRegister: (eventId: string) => void;
-  onUnregister: (eventId: string) => void;
+  onRegister: (_eventId: string) => void;
+  onUnregister: (_eventId: string) => void;
 }
 
 function EventCard({ event, onRegister, onUnregister }: EventCardProps) {
@@ -193,8 +193,8 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       onClose();
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create event');
+    onError: (_error: Error) => {
+      toast._error(_error.message || 'Failed to create event');
     },
   });
 
@@ -203,7 +203,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
     
     // Validate dates
     if (formData.endTime <= formData.startTime) {
-      toast.error('End time must be after start time');
+      toast._error('End time must be after start time');
       return;
     }
     
@@ -395,7 +395,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
             {/* Max Attendees */}
             <div>
               <label htmlFor="max-attendees" className="block text-sm font-medium text-gray-700 mb-1">
-                Maximum Attendees (optional)
+                Maximum Attendees (_optional)
               </label>
               <input
                 id="max-attendees"
@@ -504,7 +504,7 @@ export function CommunityEvents() {
   const dateRange = getDateRange();
 
   // Fetch events
-  const { data, isLoading, error } = useQuery({
+  const { data, _isLoading, _error } = useQuery({
     queryKey: ['events', selectedType, dateFilter],
     queryFn: () => communityService.getEvents({
       type: selectedType === 'all' ? undefined : selectedType,
@@ -516,25 +516,25 @@ export function CommunityEvents() {
 
   // Register for event mutation
   const registerMutation = useMutation({
-    mutationFn: (eventId: string) => communityService.registerForEvent(eventId),
+    mutationFn: (_eventId: string) => communityService.registerForEvent(_eventId),
     onSuccess: () => {
       toast.success('Successfully registered for event!');
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
     onError: () => {
-      toast.error('Failed to register for event');
+      toast._error('Failed to register for event');
     },
   });
 
   // Unregister from event mutation
   const unregisterMutation = useMutation({
-    mutationFn: (eventId: string) => communityService.unregisterFromEvent(eventId),
+    mutationFn: (_eventId: string) => communityService.unregisterFromEvent(_eventId),
     onSuccess: () => {
       toast.success('Registration cancelled');
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
     onError: () => {
-      toast.error('Failed to cancel registration');
+      toast._error('Failed to cancel registration');
     },
   });
 
@@ -548,7 +548,7 @@ export function CommunityEvents() {
     { value: 'social', label: 'Social' },
   ];
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -556,7 +556,7 @@ export function CommunityEvents() {
     );
   }
 
-  if (error) {
+  if (_error) {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Failed to load events. Please try again later.</p>

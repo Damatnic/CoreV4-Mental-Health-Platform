@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Trophy, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
+import { Target, Trophy, TrendingUp, Calendar, _ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -9,7 +9,7 @@ interface Goal {
   category: string;
   progress: number;
   targetDate?: Date;
-  milestones: any[];
+  milestones: unknown[];
   status: string;
 }
 
@@ -21,7 +21,7 @@ interface GoalsProgressWidgetProps {
 export function GoalsProgressWidget({ goals, error }: GoalsProgressWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -46,7 +46,7 @@ export function GoalsProgressWidget({ goals, error }: GoalsProgressWidgetProps) 
 
   const activeGoals = goals.filter(g => g.status === 'active');
   const completedGoals = goals.filter(g => g.status === 'completed');
-  const overallProgress = activeGoals.reduce((sum, goal) => sum + goal.progress, 0) / 
+  const _overallProgress = activeGoals.reduce((sum, goal) => sum + goal.progress, 0) / 
     (activeGoals.length || 1);
 
   const getCategoryColor = (category: string) => {
@@ -70,7 +70,7 @@ export function GoalsProgressWidget({ goals, error }: GoalsProgressWidgetProps) 
             <span className="text-sm font-medium text-gray-900">Goals Progress</span>
           </div>
           <span className="text-sm font-bold text-primary-600">
-            {Math.round(overallProgress)}%
+            {Math.round(_overallProgress)}%
           </span>
         </div>
         <div className="flex items-center space-x-4 text-xs text-gray-600">
@@ -130,7 +130,7 @@ export function GoalsProgressWidget({ goals, error }: GoalsProgressWidgetProps) 
             {goal.milestones.length > 0 && (
               <div className="mt-2 flex items-center text-xs text-gray-600">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {goal.milestones.filter((m: any) => m.completed).length}/{goal.milestones.length} milestones
+                {goal.milestones.filter((m: unknown) => m.completed).length}/{goal.milestones.length} milestones
               </div>
             )}
           </motion.div>

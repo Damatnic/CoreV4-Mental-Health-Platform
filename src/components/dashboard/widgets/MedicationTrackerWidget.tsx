@@ -23,7 +23,7 @@ interface MedicationTrackerWidgetProps {
 export function MedicationTrackerWidget({ medications, error }: MedicationTrackerWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -55,7 +55,7 @@ export function MedicationTrackerWidget({ medications, error }: MedicationTracke
   ];
 
   const pendingMeds = meds.filter(m => !m.takenToday);
-  const overallAdherence = meds.reduce((sum, m) => sum + m.adherenceRate, 0) / meds.length;
+  const _overallAdherence = meds.reduce((sum, m) => sum + m.adherenceRate, 0) / meds.length;
 
   const getAdherenceColor = (rate: number) => {
     if (rate >= 90) return 'text-green-600 bg-green-100';
@@ -72,8 +72,8 @@ export function MedicationTrackerWidget({ medications, error }: MedicationTracke
             <Pill className="h-5 w-5 text-primary-600" />
             <span className="text-sm font-medium text-gray-900">Medication Tracker</span>
           </div>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getAdherenceColor(overallAdherence)}`}>
-            {Math.round(overallAdherence)}% adherence
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getAdherenceColor(_overallAdherence)}`}>
+            {Math.round(_overallAdherence)}% adherence
           </span>
         </div>
       </div>

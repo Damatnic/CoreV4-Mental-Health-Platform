@@ -27,10 +27,10 @@ export function ConsoleGrid({ children, className = '' }: ConsoleGridProps) {
   
   // Mobile-optimized grid classes
   const getGridClasses = () => {
-    if (isSmallScreen) {
+    if (_isSmallScreen) {
       return 'grid grid-cols-1 gap-4 auto-rows-min';
     }
-    if (isMobileDevice) {
+    if (_isMobileDevice) {
       return 'grid grid-cols-1 sm:grid-cols-2 gap-4 auto-rows-min';
     }
     return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-min';

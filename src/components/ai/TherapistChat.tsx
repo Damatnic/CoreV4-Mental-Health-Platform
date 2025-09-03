@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Send, Smile, Heart, Brain, Shield, Clock, 
-  MoreVertical, X, ArrowLeft, MessageCircle,
-  Sparkles, Activity, User
+  Send, Smile, Shield, 
+  MoreVertical, ArrowLeft
 } from 'lucide-react';
 import { Therapist } from './TherapistSelector';
 import { useAITherapist, TherapistMessage } from '../../hooks/useAITherapist';
@@ -21,10 +20,10 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
   sessionId,
   fullScreen = true 
 }) => {
-  const { session, isTyping, isConnected, sendMessage, endSession } = useAITherapist({ therapist, sessionId });
+  const { session, isTyping, isConnected, sendMessage, endSession: _endSession } = useAITherapist({ therapist, sessionId });
   const [inputText, setInputText] = useState('');
   const [showSessionInfo, setShowSessionInfo] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<unknown>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -51,12 +50,12 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
     }
   };
 
-  const formatTime = (date: Date) => {
+  const formatTime = (_date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
-    }).format(date);
+    }).format(_date);
   };
 
   const renderMessage = (message: TherapistMessage, index: number) => {
@@ -265,10 +264,10 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
         {/* Helpful suggestions */}
         <div className="mt-3 flex flex-wrap gap-2">
           {[
-            "I'm feeling anxious about...",
-            "I've been struggling with...",
+            "I&apos;m feeling anxious about...",
+            "I&apos;ve been struggling with...",
             "Can you help me understand...",
-            "I'm worried about..."
+            "I&apos;m worried about..."
           ].map(suggestion => (
             <button
               key={suggestion}

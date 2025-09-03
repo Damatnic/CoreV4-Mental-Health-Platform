@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
   TrendingUp,
-  Award,
+  _Award,
   Activity,
   Droplets,
   Moon,
@@ -11,7 +11,7 @@ import {
   Heart,
   Brain,
   Zap,
-  Calendar,
+  _Calendar,
   ChevronRight,
   Plus,
   Edit2,
@@ -23,7 +23,7 @@ import {
   Flame
 } from 'lucide-react';
 import {
-  CircularProgressbar,
+  _CircularProgressbar,
   CircularProgressbarWithChildren,
   buildStyles
 } from 'react-circular-progressbar';
@@ -67,7 +67,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
     moodEntries,
     weeklyScore,
     monthlyScore,
-    calculateWellnessScores 
+    _calculateWellnessScores 
   } = useWellnessStore();
   
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -77,19 +77,19 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
 
   // Calculate today's metrics
   const todayMetrics = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const _today = new Date();
+    _today.setHours(0, 0, 0, 0);
     
     const todayData = wellnessMetrics.find(m => {
       const metricDate = new Date(m.date);
       metricDate.setHours(0, 0, 0, 0);
-      return metricDate.getTime() === today.getTime();
+      return metricDate.getTime() === _today.getTime();
     });
 
     const todayMoodEntries = moodEntries.filter(e => {
       const entryDate = new Date(e.timestamp);
       entryDate.setHours(0, 0, 0, 0);
-      return entryDate.getTime() === today.getTime();
+      return entryDate.getTime() === _today.getTime();
     });
 
     // Calculate metrics with fallbacks
@@ -213,29 +213,29 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
 
     if (!yesterdayData) return 0;
 
-    const yesterdayValue = (yesterdayData as any)[metricId] || 0;
+    const yesterdayValue = (yesterdayData as unknown)[metricId] || 0;
     if (yesterdayValue === 0) return currentValue > 0 ? 100 : 0;
     
     return ((currentValue - yesterdayValue) / yesterdayValue) * 100;
   }
 
   // Calculate streak for a metric
-  function calculateStreak(type: string): number {
+  function calculateStreak(_type: string): number {
     let streak = 0;
-    const today = new Date();
+    const _today = new Date();
     
     for (let i = 0; i < 365; i++) {
-      const date = new Date(today);
+      const date = new Date(_today);
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
       
-      const hasEntry = wellnessMetrics.some(m => {
+      const _hasEntry = wellnessMetrics.some(m => {
         const metricDate = new Date(m.date);
         metricDate.setHours(0, 0, 0, 0);
         
         if (metricDate.getTime() !== date.getTime()) return false;
         
-        switch (type) {
+        switch (_type) {
           case 'sleep': return m.sleepHours >= 7;
           case 'exercise': return m.exerciseMinutes >= 30;
           case 'meditation': return m.meditationMinutes > 0;
@@ -244,7 +244,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
         }
       });
       
-      if (hasEntry) {
+      if (_hasEntry) {
         streak++;
       } else if (i > 0) {
         break;
@@ -256,7 +256,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
 
   // Calculate wellness score
   const wellnessScore = useMemo(() => {
-    const scores = todayMetrics.map(metric => {
+    const scores = todayMetrics.map(_metric => {
       const percentage = Math.min((metric.value / metric.target) * 100, 100);
       return percentage;
     });
@@ -287,16 +287,14 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
       const percentage = (metric.value / metric.target) * 100;
       
       if (percentage < 50) {
-        recs.push({
-          metric: metric.title,
+        recs.push({ metric: metric.title,
           message: `Your ${metric.title.toLowerCase()} is below 50% of target. Consider focusing on this today.`,
           priority: 'high' as Priority,
           action: () => onSetGoal?.(metric.id)
         });
       } else if (percentage >= 100 && metric.streak && metric.streak >= 7) {
-        recs.push({
-          metric: metric.title,
-          message: `Great job! You're on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
+        recs.push({ metric: metric.title,
+          message: `Great job! You&apos;re on a ${metric.streak}-day ${metric.title.toLowerCase()} streak!`,
           priority: 'low' as Priority,
           action: () => onViewDetails?.(metric.id)
         });
@@ -305,15 +303,13 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
     
     // Add score-based recommendation
     if (wellnessScore < 40) {
-      recs.unshift({
-        metric: 'Overall',
+      recs.unshift({ metric: 'Overall',
         message: 'Your wellness score is low. Consider taking a break and focusing on self-care.',
         priority: 'critical' as Priority,
         action: () => {}
       });
     } else if (wellnessScore > 80) {
-      recs.unshift({
-        metric: 'Overall',
+      recs.unshift({ metric: 'Overall',
         message: 'Excellent wellness score! Keep up the great work!',
         priority: 'low' as Priority,
         action: () => {}
@@ -457,7 +453,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
           {['physical', 'mental', 'emotional', 'social', 'spiritual'].map(category => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(_category)}
               className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category 
                   ? 'bg-purple-100 text-purple-700' 

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * High-Performance Chart Component
  * Optimized for mental health data visualization with web workers
@@ -19,9 +20,9 @@ import {
   ChartOptions,
   ChartData,
 } from 'chart.js';
-import { startTransition, useDeferredValue } from 'react';
+import { useDeferredValue } from 'react';
 import { performanceMonitor } from '../../utils/performance/performanceMonitor';
-import { LoadingFallbacks, UpdatePriority, usePrioritizedTransition } from '../../utils/performance/concurrentFeatures';
+import { UpdatePriority, usePrioritizedTransition } from '../../utils/performance/concurrentFeatures';
 
 // Register ChartJS components
 ChartJS.register(
@@ -45,14 +46,14 @@ if (typeof Worker !== 'undefined') {
       new URL('../../workers/chartProcessor.worker.ts', import.meta.url),
       { type: 'module' }
     );
-  } catch (error) {
-    console.warn('Web Worker not available, falling back to main thread processing');
+  } catch (_error) {
+    logger.warn('Web Worker not available, falling back to main thread processing');
   }
 }
 
 interface OptimizedChartProps {
   type: 'line' | 'bar' | 'doughnut';
-  data: any[];
+  data: unknown[];
   options?: ChartOptions;
   height?: number;
   width?: number;
@@ -60,7 +61,7 @@ interface OptimizedChartProps {
   enableWebWorker?: boolean;
   enableSampling?: boolean;
   samplingThreshold?: number;
-  onDataProcessed?: (processedData: any) => void;
+  onDataProcessed?: (processedData: unknown) => void;
   className?: string;
 }
 
@@ -77,15 +78,15 @@ export function OptimizedChart({
   onDataProcessed,
   className = '',
 }: OptimizedChartProps) {
-  const chartRef = useRef<any>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<unknown>(null);
+  const _canvasRef = useRef<HTMLCanvasElement>(null);
   const [processedData, setProcessedData] = useState<ChartData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   
   // Use deferred value for non-critical updates
-  const deferredData = useDeferredValue(data);
-  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(priority);
+  const deferredData = useDeferredValue(_data);
+  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
 
   // Performance monitoring
   useEffect(() => {
@@ -95,48 +96,8 @@ export function OptimizedChart({
     };
   }, []);
 
-  // Process data with web worker
-  const processDataWithWorker = useCallback(async (rawData: any[]) => {
-    if (!chartWorker || !enableWebWorker) {
-      return processDataOnMainThread(rawData);
-    }
-
-    return new Promise((resolve, reject) => {
-      const messageHandler = (event: MessageEvent) => {
-        const { type, result, error } = event.data;
-        
-        if (error) {
-          reject(new Error(error));
-        } else {
-          resolve(result);
-        }
-        
-        chartWorker!.removeEventListener('message', messageHandler);
-      };
-
-      chartWorker.addEventListener('message', messageHandler);
-
-      // Send data to worker
-      chartWorker.postMessage({
-        type: 'PROCESS_MOOD_DATA',
-        data: rawData,
-        options: {
-          sampling: enableSampling && rawData.length > samplingThreshold ? 100 : null,
-          smoothing: true,
-          trendLine: type === 'line',
-        },
-      });
-
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        chartWorker!.removeEventListener('message', messageHandler);
-        reject(new Error('Worker timeout'));
-      }, 5000);
-    });
-  }, [enableWebWorker, enableSampling, samplingThreshold, type]);
-
   // Fallback processing on main thread
-  const processDataOnMainThread = useCallback((rawData: any[]) => {
+  const processDataOnMainThread = useCallback((rawData: unknown[]) => {
     performanceMonitor.measureStart('chart-data-processing');
     
     try {
@@ -164,11 +125,51 @@ export function OptimizedChart({
 
       performanceMonitor.measureEnd('chart-data-processing');
       return chartData;
-    } catch (error) {
+    } catch (_error) {
       performanceMonitor.measureEnd('chart-data-processing');
-      throw error;
+      throw _error;
     }
   }, [enableSampling, samplingThreshold, type]);
+
+  // Process data with web worker
+  const processDataWithWorker = useCallback(async (rawData: unknown[]) => {
+    if (!chartWorker || !enableWebWorker) {
+      return processDataOnMainThread(_rawData);
+    }
+
+    return new Promise((resolve, reject) => {
+      const messageHandler = (event: MessageEvent) => {
+        const { _type, result, _error } = event.data;
+        
+        if (_error) {
+          reject(new Error(_error));
+        } else {
+          resolve(result);
+        }
+        
+        chartWorker!.removeEventListener('message', messageHandler);
+      };
+
+      chartWorker.addEventListener('message', messageHandler);
+
+      // Send data to worker
+      chartWorker.postMessage({
+        type: 'PROCESS_MOOD_DATA',
+        data: rawData,
+        options: {
+          sampling: enableSampling && rawData.length > samplingThreshold ? 100 : null,
+          smoothing: true,
+          trendLine: type === 'line',
+        },
+      });
+
+      // Timeout after 5 seconds
+      setTimeout(() => {
+        chartWorker!.removeEventListener('message', messageHandler);
+        reject(new Error('Worker timeout'));
+      }, 5000);
+    });
+  }, [enableWebWorker, enableSampling, samplingThreshold, type, processDataOnMainThread]);
 
   // Process data when it changes
   useEffect(() => {
@@ -182,12 +183,12 @@ export function OptimizedChart({
 
     const processData = async () => {
       try {
-        const result = await processDataWithWorker(deferredData) as { processed?: Array<{ date: string, value: number }> };
+        const result = await processDataWithWorker(_deferredData) as { processed?: Array<{ date: string, value: number }> };
         
         startPrioritizedTransition(() => {
           if (result.processed) {
             // Web worker result
-            const chartData: ChartData = {
+            const _chartData: ChartData = {
               labels: result.processed.map(p => p.date),
               datasets: [{
                 label: 'Mood Trend',
@@ -199,9 +200,9 @@ export function OptimizedChart({
               }],
             };
             
-            setProcessedData(chartData);
+            setProcessedData(_chartData);
             
-            if (onDataProcessed) {
+            if (_onDataProcessed) {
               onDataProcessed(result);
             }
           } else {
@@ -211,17 +212,17 @@ export function OptimizedChart({
           
           setIsProcessing(false);
         });
-      } catch (err) {
-        console.error('Chart data processing error:', err);
-        setError(err instanceof Error ? err.message : 'Processing failed');
+      } catch (_error) {
+        logger.error('Chart data processing _error');
+        setError('Processing failed');
         setIsProcessing(false);
         
         // Fallback to main thread
         try {
-          const fallbackData = processDataOnMainThread(deferredData);
-          setProcessedData(fallbackData);
-        } catch (fallbackErr) {
-          console.error('Fallback processing failed:', fallbackErr);
+          const _fallbackData = processDataOnMainThread(_deferredData);
+          setProcessedData(_fallbackData);
+        } catch (_error) {
+    logger.error('Fallback processing failed');
         }
       }
     };
@@ -307,7 +308,7 @@ export function OptimizedChart({
 
   // Render appropriate chart component
   const ChartComponent = useMemo(() => {
-    switch (type) {
+    switch (_type) {
       case 'bar':
         return Bar;
       case 'doughnut':
@@ -317,12 +318,12 @@ export function OptimizedChart({
     }
   }, [type]);
 
-  if (error) {
+  if (_error) {
     return (
       <div className={`flex items-center justify-center h-${height} bg-red-50 rounded-lg ${className}`}>
         <div className="text-center">
           <p className="text-red-600 mb-2">Chart Error</p>
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-red-500">{_error}</p>
         </div>
       </div>
     );
@@ -353,14 +354,14 @@ export function OptimizedChart({
  */
 export function MoodChart({ 
   moodData, 
-  showTrends = true,
+  _showTrends = true,
   showInsights = true,
   ...props 
-}: any) {
+}: unknown) {
   const [insights, setInsights] = useState<string[]>([]);
   const [wellnessScore, setWellnessScore] = useState<number | null>(null);
 
-  const handleDataProcessed = useCallback((result: any) => {
+  const handleDataProcessed = useCallback((result: unknown) => {
     if (result.insights) {
       setInsights(result.insights);
     }

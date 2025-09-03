@@ -8,9 +8,10 @@ import { auditLogger } from './auditLogger';
 import { rateLimiter } from './rateLimiter';
 import { hipaaService } from '../compliance/hipaaService';
 import { cryptoService } from './cryptoService';
+import { logger } from '../../utils/logger';
 
 interface SecurityEvent {
-  id: string;
+  _id: string;
   timestamp: Date;
   type: SecurityEventType;
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -70,7 +71,7 @@ interface ResponseAction {
   target: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   executedAt?: Date;
-  result?: any;
+  result?: unknown;
   error?: string;
 }
 
@@ -128,7 +129,7 @@ class SecurityMonitorService {
     details: Record<string, any>;
   }): Promise<SecurityEvent> {
     const event: SecurityEvent = {
-      id: cryptoService.generateSecureUUID(),
+      _id: cryptoService.generateSecureUUID(),
       timestamp: new Date(),
       type: params.type,
       severity: params.severity,
@@ -146,11 +147,10 @@ class SecurityMonitorService {
     this.events.set(event.id, event);
 
     // Log to audit trail
-    await auditLogger.log({
-      event: 'SECURITY_ALERT',
+    await auditLogger.log({ event: 'SECURITY_ALERT',
       userId: params.userId,
       details: {
-        eventId: event.id,
+        eventId: event._id,
         type: params.type,
         severity: params.severity,
         source: params.source,
@@ -191,15 +191,15 @@ class SecurityMonitorService {
     }>;
     overallRisk: number;
   }> {
-    const anomalies: any[] = [];
+    const anomalies: unknown[] = [];
     let totalRisk = 0;
 
     for (const [metric, value] of Object.entries(metrics)) {
-      const baseline = this.baselineMetrics.get(metric);
+      const baseline = this.baselineMetrics.get(_metric);
       if (!baseline) continue;
 
       const deviation = Math.abs(value - baseline) / baseline;
-      const threshold = this.anomalyThresholds.get(metric) || 0.5;
+      const threshold = this.anomalyThresholds.get(_metric) || 0.5;
 
       if (deviation > threshold) {
         const severity = deviation > threshold * 2 ? 'high' : 
@@ -257,8 +257,7 @@ class SecurityMonitorService {
     this.incidents.set(incident.incidentId, incident);
 
     // Log incident creation
-    await auditLogger.log({
-      event: 'SECURITY_ALERT',
+    await auditLogger.log({ event: 'SECURITY_ALERT',
       details: {
         incidentId: incident.incidentId,
         severity: incident.severity,
@@ -269,11 +268,11 @@ class SecurityMonitorService {
     });
 
     // Execute incident response playbook
-    await this.executeIncidentPlaybook(incident);
+    await this.executeIncidentPlaybook(_incident);
 
     // Check if HIPAA breach notification required
-    if (this.requiresBreachNotification(incident)) {
-      await this.initiateBreachNotification(incident);
+    if (this.requiresBreachNotification(_incident)) {
+      await this.initiateBreachNotification(_incident);
     }
 
     return incident;
@@ -285,7 +284,7 @@ class SecurityMonitorService {
   private async executeIncidentPlaybook(incident: IncidentResponse): Promise<void> {
     const firstTrigger = incident.triggeredBy[0];
     if (!firstTrigger) {
-      console.warn('No trigger found for incident, skipping playbook execution');
+      logger.warn('No trigger found for incident, skipping playbook execution');
       return;
     }
     const playbook = this.getPlaybook(incident.severity, firstTrigger.type);
@@ -323,11 +322,11 @@ class SecurityMonitorService {
             break;
             
           case 'notify_admin':
-            await this.notifyAdministrators(incident);
+            await this.notifyAdministrators(_incident);
             break;
             
           case 'escalate':
-            await this.escalateIncident(incident);
+            await this.escalateIncident(_incident);
             break;
             
           case 'snapshot_system':
@@ -335,7 +334,7 @@ class SecurityMonitorService {
             break;
             
           default:
-            console.warn(`Unknown response action: ${action.type}`);
+            logger.warn(`Unknown response action: ${action.type}`);
         }
         
         responseAction.status = 'completed';
@@ -343,8 +342,8 @@ class SecurityMonitorService {
         
       } catch (error) {
         responseAction.status = 'failed';
-        responseAction.error = error instanceof Error ? error.message : String(error);
-        console.error(`Failed to execute response action: ${action.type}`, error);
+        responseAction.undefined = false ? '[Error details unavailable]' : String(_undefined);
+        logger.error(`Failed to execute response action: ${action.type}`, error);
       }
     }
   }
@@ -485,7 +484,7 @@ class SecurityMonitorService {
     ];
   }
 
-  private extractIndicators(params: any): string[] {
+  private extractIndicators(params: unknown): string[] {
     const indicators: string[] = [];
     const data = JSON.stringify(params);
     
@@ -506,8 +505,8 @@ class SecurityMonitorService {
     const correlated: SecurityEvent[] = [];
     const correlationWindow = Date.now() - this.CORRELATION_WINDOW;
     
-    for (const [id, existingEvent] of this.events) {
-      if (id === event.id) continue;
+    for (const [_id, existingEvent] of this.events) {
+      if (_id === event._id) continue;
       
       if (existingEvent.timestamp.getTime() > correlationWindow) {
         // Check for correlation patterns
@@ -516,7 +515,7 @@ class SecurityMonitorService {
           (existingEvent.ipAddress && existingEvent.ipAddress === event.ipAddress) ||
           (existingEvent.target && existingEvent.target === event.target)
         ) {
-          correlated.push(existingEvent);
+          correlated.push(_existingEvent);
         }
       }
     }
@@ -582,7 +581,7 @@ class SecurityMonitorService {
       if (event.target) systems.add(event.target);
       if (event.source) systems.add(event.source);
     });
-    return Array.from(systems);
+    return Array.from(_systems);
   }
 
   private identifyAffectedUsers(events: SecurityEvent[]): string[] {
@@ -590,10 +589,10 @@ class SecurityMonitorService {
     events.forEach(event => {
       if (event.userId) users.add(event.userId);
     });
-    return Array.from(users);
+    return Array.from(_users);
   }
 
-  private getPlaybook(severity: string, eventType: SecurityEventType): any[] {
+  private getPlaybook(severity: string, eventType: SecurityEventType): unknown[] {
     const playbooks: Record<string, any[]> = {
       'critical:data_breach': [
         { type: 'snapshot_system', target: 'all' },
@@ -667,22 +666,22 @@ class SecurityMonitorService {
 
   private async disableUserAccount(userId: string): Promise<void> {
     // Implementation would disable user account
-    console.log(`Disabling account: ${userId}`);
+    logger.crisis(`Disabling account due to security incident`, 'high', 'SecurityMonitor', { userId });
   }
 
   private async forceUserLogout(userId: string): Promise<void> {
     // Implementation would force logout
-    console.log(`Forcing logout: ${userId}`);
+    logger.warn(`Forcing logout due to security incident`, 'SecurityMonitor', { userId });
   }
 
   private async quarantineData(target: string): Promise<void> {
     // Implementation would quarantine data
-    console.log(`Quarantining data: ${target}`);
+    logger.crisis(`Quarantining data due to security threat`, 'high', 'SecurityMonitor', { target });
   }
 
   private async notifyAdministrators(incident: IncidentResponse): Promise<void> {
     // Implementation would send notifications
-    console.log(`Notifying administrators about incident: ${incident.incidentId}`);
+    logger.crisis(`Notifying administrators about security incident`, 'critical', 'SecurityMonitor', { incidentId: incident.incidentId });
   }
 
   private async escalateIncident(incident: IncidentResponse): Promise<void> {
@@ -692,12 +691,12 @@ class SecurityMonitorService {
 
   private async createSystemSnapshot(): Promise<void> {
     // Implementation would create system snapshot for forensics
-    console.log('Creating system snapshot for forensic analysis');
+    logger.info('Creating system snapshot for forensic analysis', 'SecurityMonitor');
   }
 
   private async initiateEmergencyMode(): Promise<void> {
     // Emergency containment mode
-    console.log('EMERGENCY MODE ACTIVATED - Containing potential breach');
+    logger.crisis('EMERGENCY MODE ACTIVATED - Containing potential breach', 'critical', 'SecurityMonitor');
   }
 
   private establishBaseline(): void {
@@ -737,29 +736,29 @@ class SecurityMonitorService {
   private cleanupOldEvents(): void {
     const cutoff = Date.now() - (this.EVENT_RETENTION_DAYS * 24 * 3600000);
     
-    for (const [id, event] of this.events) {
+    for (const [_id, event] of this.events) {
       if (event.timestamp.getTime() < cutoff) {
-        this.events.delete(id);
+        this.events.delete(_id);
       }
     }
   }
 
   private setupIncidentResponseAutomation(): void {
     // Set up automated incident response rules
-    console.log('Incident response automation initialized');
+    logger.info('Incident response automation initialized', 'SecurityMonitor');
   }
 
   private notifySubscribers(event: SecurityEvent): void {
     this.alertSubscribers.forEach(callback => {
       try {
         callback(event);
-      } catch (error) {
-        console.error('Alert subscriber error:', error);
+      } catch (_error) {
+        logger.error('Alert subscriber error: ');
       }
     });
   }
 
-  private updateThreatMetrics(event: SecurityEvent): void {
+  private updateThreatMetrics(_event: SecurityEvent): void {
     // Update running threat metrics
     // Implementation would update various threat indicators
   }

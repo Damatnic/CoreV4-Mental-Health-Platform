@@ -42,7 +42,7 @@ declare module 'react-window' {
       visibleStartIndex: number;
       visibleStopIndex: number;
     }) => void;
-    ref?: Ref<any>;
+    ref?: Ref<unknown>;
     className?: string;
     style?: CSSProperties;
     estimatedItemSize?: number;

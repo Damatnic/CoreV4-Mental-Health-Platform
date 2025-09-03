@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { logger } from '../../utils/logger';
 import CrisisButton from '../../components/crisis/CrisisButton';
 import MoodTracker from '../../components/wellness/MoodTracker';
 
@@ -59,7 +60,7 @@ class PerformanceMonitor {
   }
 
   getMeasure(name: string): number | undefined {
-    return this.measures.get(name);
+    return this.measures.get(_name);
   }
 
   getAllMeasures(): Record<string, number> {
@@ -96,7 +97,7 @@ describe('Crisis Response Performance', () => {
       const button = screen.getByRole('button', { name: /crisis help/i });
       
       monitor.mark('crisis-start');
-      await user.click(button);
+      await user.click(_button);
       
       await waitFor(() => {
         expect(screen.getByText(/crisis resources/i)).toBeInTheDocument();
@@ -107,7 +108,7 @@ describe('Crisis Response Performance', () => {
       expect(responseTime).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);
       
       // Log for monitoring
-      console.log(`Crisis response time: ${responseTime.toFixed(2)}ms`);
+      logger.debug(`Crisis response time: ${responseTime.toFixed(2)}ms`);
     });
 
     it('should render crisis button quickly', () => {
@@ -123,7 +124,7 @@ describe('Crisis Response Performance', () => {
       
       expect(renderTime).toBeLessThan(PERFORMANCE_THRESHOLDS.RENDER_TIME);
       
-      console.log(`Crisis button render time: ${renderTime.toFixed(2)}ms`);
+      logger.debug(`Crisis button render time: ${renderTime.toFixed(2)}ms`);
     });
 
     it('should handle rapid crisis button clicks efficiently', async () => {
@@ -141,7 +142,7 @@ describe('Crisis Response Performance', () => {
       
       // Simulate panic clicking (10 rapid clicks)
       for (let i = 0; i < 10; i++) {
-        await user.click(button);
+        await user.click(_button);
       }
       
       const totalTime = monitor.measure('rapid-clicks', 'rapid-clicks-start');
@@ -150,7 +151,7 @@ describe('Crisis Response Performance', () => {
       // Should handle rapid clicks without performance degradation
       expect(averageTime).toBeLessThan(PERFORMANCE_THRESHOLDS.INTERACTION_DELAY);
       
-      console.log(`Average time per click: ${averageTime.toFixed(2)}ms`);
+      logger.debug(`Average time per click: ${averageTime.toFixed(2)}ms`);
     });
   });
 
@@ -167,7 +168,7 @@ describe('Crisis Response Performance', () => {
       const button = screen.getByRole('button', { name: /crisis help/i });
       
       monitor.mark('api-start');
-      await user.click(button);
+      await user.click(_button);
       
       await waitFor(() => {
         expect(screen.getByText('988')).toBeInTheDocument();
@@ -177,7 +178,7 @@ describe('Crisis Response Performance', () => {
       
       expect(apiTime).toBeLessThan(PERFORMANCE_THRESHOLDS.API_RESPONSE * 2); // Allow some overhead
       
-      console.log(`Crisis API response time: ${apiTime.toFixed(2)}ms`);
+      logger.debug(`Crisis API response time: ${apiTime.toFixed(2)}ms`);
     });
 
     it('should cache crisis resources for instant access', async () => {
@@ -193,24 +194,24 @@ describe('Crisis Response Performance', () => {
       
       // First click - cold cache
       monitor.mark('cold-start');
-      await user.click(button);
+      await user.click(_button);
       await waitFor(() => screen.getByText('988'));
       const coldTime = monitor.measure('cold-response', 'cold-start');
       
       // Close modal
       const closeButton = screen.getByRole('button', { name: /close/i });
-      await user.click(closeButton);
+      await user.click(_closeButton);
       
       // Second click - warm cache
       monitor.mark('warm-start');
-      await user.click(button);
+      await user.click(_button);
       await waitFor(() => screen.getByText('988'));
       const warmTime = monitor.measure('warm-response', 'warm-start');
       
       // Cached response should be significantly faster
       expect(warmTime).toBeLessThan(coldTime * 0.5);
       
-      console.log(`Cold cache: ${coldTime.toFixed(2)}ms, Warm cache: ${warmTime.toFixed(2)}ms`);
+      logger.debug(`Cold cache: ${coldTime.toFixed(2)}ms, Warm cache: ${warmTime.toFixed(2)}ms`);
     });
   });
 
@@ -219,7 +220,7 @@ describe('Crisis Response Performance', () => {
       const user = userEvent.setup();
       
       // Get initial memory (if available)
-      const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const initialMemory = (performance as unknown).memory?.usedJSHeapSize || 0;
       
       render(
         <TestWrapper>
@@ -231,11 +232,11 @@ describe('Crisis Response Performance', () => {
       
       // Perform multiple open/close cycles
       for (let i = 0; i < 5; i++) {
-        await user.click(button);
+        await user.click(_button);
         await waitFor(() => screen.getByText('988'));
         
         const closeButton = screen.getByRole('button', { name: /close/i });
-        await user.click(closeButton);
+        await user.click(_closeButton);
         await waitFor(() => expect(screen.queryByText('988')).not.toBeInTheDocument());
       }
       
@@ -245,13 +246,13 @@ describe('Crisis Response Performance', () => {
       }
       
       // Check memory after interactions
-      const finalMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const finalMemory = (performance as unknown).memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
       
       // Memory increase should be minimal
       if (initialMemory > 0) {
-        expect(memoryIncrease).toBeLessThan(5 * 1024 * 1024); // Less than 5MB increase
-        console.log(`Memory increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)}MB`);
+        expect(_memoryIncrease).toBeLessThan(5 * 1024 * 1024); // Less than 5MB increase
+        logger.debug(`Memory increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)}MB`);
       }
     });
 
@@ -265,12 +266,12 @@ describe('Crisis Response Performance', () => {
       );
       
       const button = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(button);
+      await user.click(_button);
       
       // Get initial listener count
       const getListenerCount = () => {
-        const events = (window as any).getEventListeners?.(document) || {};
-        return Object.values(events).reduce((sum: number, arr: any) => sum + arr.length, 0);
+        const events = (window as unknown).getEventListeners?.(_document) || {};
+        return Object.values(_events).reduce((sum: number, arr: unknown) => sum + arr.length, 0);
       };
       
       const initialListeners = getListenerCount();
@@ -282,7 +283,7 @@ describe('Crisis Response Performance', () => {
       const finalListeners = getListenerCount();
       
       if (initialListeners > 0) {
-        expect(finalListeners).toBeLessThanOrEqual(initialListeners);
+        expect(_finalListeners).toBeLessThanOrEqual(_initialListeners);
       }
     });
   });
@@ -301,7 +302,7 @@ describe('Crisis Response Performance', () => {
       
       expect(renderTime).toBeLessThan(PERFORMANCE_THRESHOLDS.RENDER_TIME * 2);
       
-      console.log(`Mood tracker render time: ${renderTime.toFixed(2)}ms`);
+      logger.debug(`Mood tracker render time: ${renderTime.toFixed(2)}ms`);
     });
 
     it('should efficiently update mood display', async () => {
@@ -326,7 +327,7 @@ describe('Crisis Response Performance', () => {
       
       expect(updateTime).toBeLessThan(PERFORMANCE_THRESHOLDS.INTERACTION_DELAY);
       
-      console.log(`Mood update time: ${updateTime.toFixed(2)}ms`);
+      logger.debug(`Mood update time: ${updateTime.toFixed(2)}ms`);
     });
 
     it('should lazy load non-critical components', async () => {
@@ -338,7 +339,7 @@ describe('Crisis Response Performance', () => {
       
       // Initial render without history
       const initialComponents = screen.queryByTestId('mood-history-chart');
-      expect(initialComponents).not.toBeInTheDocument();
+      expect(_initialComponents).not.toBeInTheDocument();
       
       // Re-render with history
       monitor.mark('lazy-load-start');
@@ -358,7 +359,7 @@ describe('Crisis Response Performance', () => {
       // Lazy loading should be reasonably fast
       expect(lazyLoadTime).toBeLessThan(PERFORMANCE_THRESHOLDS.RENDER_TIME * 4);
       
-      console.log(`Lazy load time: ${lazyLoadTime.toFixed(2)}ms`);
+      logger.debug(`Lazy load time: ${lazyLoadTime.toFixed(2)}ms`);
     });
   });
 
@@ -385,7 +386,7 @@ describe('Crisis Response Performance', () => {
       const button = screen.getByRole('button', { name: /crisis help/i });
       
       monitor.mark('slow-network-start');
-      await user.click(button);
+      await user.click(_button);
       
       // Should show loading state immediately
       expect(screen.getByText(/connecting to crisis support/i)).toBeInTheDocument();
@@ -393,14 +394,14 @@ describe('Crisis Response Performance', () => {
       const loadingTime = monitor.measure('loading-shown', 'slow-network-start');
       expect(loadingTime).toBeLessThan(50); // Loading state should appear quickly
       
-      console.log(`Loading state appeared in: ${loadingTime.toFixed(2)}ms`);
+      logger.debug(`Loading state appeared in: ${loadingTime.toFixed(2)}ms`);
     });
 
     it('should prioritize critical resources', async () => {
       const fetchOrder: string[] = [];
       
       const trackingFetch = vi.fn().mockImplementation((url: string) => {
-        fetchOrder.push(url);
+        fetchOrder.push(_url);
         return Promise.resolve({
           ok: true,
           json: async () => ({})
@@ -422,12 +423,12 @@ describe('Crisis Response Performance', () => {
       // Crisis resources should be fetched first
       expect(fetchOrder[0]).toContain('crisis');
       
-      console.log('Resource fetch order:', fetchOrder);
+      logger.debug('Resource fetch order:', fetchOrder);
     });
   });
 
   describe('Bundle Size and Loading', () => {
-    it('should have acceptable Time to Interactive (TTI)', async () => {
+    it('should have acceptable Time to Interactive (_TTI)', async () => {
       monitor.mark('tti-start');
       
       render(
@@ -442,8 +443,8 @@ describe('Crisis Response Performance', () => {
         const button = screen.getByRole('button', { name: /crisis help/i });
         const slider = screen.getByRole('slider');
         
-        expect(button).toBeEnabled();
-        expect(slider).toBeEnabled();
+        expect(_button).toBeEnabled();
+        expect(_slider).toBeEnabled();
       });
       
       const ttiTime = monitor.measure('tti', 'tti-start');
@@ -451,7 +452,7 @@ describe('Crisis Response Performance', () => {
       // TTI should be under 3 seconds for good UX
       expect(ttiTime).toBeLessThan(3000);
       
-      console.log(`Time to Interactive: ${ttiTime.toFixed(2)}ms`);
+      logger.debug(`Time to Interactive: ${ttiTime.toFixed(2)}ms`);
     });
 
     it('should efficiently batch DOM updates', async () => {
@@ -489,7 +490,7 @@ describe('Crisis Response Performance', () => {
       // Updates should be batched efficiently
       expect(updateCount).toBeLessThan(50); // Should batch updates
       
-      console.log(`DOM updates for 10 changes: ${updateCount}`);
+      logger.debug(`DOM updates for 10 changes: ${updateCount}`);
     });
   });
 
@@ -513,7 +514,7 @@ describe('Crisis Response Performance', () => {
       // Test crisis button
       monitor.mark('crisis-test-start');
       const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      await user.click(_crisisButton);
       await waitFor(() => screen.getByText('988'));
       performanceMetrics.crisisResponse = monitor.measure('crisis-test', 'crisis-test-start');
       
@@ -531,12 +532,12 @@ describe('Crisis Response Performance', () => {
       performanceMetrics.totalFlow = monitor.measure('total-flow', 'flow-start');
       
       // Generate report
-      console.log('\n=== Performance Report ===');
-      console.log(`Initial Render: ${performanceMetrics.initialRender.toFixed(2)}ms`);
-      console.log(`Crisis Response: ${performanceMetrics.crisisResponse.toFixed(2)}ms`);
-      console.log(`Mood Logging: ${performanceMetrics.moodLogging.toFixed(2)}ms`);
-      console.log(`Total Flow: ${performanceMetrics.totalFlow.toFixed(2)}ms`);
-      console.log('========================\n');
+      logger.debug('\n=== Performance Report ===');
+      logger.debug(`Initial Render: ${performanceMetrics.initialRender.toFixed(2)}ms`);
+      logger.debug(`Crisis Response: ${performanceMetrics.crisisResponse.toFixed(2)}ms`);
+      logger.debug(`Mood Logging: ${performanceMetrics.moodLogging.toFixed(2)}ms`);
+      logger.debug(`Total Flow: ${performanceMetrics.totalFlow.toFixed(2)}ms`);
+      logger.debug('========================\n');
       
       // Assert critical metrics
       expect(performanceMetrics.crisisResponse).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);

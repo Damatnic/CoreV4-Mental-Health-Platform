@@ -11,10 +11,10 @@ export interface Activity {
   scheduledTime?: Date;
   duration?: number; // in minutes
   energyLevel?: 'low' | 'medium' | 'high'; // Required energy level
-  moodImpact?: number; // Expected mood impact (-5 to +5)
+  moodImpact?: number; // Expected _mood impact (-5 to +5)
   completed: boolean;
   completedAt?: Date;
-  actualMoodImpact?: number; // Actual mood impact after completion
+  actualMoodImpact?: number; // Actual _mood impact after completion
   notes?: string;
   recurring?: {
     frequency: 'daily' | 'weekly' | 'monthly';
@@ -223,7 +223,7 @@ interface ActivityStore {
   
   // Analytics and insights
   analyzeActivityEffectiveness: (activityId: string) => ActivityAnalytics;
-  getActivityRecommendations: (energyLevel: 'low' | 'medium' | 'high', mood: number) => Activity[];
+  getActivityRecommendations: (energyLevel: 'low' | 'medium' | 'high', _mood: number) => Activity[];
   getOptimalSchedule: (date: Date) => Activity[];
   correlateActivitiesWithMood: () => { activity: string; correlation: number }[];
   
@@ -239,7 +239,7 @@ interface ActivityStore {
 }
 
 // Create the store with persistence
-export const useActivityStore = create<ActivityStore>()(
+export const _useActivityStore = create<ActivityStore>()(
   persist(
     (set, get) => ({
       // Initialize state
@@ -259,13 +259,13 @@ export const useActivityStore = create<ActivityStore>()(
           ...activity,
           id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         };
-        set((state) => ({
+        set((_state) => ({
           activities: [...state.activities, newActivity],
         }));
       },
       
       updateActivity: (id, updates) => {
-        set((state) => ({
+        set((_state) => ({
           activities: state.activities.map((activity) =>
             activity.id === id ? { ...activity, ...updates } : activity
           ),
@@ -273,7 +273,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       deleteActivity: (id) => {
-        set((state) => ({
+        set((_state) => ({
           activities: state.activities.filter((activity) => activity.id !== id),
         }));
       },
@@ -310,7 +310,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       rescheduleActivity: (id, newTime) => {
-        set((state) => ({
+        set((_state) => ({
           activities: state.activities.map((activity) =>
             activity.id === id ? { ...activity, scheduledTime: newTime } : activity
           ),
@@ -324,13 +324,13 @@ export const useActivityStore = create<ActivityStore>()(
           id: `goal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           progress: 0,
         };
-        set((state) => ({
+        set((_state) => ({
           goals: [...state.goals, newGoal],
         }));
       },
       
       updateGoal: (id, updates) => {
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === id ? { ...goal, ...updates } : goal
           ),
@@ -338,7 +338,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       updateGoalProgress: (id, newValue) => {
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) => {
             if (goal.id === id) {
               const progress = Math.min((newValue / goal.targetValue) * 100, 100);
@@ -359,7 +359,7 @@ export const useActivityStore = create<ActivityStore>()(
       
       completeGoal: (id) => {
         const now = new Date();
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === id
               ? {
@@ -377,7 +377,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       pauseGoal: (id) => {
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === id ? { ...goal, status: 'paused' } : goal
           ),
@@ -385,7 +385,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       abandonGoal: (id, reason) => {
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === id
               ? {
@@ -404,7 +404,7 @@ export const useActivityStore = create<ActivityStore>()(
           id: `milestone-${Date.now()}`,
           goalId,
         };
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === goalId
               ? { ...goal, milestones: [...goal.milestones, newMilestone] }
@@ -415,7 +415,7 @@ export const useActivityStore = create<ActivityStore>()(
       
       completeMilestone: (goalId, milestoneId) => {
         const now = new Date();
-        set((state) => ({
+        set((_state) => ({
           goals: state.goals.map((goal) =>
             goal.id === goalId
               ? {
@@ -442,13 +442,13 @@ export const useActivityStore = create<ActivityStore>()(
           longestStreak: 0,
           totalCompletions: 0,
         };
-        set((state) => ({
+        set((_state) => ({
           habits: [...state.habits, newHabit],
         }));
       },
       
       updateHabit: (id, updates) => {
-        set((state) => ({
+        set((_state) => ({
           habits: state.habits.map((habit) =>
             habit.id === id ? { ...habit, ...updates } : habit
           ),
@@ -457,7 +457,7 @@ export const useActivityStore = create<ActivityStore>()(
       
       completeHabit: (id) => {
         const now = new Date();
-        set((state) => ({
+        set((_state) => ({
           habits: state.habits.map((habit) => {
             if (habit.id === id) {
               const lastDate = habit.lastCompleted ? new Date(habit.lastCompleted) : null;
@@ -485,7 +485,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       resetHabitStreak: (id) => {
-        set((state) => ({
+        set((_state) => ({
           habits: state.habits.map((habit) =>
             habit.id === id ? { ...habit, currentStreak: 0 } : habit
           ),
@@ -493,7 +493,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       pauseHabit: (id) => {
-        set((state) => ({
+        set((_state) => ({
           habits: state.habits.map((habit) =>
             habit.id === id ? { ...habit, isActive: false } : habit
           ),
@@ -501,7 +501,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       stackHabits: (habitIds) => {
-        set((state) => ({
+        set((_state) => ({
           habits: state.habits.map((habit) =>
             habitIds.includes(habit.id)
               ? { ...habit, stackedWith: habitIds.filter(id => id !== habit.id) }
@@ -516,22 +516,22 @@ export const useActivityStore = create<ActivityStore>()(
           ...session,
           id: `therapy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         };
-        set((state) => ({
+        set((_state) => ({
           therapyProgress: [...state.therapyProgress, newSession],
         }));
       },
       
       updateTherapyProgress: (id, updates) => {
-        set((state) => ({
+        set((_state) => ({
           therapyProgress: state.therapyProgress.map((session) =>
             session.id === id ? { ...session, ...updates } : session
           ),
         }));
       },
       
-      completeHomework: (sessionId, homeworkId, notes) => {
+      completeHomework: (sessionId, homeworkId, _notes) => {
         const now = new Date();
-        set((state) => ({
+        set((_state) => ({
           therapyProgress: state.therapyProgress.map((session) =>
             session.id === sessionId
               ? {
@@ -555,7 +555,7 @@ export const useActivityStore = create<ActivityStore>()(
           const recentSession = state.therapyProgress
             .sort((a, b) => b.sessionDate.getTime() - a.sessionDate.getTime())[0];
           
-          if (recentSession) {
+          if (_recentSession) {
             return {
               therapyProgress: state.therapyProgress.map((session) =>
                 session.id === recentSession.id
@@ -627,7 +627,7 @@ export const useActivityStore = create<ActivityStore>()(
         // Unlock new achievements
         potentialAchievements.forEach(achievement => {
           get().unlockAchievement(achievement.id);
-          set((state) => ({
+          set((_state) => ({
             achievements: [...state.achievements, { ...achievement, unlockedDate: new Date() }],
           }));
         });
@@ -635,7 +635,7 @@ export const useActivityStore = create<ActivityStore>()(
       
       unlockAchievement: (id) => {
         const now = new Date();
-        set((state) => ({
+        set((_state) => ({
           achievements: state.achievements.map((achievement) =>
             achievement.id === id && !achievement.unlockedDate
               ? { ...achievement, unlockedDate: now }
@@ -645,7 +645,7 @@ export const useActivityStore = create<ActivityStore>()(
       },
       
       shareAchievement: (id) => {
-        set((state) => ({
+        set((_state) => ({
           achievements: state.achievements.map((achievement) =>
             achievement.id === id ? { ...achievement, shared: true } : achievement
           ),
@@ -692,20 +692,20 @@ export const useActivityStore = create<ActivityStore>()(
           analytics.recommendations.push('Consider scheduling this activity at a different time');
         }
         if (averageMoodImpact > 3) {
-          analytics.recommendations.push('This activity significantly improves your mood - prioritize it!');
+          analytics.recommendations.push('This activity significantly improves your _mood - prioritize it!');
         }
         
         return analytics;
       },
       
-      getActivityRecommendations: (energyLevel, mood) => {
+      getActivityRecommendations: (energyLevel, _mood) => {
         const state = get();
         const recommendations: Activity[] = [];
         
-        // Filter activities based on energy level and expected mood impact
+        // Filter activities based on energy level and expected _mood impact
         state.activities.forEach(activity => {
           if (!activity.completed && activity.energyLevel === energyLevel) {
-            recommendations.push(activity);
+            recommendations.push(_activity);
           }
         });
         
@@ -769,7 +769,7 @@ export const useActivityStore = create<ActivityStore>()(
           if (!activity.completed && activity.scheduledTime) {
             const isToday = new Date(activity.scheduledTime).toDateString() === today.toDateString();
             if (isToday && activity.energyLevel !== energyLevel && activity.flexibility !== 'fixed') {
-              suggestions.push(activity);
+              suggestions.push(_activity);
             }
           }
         });
@@ -782,12 +782,12 @@ export const useActivityStore = create<ActivityStore>()(
         const today = new Date();
         
         // Mark optional activities as postponed
-        set((state) => ({
+        set((_state) => ({
           activities: state.activities.map(activity => {
             if (activity.scheduledTime) {
               const isToday = new Date(activity.scheduledTime).toDateString() === today.toDateString();
               if (isToday && activity.flexibility === 'optional' && !activity.completed) {
-                const tomorrow = new Date(today);
+                const tomorrow = new Date(_today);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 return { ...activity, scheduledTime: tomorrow };
               }
@@ -804,8 +804,8 @@ export const useActivityStore = create<ActivityStore>()(
         // Get recurring activities for this day
         state.activities.forEach(activity => {
           if (activity.recurring) {
-            const dayOfWeek = date.getDay();
-            if (activity.recurring.daysOfWeek?.includes(dayOfWeek)) {
+            const _dayOfWeek = date.getDay();
+            if (activity.recurring.daysOfWeek?.includes(_dayOfWeek)) {
               schedule.push({
                 ...activity,
                 scheduledTime: date,
@@ -867,8 +867,9 @@ export const useActivityStore = create<ActivityStore>()(
             achievements: parsed.achievements || [],
             analytics: parsed.analytics || [],
           });
-        } catch (error) {
-          console.error('Failed to import data:', error);
+        } catch (_error) {
+          logger.error('Failed to import data:');
+import { logger } from '../utils/logger';
         }
       },
       
@@ -888,7 +889,7 @@ export const useActivityStore = create<ActivityStore>()(
     }),
     {
       name: 'activity-store',
-      partialize: (state) => ({
+      partialize: (_state) => ({
         activities: state.activities,
         goals: state.goals,
         habits: state.habits,

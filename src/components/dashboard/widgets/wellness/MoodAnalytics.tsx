@@ -1,19 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, _useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
   TrendingDown,
-  Calendar,
+  _Calendar,
   Brain,
   AlertCircle,
   Download,
   Filter,
-  ChevronLeft,
-  ChevronRight,
+  _ChevronLeft,
+  _ChevronRight,
   Activity,
   Cloud,
   Moon,
-  Sun,
+  _Sun,
   Users,
   Heart,
   Target,
@@ -39,16 +39,16 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell,
+  _Cell,
   ReferenceLine,
-  ReferenceArea
+  _ReferenceArea
 } from 'recharts';
 import { useWellnessStore } from '../../../../stores/wellnessStore';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, subDays, addDays } from 'date-fns';
+import { format, _startOfWeek, _endOfWeek, _eachDayOfInterval, subDays, addDays } from 'date-fns';
 
 interface MoodAnalyticsProps {
   timeRange?: 'day' | 'week' | 'month' | 'year';
-  onExport?: (data: any) => void;
+  onExport?: (_data: unknown) => void;
   onTriggerIdentified?: (trigger: string) => void;
 }
 
@@ -56,7 +56,7 @@ type ViewMode = 'overview' | 'patterns' | 'correlations' | 'predictions';
 type ChartType = 'line' | 'area' | 'bar' | 'radar';
 
 export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentified }: MoodAnalyticsProps) {
-  const { moodEntries, moodPatterns, analyzeMoodPatterns, wellnessInsights } = useWellnessStore();
+  const { moodEntries, moodPatterns, _analyzeMoodPatterns, wellnessInsights } = useWellnessStore();
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
   const [chartType, setChartType] = useState<ChartType>('line');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -68,7 +68,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
     const end = new Date();
     let start = new Date();
     
-    switch (timeRange) {
+    switch (_timeRange) {
       case 'day':
         start = new Date(end);
         start.setHours(0, 0, 0, 0);
@@ -102,7 +102,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
     filteredEntries.forEach(entry => {
       const date = format(new Date(entry.timestamp), 'yyyy-MM-dd');
       
-      if (!dataByDay.has(date)) {
+      if (!dataByDay.has(_date)) {
         dataByDay.set(date, {
           date,
           entries: [],
@@ -116,8 +116,8 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
         });
       }
       
-      const dayData = dataByDay.get(date);
-      dayData.entries.push(entry);
+      const dayData = dataByDay.get(_date);
+      dayData.entries.push(_entry);
     });
 
     // Calculate averages for each day
@@ -128,13 +128,13 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
       return {
         ...day,
         date: format(new Date(day.date), 'MMM dd'),
-        avgMood: entries.reduce((sum: number, e: any) => sum + e.moodScore, 0) / count,
-        avgStress: entries.reduce((sum: number, e: any) => sum + (e.stressLevel || 0), 0) / count,
-        avgEnergy: entries.reduce((sum: number, e: any) => sum + (e.energyLevel || 0), 0) / count,
-        avgAnxiety: entries.reduce((sum: number, e: any) => sum + (e.anxietyLevel || 0), 0) / count,
-        sleep: Math.max(...entries.map((e: any) => e.sleep || 0)),
-        exercise: entries.some((e: any) => e.exercise),
-        socialInteraction: Math.max(...entries.map((e: any) => e.socialInteraction || 0))
+        avgMood: entries.reduce((sum: number, e: unknown) => sum + e.moodScore, 0) / count,
+        avgStress: entries.reduce((sum: number, e: unknown) => sum + (e.stressLevel || 0), 0) / count,
+        avgEnergy: entries.reduce((sum: number, e: unknown) => sum + (e.energyLevel || 0), 0) / count,
+        avgAnxiety: entries.reduce((sum: number, e: unknown) => sum + (e.anxietyLevel || 0), 0) / count,
+        sleep: Math.max(...entries.map((e: unknown) => e.sleep || 0)),
+        exercise: entries.some((e: unknown) => e.exercise),
+        socialInteraction: Math.max(...entries.map((e: unknown) => e.socialInteraction || 0))
       };
     });
 
@@ -144,10 +144,10 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
   // Correlation analysis
   const correlations = useMemo(() => {
     const factors = ['sleep', 'exercise', 'socialInteraction', 'weather'];
-    const correlationData: any[] = [];
+    const correlationData: unknown[] = [];
 
     factors.forEach(factor => {
-      const withFactor = filteredEntries.filter((e: any) => {
+      const withFactor = filteredEntries.filter((e: unknown) => {
         switch (factor) {
           case 'sleep': return e.sleep && e.sleep >= 7;
           case 'exercise': return e.exercise === true;
@@ -157,7 +157,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
         }
       });
 
-      const withoutFactor = filteredEntries.filter((e: any) => {
+      const withoutFactor = filteredEntries.filter((e: unknown) => {
         switch (factor) {
           case 'sleep': return !e.sleep || e.sleep < 7;
           case 'exercise': return e.exercise === false;
@@ -174,7 +174,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
 
         correlationData.push({
           factor: factor.charAt(0).toUpperCase() + factor.slice(1).replace(/([A-Z])/g, ' $1'),
-          impact: Math.round(impact),
+          impact: Math.round(_impact),
           positive: impact > 0,
           avgWith: avgWithFactor.toFixed(1),
           avgWithout: avgWithoutFactor.toFixed(1),
@@ -188,25 +188,25 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
 
   // Trigger analysis
   const triggerAnalysis = useMemo(() => {
-    const triggerMap = new Map<string, { count: number; avgMood: number; entries: any[] }>();
+    const triggerMap = new Map<string, { count: number; avgMood: number; entries: unknown[] }>();
 
     filteredEntries.forEach(entry => {
       entry.triggers.forEach(trigger => {
-        if (!triggerMap.has(trigger)) {
+        if (!triggerMap.has(_trigger)) {
           triggerMap.set(trigger, { count: 0, avgMood: 0, entries: [] });
         }
-        const data = triggerMap.get(trigger)!;
+        const data = triggerMap.get(_trigger)!;
         data.count++;
-        data.entries.push(entry);
+        data.entries.push(_entry);
       });
     });
 
-    const triggerData = Array.from(triggerMap.entries()).map(([trigger, data]) => ({
+    const triggerData = Array.from(triggerMap.entries()).map(([trigger, _data]) => ({
       trigger,
-      count: data.count,
-      avgMood: data.entries.reduce((sum, e) => sum + e.moodScore, 0) / data.entries.length,
+      count: _data.count,
+      avgMood: _data.entries.reduce((sum, e) => sum + e.moodScore, 0) / _data.entries.length,
       impact: 'negative' as const,
-      percentage: (data.count / filteredEntries.length) * 100
+      percentage: (_data.count / filteredEntries.length) * 100
     }));
 
     return triggerData.sort((a, b) => b.count - a.count).slice(0, 5);
@@ -242,7 +242,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
 
   // Render different chart types
   const renderChart = () => {
-    const colors = {
+    const _colors = {
       mood: '#8b5cf6',
       stress: '#ef4444',
       energy: '#3b82f6',
@@ -251,7 +251,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
       social: '#ec4899'
     };
 
-    switch (chartType) {
+    switch (_chartType) {
       case 'area':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -359,7 +359,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
 
   // Export data for healthcare providers
   const handleExport = () => {
-    const exportData = {
+    const _exportData = {
       dateRange,
       entries: filteredEntries,
       patterns: moodPatterns,
@@ -372,16 +372,16 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
       }
     };
 
-    if (onExport) {
-      onExport(exportData);
+    if (_onExport) {
+      onExport(_exportData);
     } else {
       // Create CSV or PDF export
-      const csv = convertToCSV(exportData);
+      const csv = convertToCSV(_exportData);
       downloadCSV(csv, `mood-report-${format(new Date(), 'yyyy-MM-dd')}.csv`);
     }
   };
 
-  const convertToCSV = (data: any) => {
+  const convertToCSV = (_data: unknown) => {
     const headers = ['Date', 'Mood', 'Stress', 'Energy', 'Anxiety', 'Sleep', 'Exercise', 'Social', 'Triggers', 'Notes'];
     const rows = filteredEntries.map(entry => [
       format(new Date(entry.timestamp), 'yyyy-MM-dd HH:mm'),
@@ -400,13 +400,13 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
   };
 
   const downloadCSV = (csv: string, filename: string) => {
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
+    const _blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(_blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(_url);
   };
 
   return (
@@ -416,7 +416,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setViewMode('overview')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-_colors ${
               viewMode === 'overview' 
                 ? 'bg-purple-100 text-purple-700' 
                 : 'text-gray-600 hover:bg-gray-100'
@@ -426,7 +426,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
           </button>
           <button
             onClick={() => setViewMode('patterns')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-_colors ${
               viewMode === 'patterns' 
                 ? 'bg-purple-100 text-purple-700' 
                 : 'text-gray-600 hover:bg-gray-100'
@@ -436,7 +436,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
           </button>
           <button
             onClick={() => setViewMode('correlations')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-_colors ${
               viewMode === 'correlations' 
                 ? 'bg-purple-100 text-purple-700' 
                 : 'text-gray-600 hover:bg-gray-100'
@@ -446,7 +446,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
           </button>
           <button
             onClick={() => setViewMode('predictions')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-_colors ${
               viewMode === 'predictions' 
                 ? 'bg-purple-100 text-purple-700' 
                 : 'text-gray-600 hover:bg-gray-100'
@@ -530,7 +530,7 @@ export function MoodAnalytics({ timeRange = 'week', onExport, onTriggerIdentifie
                             : [...prev, factor]
                         );
                       }}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-_colors ${
                         selectedFactors.includes(factor)
                           ? 'bg-purple-500 text-white'
                           : 'bg-white text-gray-700 border border-gray-300'

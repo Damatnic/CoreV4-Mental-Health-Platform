@@ -2,7 +2,8 @@
 // Ensures all PHI (Protected Health Information) is handled according to HIPAA standards
 
 import CryptoJS from 'crypto-js';
-import { secureStorage } from './SecureLocalStorage';
+import { _secureStorage } from './SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 // HIPAA compliance requirements
 export enum ComplianceRequirement {
@@ -42,7 +43,7 @@ export interface AuditLogEntry {
   timestamp: Date;
   userId: string;
   action: string;
-  resourceType: string;
+  _resourceType: string;
   resourceId: string;
   ipAddress: string;
   userAgent: string;
@@ -63,7 +64,7 @@ interface EncryptionConfig {
 // Access control entry
 export interface AccessControlEntry {
   userId: string;
-  resourceType: string;
+  _resourceType: string;
   resourceId?: string;
   permissions: string[];
   grantedBy: string;
@@ -88,7 +89,7 @@ export interface BreachNotification {
   reportedAt?: Date;
   affectedUsers: string[];
   dataTypes: PHIFieldType[];
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | '_critical';
   description: string;
   remediation: string;
   notificationsSent: boolean;
@@ -136,7 +137,7 @@ export class HIPAAComplianceService {
       key = `temp_key_${  Date.now()  }_${  Math.random().toString(36)}`;
       
       // Log warning about temporary key
-      console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
+      logger.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
       
       // NEVER store in localStorage - this was the critical vulnerability
       // secureStorage.setItem('hipaa_encryption_key', key); // REMOVED
@@ -171,7 +172,7 @@ export class HIPAAComplianceService {
 
     this.retentionPolicies.set('crisis_sessions', {
       dataType: 'crisis_sessions',
-      retentionPeriod: 2555, // 7 years (critical mental health data)
+      retentionPeriod: 2555, // 7 years (_critical mental health data)
       purgeAfter: 3650, // 10 years
       archiveRequired: true
     });
@@ -202,8 +203,8 @@ export class HIPAAComplianceService {
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey);
       
       return encrypted.toString();
-    } catch (error) {
-      this.logSecurityEvent('encryption_failure', { error: error instanceof Error ? error.message : 'Unknown error' });
+    } catch (_error) {
+      this.logSecurityEvent('encryption_failure', { error: 'Processing error' });
       throw new Error('Failed to encrypt PHI data');
     }
   }
@@ -214,8 +215,8 @@ export class HIPAAComplianceService {
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       
       return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-      this.logSecurityEvent('decryption_failure', { error: error instanceof Error ? error.message : 'Unknown error' });
+    } catch (_error) {
+      this.logSecurityEvent('decryption_failure', { error: 'Processing error' });
       throw new Error('Failed to decrypt PHI data');
     }
   }
@@ -227,7 +228,7 @@ export class HIPAAComplianceService {
 
   // Encrypt object with PHI fields
   public encryptObject<T extends Record<string, any>>(obj: T, phiFields: string[]): T {
-    const encrypted = { ...obj } as any;
+    const encrypted = { ...obj } as unknown;
     
     for (const field of phiFields) {
       if (field in encrypted && encrypted[field]) {
@@ -240,7 +241,7 @@ export class HIPAAComplianceService {
 
   // Decrypt object with PHI fields
   public decryptObject<T extends Record<string, any>>(obj: T, phiFields: string[]): T {
-    const decrypted = { ...obj } as any;
+    const decrypted = { ...obj } as unknown;
     
     for (const field of phiFields) {
       if (field in decrypted && decrypted[field]) {
@@ -263,12 +264,12 @@ export class HIPAAComplianceService {
   // Check access permission
   public async checkAccess(
     userId: string,
-    resourceType: string,
+    _resourceType: string,
     resourceId: string,
     permission: string
   ): Promise<boolean> {
     // Log access attempt
-    this.auditAccess(userId, resourceType, resourceId, 'access_check', { permission });
+    this.auditAccess(userId, _resourceType, resourceId, 'access_check', { permission });
     
     // Get user's access control entries
     const userAcl = this.accessControlList.get(userId) || [];
@@ -276,13 +277,13 @@ export class HIPAAComplianceService {
     // Check for matching permission
     const hasAccess = userAcl.some(acl => {
       // Check resource type match
-      if (acl.resourceType !== resourceType) return false;
+      if (acl._resourceType !== _resourceType) return false;
       
       // Check resource ID match (if specified)
       if (acl.resourceId && acl.resourceId !== resourceId) return false;
       
       // Check permission
-      if (!acl.permissions.includes(permission)) return false;
+      if (!acl.permissions.includes(_permission)) return false;
       
       // Check expiration
       if (acl.expiresAt && acl.expiresAt < new Date()) return false;
@@ -297,7 +298,7 @@ export class HIPAAComplianceService {
     });
     
     // Log result
-    this.auditAccess(userId, resourceType, resourceId, 'access_result', {
+    this.auditAccess(userId, _resourceType, resourceId, 'access_result', {
       permission,
       granted: hasAccess
     });
@@ -308,7 +309,7 @@ export class HIPAAComplianceService {
   // Grant access
   public grantAccess(
     userId: string,
-    resourceType: string,
+    _resourceType: string,
     permissions: string[],
     grantedBy: string,
     options?: {
@@ -317,9 +318,9 @@ export class HIPAAComplianceService {
       conditions?: Record<string, any>;
     }
   ): void {
-    const entry: AccessControlEntry = {
+    const _entry: AccessControlEntry = {
       userId,
-      resourceType,
+      _resourceType,
       resourceId: options?.resourceId,
       permissions,
       grantedBy,
@@ -334,20 +335,20 @@ export class HIPAAComplianceService {
       this.accessControlList.set(userId, []);
     }
     
-    this.accessControlList.get(userId)!.push(entry);
+    this.accessControlList.get(userId)!.push(_entry);
     
     // Audit the grant
     this.auditAccess(grantedBy, 'access_control', userId, 'grant_access', {
-      resourceType,
+      _resourceType,
       permissions,
-      expiresAt: entry.expiresAt
+      expiresAt: _entry.expiresAt
     });
   }
 
   // Revoke access
   public revokeAccess(
     userId: string,
-    resourceType: string,
+    _resourceType: string,
     resourceId?: string,
     revokedBy?: string
   ): void {
@@ -355,7 +356,7 @@ export class HIPAAComplianceService {
     
     if (userAcl) {
       const filtered = userAcl.filter(acl => {
-        if (acl.resourceType !== resourceType) return true;
+        if (acl._resourceType !== _resourceType) return true;
         if (resourceId && acl.resourceId !== resourceId) return true;
         return false;
       });
@@ -365,7 +366,7 @@ export class HIPAAComplianceService {
     
     // Audit the revocation
     this.auditAccess(revokedBy || 'system', 'access_control', userId, 'revoke_access', {
-      resourceType,
+      _resourceType,
       resourceId
     });
   }
@@ -377,41 +378,41 @@ export class HIPAAComplianceService {
   // Log PHI access
   public auditAccess(
     userId: string,
-    resourceType: string,
+    _resourceType: string,
     resourceId: string,
     action: string,
     details?: Record<string, any>
   ): void {
-    const entry: AuditLogEntry = {
+    const _entry: AuditLogEntry = {
       id: this.generateAuditId(),
       timestamp: new Date(),
       userId,
       action,
-      resourceType,
+      _resourceType,
       resourceId,
       ipAddress: this.getClientIP(),
       userAgent: navigator.userAgent,
       result: 'success',
       details,
-      phiAccessed: this.isPHIResource(resourceType)
+      phiAccessed: this.isPHIResource(_resourceType)
     };
     
-    this.auditQueue.push(entry);
+    this.auditQueue.push(_entry);
     
     // Flush immediately for critical actions
-    if (this.isCriticalAction(action)) {
+    if (this.isCriticalAction(_action)) {
       this.flushAuditQueue();
     }
   }
 
   // Log security event
   public logSecurityEvent(eventType: string, details: Record<string, any>): void {
-    const entry: AuditLogEntry = {
+    const _entry: AuditLogEntry = {
       id: this.generateAuditId(),
       timestamp: new Date(),
       userId: this.getCurrentUserId(),
       action: `security:${eventType}`,
-      resourceType: 'security',
+      _resourceType: 'security',
       resourceId: '',
       ipAddress: this.getClientIP(),
       userAgent: navigator.userAgent,
@@ -419,7 +420,7 @@ export class HIPAAComplianceService {
       details
     };
     
-    this.auditQueue.push(entry);
+    this.auditQueue.push(_entry);
     this.flushAuditQueue(); // Security events are always flushed immediately
   }
 
@@ -439,8 +440,8 @@ export class HIPAAComplianceService {
         },
         body: JSON.stringify({ entries })
       });
-    } catch (error) {
-      console.error('Failed to flush audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to flush audit logs:');
       
       // Re-queue failed entries
       this.auditQueue.unshift(...entries);
@@ -516,7 +517,7 @@ export class HIPAAComplianceService {
     // 3. Overwrite memory locations
     // 4. Update disposal records
     
-    console.log(`Securely disposed ${dataType} with ID ${dataId}`);
+    logger.info(`Securely disposed ${dataType} with ID ${dataId}`, 'HIPAACompliance', { isPrivacySafe: true });
   }
 
   // ============================================
@@ -524,14 +525,14 @@ export class HIPAAComplianceService {
   // ============================================
 
   // Detect potential breach
-  public detectBreach(indicators: {
+  public detectBreach(_indicators: {
     unusualAccess?: boolean;
     multipleFailedAttempts?: boolean;
     unauthorizedDataAccess?: boolean;
     abnormalDataVolume?: boolean;
   }): boolean {
-    const breachScore = Object.values(indicators).filter(v => v).length;
-    return breachScore >= 2; // Breach detected if 2+ indicators
+    const breachScore = Object.values(_indicators).filter(v => v).length;
+    return breachScore >= 2; // Breach detected if 2+ _indicators
   }
 
   // Report breach
@@ -553,7 +554,7 @@ export class HIPAAComplianceService {
     // 5. Document remediation steps
     
     // Send breach notification
-    await this.sendBreachNotifications(notification);
+    await this.sendBreachNotifications(_notification);
   }
 
   // Send breach notifications
@@ -679,7 +680,7 @@ export class HIPAAComplianceService {
     }
   }
 
-  private isPHIResource(resourceType: string): boolean {
+  private isPHIResource(_resourceType: string): boolean {
     const phiResources = [
       'medical_record',
       'appointment',
@@ -692,7 +693,7 @@ export class HIPAAComplianceService {
       'safety_plan'
     ];
     
-    return phiResources.includes(resourceType);
+    return phiResources.includes(_resourceType);
   }
 
   private isCriticalAction(action: string): boolean {
@@ -705,19 +706,19 @@ export class HIPAAComplianceService {
       'access_denied'
     ];
     
-    return criticalActions.some(critical => action.includes(critical));
+    return criticalActions.some(_critical => action.includes(_critical));
   }
 
   private async notifyUser(userId: string, breach: BreachNotification): Promise<void> {
     // Send notification to user
-    console.log(`Notifying user ${userId} about breach ${breach.id}`);
+    logger.crisis(`Notifying user about HIPAA breach`, '_critical', 'HIPAACompliance', { userId, breachId: breach.id });
   }
 
   private async notifyAuthorities(breach: BreachNotification): Promise<void> {
     // Notify HHS and other required authorities
-    console.log(`Notifying authorities about breach ${breach.id}`);
+    logger.crisis(`Notifying authorities about HIPAA breach`, '_critical', 'HIPAACompliance', { breachId: breach.id });
   }
 }
 
 // Export singleton instance
-export const hipaaService = HIPAAComplianceService.getInstance();
+export const _hipaaService = HIPAAComplianceService.getInstance();

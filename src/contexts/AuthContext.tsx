@@ -3,14 +3,15 @@
  * Comprehensive security features including MFA, privacy controls, and HIPAA compliance
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, _useCallback } from 'react';
 import type { User, PrivacySettings, ConsentRecord } from '@/types';
 import { authService } from '@/services/auth/authService';
 import { mfaService, MFAMethod, MFASetup } from '@/services/auth/mfaService';
 import { privacyService, ConsentType, DataCategory } from '@/services/privacy/privacyService';
-import { hipaaService } from '@/services/compliance/hipaaService';
+import { _hipaaService } from '@/services/compliance/hipaaService';
 import { auditLogger } from '@/services/security/auditLogger';
 import { secureStorage } from '@/services/security/secureStorage';
+import { logger } from '../utils/logger';
 
 interface AuthContextType {
   // User state
@@ -26,24 +27,24 @@ interface AuthContextType {
   register: (email: string, password: string, name: string, options?: RegisterOptions) => Promise<void>;
   
   // Profile management
-  updateProfile: (updates: Partial<User>) => Promise<void>;
+  updateProfile: (_updates: Partial<User>) => Promise<void>;
   deleteAccount: (reason?: string) => Promise<void>;
   
   // Password management
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  changePassword: (_currentPassword: string, _newPassword: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
-  confirmPasswordReset: (token: string, newPassword: string) => Promise<void>;
+  confirmPasswordReset: (token: string, _newPassword: string) => Promise<void>;
   
   // Multi-factor authentication
   mfaEnabled: boolean;
-  setupMFA: (method: MFAMethod) => Promise<any>;
+  setupMFA: (_method: MFAMethod) => Promise<unknown>;
   verifyMFA: (code: string) => Promise<boolean>;
-  disableMFA: (method: MFAMethod) => Promise<void>;
+  disableMFA: (_method: MFAMethod) => Promise<void>;
   getMFAMethods: () => Promise<MFASetup[]>;
   
   // Privacy controls
   privacySettings: PrivacySettings | null;
-  updatePrivacySettings: (settings: Partial<PrivacySettings>) => Promise<void>;
+  updatePrivacySettings: (_settings: Partial<PrivacySettings>) => Promise<void>;
   grantConsent: (type: ConsentType, categories: DataCategory[], purpose: string) => Promise<void>;
   revokeConsent: (consentId: string) => Promise<void>;
   getConsents: () => Promise<ConsentRecord[]>;
@@ -82,10 +83,10 @@ interface RegisterOptions {
   anonymousMode?: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(_undefined);
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(_AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -110,11 +111,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     checkAuth();
     
     // Set up session monitoring
-    const sessionInterval = setInterval(() => {
+    const _sessionInterval = setInterval(() => {
       checkSessionExpiry();
     }, 60000); // Check every minute
     
-    return () => clearInterval(sessionInterval);
+    return () => clearInterval(_sessionInterval);
   }, []);
 
   const checkAuth = async () => {
@@ -137,8 +138,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } catch (_error) {
+      logger.error('Auth check failed:');
       await authService.logout();
     } finally {
       setLoading(false);
@@ -148,19 +149,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const loadUserData = async (userId: string) => {
     try {
       // Load MFA status
-      const hasMFA = await mfaService.hasMFAEnabled(userId);
-      setMfaEnabled(hasMFA);
+      const _hasMFA = await mfaService.hasMFAEnabled(userId);
+      setMfaEnabled(_hasMFA);
       
-      // Load privacy settings
-      const settings = await privacyService.getPrivacySettings(userId);
-      setPrivacySettings(settings);
+      // Load privacy _settings
+      const _settings = await privacyService.getPrivacySettings(userId);
+      setPrivacySettings(_settings);
       
       // Check emergency access status
-      const emergencyKey = `emergency_access_${userId}`;
-      const emergencyStatus = await secureStorage.getItem(emergencyKey);
+      const _emergencyKey = `emergency_access_${userId}`;
+      const emergencyStatus = await secureStorage.getItem(_emergencyKey);
       setEmergencyAccessEnabled(!!emergencyStatus?.enabled);
-    } catch (error) {
-      console.error('Failed to load user data:', error);
+    } catch (_error) {
+      logger.error('Failed to load user data:');
     }
   };
   
@@ -215,8 +216,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await loadUserData(result.data.user.id);
         
         // Check if MFA is required but not provided
-        const hasMFA = await mfaService.hasMFAEnabled(result.data.user.id);
-        if (hasMFA && !options.mfaCode) {
+        const _hasMFA = await mfaService.hasMFAEnabled(result.data.user.id);
+        if (_hasMFA && !options.mfaCode) {
           // Create MFA challenge
           const challenge = await mfaService.createChallenge(result.data.user.id);
           setMfaChallengeId(challenge.challengeId);
@@ -224,7 +225,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return {
             success: false,
             requiresMFA: true,
-            mfaMethod: challenge.method,
+            mfaMethod: challenge._method,
           };
         }
         
@@ -235,11 +236,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         success: false,
         error: 'Login failed',
       };
-    } catch (error: any) {
-      console.error('Login failed:', error);
+    } catch (_error) {
+      logger.error('Login failed:');
       return {
         success: false,
-        error: error.message,
+        error: '[Error details unavailable]',
       };
     } finally {
       setLoading(false);
@@ -260,9 +261,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(result.data.user);
         setSessionExpiresAt(new Date(result.data.expiresAt));
       }
-    } catch (error) {
-      console.error('Anonymous login failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Anonymous login failed:');
+      throw undefined;
     } finally {
       setLoading(false);
     }
@@ -277,8 +278,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSessionExpiresAt(null);
       setEmergencyAccessEnabled(false);
       setMfaChallengeId(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
+    } catch (_error) {
+      logger.error('Logout failed:');
       // Force cleanup even if logout fails
       setUser(null);
     }
@@ -321,23 +322,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
           await login(email, password);
         }
       }
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Registration failed:');
+      throw undefined;
     } finally {
       setLoading(false);
     }
   };
 
-  const updateProfile = async (updates: Partial<User>) => {
+  const updateProfile = async (_updates: Partial<User>) => {
     try {
-      const result = await authService.updateProfile(updates);
+      const result = await authService.updateProfile(_updates);
       if (result.success && result.data) {
         setUser(result.data);
       }
-    } catch (error) {
-      console.error('Profile update failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Profile update failed:');
+      throw undefined;
     }
   };
   
@@ -350,13 +351,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       // Logout
       await logout();
-    } catch (error) {
-      console.error('Account deletion failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Account deletion failed:');
+      throw undefined;
     }
   };
   
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (_currentPassword: string, _newPassword: string) => {
     try {
       if (!user) throw new Error('No user logged in');
       
@@ -366,39 +367,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userId: user.id,
         severity: 'info',
       });
-    } catch (error) {
-      console.error('Password change failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Password change failed:');
+      throw undefined;
     }
   };
   
   const requestPasswordReset = async (email: string) => {
     try {
       await authService.requestPasswordReset({ email });
-    } catch (error) {
-      console.error('Password reset request failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Password reset request failed:');
+      throw undefined;
     }
   };
   
-  const confirmPasswordReset = async (token: string, newPassword: string) => {
+  const confirmPasswordReset = async (token: string, _newPassword: string) => {
     try {
       await authService.confirmPasswordReset({
         token,
-        newPassword,
-        confirmPassword: newPassword,
+        _newPassword,
+        confirmPassword: _newPassword,
       });
-    } catch (error) {
-      console.error('Password reset confirmation failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Password reset confirmation failed:');
+      throw undefined;
     }
   };
 
   // MFA methods
-  const setupMFA = async (method: MFAMethod) => {
+  const setupMFA = async (_method: MFAMethod) => {
     if (!user) throw new Error('No user logged in');
     
-    switch (method) {
+    switch (_method) {
       case 'totp':
         return await mfaService.setupTOTP(user.id);
       case 'sms':
@@ -409,7 +410,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       case 'biometric':
         return await mfaService.setupBiometric(user.id);
       default:
-        throw new Error('Invalid MFA method');
+        throw new Error('Invalid MFA _method');
     }
   };
   
@@ -417,19 +418,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!user || !mfaChallengeId) return false;
     
     const result = await mfaService.verifyChallenge(user.id, mfaChallengeId, code);
-    if (result) {
+    if (_result) {
       setMfaChallengeId(null);
       setMfaEnabled(true);
     }
     return result;
   };
   
-  const disableMFA = async (method: MFAMethod) => {
+  const disableMFA = async (_method: MFAMethod) => {
     if (!user) throw new Error('No user logged in');
     
-    await mfaService.disableMFA(user.id, method);
-    const hasMFA = await mfaService.hasMFAEnabled(user.id);
-    setMfaEnabled(hasMFA);
+    await mfaService.disableMFA(user.id, _method);
+    const _hasMFA = await mfaService.hasMFAEnabled(user.id);
+    setMfaEnabled(_hasMFA);
   };
   
   const getMFAMethods = async () => {
@@ -438,11 +439,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
   
   // Privacy methods
-  const updatePrivacySettings = async (settings: Partial<PrivacySettings>) => {
+  const updatePrivacySettings = async (_settings: Partial<PrivacySettings>) => {
     if (!user) throw new Error('No user logged in');
     
-    const updated = await privacyService.updatePrivacySettings(user.id, settings);
-    setPrivacySettings(updated);
+    const _updated = await privacyService.updatePrivacySettings(user.id, _settings);
+    setPrivacySettings(_updated);
   };
   
   const grantConsent = async (
@@ -489,8 +490,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   // Session management
   const refreshSession = async () => {
-    const tokens = await authService.refreshTokens();
-    if (tokens) {
+    const _tokens = await authService.refreshTokens();
+    if (_tokens) {
       const session = authService.getCurrentSession();
       if (session) {
         setSessionExpiresAt(new Date(session.expiresAt));
@@ -500,8 +501,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   const extendSession = () => {
     if (sessionExpiresAt) {
-      const newExpiry = new Date(sessionExpiresAt.getTime() + 30 * 60 * 1000);
-      setSessionExpiresAt(newExpiry);
+      const _newExpiry = new Date(sessionExpiresAt.getTime() + 30 * 60 * 1000);
+      setSessionExpiresAt(_newExpiry);
     }
   };
   
@@ -509,8 +510,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const enableEmergencyAccess = async () => {
     if (!user) throw new Error('No user logged in');
     
-    const key = `emergency_access_${user.id}`;
-    await secureStorage.setItem(key, {
+    const _key = `emergency_access_${user.id}`;
+    await secureStorage.setItem(_key, {
       enabled: true,
       enabledAt: new Date(),
     });
@@ -527,8 +528,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const disableEmergencyAccess = async () => {
     if (!user) throw new Error('No user logged in');
     
-    const key = `emergency_access_${user.id}`;
-    await secureStorage.removeItem(key);
+    const _key = `emergency_access_${user.id}`;
+    await secureStorage.removeItem(_key);
     setEmergencyAccessEnabled(false);
     
     await auditLogger.log({

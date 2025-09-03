@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, Star, TrendingUp, Command, ArrowRight, Heart, Users, Brain, Calendar, FileText, HelpCircle, AlertTriangle } from 'lucide-react';
 import { useNavigation } from './NavigationContext';
-import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
+import { _useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 
 interface SearchResult {
   id: string;
@@ -54,7 +54,7 @@ const searchDatabase: SearchResult[] = [
 
 export function GlobalSearch() {
   const navigate = useNavigate();
-  const { isSearchOpen, setSearchOpen, preferences, addToRecent } = useNavigation();
+  const { isSearchOpen, setSearchOpen, _preferences, addToRecent } = useNavigation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -63,18 +63,18 @@ export function GlobalSearch() {
 
   // Load recent searches from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('recentSearches');
-    if (saved) {
-      setRecentSearches(JSON.parse(saved));
+    const _saved = localStorage.getItem('recentSearches');
+    if (_saved) {
+      setRecentSearches(JSON.parse(_saved));
     }
   }, []);
 
   // Save recent searches
   const saveRecentSearch = (searchTerm: string) => {
     if (searchTerm.trim()) {
-      const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
-      setRecentSearches(updated);
-      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      const _updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
+      setRecentSearches(_updated);
+      localStorage.setItem('recentSearches', JSON.stringify(_updated));
     }
   };
 
@@ -86,9 +86,9 @@ export function GlobalSearch() {
     }
 
     const lowerQuery = searchQuery.toLowerCase();
-    const terms = lowerQuery.split(' ').filter(Boolean);
+    const terms = lowerQuery.split(' ').filter(_Boolean);
 
-    const searchResults = searchDatabase
+    const _searchResults = searchDatabase
       .map(item => {
         let score = 0;
         
@@ -98,19 +98,19 @@ export function GlobalSearch() {
         }
         
         // Title contains query
-        if (item.title.toLowerCase().includes(lowerQuery)) {
+        if (item.title.toLowerCase().includes(_lowerQuery)) {
           score += 50;
         }
         
         // Check each term
-        terms.forEach(term => {
-          if (item.title.toLowerCase().includes(term)) {
+        terms.forEach(_term => {
+          if (item.title.toLowerCase().includes(_term)) {
             score += 20;
           }
-          if (item.description?.toLowerCase().includes(term)) {
+          if (item.description?.toLowerCase().includes(_term)) {
             score += 10;
           }
-          if (item.keywords.some(k => k.includes(term))) {
+          if (item.keywords.some(k => k.includes(_term))) {
             score += 15;
           }
         });
@@ -119,7 +119,7 @@ export function GlobalSearch() {
         score += (item.priority || 0);
         
         // Category boost for crisis items when certain keywords are present
-        if (item.category === 'crisis' && ['help', 'emergency', 'crisis', 'suicide'].some(word => lowerQuery.includes(word))) {
+        if (item.category === 'crisis' && ['help', 'emergency', 'crisis', 'suicide'].some(_word => lowerQuery.includes(_word))) {
           score += 200;
         }
         
@@ -129,17 +129,17 @@ export function GlobalSearch() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);
 
-    setResults(searchResults);
+    setResults(_searchResults);
     setSelectedIndex(0);
   }, []);
 
   // Handle search input change
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      performSearch(query);
+    const _debounceTimer = setTimeout(() => {
+      performSearch(_query);
     }, 150);
 
-    return () => clearTimeout(debounceTimer);
+    return () => clearTimeout(_debounceTimer);
   }, [query, performSearch]);
 
   // Keyboard navigation
@@ -181,7 +181,7 @@ export function GlobalSearch() {
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
-    saveRecentSearch(query);
+    saveRecentSearch(_query);
     addToRecent(result.path);
     
     if (result.path.startsWith('tel:') || result.path.startsWith('sms:')) {
@@ -263,8 +263,8 @@ export function GlobalSearch() {
                     {results.map((result, index) => (
                       <button
                         key={result.id}
-                        onClick={() => handleResultClick(result)}
-                        onMouseEnter={() => setSelectedIndex(index)}
+                        onClick={() => handleResultClick(_result)}
+                        onMouseEnter={() => setSelectedIndex(_index)}
                         className={`w-full px-6 py-3 flex items-center hover:bg-gray-50 transition-colors ${
                           index === selectedIndex ? 'bg-gray-50' : ''
                         }`}

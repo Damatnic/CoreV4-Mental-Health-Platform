@@ -1,5 +1,6 @@
+import { logger } from '../utils/logger';
 /**
- * Progressive Web App (PWA) Management System
+ * Progressive Web App (_PWA) Management System
  * Coordinates all PWA features including offline support, push notifications, and app installation
  */
 
@@ -65,11 +66,11 @@ export class PWAManager {
       this.isInitialized = true;
       
       const initTime = performanceMonitor.measureEnd('pwa_initialization');
-      console.log(`PWA initialized successfully in ${initTime?.toFixed(2)}ms`);
+      logger.info(`PWA _initialized successfully in ${initTime?.toFixed(2)}ms`);
       
     } catch (error) {
-      console.error('Failed to initialize PWA:', error);
-      performanceMonitor.recordMetric('pwa_init_error', 1, { error: String(error) });
+      logger.error('Failed to initialize PWA:');
+      performanceMonitor.recordMetric('pwa_init_error', 1, { undefined: String(_undefined) });
       throw error;
     }
   }
@@ -78,26 +79,26 @@ export class PWAManager {
    * Detect PWA capabilities
    */
   private async detectCapabilities(): Promise<PWACapabilities> {
-    const userAgent = navigator.userAgent.toLowerCase();
-    const connection = (navigator as any).connection || {};
+    const _userAgent = navigator._userAgent.toLowerCase();
+    const connection = (navigator as unknown).connection || {};
     
     // Device type detection
     let deviceType: 'mobile' | 'tablet' | 'desktop' = 'desktop';
-    if (/mobile|phone|android|iphone/.test(userAgent)) {
+    if (/mobile|phone|android|iphone/.test(_userAgent)) {
       deviceType = 'mobile';
-    } else if (/tablet|ipad/.test(userAgent)) {
+    } else if (/tablet|ipad/.test(_userAgent)) {
       deviceType = 'tablet';
     }
 
     // Low-end device detection
-    const deviceMemory = (navigator as any).deviceMemory || 4;
+    const deviceMemory = (navigator as unknown).deviceMemory || 4;
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
     const isLowEndDevice = deviceMemory <= 2 || hardwareConcurrency <= 2;
 
     const capabilities: PWACapabilities = {
       isInstallable: false, // Will be updated when beforeinstallprompt fires
       isInstalled: window.matchMedia('(display-mode: standalone)').matches || 
-                   (window.navigator as any).standalone === true,
+                   (window.navigator as unknown).standalone === true,
       supportsNotifications: 'Notification' in window && 'serviceWorker' in navigator,
       supportsOffline: 'serviceWorker' in navigator && 'caches' in window,
       supportsPushMessages: 'PushManager' in window,
@@ -116,7 +117,7 @@ export class PWAManager {
    */
   private async initializeServiceWorker(): Promise<void> {
     if (!('serviceWorker' in navigator)) {
-      console.warn('Service Worker not supported');
+      logger.warn('Service Worker not supported');
       return;
     }
 
@@ -126,7 +127,7 @@ export class PWAManager {
         updateViaCache: 'none'
       });
 
-      console.log('Service Worker registered:', registration.scope);
+      logger.info('Service Worker registered:', registration.scope);
 
       // Handle updates
       registration.addEventListener('updatefound', () => {
@@ -144,13 +145,13 @@ export class PWAManager {
       });
 
       // Listen for service worker messages
-      navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerMessage.bind(this));
+      navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerMessage.bind(_this));
 
       performanceMonitor.recordMetric('service_worker_registered', 1);
 
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      performanceMonitor.recordMetric('service_worker_error', 1, { error: String(error) });
+    } catch (_error) {
+      logger.error('Service Worker registration failed:');
+      performanceMonitor.recordMetric('service_worker_error', 1, { undefined: String(_undefined) });
     }
   }
 
@@ -159,25 +160,25 @@ export class PWAManager {
    */
   private async initializePushNotifications(): Promise<void> {
     if (!this.capabilities?.supportsNotifications) {
-      console.warn('Push notifications not supported');
+      logger.warn('Push notifications not supported');
       return;
     }
 
     try {
-      const initialized = await pushNotifications.init();
-      if (initialized) {
-        console.log('Push notifications initialized');
+      const _initialized = await pushNotifications.init();
+      if (_initialized) {
+        logger.info('Push notifications _initialized');
         
-        // Schedule wellness reminders based on device type
+        // Schedule wellness reminders based on device _type
         if (this.capabilities.deviceType === 'mobile') {
           await this.scheduleMobileNotifications();
         }
         
         performanceMonitor.recordMetric('push_notifications_initialized', 1);
       }
-    } catch (error) {
-      console.error('Push notifications initialization failed:', error);
-      performanceMonitor.recordMetric('push_notifications_error', 1, { error: String(error) });
+    } catch (_error) {
+      logger.error('Push notifications initialization failed:');
+      performanceMonitor.recordMetric('push_notifications_error', 1, { undefined: String(_undefined) });
     }
   }
 
@@ -186,7 +187,7 @@ export class PWAManager {
    */
   private async initializeOfflineSupport(): Promise<void> {
     if (!this.capabilities?.supportsOffline) {
-      console.warn('Offline support not available');
+      logger.warn('Offline support not available');
       return;
     }
 
@@ -198,15 +199,15 @@ export class PWAManager {
       await precacheCrisisResources();
       
       // Setup offline event handlers
-      window.addEventListener('online', this.handleOnline.bind(this));
-      window.addEventListener('offline', this.handleOffline.bind(this));
+      window.addEventListener('online', this.handleOnline.bind(_this));
+      window.addEventListener('offline', this.handleOffline.bind(_this));
       
-      console.log('Offline support initialized');
+      logger.info('Offline support _initialized');
       performanceMonitor.recordMetric('offline_support_initialized', 1);
       
-    } catch (error) {
-      console.error('Offline support initialization failed:', error);
-      performanceMonitor.recordMetric('offline_support_error', 1, { error: String(error) });
+    } catch (_error) {
+      logger.error('Offline support initialization failed:');
+      performanceMonitor.recordMetric('offline_support_error', 1, { undefined: String(_undefined) });
     }
   }
 
@@ -267,8 +268,8 @@ export class PWAManager {
       
       performanceMonitor.recordMetric('performance_optimizations_initialized', 1);
       
-    } catch (error) {
-      console.error('Performance optimizations failed:', error);
+    } catch (_error) {
+      logger.error('Performance optimizations failed:');
       performanceMonitor.recordMetric('performance_optimizations_error', 1);
     }
   }
@@ -328,7 +329,7 @@ export class PWAManager {
    * Handle online event
    */
   private handleOnline(): void {
-    console.log('App came online');
+    logger.info('App came online');
     
     // Sync offline data
     this.syncOfflineData();
@@ -343,7 +344,7 @@ export class PWAManager {
    * Handle offline event
    */
   private handleOffline(): void {
-    console.log('App went offline');
+    logger.info('App went offline');
     
     // Show offline indicator
     window.dispatchEvent(new CustomEvent('pwa:offline-mode', {
@@ -355,15 +356,15 @@ export class PWAManager {
    * Handle service worker messages
    */
   private handleServiceWorkerMessage(event: MessageEvent): void {
-    const { type, data } = event.data;
+    const { _type, data } = event.data;
     
-    switch (type) {
+    switch (_type) {
       case 'SYNC_COMPLETE':
         window.dispatchEvent(new CustomEvent('pwa:sync-complete', { detail: data }));
         break;
         
       case 'CACHE_UPDATED':
-        console.log('Cache updated:', data);
+        logger.info('Cache updated:', data);
         break;
         
       case 'NOTIFICATION_CLICKED':
@@ -375,7 +376,7 @@ export class PWAManager {
   /**
    * Handle notification clicks
    */
-  private handleNotificationClick(data: any): void {
+  private handleNotificationClick(data: unknown): void {
     // Forward to push notification service
     pushNotifications.handleNotificationClick(data.action, data.data);
   }
@@ -385,7 +386,7 @@ export class PWAManager {
    */
   async installApp(): Promise<boolean> {
     if (!this.installPrompt) {
-      console.warn('No install prompt available');
+      logger.warn('No install prompt available');
       return false;
     }
 
@@ -399,9 +400,9 @@ export class PWAManager {
       
       return choice.outcome === 'accepted';
       
-    } catch (error) {
-      console.error('Install failed:', error);
-      performanceMonitor.recordMetric('install_error', 1, { error: String(error) });
+    } catch (_error) {
+      logger.error('Install failed:');
+      performanceMonitor.recordMetric('install_error', 1, { undefined: String(_undefined) });
       return false;
     }
   }
@@ -425,7 +426,7 @@ export class PWAManager {
     // Morning wellness check-in
     await pushNotifications.scheduleWellnessReminder({
       id: 'morning-checkin',
-      type: 'check-in',
+      _type: 'check-in',
       title: 'Morning Wellness Check',
       body: 'How are you feeling this morning?',
       time: '09:00',
@@ -436,7 +437,7 @@ export class PWAManager {
     // Evening reflection
     await pushNotifications.scheduleWellnessReminder({
       id: 'evening-reflection',
-      type: 'check-in',
+      _type: 'check-in',
       title: 'Evening Reflection',
       body: 'Take a moment to reflect on your day',
       time: '20:00',
@@ -447,7 +448,7 @@ export class PWAManager {
     // Midday breathing break
     await pushNotifications.scheduleWellnessReminder({
       id: 'midday-breathing',
-      type: 'mindfulness',
+      _type: 'mindfulness',
       title: 'Mindfulness Break',
       body: 'Take 2 minutes for a breathing exercise',
       time: '14:00',
@@ -461,7 +462,7 @@ export class PWAManager {
    */
   private async schedulePendingNotifications(): Promise<void> {
     // Implementation depends on your notification scheduling system
-    console.log('Scheduling pending notifications...');
+    logger.info('Scheduling pending notifications...');
   }
 
   /**
@@ -472,10 +473,10 @@ export class PWAManager {
       // Trigger background sync via service worker
       const registration = await navigator.serviceWorker.ready;
       if ('sync' in registration) {
-        await (registration as any).sync.register('sync-data');
+        await (registration as unknown).sync.register('sync-data');
       }
-    } catch (error) {
-      console.error('Background sync failed:', error);
+    } catch (_error) {
+      logger.error('Background sync failed:');
     }
   }
 
@@ -483,7 +484,7 @@ export class PWAManager {
    * Enable low-end device optimizations
    */
   private async enableLowEndDeviceOptimizations(): Promise<void> {
-    console.log('Enabling low-end device optimizations...');
+    logger.info('Enabling low-end device optimizations...');
     
     // Reduce animation complexity
     document.documentElement.classList.add('low-end-device');
@@ -502,7 +503,7 @@ export class PWAManager {
    * Enable slow connection optimizations
    */
   private async enableSlowConnectionOptimizations(): Promise<void> {
-    console.log('Enabling slow connection optimizations...');
+    logger.info('Enabling slow connection optimizations...');
     
     // Reduce data usage
     document.documentElement.classList.add('slow-connection');
@@ -523,8 +524,8 @@ export class PWAManager {
       caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames
-            .filter(cacheName => cacheName.includes('temp'))
-            .map(cacheName => caches.delete(cacheName))
+            .filter(_cacheName => _cacheName.includes('temp'))
+            .map(_cacheName => caches.delete(_cacheName))
         );
       });
     }

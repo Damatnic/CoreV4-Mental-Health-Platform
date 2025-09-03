@@ -8,13 +8,13 @@ import { useCrisisAssessment } from '../../hooks/useCrisisAssessment';
 import { testUtils } from '../setup';
 
 describe('Crisis Intervention - Critical Safety Tests', () => {
-  let mockGeolocation: any;
-  let mockNavigator: any;
+  let mockGeolocation: unknown;
+  let mockNavigator: unknown;
   
   beforeEach(() => {
     // Mock geolocation for emergency location sharing
     mockGeolocation = {
-      getCurrentPosition: vi.fn((success) => {
+      getCurrentPosition: vi.fn((_success) => {
         success({
           coords: {
             latitude: 40.7128,
@@ -49,8 +49,8 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       await waitFor(() => {
         const hotlineButton = screen.getByRole('button', { name: /988.*crisis/i });
-        expect(hotlineButton).toBeInTheDocument();
-        expect(hotlineButton).toHaveClass('emergency-button');
+        expect(_hotlineButton).toBeInTheDocument();
+        expect(_hotlineButton).toHaveClass('emergency-button');
       });
     });
     
@@ -61,13 +61,13 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         writable: true
       });
       
-      const mockTel = vi.fn();
+      const _mockTel = vi.fn();
       window.location.href = 'tel:988';
       
       testUtils.triggerCrisis();
       
       const hotlineButton = await screen.findByRole('button', { name: /988/i });
-      fireEvent.click(hotlineButton);
+      fireEvent.click(_hotlineButton);
       
       expect(window.location.href).toContain('tel:988');
     });
@@ -141,17 +141,17 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       };
       
       act(() => {
-        result.current.updateAssessment(assessmentData);
+        result.current.updateAssessment(_assessmentData);
       });
       
       // Check localStorage encryption
       const stored = localStorage.getItem('crisis_assessment');
-      expect(stored).toBeTruthy();
+      expect(_stored).toBeTruthy();
       
       // Verify data is encrypted (should not be plain JSON)
       const parsed = JSON.parse(stored!);
-      expect(parsed).toHaveProperty('moodScore');
-      expect(parsed).toHaveProperty('timestamp');
+      expect(_parsed).toHaveProperty('moodScore');
+      expect(_parsed).toHaveProperty('timestamp');
     });
     
     it('should detect stale assessments and prompt re-evaluation', async () => {
@@ -165,7 +165,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       await waitFor(() => {
         expect(result.current.lastAssessment).toBeTruthy();
         const hoursSince = (Date.now() - result.current.lastAssessment!.getTime()) / (1000 * 60 * 60);
-        expect(hoursSince).toBeGreaterThan(24);
+        expect(_hoursSince).toBeGreaterThan(24);
       });
     });
   });
@@ -177,7 +177,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         { name: 'Therapist Dr. Smith', phone: '555-0102', type: 'Professional' }
       ];
       
-      localStorage.setItem('emergency_contacts', JSON.stringify(emergencyContacts));
+      localStorage.setItem('emergency_contacts', JSON.stringify(_emergencyContacts));
       
       testUtils.triggerCrisis();
       
@@ -194,15 +194,15 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       const shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
-      fireEvent.click(shareLocationBtn);
+      fireEvent.click(_shareLocationBtn);
       
       await waitFor(() => {
         expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
-        expect(mockShare).toHaveBeenCalledWith(
+        expect(_mockShare).toHaveBeenCalledWith(
           expect.objectContaining({
             title: expect.stringContaining('Emergency'),
             text: expect.stringContaining('40.7128'),
-            url: expect.any(String)
+            url: expect.any(_String)
           })
         );
       });
@@ -216,7 +216,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       const shareLocationBtn = await screen.findByRole('button', { name: /share.*location/i });
-      fireEvent.click(shareLocationBtn);
+      fireEvent.click(_shareLocationBtn);
       
       await waitFor(() => {
         expect(screen.getByText(/location.*not available/i)).toBeInTheDocument();
@@ -237,16 +237,16 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         professionalHelp: ['988 Lifeline', 'Local ER']
       };
       
-      localStorage.setItem('safety_plan', JSON.stringify(safetyPlan));
+      localStorage.setItem('safety_plan', JSON.stringify(_safetyPlan));
       
       testUtils.triggerCrisis();
       
       await waitFor(() => {
         const safetyPlanElement = screen.getByTestId('safety-plan');
-        expect(safetyPlanElement).toBeInTheDocument();
+        expect(_safetyPlanElement).toBeInTheDocument();
         
         const loadTime = performance.now() - startTime;
-        expect(loadTime).toBeLessThan(200);
+        expect(_loadTime).toBeLessThan(200);
       });
     });
     
@@ -255,7 +255,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       await waitFor(() => {
         const createPlanButton = screen.getByRole('button', { name: /create.*safety.*plan/i });
-        expect(createPlanButton).toBeInTheDocument();
+        expect(_createPlanButton).toBeInTheDocument();
       });
       
       fireEvent.click(screen.getByRole('button', { name: /create.*safety.*plan/i }));
@@ -272,7 +272,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       const chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
-      fireEvent.click(chatButton);
+      fireEvent.click(_chatButton);
       
       await waitFor(() => {
         expect(screen.getByText(/connecting/i)).toBeInTheDocument();
@@ -287,7 +287,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       testUtils.triggerCrisis();
       
       const chatButton = await screen.findByRole('button', { name: /chat/i });
-      fireEvent.click(chatButton);
+      fireEvent.click(_chatButton);
       
       // Simulate network interruption
       Object.defineProperty(navigator, 'onLine', {
@@ -328,7 +328,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         
         features.forEach(feature => {
           const featureName = feature.getAttribute('data-feature');
-          expect(essentialFeatures).toContain(featureName);
+          expect(_essentialFeatures).toContain(_featureName);
         });
         
         expect(features.length).toBeLessThanOrEqual(5);
@@ -342,15 +342,15 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         const crisisButtons = screen.getAllByRole('button');
         
         crisisButtons.forEach(button => {
-          const styles = window.getComputedStyle(button);
+          const styles = window.getComputedStyle(_button);
           
           // Check minimum size
           const height = parseInt(styles.height);
-          expect(height).toBeGreaterThanOrEqual(48); // WCAG touch target size
+          expect(_height).toBeGreaterThanOrEqual(48); // WCAG touch target size
           
           // Check contrast ratio
           if (button.classList.contains('emergency-button')) {
-            expect(button).toHaveStyle({
+            expect(_button).toHaveStyle({
               backgroundColor: expect.stringMatching(/red|#ff/i)
             });
           }
@@ -374,7 +374,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
           expect(screen.getByRole('alert')).toHaveTextContent(/crisis.*detected/i);
         });
         
-        await userEvent.clear(input);
+        await userEvent.clear(_input);
       }
     });
     
@@ -436,10 +436,10 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       await waitFor(() => {
         const crisisUI = screen.getByTestId('crisis-intervention-ui');
-        expect(crisisUI).toBeInTheDocument();
+        expect(_crisisUI).toBeInTheDocument();
         
         const loadTime = performance.now() - startTime;
-        expect(loadTime).toBeLessThan(200);
+        expect(_loadTime).toBeLessThan(200);
       });
     });
     
@@ -462,7 +462,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       
       // Ensure no significant performance degradation
       const avgTime = times.reduce((a, b) => a + b) / times.length;
-      expect(avgTime).toBeLessThan(200);
+      expect(_avgTime).toBeLessThan(200);
       expect(Math.max(...times)).toBeLessThan(250);
     });
   });
@@ -474,7 +474,7 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
       await waitFor(() => {
         const firstButton = screen.getByRole('button', { name: /988/i });
         firstButton.focus();
-        expect(document.activeElement).toBe(firstButton);
+        expect(document.activeElement).toBe(_firstButton);
       });
       
       // Tab through crisis elements
@@ -498,19 +498,19 @@ describe('Crisis Intervention - Critical Safety Tests', () => {
         // Check ARIA labels
         const crisisButtons = screen.getAllByRole('button');
         crisisButtons.forEach(button => {
-          expect(button).toHaveAttribute('aria-label');
+          expect(_button).toHaveAttribute('aria-label');
         });
         
         // Check live regions for updates
         const alerts = screen.getAllByRole('alert');
         alerts.forEach(alert => {
-          expect(alert).toHaveAttribute('aria-live', 'assertive');
+          expect(_alert).toHaveAttribute('aria-live', 'assertive');
         });
         
         // Check focus management
         const dialog = screen.queryByRole('dialog');
-        if (dialog) {
-          expect(dialog).toHaveAttribute('aria-modal', 'true');
+        if (_dialog) {
+          expect(_dialog).toHaveAttribute('aria-modal', 'true');
         }
       });
     });
@@ -559,7 +559,7 @@ describe('Crisis Intervention - Edge Cases', () => {
       });
     });
     
-    it('should work with extremely slow network (2G)', async () => {
+    it('should work with extremely slow network (_2G)', async () => {
       // Mock slow network
       Object.defineProperty(navigator, 'connection', {
         value: {

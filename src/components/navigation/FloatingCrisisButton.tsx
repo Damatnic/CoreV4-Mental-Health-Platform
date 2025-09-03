@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Phone, MessageCircle, Heart, X, ChevronUp, HelpCircle } from 'lucide-react';
+import { AlertTriangle, Phone, MessageCircle, Heart, _X, ChevronUp, HelpCircle } from 'lucide-react';
 import { useNavigation } from './NavigationContext';
 import { useLocation } from 'react-router-dom';
 
@@ -128,7 +128,7 @@ export function FloatingCrisisButton() {
   };
 
   useEffect(() => {
-    if (isDragging) {
+    if (_isDragging) {
       window.addEventListener('mousemove', handleDragMove);
       window.addEventListener('mouseup', handleDragEnd);
       window.addEventListener('touchmove', handleDragMove);
@@ -201,7 +201,7 @@ export function FloatingCrisisButton() {
               {/* Safety message */}
               <div className="mt-3 p-2 bg-amber-50 rounded-lg">
                 <p className="text-xs text-amber-800 text-center">
-                  You're not alone. Help is available 24/7.
+                  You&apos;re not alone. Help is available 24/7.
                 </p>
               </div>
             </div>

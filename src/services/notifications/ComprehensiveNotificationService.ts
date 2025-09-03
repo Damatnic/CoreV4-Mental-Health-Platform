@@ -66,11 +66,11 @@ export interface NotificationSchedule {
 
 export interface SmartNotification {
   id: string;
-  ruleId: string;
+  _ruleId: string;
   title: string;
   body: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
-  timestamp: number;
+  _timestamp: number;
   scheduledFor: number;
   status: 'pending' | 'sent' | 'delivered' | 'clicked' | 'dismissed' | 'expired';
   actions: NotificationAction[];
@@ -172,7 +172,7 @@ export class ComprehensiveNotificationService {
     try {
       const preferences = await secureStorage.getItem('notification_preferences');
       
-      if (preferences) {
+      if (_preferences) {
         this.preferences = preferences;
       } else {
         // Create default preferences
@@ -462,12 +462,12 @@ export class ComprehensiveNotificationService {
       
       // Process time-based notifications
       for (const rule of this.rules.values()) {
-        if (!rule.isActive || !this.isRuleEnabled(rule)) continue;
+        if (!rule.isActive || !this.isRuleEnabled(_rule)) continue;
 
         if (rule.trigger.type === 'time_based') {
-          const shouldTrigger = await this.shouldTriggerTimeBasedRule(rule, now);
-          if (shouldTrigger) {
-            await this.createAndScheduleNotification(rule);
+          const _shouldTrigger = await this.shouldTriggerTimeBasedRule(rule, now);
+          if (_shouldTrigger) {
+            await this.createAndScheduleNotification(_rule);
           }
         }
       }
@@ -497,7 +497,7 @@ export class ComprehensiveNotificationService {
       // Check if rule was already triggered today (for daily rules)
       if (rule.schedule.frequency === 'daily' && rule.lastTriggered) {
         const lastTriggeredDate = new Date(rule.lastTriggered);
-        const currentDate = new Date(now);
+        const currentDate = new Date(_now);
         
         if (lastTriggeredDate.toDateString() === currentDate.toDateString()) {
           return false;
@@ -506,7 +506,7 @@ export class ComprehensiveNotificationService {
 
       // Parse time pattern (simplified cron-like)
       const timePattern = rule.trigger.parameters.timePattern;
-      if (timePattern) {
+      if (_timePattern) {
         return this.matchesTimePattern(timePattern, now);
       }
 
@@ -520,8 +520,8 @@ export class ComprehensiveNotificationService {
     }
   }
 
-  private matchesTimePattern(pattern: string, timestamp: number): boolean {
-    const date = new Date(timestamp);
+  private matchesTimePattern(pattern: string, _timestamp: number): boolean {
+    const date = new Date(_timestamp);
     const parts = pattern.split(' ');
     const minute = parts[0] || '*';
     const hour = parts[1] || '*';
@@ -530,8 +530,8 @@ export class ComprehensiveNotificationService {
     const currentHour = date.getHours();
     
     // Simple pattern matching (full cron implementation would be more complex)
-    const minuteMatch = minute === '*' || parseInt(minute) === currentMinute;
-    const hourMatch = hour === '*' || parseInt(hour) === currentHour;
+    const minuteMatch = minute === '*' || parseInt(_minute) === currentMinute;
+    const hourMatch = hour === '*' || parseInt(_hour) === currentHour;
     
     return minuteMatch && hourMatch;
   }
@@ -556,7 +556,7 @@ export class ComprehensiveNotificationService {
   private async checkDailyFrequencyLimit(): Promise<boolean> {
     const today = new Date().toDateString();
     const todaysNotifications = Array.from(this.notifications.values())
-      .filter(n => new Date(n.timestamp).toDateString() === today && n.status === 'sent');
+      .filter(n => new Date(n._timestamp).toDateString() === today && n.status === 'sent');
     
     const maxPerDay = this.preferences?.frequency.maxPerDay || 8;
     return todaysNotifications.length < maxPerDay;
@@ -571,7 +571,7 @@ export class ComprehensiveNotificationService {
 
   public async createAndScheduleNotification(
     rule: NotificationRule, 
-    customData?: Record<string, any>
+    _customData?: Record<string, any>
   ): Promise<string | null> {
     try {
       // Check if conditions are met
@@ -579,21 +579,21 @@ export class ComprehensiveNotificationService {
       if (!conditionsMet) return null;
 
       // Personalize notification content
-      const personalizedContent = await this.personalizeContent(rule.content, customData);
+      const personalizedContent = await this.personalizeContent(rule.content, _customData);
 
       const notification: SmartNotification = {
         id: `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        ruleId: rule.id,
+        _ruleId: rule.id,
         title: personalizedContent.title,
         body: personalizedContent.body,
         priority: rule.priority,
-        timestamp: Date.now(),
+        _timestamp: Date.now(),
         scheduledFor: Date.now(),
         status: 'pending',
         actions: personalizedContent.actions || [],
         metadata: {
           userId: this.preferences?.userId || 'anonymous',
-          context: customData,
+          context: _customData,
           personalizedData: personalizedContent.personalizedData
         }
       };
@@ -638,7 +638,7 @@ export class ComprehensiveNotificationService {
 
   private async personalizeContent(
     content: NotificationContent, 
-    customData?: Record<string, any>
+    _customData?: Record<string, any>
   ): Promise<NotificationContent & { personalizedData?: Record<string, any> }> {
     let personalizedTitle = content.title;
     let personalizedBody = content.body;
@@ -648,7 +648,7 @@ export class ComprehensiveNotificationService {
       // Add user name if requested
       if (content.personalizedElements?.userName) {
         const userName = await this.getUserName();
-        if (userName) {
+        if (_userName) {
           personalizedTitle = personalizedTitle.replace(/Good morning!/g, `Good morning, ${userName}!`);
           personalizedData.userName = userName;
         }
@@ -657,7 +657,7 @@ export class ComprehensiveNotificationService {
       // Add mood context if requested
       if (content.personalizedElements?.moodContext) {
         const moodContext = await this.getMoodContext();
-        if (moodContext) {
+        if (_moodContext) {
           personalizedData.moodContext = moodContext;
         }
       }
@@ -690,7 +690,7 @@ export class ComprehensiveNotificationService {
     try {
       const userProfile = await secureStorage.getItem('user_profile');
       return userProfile?.name || null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -703,12 +703,12 @@ export class ComprehensiveNotificationService {
         return `Last mood: ${latest.mood} (${latest.energy}/10 energy)`;
       }
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
 
-  private async getProgressData(): Promise<{ summary: string; details: any } | null> {
+  private async getProgressData(): Promise<{ summary: string; details: unknown } | null> {
     try {
       // Mock progress data
       return {
@@ -719,7 +719,7 @@ export class ComprehensiveNotificationService {
           weeklyStreak: 5
         }
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -803,7 +803,7 @@ export class ComprehensiveNotificationService {
 
   public async handleNotificationClick(notificationId: string, actionId: string): Promise<void> {
     try {
-      const notification = this.notifications.get(notificationId);
+      const notification = this.notifications.get(_notificationId);
       if (!notification) return;
 
       // Update notification status
@@ -966,9 +966,9 @@ export class ComprehensiveNotificationService {
     return newRule.id;
   }
 
-  public async removeRule(ruleId: string): Promise<boolean> {
-    const deleted = this.rules.delete(ruleId);
-    if (deleted) {
+  public async removeRule(_ruleId: string): Promise<boolean> {
+    const deleted = this.rules.delete(_ruleId);
+    if (_deleted) {
       await this.saveNotificationRules();
     }
     return deleted;
@@ -984,7 +984,7 @@ export class ComprehensiveNotificationService {
 
   public getNotificationHistory(): SmartNotification[] {
     return Array.from(this.notifications.values())
-      .sort((a, b) => b.timestamp - a.timestamp);
+      .sort((a, b) => b._timestamp - a._timestamp);
   }
 
   private async savePreferences(): Promise<void> {

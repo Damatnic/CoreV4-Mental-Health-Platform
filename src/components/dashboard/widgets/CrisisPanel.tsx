@@ -20,11 +20,11 @@ export function CrisisPanel({ data, onEmergencyCall, onOpenSafetyPlan }: CrisisP
   ];
 
   const hotlines = data?.hotlines || defaultHotlines;
-  const riskLevel = data?.currentRiskLevel || 'low';
+  const _riskLevel = data?.currentRiskLevel || 'low';
 
   // Risk level styling
   const getRiskLevelStyle = () => {
-    switch (riskLevel) {
+    switch (_riskLevel) {
       case 'critical':
         return 'bg-red-100 border-red-500 text-red-900';
       case 'high':
@@ -37,7 +37,7 @@ export function CrisisPanel({ data, onEmergencyCall, onOpenSafetyPlan }: CrisisP
   };
 
   const getRiskLevelText = () => {
-    switch (riskLevel) {
+    switch (_riskLevel) {
       case 'critical':
         return 'Immediate Support Available';
       case 'high':

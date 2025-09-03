@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, _AnimatePresence } from 'framer-motion';
 import { 
-  MessageSquare, Phone, Video, Mail, Send, Paperclip, 
+  MessageSquare, Phone, Video, _Mail, Send, Paperclip, 
   Calendar, Clock, Shield, Lock, CheckCircle, AlertCircle,
-  User, Users, FileText, Download, Upload, Info, Bell,
-  ChevronRight, Search, Filter, Archive, Star, Reply
+  User, _Users, FileText, Download, Upload, Info, _Bell,
+  _ChevronRight, Search, _Filter, Archive, _Star, _Reply
 } from 'lucide-react';
 
 interface Message {
@@ -44,7 +44,7 @@ interface CommunicationThread {
   lastMessage: Message;
   unreadCount: number;
   isUrgent: boolean;
-  category: 'clinical' | 'administrative' | 'prescription' | 'appointment' | 'results';
+  _category: 'clinical' | 'administrative' | 'prescription' | 'appointment' | 'results';
   startedAt: Date;
   lastActivity: Date;
   archived: boolean;
@@ -82,11 +82,11 @@ interface ProviderCommunicationProps {
   appointmentRequests?: AppointmentRequest[];
   documents?: Document[];
   currentUserId?: string;
-  onSendMessage?: (recipientId: string, message: string, attachments?: File[]) => void;
-  onScheduleAppointment?: (request: AppointmentRequest) => void;
-  onUploadDocument?: (document: File, type: string) => void;
+  _onSendMessage?: (recipientId: string, message: string, attachments?: File[]) => void;
+  _onScheduleAppointment?: (request: AppointmentRequest) => void;
+  _onUploadDocument?: (document: File, type: string) => void;
   onDownloadDocument?: (documentId: string) => void;
-  onMarkAsRead?: (messageId: string) => void;
+  _onMarkAsRead?: (messageId: string) => void;
   onArchiveThread?: (threadId: string) => void;
 }
 
@@ -96,20 +96,20 @@ export function ProviderCommunication({
   appointmentRequests = [],
   documents = [],
   currentUserId = 'user123',
-  onSendMessage,
-  onScheduleAppointment,
-  onUploadDocument,
+  _onSendMessage,
+  _onScheduleAppointment,
+  _onUploadDocument,
   onDownloadDocument,
-  onMarkAsRead,
+  _onMarkAsRead,
   onArchiveThread
 }: ProviderCommunicationProps) {
   const [activeTab, setActiveTab] = useState<'messages' | 'appointments' | 'documents' | 'secure'>('messages');
   const [selectedThread, setSelectedThread] = useState<CommunicationThread | null>(null);
-  const [composeMode, setComposeMode] = useState(false);
+  const [_composeMode, setComposeMode] = useState(false);
   const [messageContent, setMessageContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [_showUploadModal, setShowUploadModal] = useState(false);
 
   // Get unread message count
   const unreadCount = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);
@@ -120,11 +120,11 @@ export function ProviderCommunication({
   // Get documents requiring action
   const actionRequiredDocs = documents.filter(doc => doc.requiresAction);
 
-  // Filter threads based on search and category
+  // _Filter threads based on search and _category
   const filteredThreads = threads.filter(thread => {
     const matchesSearch = thread.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          thread.lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || thread.category === filterCategory;
+    const matchesCategory = filterCategory === 'all' || thread._category === filterCategory;
     return matchesSearch && matchesCategory && !thread.archived;
   });
 
@@ -135,9 +135,9 @@ export function ProviderCommunication({
   };
 
   // Format timestamp
-  const formatTimestamp = (date: Date) => {
+  const formatTimestamp = (_date: Date) => {
     const now = new Date();
-    const msgDate = new Date(date);
+    const msgDate = new Date(_date);
     const diffMs = now.getTime() - msgDate.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     
@@ -148,8 +148,8 @@ export function ProviderCommunication({
   };
 
   // Get category color
-  const getCategoryColor = (category: string) => {
-    switch (category) {
+  const getCategoryColor = (_category: string) => {
+    switch (_category) {
       case 'clinical': return 'bg-blue-100 text-blue-700';
       case 'administrative': return 'bg-gray-100 text-gray-700';
       case 'prescription': return 'bg-purple-100 text-purple-700';
@@ -199,7 +199,7 @@ export function ProviderCommunication({
         {(['messages', 'appointments', 'documents', 'secure'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => setActiveTab(_tab)}
             className={`px-4 py-2 text-sm font-medium transition-all capitalize ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -227,7 +227,7 @@ export function ProviderCommunication({
           <div className="h-full flex">
             {/* Thread List */}
             <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
-              {/* Search and Filter */}
+              {/* Search and _Filter */}
               <div className="p-3 border-b border-gray-200">
                 <div className="relative mb-2">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -303,8 +303,8 @@ export function ProviderCommunication({
                       {thread.lastMessage.content}
                     </p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(thread.category)}`}>
-                        {thread.category}
+                      <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(thread._category)}`}>
+                        {thread._category}
                       </span>
                       <span className="text-xs text-gray-500">
                         {formatTimestamp(thread.lastActivity)}
@@ -466,8 +466,8 @@ export function ProviderCommunication({
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
-                      Requested: {request.requestedDates.map(date => 
-                        new Date(date).toLocaleDateString()
+                      Requested: {request.requestedDates.map(_date => 
+                        new Date(_date).toLocaleDateString()
                       ).join(', ')}
                     </div>
                     <div className="flex items-center text-gray-600">

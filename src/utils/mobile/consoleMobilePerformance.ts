@@ -37,7 +37,7 @@ class ConsoleMobilePerformance {
   }
 
   private detectDeviceCapabilities(): DeviceCapabilities {
-    const deviceMemory = (navigator as any).deviceMemory || 4;
+    const deviceMemory = (navigator as unknown).deviceMemory || 4;
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
     
     return {
@@ -66,7 +66,7 @@ class ConsoleMobilePerformance {
 
   private getOptimalSettings(): MobilePerformanceSettings {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isLowBattery = (navigator as any).getBattery?.()?.then?.((battery: any) => battery.level < 0.2);
+    const _isLowBattery = (navigator as unknown).getBattery?.()?.then?.((battery: unknown) => battery.level < 0.2);
     
     return {
       reduceMotion: prefersReducedMotion || this.deviceCapabilities.isLowEndDevice,
@@ -83,7 +83,7 @@ class ConsoleMobilePerformance {
 
     // Monitor battery if available
     if ('getBattery' in navigator) {
-      (navigator as any).getBattery().then((battery: any) => {
+      (navigator as unknown).getBattery().then((battery: unknown) => {
         this.settings.batterySavingMode = battery.level < 0.2;
         
         battery.addEventListener('levelchange', () => {
@@ -107,8 +107,8 @@ class ConsoleMobilePerformance {
         });
         
         this.performanceObserver.observe({ entryTypes: ['measure', 'navigation'] });
-      } catch (error) {
-        console.warn('Performance Observer not supported:', error);
+      } catch {
+        console.warn('Performance Observer not supported:');
       }
     }
   }
@@ -117,7 +117,7 @@ class ConsoleMobilePerformance {
     let frames = 0;
     let lastTime = performance.now();
 
-    const measureFPS = (currentTime: number) => {
+    const _measureFPS = (currentTime: number) => {
       frames++;
       
       if (currentTime - lastTime >= 1000) {
@@ -133,10 +133,10 @@ class ConsoleMobilePerformance {
         }
       }
       
-      this.frameRateMonitor = requestAnimationFrame(measureFPS);
+      this.frameRateMonitor = requestAnimationFrame(_measureFPS);
     };
 
-    this.frameRateMonitor = requestAnimationFrame(measureFPS);
+    this.frameRateMonitor = requestAnimationFrame(_measureFPS);
   }
 
   private handleSlowFrame(duration: number): void {
@@ -229,7 +229,7 @@ class ConsoleMobilePerformance {
       ` : ''}
     `;
     
-    document.head.appendChild(style);
+    document.head.appendChild(_style);
   }
 
   public enablePerformanceMode(): void {
@@ -303,7 +303,7 @@ class ConsoleMobilePerformance {
     }
   }
 
-  public getOptimizedAnimationConfig(baseConfig: any): any {
+  public getOptimizedAnimationConfig(baseConfig: unknown): unknown {
     if (this.settings.reduceMotion) {
       return {
         ...baseConfig,
@@ -401,7 +401,7 @@ export function useConsoleMobilePerformance() {
     enablePerformanceMode: () => consoleMobilePerformance.enablePerformanceMode(),
     disablePerformanceMode: () => consoleMobilePerformance.disablePerformanceMode(),
     optimizeElement: (element: HTMLElement) => consoleMobilePerformance.optimizeConsoleElement(element),
-    getOptimizedConfig: (config: any) => consoleMobilePerformance.getOptimizedAnimationConfig(config),
+    getOptimizedConfig: (config: unknown) => consoleMobilePerformance.getOptimizedAnimationConfig(config),
     measurePerformance: <T>(name: string, fn: () => T) => consoleMobilePerformance.measurePerformance(name, fn),
   };
 }

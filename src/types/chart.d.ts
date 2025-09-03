@@ -6,10 +6,10 @@
 declare module 'chart.js' {
   // Core Chart class
   export class Chart {
-    constructor(ctx: any, config: any);
-    static register(...components: any[]): void;
-    static getChart(key: any): Chart | undefined;
-    static defaults: any;
+    constructor(ctx: unknown, config: unknown);
+    static register(...components: unknown[]): void;
+    static getChart(key: unknown): Chart | undefined;
+    static defaults: unknown;
     destroy(): void;
     update(mode?: string): void;
     render(): void;
@@ -18,13 +18,13 @@ declare module 'chart.js' {
     clear(): void;
     toBase64Image(): string;
     generateLegend(): string;
-    getElementsAtEventForMode(e: any, mode: string, options: any, useFinalPosition?: boolean): any[];
-    getSortedVisibleDatasetMetas(): any[];
-    getDatasetMeta(datasetIndex: number): any;
-    getContext(): any;
+    getElementsAtEventForMode(e: unknown, mode: string, options: unknown, useFinalPosition?: boolean): unknown[];
+    getSortedVisibleDatasetMetas(): unknown[];
+    getDatasetMeta(datasetIndex: number): unknown;
+    getContext(): unknown;
     getCanvas(): HTMLCanvasElement;
-    data: any;
-    options: any;
+    data: unknown;
+    options: unknown;
   }
   
   // Chart components and scales
@@ -48,61 +48,61 @@ declare module 'chart.js' {
   }
   
   export interface ChartData {
-    labels?: any[];
+    labels?: unknown[];
     datasets: Dataset[];
   }
   
   export interface Dataset {
     label?: string;
-    data: any[];
-    backgroundColor?: any;
-    borderColor?: any;
+    data: unknown[];
+    backgroundColor?: unknown;
+    borderColor?: unknown;
     borderWidth?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   }
   
   export interface ChartOptions {
     responsive?: boolean;
     maintainAspectRatio?: boolean;
-    plugins?: any;
-    scales?: any;
-    elements?: any;
-    layout?: any;
-    animation?: any;
-    [key: string]: any;
+    plugins?: unknown;
+    scales?: unknown;
+    elements?: unknown;
+    layout?: unknown;
+    animation?: unknown;
+    [key: string]: unknown;
   }
   
   export type ChartType = 'line' | 'bar' | 'radar' | 'doughnut' | 'pie' | 'polarArea' | 'bubble' | 'scatter';
   
   export interface Plugin<TType extends ChartType = ChartType> {
     id?: string;
-    beforeInit?: (chart: Chart, args: any, options: any) => void;
-    afterInit?: (chart: Chart, args: any, options: any) => void;
-    beforeUpdate?: (chart: Chart, args: any, options: any) => void;
-    afterUpdate?: (chart: Chart, args: any, options: any) => void;
-    beforeElementsUpdate?: (chart: Chart, args: any, options: any) => void;
-    beforeLayout?: (chart: Chart, args: any, options: any) => void;
-    afterLayout?: (chart: Chart, args: any, options: any) => void;
-    beforeDatasetsUpdate?: (chart: Chart, args: any, options: any) => void;
-    afterDatasetsUpdate?: (chart: Chart, args: any, options: any) => void;
-    beforeDatasetUpdate?: (chart: Chart, args: any, options: any) => void;
-    afterDatasetUpdate?: (chart: Chart, args: any, options: any) => void;
-    beforeRender?: (chart: Chart, args: any, options: any) => void;
-    afterRender?: (chart: Chart, args: any, options: any) => void;
-    beforeDraw?: (chart: Chart, args: any, options: any) => void;
-    afterDraw?: (chart: Chart, args: any, options: any) => void;
-    beforeDatasetsDraw?: (chart: Chart, args: any, options: any) => void;
-    afterDatasetsDraw?: (chart: Chart, args: any, options: any) => void;
-    beforeDatasetDraw?: (chart: Chart, args: any, options: any) => void;
-    afterDatasetDraw?: (chart: Chart, args: any, options: any) => void;
-    beforeTooltipDraw?: (chart: Chart, args: any, options: any) => void;
-    afterTooltipDraw?: (chart: Chart, args: any, options: any) => void;
-    beforeEvent?: (chart: Chart, args: any, options: any) => void;
-    afterEvent?: (chart: Chart, args: any, options: any) => void;
-    beforeDestroy?: (chart: Chart, args: any, options: any) => void;
-    afterDestroy?: (chart: Chart, args: any, options: any) => void;
-    install?: (chart: Chart, args: any, options: any) => void;
-    uninstall?: (chart: Chart, args: any, options: any) => void;
+    beforeInit?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterInit?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeElementsUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeLayout?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterLayout?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDatasetsUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDatasetsUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDatasetUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDatasetUpdate?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeRender?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterRender?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDatasetsDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDatasetsDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDatasetDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDatasetDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeTooltipDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterTooltipDraw?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeEvent?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterEvent?: (chart: Chart, args: unknown, options: unknown) => void;
+    beforeDestroy?: (chart: Chart, args: unknown, options: unknown) => void;
+    afterDestroy?: (chart: Chart, args: unknown, options: unknown) => void;
+    install?: (chart: Chart, args: unknown, options: unknown) => void;
+    uninstall?: (chart: Chart, args: unknown, options: unknown) => void;
   }
   
   // Mental health specific chart data structures
@@ -140,10 +140,10 @@ declare module 'chart.js' {
 
   // Chart.js plugin extensions for mental health visualizations
   export interface MentalHealthChartPlugin extends Plugin<ChartType> {
-    beforeDraw?: (chart: any, args: any, options: any) => void;
-    afterDraw?: (chart: any, args: any, options: any) => void;
-    beforeDatasetDraw?: (chart: any, args: any, options: any) => void;
-    afterDatasetDraw?: (chart: any, args: any, options: any) => void;
+    beforeDraw?: (chart: unknown, args: unknown, options: unknown) => void;
+    afterDraw?: (chart: unknown, args: unknown, options: unknown) => void;
+    beforeDatasetDraw?: (chart: unknown, args: unknown, options: unknown) => void;
+    afterDatasetDraw?: (chart: unknown, args: unknown, options: unknown) => void;
   }
 
   // Mood tracking chart configuration
@@ -180,14 +180,14 @@ declare module 'chart.js' {
       recommendations: string[];
       riskLevel: 'low' | 'medium' | 'high';
     };
-    formatTherapeuticData: (raw: any[]) => MoodChartData;
+    formatTherapeuticData: (raw: unknown[]) => MoodChartData;
   }
 
   // Export enhanced chart configuration
   export const MentalHealthChart: {
     create: (config: MoodChartConfiguration) => any;
-    updateSafely: (chart: any, data: MoodChartData) => void;
-    addPrivacyLayer: (chart: any, level: 'none' | 'blur' | 'aggregate') => void;
+    updateSafely: (chart: unknown, data: MoodChartData) => void;
+    addPrivacyLayer: (chart: unknown, level: 'none' | 'blur' | 'aggregate') => void;
   };
 }
 
@@ -197,7 +197,7 @@ declare module 'react-chartjs-2' {
 
   // Enhanced chart components with mental health specific props
   export interface MentalHealthChartProps extends Omit<ChartProps, 'type'> {
-    data: any;
+    data: unknown;
     options?: ChartOptions & {
       mentalHealth?: {
         showTrendLine?: boolean;
@@ -213,7 +213,7 @@ declare module 'react-chartjs-2' {
         enableKeyboardNav?: boolean;
       };
     };
-    plugins?: any[];
+    plugins?: unknown[];
     redraw?: boolean;
     updateMode?: 'resize' | 'reset' | 'none' | 'hide' | 'show' | 'active';
     height?: number;
@@ -264,7 +264,7 @@ declare module 'react-chartjs-2' {
   }>;
 
   // Chart registration and defaults
-  export function getElementAtEvent(chart: any, event: React.MouseEvent): any[];
-  export function getElementsAtEvent(chart: any, event: React.MouseEvent): any[];
-  export function getDatasetAtEvent(chart: any, event: React.MouseEvent): any[];
+  export function getElementAtEvent(chart: unknown, event: React.MouseEvent): unknown[];
+  export function getElementsAtEvent(chart: unknown, event: React.MouseEvent): unknown[];
+  export function getDatasetAtEvent(chart: unknown, event: React.MouseEvent): unknown[];
 }

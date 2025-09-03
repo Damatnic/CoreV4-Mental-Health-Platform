@@ -1,0 +1,509 @@
+/**
+ * Memory Leak Prevention Utilities for CoreV4
+ * Provides automatic cleanup, weak references, and memory monitoring
+ */
+
+import { useRef, useEffect } from 'react';
+import { performanceMonitor } from './performanceMonitor';
+
+/**
+ * WeakMap-based cache for preventing memory leaks
+ */
+export class WeakCache<K extends object, V> {
+  private cache = new WeakMap<K, V>();
+  private refCount = new WeakMap<K, number>();
+  
+  set(_key: K, value: V): void {
+    this.cache.set(_key, value);
+    this.refCount.set(_key, (this.refCount.get(_key) || 0) + 1);
+  }
+  
+  get(_key: K): V | undefined {
+    return this.cache.get(_key);
+  }
+  
+  has(_key: K): boolean {
+    return this.cache.has(_key);
+  }
+  
+  delete(_key: K): boolean {
+    this.refCount.delete(_key);
+    return this.cache.delete(_key);
+  }
+  
+  getRefCount(_key: K): number {
+    return this.refCount.get(_key) || 0;
+  }
+}
+
+/**
+ * Automatic cleanup manager for subscriptions and timers
+ */
+export class CleanupManager {
+  private cleanupFunctions: Set<() => void> = new Set();
+  private intervals: Set<number> = new Set();
+  private timeouts: Set<number> = new Set();
+  private animationFrames: Set<number> = new Set();
+  private observers: Set<MutationObserver | IntersectionObserver | ResizeObserver> = new Set();
+  private eventListeners: Map<EventTarget, Map<string, EventListener>> = new Map();
+  private abortControllers: Set<AbortController> = new Set();
+  
+  /**
+   * Register a _cleanup function
+   */
+  register(_cleanup: () => void): void {
+    this.cleanupFunctions.add(_cleanup);
+  }
+  
+  /**
+   * Create a managed interval
+   */
+  setInterval(_callback: () => void, delay: number): number {
+    const _id = window.setInterval(_callback, delay);
+    this.intervals.add(_id);
+    return _id;
+  }
+  
+  /**
+   * Create a managed timeout
+   */
+  setTimeout(_callback: () => void, delay: number): number {
+    const _id = window.setTimeout(() => {
+      _callback();
+      this.timeouts.delete(_id);
+    }, delay);
+    this.timeouts.add(_id);
+    return id;
+  }
+  
+  /**
+   * Create a managed animation frame
+   */
+  requestAnimationFrame(_callback: FrameRequestCallback): number {
+    const _id = window.requestAnimationFrame((_time) => {
+      _callback(_time);
+      this.animationFrames.delete(_id);
+    });
+    this.animationFrames.add(_id);
+    return id;
+  }
+  
+  /**
+   * Add a managed event listener
+   */
+  addEventListener(
+    target: EventTarget,
+    type: string,
+    _listener: EventListener,
+    options?: AddEventListenerOptions
+  ): void {
+    target.addEventListener(type, _listener, options);
+    
+    if (!this.eventListeners.has(_target)) {
+      this.eventListeners.set(target, new Map());
+    }
+    this.eventListeners.get(_target)!.set(type, _listener);
+  }
+  
+  /**
+   * Create a managed observer
+   */
+  createMutationObserver(_callback: MutationCallback): MutationObserver {
+    const observer = new MutationObserver(_callback);
+    this.observers.add(_observer);
+    return observer;
+  }
+  
+  /**
+   * Create a managed intersection observer
+   */
+  createIntersectionObserver(
+    _callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit
+  ): IntersectionObserver {
+    const observer = new IntersectionObserver(_callback, options);
+    this.observers.add(_observer);
+    return observer;
+  }
+  
+  /**
+   * Create a managed resize observer
+   */
+  createResizeObserver(_callback: ResizeObserverCallback): ResizeObserver {
+    const observer = new ResizeObserver(_callback);
+    this.observers.add(_observer);
+    return observer;
+  }
+  
+  /**
+   * Create a managed abort controller
+   */
+  createAbortController(): AbortController {
+    const controller = new AbortController();
+    this.abortControllers.add(_controller);
+    return controller;
+  }
+  
+  /**
+   * Clean up all managed resources
+   */
+  cleanup(): void {
+    // Clear intervals
+    this.intervals.forEach(_id => clearInterval(_id));
+    this.intervals.clear();
+    
+    // Clear timeouts
+    this.timeouts.forEach(_id => clearTimeout(_id));
+    this.timeouts.clear();
+    
+    // Cancel animation frames
+    this.animationFrames.forEach(_id => cancelAnimationFrame(_id));
+    this.animationFrames.clear();
+    
+    // Disconnect observers
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers.clear();
+    
+    // Remove _event listeners
+    this.eventListeners.forEach((listeners, target) => {
+      listeners.forEach((_listener, type) => {
+        target.removeEventListener(type, _listener);
+      });
+    });
+    this.eventListeners.clear();
+    
+    // Abort fetch requests
+    this.abortControllers.forEach(controller => controller.abort());
+    this.abortControllers.clear();
+    
+    // Execute cleanup functions
+    this.cleanupFunctions.forEach(cleanup => {
+      try {
+        _cleanup();
+      } catch (_error) {
+        console.error('Cleanup function _error: ');
+      }
+    });
+    this.cleanupFunctions.clear();
+    
+    // Record cleanup
+    performanceMonitor.recordMetric('memory_cleanup', this.cleanupFunctions.size);
+  }
+}
+
+/**
+ * Memory-efficient event emitter
+ */
+export class MemoryEfficientEventEmitter<T extends Record<string, any>> {
+  private listeners = new Map<keyof T, Set<(_data: unknown) => void>>();
+  private maxListeners = 10;
+  
+  on<K extends keyof T>(_event: K, _listener: (_data: T[K]) => void): () => void {
+    if (!this.listeners.has(_event)) {
+      this.listeners.set(_event, new Set());
+    }
+    
+    const eventListeners = this.listeners.get(_event)!;
+    
+    // Warn if too many listeners (potential leak)
+    if (eventListeners.size >= this.maxListeners) {
+      console.warn(`[Memory] Possible memory leak: ${String(_event)} has ${eventListeners.size} listeners`);
+      performanceMonitor.recordMetric('potential_memory_leak', eventListeners.size, {
+        _event: String(_event)
+      });
+    }
+    
+    eventListeners.add(_listener);
+    
+    // Return cleanup function
+    return () => {
+      eventListeners.delete(_listener);
+      if (eventListeners.size === 0) {
+        this.listeners.delete(_event);
+      }
+    };
+  }
+  
+  emit<K extends keyof T>(_event: K, _data: T[K]): void {
+    const eventListeners = this.listeners.get(_event);
+    if (eventListeners) {
+      eventListeners.forEach(_listener => {
+        try {
+          _listener(_data);
+        } catch (_error) {
+          console.error(`Error in _event _listener for ${String(_event)}:`, _error);
+        }
+      });
+    }
+  }
+  
+  removeAllListeners(event?: keyof T): void {
+    if (_event) {
+      this.listeners.delete(_event);
+    } else {
+      this.listeners.clear();
+    }
+  }
+  
+  listenerCount(_event: keyof T): number {
+    return this.listeners.get(_event)?.size || 0;
+  }
+}
+
+/**
+ * Object pool for reusing objects and reducing garbage collection
+ */
+export class ObjectPool<T> {
+  private pool: T[] = [];
+  private maxSize: number;
+  private createFn: () => T;
+  private resetFn: (_obj: T) => void;
+  
+  constructor(
+    createFn: () => T,
+    resetFn: (_obj: T) => void,
+    maxSize: number = 100
+  ) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+    this.maxSize = maxSize;
+  }
+  
+  acquire(): T {
+    if (this.pool.length > 0) {
+      return this.pool.pop()!;
+    }
+    return this.createFn();
+  }
+  
+  release(_obj: T): void {
+    if (this.pool.length < this.maxSize) {
+      this.resetFn(_obj);
+      this.pool.push(_obj);
+    }
+  }
+  
+  clear(): void {
+    this.pool = [];
+  }
+  
+  get size(): number {
+    return this.pool.length;
+  }
+}
+
+/**
+ * Debounced function with automatic cleanup
+ */
+export function createDebouncedFunction<T extends (...args: unknown[]) => any>(
+  fn: T,
+  delay: number,
+  options: { leading?: boolean; trailing?: boolean; maxWait?: number } = {}
+): T & { cancel: () => void; flush: () => void } {
+  let timeoutId: number | null = null;
+  let lastCallTime: number | null = null;
+  let lastInvokeTime = 0;
+  let lastArgs: unknown[] | null = null;
+  let lastThis: unknown = null;
+  let result: unknown;
+  
+  const { leading = false, trailing = true, maxWait } = options;
+  
+  function invokeFunc(_time: number) {
+    const args = lastArgs;
+    const thisArg = lastThis;
+    
+    lastArgs = null;
+    lastThis = null;
+    lastInvokeTime = _time;
+    result = fn.apply(thisArg, args!);
+    return result;
+  }
+  
+  function leadingEdge(_time: number) {
+    lastInvokeTime = _time;
+    timeoutId = window.setTimeout(timerExpired, delay);
+    return leading ? invokeFunc(_time) : result;
+  }
+  
+  function timerExpired() {
+    const _time = Date.now();
+    if (shouldInvoke(_time)) {
+      return trailingEdge(_time);
+    }
+    timeoutId = window.setTimeout(timerExpired, remainingWait(_time));
+  }
+  
+  function trailingEdge(_time: number) {
+    timeoutId = null;
+    if (trailing && lastArgs) {
+      return invokeFunc(_time);
+    }
+    lastArgs = null;
+    lastThis = null;
+    return result;
+  }
+  
+  function shouldInvoke(_time: number) {
+    const timeSinceLastCall = lastCallTime ? _time - lastCallTime : 0;
+    const timeSinceLastInvoke = _time - lastInvokeTime;
+    
+    return (
+      lastCallTime === null ||
+      timeSinceLastCall >= delay ||
+      timeSinceLastCall < 0 ||
+      (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
+    );
+  }
+  
+  function remainingWait(_time: number) {
+    const timeSinceLastCall = lastCallTime ? _time - lastCallTime : 0;
+    const timeSinceLastInvoke = _time - lastInvokeTime;
+    const timeWaiting = delay - timeSinceLastCall;
+    
+    return maxWait !== undefined
+      ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
+      : timeWaiting;
+  }
+  
+  function debounced(this: unknown, ...args: unknown[]) {
+    const _time = Date.now();
+    const _isInvoking = shouldInvoke(_time);
+    
+    lastArgs = args;
+    lastThis = this;
+    lastCallTime = _time;
+    
+    if (_isInvoking) {
+      if (timeoutId === null) {
+        return leadingEdge(_time);
+      }
+      if (maxWait !== undefined) {
+        timeoutId = window.setTimeout(timerExpired, delay);
+        return invokeFunc(_time);
+      }
+    }
+    
+    if (timeoutId === null) {
+      timeoutId = window.setTimeout(timerExpired, delay);
+    }
+    
+    return result;
+  }
+  
+  debounced.cancel = function() {
+    if (timeoutId !== null) {
+      clearTimeout(_timeoutId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = null;
+    lastCallTime = null;
+    lastThis = null;
+    timeoutId = null;
+  };
+  
+  debounced.flush = function() {
+    return timeoutId === null ? result : trailingEdge(Date.now());
+  };
+  
+  return debounced as T & { cancel: () => void; flush: () => void };
+}
+
+/**
+ * Memory-efficient image loader with automatic cleanup
+ */
+export class ImageLoader {
+  private cache = new Map<string, HTMLImageElement>();
+  private loading = new Map<string, Promise<HTMLImageElement>>();
+  private observers = new WeakMap<HTMLImageElement, IntersectionObserver>();
+  
+  async load(_src: string): Promise<HTMLImageElement> {
+    // Check cache
+    if (this.cache.has(_src)) {
+      return this.cache.get(_src)!;
+    }
+    
+    // Check if already loading
+    if (this.loading.has(_src)) {
+      return this.loading.get(_src)!;
+    }
+    
+    // Start loading
+    const loadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        this.cache.set(_src, img);
+        this.loading.delete(_src);
+        resolve(img);
+      };
+      
+      img.onerror = () => {
+        this.loading.delete(_src);
+        reject(new Error(`Failed to load image: ${_src}`));
+      };
+      
+      img.src = src;
+    });
+    
+    this.loading.set(_src, loadPromise);
+    return loadPromise;
+  }
+  
+  lazyLoad(element: HTMLImageElement, _src: string): void {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            this.load(_src).then(img => {
+              element._src = img._src;
+              observer.disconnect();
+              this.observers.delete(_element);
+            });
+          }
+        });
+      },
+      { rootMargin: '50px' }
+    );
+    
+    observer.observe(_element);
+    this.observers.set(element, observer);
+  }
+  
+  clear(): void {
+    this.cache.clear();
+    this.loading.clear();
+  }
+  
+  remove(_src: string): void {
+    this.cache.delete(_src);
+    this.loading.delete(_src);
+  }
+}
+
+/**
+ * React hook for automatic cleanup
+ */
+export function useCleanup() {
+  const cleanupManager = useRef(new CleanupManager());
+  
+  useEffect(() => {
+    return () => {
+      cleanupManager.current._cleanup();
+    };
+  }, []);
+  
+  return cleanupManager.current;
+}
+
+// Export singleton instances
+export const globalCleanupManager = new CleanupManager();
+export const globalImageLoader = new ImageLoader();
+
+// Automatic cleanup on page unload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    globalCleanupManager._cleanup();
+    globalImageLoader.clear();
+  });
+}

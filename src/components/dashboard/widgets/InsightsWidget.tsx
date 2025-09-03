@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 
 interface Insight {
   id: string;
-  type: string;
+  _type: string;
   title: string;
   description: string;
-  priority: string;
+  _priority: string;
   actionable: boolean;
-  actions?: any[];
+  actions?: unknown[];
 }
 
 interface InsightsWidgetProps {
@@ -21,7 +21,7 @@ interface InsightsWidgetProps {
 export function InsightsWidget({ insights, error }: InsightsWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>
@@ -33,26 +33,26 @@ export function InsightsWidget({ insights, error }: InsightsWidgetProps) {
   const defaultInsights: Insight[] = insights?.length ? insights : [
     {
       id: '1',
-      type: 'trend',
+      _type: 'trend',
       title: 'Your mood improves after exercise',
       description: 'We noticed your mood scores are 40% higher on days you exercise.',
-      priority: 'medium',
+      _priority: 'medium',
       actionable: true,
       actions: [{ label: 'Schedule workout', route: '/wellness/activities' }]
     },
     {
       id: '2',
-      type: 'recommendation',
+      _type: 'recommendation',
       title: 'Try morning meditation',
       description: 'Users who meditate in the morning report 25% better focus throughout the day.',
-      priority: 'low',
+      _priority: 'low',
       actionable: true,
       actions: [{ label: 'Start meditation', route: '/wellness/meditation' }]
     }
   ];
 
-  const getInsightIcon = (type: string) => {
-    switch (type) {
+  const getInsightIcon = (_type: string) => {
+    switch (_type) {
       case 'warning':
         return <AlertCircle className="h-5 w-5 text-yellow-500" />;
       case 'trend':
@@ -64,8 +64,8 @@ export function InsightsWidget({ insights, error }: InsightsWidgetProps) {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const getPriorityColor = (_priority: string) => {
+    switch (_priority) {
       case 'high':
         return 'border-red-200 bg-red-50';
       case 'medium':
@@ -99,12 +99,12 @@ export function InsightsWidget({ insights, error }: InsightsWidgetProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`border rounded-lg p-3 cursor-pointer hover:shadow-md transition-all ${getPriorityColor(insight.priority)}`}
+            className={`border rounded-lg p-3 cursor-pointer hover:shadow-md transition-all ${getPriorityColor(insight._priority)}`}
             onClick={() => navigate('/wellness/insights')}
           >
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 mt-0.5">
-                {getInsightIcon(insight.type)}
+                {getInsightIcon(insight._type)}
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-medium text-gray-900 mb-1">

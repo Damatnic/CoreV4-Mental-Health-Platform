@@ -5,8 +5,9 @@
  * Prevents XSS attacks from accessing plain text mental health data
  */
 
-// @ts-ignore - CryptoJS types compatibility
+// @ts-expect-error - CryptoJS types compatibility
 import CryptoJS from 'crypto-js';
+import { logger } from '../../utils/logger';
 
 // Sensitive data types that must be encrypted
 const SENSITIVE_DATA_KEYS = [
@@ -43,7 +44,7 @@ class SecureLocalStorage {
       this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
       this.isInitialized = true;
     } catch (error) {
-      console.error('🔒 SecureLocalStorage initialization failed:', error);
+      logger.error('🔒 SecureLocalStorage initialization failed:', error);
       // Fallback to a simple key to prevent app crashes
       this.encryptionKey = `fallback_emergency_key_${  Date.now()}`;
       this.isInitialized = false;
@@ -57,27 +58,27 @@ class SecureLocalStorage {
   private generateTempKey(): string {
     try {
       // Try CryptoJS first
-      // @ts-ignore - CryptoJS lib property access
+      // @ts-expect-error - CryptoJS lib property access
       const tempKey = CryptoJS.lib.WordArray.random(256/8).toString();
-      console.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
+      logger.warn('⚠️ Using temporary encryption key. Set VITE_ENCRYPTION_KEY for production.');
       return tempKey;
-    } catch (error) {
+    } catch {
       // Fallback to browser crypto API or manual generation
-      console.warn('⚠️ CryptoJS random failed, using fallback method:', error);
+      logger.warn('⚠️ CryptoJS random failed, using fallback method');
       
       if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
         // Use browser's crypto API
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);
         const tempKey = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-        console.warn('⚠️ Using browser crypto for temporary key. Set VITE_ENCRYPTION_KEY for production.');
+        logger.warn('⚠️ Using browser crypto for temporary key. Set VITE_ENCRYPTION_KEY for production.');
         return tempKey;
       } else {
         // Final fallback - deterministic but unique per session
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2);
         const tempKey = `fallback_${timestamp}_${random}`;
-        console.warn('⚠️ Using fallback key generation. Set VITE_ENCRYPTION_KEY for production.');
+        logger.warn('⚠️ Using fallback key generation. Set VITE_ENCRYPTION_KEY for production.');
         return tempKey;
       }
     }
@@ -99,21 +100,21 @@ class SecureLocalStorage {
     try {
       // Check if CryptoJS is properly initialized
       if (!CryptoJS || !CryptoJS.AES || !this.isInitialized) {
-        console.warn('🔒 CryptoJS not properly initialized, storing data unencrypted');
+        logger.warn('🔒 CryptoJS not properly initialized, storing data unencrypted');
         return data; // Store unencrypted but warn about it
       }
 
-      // @ts-ignore - CryptoJS method access
+      // @ts-expect-error - CryptoJS method access
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey, {
-        // @ts-ignore - CryptoJS mode property access
+        // @ts-expect-error - CryptoJS mode property access
         mode: CryptoJS.mode.CBC,
-        // @ts-ignore - CryptoJS padding property access
+        // @ts-expect-error - CryptoJS padding property access
         padding: CryptoJS.pad.Pkcs7
       });
       return encrypted.toString();
     } catch (error) {
-      console.error('🔒 Encryption failed:', error);
-      console.warn('🔒 Storing data unencrypted due to encryption failure');
+      logger.error('🔒 Encryption failed:', error);
+      logger.warn('🔒 Storing data unencrypted due to encryption failure');
       return data; // Fallback to unencrypted to prevent app crashes
     }
   }
@@ -125,37 +126,37 @@ class SecureLocalStorage {
     try {
       // Validate input data
       if (!encryptedData || typeof encryptedData !== 'string') {
-        console.warn('🔒 Invalid encrypted data format, clearing...');
+        logger.warn('🔒 Invalid encrypted data format, clearing...');
         return '';
       }
 
       // Check if CryptoJS is properly initialized
       if (!CryptoJS || !CryptoJS.AES || !this.isInitialized) {
-        console.warn('🔒 CryptoJS not properly initialized, returning data as-is');
+        logger.warn('🔒 CryptoJS not properly initialized, returning data as-is');
         return encryptedData; // Return unencrypted data
       }
       
-      // @ts-ignore - CryptoJS method access
+      // @ts-expect-error - CryptoJS method access
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey, {
-        // @ts-ignore - CryptoJS mode property access
+        // @ts-expect-error - CryptoJS mode property access
         mode: CryptoJS.mode.CBC,
-        // @ts-ignore - CryptoJS padding property access
+        // @ts-expect-error - CryptoJS padding property access
         padding: CryptoJS.pad.Pkcs7
       });
       
-      // @ts-ignore - CryptoJS encoding access
+      // @ts-expect-error - CryptoJS encoding access
       const result = decrypted.toString(CryptoJS.enc.Utf8);
       
       if (!result) {
-        console.warn('🔒 Corrupted data detected, returning original...');
+        logger.warn('🔒 Corrupted data detected, returning original...');
         return encryptedData; // Return original data instead of empty string
       }
       
       return result;
     } catch (error) {
-      console.error('🔒 Decryption failed:', error);
+      logger.error('🔒 Decryption failed:', error);
       // Return original data instead of throwing to prevent app crashes
-      console.warn('🔒 Returning data unencrypted due to decryption failure');
+      logger.warn('🔒 Returning data unencrypted due to decryption failure');
       return encryptedData;
     }
   }
@@ -171,14 +172,14 @@ class SecureLocalStorage {
         localStorage.setItem(`encrypted_${key}`, encryptedValue);
         
         // Log security action (but not the data)
-        console.info('🔒 Stored encrypted data for key:', key);
+        logger.debug('Stored encrypted data for key', 'SecureLocalStorage', { key, isPrivacySafe: true });
       } else {
         // Store non-sensitive data normally
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      console.error('🔒 SecureLocalStorage.setItem failed:', error);
-      throw error;
+      logger.error('🔒 SecureLocalStorage.setItem failed:', error);
+      throw undefined;
     }
   }
 
@@ -193,9 +194,9 @@ class SecureLocalStorage {
         if (encryptedValue) {
           try {
             return this.decrypt(encryptedValue);
-          } catch (decryptError) {
+          } catch {
             // If decryption fails (malformed data/wrong key), clear corrupted data
-            console.warn('🔒 Corrupted encrypted data detected, clearing:', key);
+            logger.warn('🔒 Corrupted encrypted data detected, clearing:', key);
             localStorage.removeItem(`encrypted_${key}`);
             localStorage.removeItem(key);
             return null;
@@ -209,10 +210,10 @@ class SecureLocalStorage {
             // Migrate to encrypted storage
             this.setItem(key, plainValue);
             localStorage.removeItem(key); // Remove plain text version
-            console.info('🔒 Migrated plain text data to encrypted storage:', key);
+            logger.info('Migrated plain text data to encrypted storage', 'SecureLocalStorage', { key, isPrivacySafe: true });
             return plainValue;
-          } catch (encryptError) {
-            console.warn('🔒 Failed to encrypt during migration, returning plain value:', key);
+          } catch (_error) {
+    logger.warn('🔒 Failed to encrypt during migration, returning plain value:', key);
             return plainValue;
           }
         }
@@ -223,7 +224,7 @@ class SecureLocalStorage {
         return localStorage.getItem(key);
       }
     } catch (error) {
-      console.error('🔒 SecureLocalStorage.getItem failed:', error);
+      logger.error('🔒 SecureLocalStorage.getItem failed:', error);
       return null;
     }
   }
@@ -236,12 +237,12 @@ class SecureLocalStorage {
       if (this.isSensitiveData(key)) {
         localStorage.removeItem(`encrypted_${key}`);
         localStorage.removeItem(key); // Also remove any plain text version
-        console.info('🔒 Removed encrypted data for key:', key);
+        logger.debug('Removed encrypted data for key', 'SecureLocalStorage', { key, isPrivacySafe: true });
       } else {
         localStorage.removeItem(key);
       }
     } catch (error) {
-      console.error('🔒 SecureLocalStorage.removeItem failed:', error);
+      logger.error('🔒 SecureLocalStorage.removeItem failed:', error);
     }
   }
 
@@ -251,9 +252,9 @@ class SecureLocalStorage {
   clear(): void {
     try {
       localStorage.clear();
-      console.info('🔒 Cleared all localStorage data');
+      logger.info('Cleared all localStorage data', 'SecureLocalStorage');
     } catch (error) {
-      console.error('🔒 SecureLocalStorage.clear failed:', error);
+      logger.error('🔒 SecureLocalStorage.clear failed:', error);
     }
   }
 
@@ -278,7 +279,7 @@ class SecureLocalStorage {
         percentage: Math.round((used / total) * 100)
       };
     } catch (error) {
-      console.error('🔒 Failed to get storage info:', error);
+      logger.error('🔒 Failed to get storage info:', error);
       return { used: 0, total: 0, percentage: 0 };
     }
   }
@@ -305,7 +306,7 @@ class SecureLocalStorage {
         }
       }
     } catch (error) {
-      console.error('🔒 Failed to audit stored data:', error);
+      logger.error('🔒 Failed to audit stored data:', error);
     }
 
     return { encrypted, plainText, sensitive };
@@ -315,7 +316,7 @@ class SecureLocalStorage {
    * Migrate all sensitive plain text data to encrypted storage
    */
   migrateSensitiveData(): void {
-    console.info('🔒 Starting migration of sensitive data to encrypted storage...');
+    logger.info('Starting migration of sensitive data to encrypted storage...', 'SecureLocalStorage');
     
     const audit = this.auditStoredData();
     let migrated = 0;
@@ -328,12 +329,12 @@ class SecureLocalStorage {
           this.setItem(key, value); // This will encrypt it
           migrated++;
         } catch (error) {
-          console.error(`🔒 Failed to migrate ${key}:`, error);
+          logger.error(`🔒 Failed to migrate ${key}:`, error);
         }
       }
     });
 
-    console.info(`🔒 Migration complete. ${migrated} keys migrated to encrypted storage.`);
+    logger.info(`Migration complete. ${migrated} keys migrated to encrypted storage.`, 'SecureLocalStorage');
   }
 }
 
@@ -354,5 +355,5 @@ export const secureStorage = {
   removeItem: (key: string) => secureStorageInstance.removeItem(key),
   clear: () => secureStorageInstance.clear(),
   get length() { return localStorage.length; },
-  key: (index: number) => localStorage.key(index)
+  key: (_index: number) => localStorage.key(_index)
 };

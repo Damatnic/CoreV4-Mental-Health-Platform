@@ -6,11 +6,11 @@
 import React from 'react';
 
 export interface CommunityFeedProps {
-  userId?: string;
-  filters?: string[];
+  _userId?: string;
+  _filters?: string[];
 }
 
-export default function CommunityFeed({ userId, filters }: CommunityFeedProps) {
+export default function CommunityFeed({ _userId, _filters }: CommunityFeedProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -78,7 +78,7 @@ export default function CommunityFeed({ userId, filters }: CommunityFeedProps) {
               Community Features Coming Soon
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              We're building a supportive community space where you can share experiences, 
+              We&apos;re building a supportive community space where you can share experiences, 
               find encouragement, and connect with others on similar wellness journeys.
             </p>
             <div className="flex flex-wrap justify-center gap-2">

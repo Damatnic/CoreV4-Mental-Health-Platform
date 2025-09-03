@@ -387,7 +387,7 @@ export interface ApiResponse<T> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   requestId: string;
 }
@@ -411,7 +411,7 @@ export interface PaginationInfo {
 // WebSocket Event Types
 export interface WebSocketEvent {
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: Date;
   userId?: string;
 }

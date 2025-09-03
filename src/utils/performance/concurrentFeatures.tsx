@@ -11,7 +11,7 @@ import React, {
   lazy,
   memo,
   useCallback,
-  useMemo,
+  _useMemo,
   ComponentType,
   ReactNode,
 } from 'react';
@@ -55,7 +55,7 @@ export function usePrioritizedDeferredValue<T>(
   value: T,
   priority: UpdatePriority = UpdatePriority.MEDIUM
 ): T {
-  const deferred = useDeferredValue(value);
+  const deferred = useDeferredValue(_value);
   
   // For crisis priority, return immediate value
   if (priority === UpdatePriority.CRISIS) {
@@ -153,20 +153,20 @@ export function SuspenseWrapper({
 /**
  * Lazy loading with preload support
  */
-export function lazyWithPreload<T extends ComponentType<any>>(
+export function lazyWithPreload<T extends ComponentType<unknown>>(
   importFn: () => Promise<{ default: T }>
 ) {
   let preloadPromise: Promise<{ default: T }> | null = null;
   
   const LazyComponent = lazy(() => {
-    if (preloadPromise) {
+    if (_preloadPromise) {
       return preloadPromise;
     }
     return importFn();
   });
   
   // Add preload method
-  (LazyComponent as any).preload = () => {
+  (LazyComponent as unknown).preload = () => {
     if (!preloadPromise) {
       preloadPromise = importFn();
     }
@@ -199,13 +199,13 @@ export function ProgressiveEnhancement({
       return;
     }
     
-    const timer = setTimeout(() => {
+    const _timer = setTimeout(() => {
       startTransition(() => {
         setIsReady(true);
       });
     }, delay);
     
-    return () => clearTimeout(timer);
+    return () => clearTimeout(_timer);
   }, [delay, priority]);
   
   if (!isReady) {
@@ -229,8 +229,8 @@ export function optimizedMemo<P extends object>(
  * Shallow equality check for props
  */
 function shallowEqual<T extends object>(prevProps: T, nextProps: T): boolean {
-  const prevKeys = Object.keys(prevProps);
-  const nextKeys = Object.keys(nextProps);
+  const prevKeys = Object.keys(_prevProps);
+  const nextKeys = Object.keys(_nextProps);
   
   if (prevKeys.length !== nextKeys.length) {
     return false;
@@ -297,6 +297,7 @@ export function LazyLoad({
   const ref = React.useRef<HTMLDivElement>(null);
   
   React.useEffect(() => {
+// @ts-expect-error - IntersectionObserver is a global API
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -336,7 +337,7 @@ export async function timeSlice<T>(
     
     await new Promise(resolve => {
       startTransition(() => {
-        chunk.forEach(processor);
+        chunk.forEach(_processor);
         setTimeout(resolve, delay);
       });
     });

@@ -2,6 +2,7 @@
 // CRITICAL: This is for DEMO PURPOSES ONLY - Production requires certified counselors
 
 import { RealtimeMessage } from '../realtime/websocketService';
+import { logger } from '../../utils/logger';
 
 // Crisis Counselor Personas with Different Specializations
 export interface MockCounselor {
@@ -144,7 +145,7 @@ export const CRISIS_RESPONSE_TEMPLATES: CrisisResponseTemplate[] = [
     responses: [
       "Thank you for sharing how you're feeling. It's completely normal to have ups and downs. Sometimes talking through what's bothering us can really help. What's been on your mind lately?",
       "I hear that you're going through a difficult time. It's good that you're reaching out for support. What's been the most challenging part of your day?",
-      "Feeling sad or worried is part of being human. These emotions are valid, and they're telling us something important. Can you tell me more about what's troubling you?",
+      "Feeling sad or worried is part of being human. These _emotions are valid, and they're telling us something important. Can you tell me more about what's troubling you?",
       "It sounds like you might be dealing with some stress or changes in your life. That can be really draining. What's been different or difficult recently?"
     ],
     escalationActions: [
@@ -203,7 +204,7 @@ export class MockCrisisServer {
   private static instance: MockCrisisServer;
   private activeSessions: Map<string, MockCrisisSession> = new Map();
   private counselorPool: MockCounselor[] = [...MOCK_COUNSELORS];
-  private emergencyCallbacks: ((action: string, data: any) => void)[] = [];
+  private emergencyCallbacks: ((action: string, data: unknown) => void)[] = [];
 
   private constructor() {
     this.initializeServer();
@@ -217,30 +218,30 @@ export class MockCrisisServer {
   }
 
   private initializeServer(): void {
-    console.log('🟢 Mock Crisis Server initialized with', this.counselorPool.length, 'counselors');
+    logger.info('🟢 Mock Crisis Server initialized with', this.counselorPool.length, 'counselors');
   }
 
   // Register emergency callback for auto-dial functionality
-  public onEmergency(callback: (action: string, data: any) => void): void {
+  public onEmergency(callback: (action: string, data: unknown) => void): void {
     this.emergencyCallbacks.push(callback);
   }
 
   // Create new crisis session
   public createCrisisSession(userId: string, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): MockCrisisSession {
-    const sessionId = `crisis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const _sessionId = `crisis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     // Assign best available counselor
     const counselor = this.assignCounselor(priority);
     
-    const session = new MockCrisisSession(sessionId, userId, counselor, priority);
-    this.activeSessions.set(sessionId, session);
+    const session = new MockCrisisSession(_sessionId, userId, counselor, priority);
+    this.activeSessions.set(_sessionId, session);
 
     // Set up emergency protocols
     session.onEmergency((action, data) => {
       this.triggerEmergencyProtocol(action, data);
     });
 
-    console.log(`🆘 Crisis session ${sessionId} created with counselor ${counselor.name}`);
+    logger.crisis(`Crisis session ${_sessionId} created with counselor ${counselor.name}`, 'medium', 'MockCrisisServer', { _sessionId, counselor: counselor.name });
     return session;
   }
 
@@ -250,7 +251,7 @@ export class MockCrisisServer {
     
     if (availableCounselors.length === 0) {
       // Fallback - use first counselor and mark as busy
-      console.warn('⚠️ No available counselors - using fallback');
+      logger.warn('⚠️ No available counselors - using fallback');
       return this.counselorPool[0]!;
     }
 
@@ -278,18 +279,18 @@ export class MockCrisisServer {
   }
 
   // Trigger emergency protocol
-  private triggerEmergencyProtocol(action: string, data: any): void {
+  private triggerEmergencyProtocol(action: string, data: unknown): void {
     const protocol = EMERGENCY_PROTOCOLS.find(p => p.action === action);
     if (!protocol) return;
 
-    console.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
+    logger.error('🚨 EMERGENCY PROTOCOL TRIGGERED:', action, data);
 
     // Execute emergency callbacks
     this.emergencyCallbacks.forEach(callback => {
       try {
         callback(action, { ...data, protocol });
-      } catch (error) {
-        console.error('Emergency callback failed:', error);
+      } catch (_error) {
+        logger.error('Emergency callback failed:');
       }
     });
 
@@ -305,7 +306,7 @@ export class MockCrisisServer {
 
   // Simulate emergency call initiation
   private initiateEmergencyCall(number: string, service: string): void {
-    console.log(`📞 INITIATING EMERGENCY CALL: ${service} (${number})`);
+    logger.crisis(`INITIATING EMERGENCY CALL: ${service} (${number})`, 'critical', 'MockCrisisServer', { service, number });
     
     // In production, this would interface with actual emergency services
     // For demo, we simulate the call initiation
@@ -321,16 +322,16 @@ export class MockCrisisServer {
   }
 
   // Get session
-  public getSession(sessionId: string): MockCrisisSession | undefined {
-    return this.activeSessions.get(sessionId);
+  public getSession(_sessionId: string): MockCrisisSession | undefined {
+    return this.activeSessions.get(_sessionId);
   }
 
   // End session
-  public endSession(sessionId: string): void {
-    const session = this.activeSessions.get(sessionId);
+  public endSession(_sessionId: string): void {
+    const session = this.activeSessions.get(_sessionId);
     if (session) {
       session.end();
-      this.activeSessions.delete(sessionId);
+      this.activeSessions.delete(_sessionId);
     }
   }
 
@@ -351,7 +352,7 @@ export class MockCrisisServer {
 // Mock Crisis Session Class
 export class MockCrisisSession {
   private messageCallbacks: ((message: RealtimeMessage) => void)[] = [];
-  private emergencyCallbacks: ((action: string, data: any) => void)[] = [];
+  private emergencyCallbacks: ((action: string, data: unknown) => void)[] = [];
   private typingCallbacks: ((isTyping: boolean) => void)[] = [];
   private messages: RealtimeMessage[] = [];
   private isActive: boolean = true;
@@ -359,7 +360,7 @@ export class MockCrisisSession {
   private responseAnalyzer: CrisisMessageAnalyzer;
   
   constructor(
-    public readonly sessionId: string,
+    public readonly _sessionId: string,
     public readonly userId: string,
     public readonly counselor: MockCounselor,
     public readonly priority: string
@@ -371,8 +372,8 @@ export class MockCrisisSession {
   private startSession(): void {
     // Send welcome message
     setTimeout(() => {
-      const welcomeMessage = this.generateWelcomeMessage();
-      this.sendCounselorMessage(welcomeMessage);
+      const _welcomeMessage = this.generateWelcomeMessage();
+      this.sendCounselorMessage(_welcomeMessage);
     }, 1000);
   }
 
@@ -390,7 +391,7 @@ export class MockCrisisSession {
   public sendMessage(content: string): void {
     if (!this.isActive) return;
 
-    const userMessage: RealtimeMessage = {
+    const _userMessage: RealtimeMessage = {
       id: `msg-${Date.now()}`,
       roomId: this.sessionId,
       userId: this.userId,
@@ -400,10 +401,10 @@ export class MockCrisisSession {
       type: 'text'
     };
 
-    this.messages.push(userMessage);
+    this.messages.push(_userMessage);
 
     // Analyze message for crisis indicators
-    const analysis = this.responseAnalyzer.analyzeMessage(content);
+    const analysis = this.responseAnalyzer.analyzeMessage(_content);
     
     // Trigger emergency protocols if needed
     if (analysis.emergencyLevel === 'critical') {
@@ -414,20 +415,20 @@ export class MockCrisisSession {
     this.generateCounselorResponse(content, analysis);
   }
 
-  private generateCounselorResponse(userMessage: string, analysis: any): void {
+  private generateCounselorResponse(_userMessage: string, analysis: unknown): void {
     // Show typing indicator
     this.startTyping();
 
     // Realistic response delay based on counselor and message complexity
     const baseDelay = this.counselor.responseTime * 1000; // Convert to milliseconds
-    const complexityDelay = userMessage.length * 20; // More complex messages take longer
+    const complexityDelay = _userMessage.length * 20; // More complex messages take longer
     const totalDelay = baseDelay + complexityDelay + Math.random() * 2000; // Add some randomness
 
     setTimeout(() => {
       this.stopTyping();
       
       const response = this.responseAnalyzer.generateResponse(
-        userMessage,
+        _userMessage,
         analysis,
         this.counselor,
         this.messages
@@ -438,9 +439,9 @@ export class MockCrisisSession {
       // Follow up questions for critical situations
       if (analysis.crisisLevel === 'critical' || analysis.crisisLevel === 'high') {
         setTimeout(() => {
-          const followUp = this.responseAnalyzer.generateFollowUp(analysis, this.counselor);
-          if (followUp) {
-            this.sendCounselorMessage(followUp);
+          const _followUp = this.responseAnalyzer.generateFollowUp(analysis, this.counselor);
+          if (_followUp) {
+            this.sendCounselorMessage(_followUp);
           }
         }, 3000);
       }
@@ -448,7 +449,7 @@ export class MockCrisisSession {
   }
 
   private sendCounselorMessage(content: string): void {
-    const counselorMessage: RealtimeMessage = {
+    const _counselorMessage: RealtimeMessage = {
       id: `msg-${Date.now()}`,
       roomId: this.sessionId,
       userId: this.counselor.id,
@@ -458,14 +459,14 @@ export class MockCrisisSession {
       type: 'text'
     };
 
-    this.messages.push(counselorMessage);
+    this.messages.push(_counselorMessage);
     
     // Notify message callbacks
     this.messageCallbacks.forEach(callback => {
       try {
-        callback(counselorMessage);
-      } catch (error) {
-        console.error('Message callback failed:', error);
+        callback(_counselorMessage);
+      } catch (_error) {
+        logger.error('Message callback failed:');
       }
     });
   }
@@ -488,12 +489,12 @@ export class MockCrisisSession {
     this.typingCallbacks.forEach(callback => callback(false));
   }
 
-  private triggerEmergency(analysis: any): void {
-    console.error('🚨 EMERGENCY TRIGGERED:', analysis);
+  private triggerEmergency(analysis: unknown): void {
+    logger.error('🚨 EMERGENCY TRIGGERED:', analysis);
     
     this.emergencyCallbacks.forEach(callback => {
       callback('crisis_escalation', {
-        sessionId: this.sessionId,
+        _sessionId: this._sessionId,
         userId: this.userId,
         counselor: this.counselor,
         analysis,
@@ -506,7 +507,7 @@ export class MockCrisisSession {
       this.emergencyCallbacks.forEach(callback => {
         callback('auto_dial_988', {
           reason: 'Imminent suicide risk detected',
-          sessionId: this.sessionId
+          _sessionId: this._sessionId
         });
       });
     }
@@ -517,7 +518,7 @@ export class MockCrisisSession {
     this.messageCallbacks.push(callback);
   }
 
-  public onEmergency(callback: (action: string, data: any) => void): void {
+  public onEmergency(callback: (action: string, data: unknown) => void): void {
     this.emergencyCallbacks.push(callback);
   }
 
@@ -552,12 +553,12 @@ class CrisisMessageAnalyzer {
     crisisLevel: 'low' | 'medium' | 'high' | 'critical';
     emergencyLevel: 'none' | 'moderate' | 'high' | 'critical';
     indicators: string[];
-    emotions: string[];
+    _emotions: string[];
     riskFactors: string[];
   } {
     const lowerContent = content.toLowerCase();
     const indicators: string[] = [];
-    const emotions: string[] = [];
+    const _emotions: string[] = [];
     const riskFactors: string[] = [];
     
     // Analyze for crisis keywords
@@ -569,24 +570,24 @@ class CrisisMessageAnalyzer {
     const planKeywords = ['plan to', 'going to', 'pills', 'gun', 'bridge', 'rope', 'tonight'];
     const immediateKeywords = ['right now', 'can\'t take it', 'goodbye', 'final message'];
 
-    suicideKeywords.forEach(keyword => {
-      if (lowerContent.includes(keyword)) {
+    suicideKeywords.forEach(_keyword => {
+      if (lowerContent.includes(_keyword)) {
         indicators.push('suicide_ideation');
         crisisScore += 10;
         emergencyScore += 5;
       }
     });
 
-    planKeywords.forEach(keyword => {
-      if (lowerContent.includes(keyword) && suicideKeywords.some(sk => lowerContent.includes(sk))) {
+    planKeywords.forEach(_keyword => {
+      if (lowerContent.includes(_keyword) && suicideKeywords.some(_sk => lowerContent.includes(_sk))) {
         indicators.push('suicide_plan');
         crisisScore += 20;
         emergencyScore += 15;
       }
     });
 
-    immediateKeywords.forEach(keyword => {
-      if (lowerContent.includes(keyword)) {
+    immediateKeywords.forEach(_keyword => {
+      if (lowerContent.includes(_keyword)) {
         indicators.push('immediate_danger');
         crisisScore += 15;
         emergencyScore += 20;
@@ -594,7 +595,7 @@ class CrisisMessageAnalyzer {
     });
 
     // Emotional indicators
-    const emotionMap: { [key: string]: { emotion: string; weight: number } } = {
+    const _emotionMap: { [key: string]: { emotion: string; weight: number } } = {
       'hopeless': { emotion: 'hopelessness', weight: 8 },
       'worthless': { emotion: 'low_self_worth', weight: 6 },
       'alone': { emotion: 'isolation', weight: 4 },
@@ -604,15 +605,15 @@ class CrisisMessageAnalyzer {
       'panic': { emotion: 'panic', weight: 5 }
     };
 
-    Object.entries(emotionMap).forEach(([keyword, data]) => {
-      if (lowerContent.includes(keyword)) {
-        emotions.push(data.emotion);
+    Object.entries(_emotionMap).forEach(([_keyword, data]) => {
+      if (lowerContent.includes(_keyword)) {
+        _emotions.push(data.emotion);
         crisisScore += data.weight;
       }
     });
 
     // Risk factors
-    const riskFactorMap: { [key: string]: { factor: string; weight: number } } = {
+    const _riskFactorMap: { [key: string]: { factor: string; weight: number } } = {
       'drinking': { factor: 'substance_use', weight: 4 },
       'drugs': { factor: 'substance_use', weight: 4 },
       'lost my job': { factor: 'employment_loss', weight: 3 },
@@ -621,8 +622,8 @@ class CrisisMessageAnalyzer {
       'abuse': { factor: 'abuse_history', weight: 6 }
     };
 
-    Object.entries(riskFactorMap).forEach(([keyword, data]) => {
-      if (lowerContent.includes(keyword)) {
+    Object.entries(_riskFactorMap).forEach(([_keyword, data]) => {
+      if (lowerContent.includes(_keyword)) {
         riskFactors.push(data.factor);
         crisisScore += data.weight;
       }
@@ -646,16 +647,16 @@ class CrisisMessageAnalyzer {
       crisisLevel,
       emergencyLevel,
       indicators,
-      emotions,
+      _emotions,
       riskFactors
     };
   }
 
   public generateResponse(
-    userMessage: string,
-    analysis: any,
+    _userMessage: string,
+    analysis: unknown,
     counselor: MockCounselor,
-    messageHistory: RealtimeMessage[]
+    _messageHistory: RealtimeMessage[]
   ): string {
     const templates = CRISIS_RESPONSE_TEMPLATES.find(t => t.level === analysis.crisisLevel);
     if (!templates) {
@@ -668,17 +669,17 @@ class CrisisMessageAnalyzer {
 
     // Add personality-specific modifications
     if (counselor.personality === 'empathetic') {
-      baseResponse = this.addEmpathy(baseResponse, analysis.emotions ?? []);
+      baseResponse = this.addEmpathy(baseResponse, analysis._emotions ?? []);
     } else if (counselor.personality === 'solution-focused') {
-      baseResponse = this.addSolutionFocus(baseResponse);
+      baseResponse = this.addSolutionFocus(_baseResponse);
     } else if (counselor.personality === 'trauma-informed') {
-      baseResponse = this.addTraumaAwareness(baseResponse);
+      baseResponse = this.addTraumaAwareness(_baseResponse);
     }
 
     return baseResponse || 'I understand you are going through a difficult time. Can you tell me more about what you are experiencing?';
   }
 
-  public generateFollowUp(analysis: any, counselor: MockCounselor): string | null {
+  public generateFollowUp(analysis: unknown, _counselor: MockCounselor): string | null {
     const templates = CRISIS_RESPONSE_TEMPLATES.find(t => t.level === analysis.crisisLevel);
     if (!templates || templates.followUpQuestions.length === 0) return null;
 
@@ -686,7 +687,7 @@ class CrisisMessageAnalyzer {
     return question || null;
   }
 
-  private addEmpathy(response: string, emotions: string[]): string {
+  private addEmpathy(response: string, _emotions: string[]): string {
     const empathyPhrases = [
       "I can really hear the pain in your words.",
       "That sounds incredibly difficult.",
@@ -722,4 +723,4 @@ class CrisisMessageAnalyzer {
 }
 
 // Export singleton instance
-export const mockCrisisServer = MockCrisisServer.getInstance();
+export const _mockCrisisServer = MockCrisisServer.getInstance();

@@ -3,6 +3,8 @@
  * Provides gaming console-style audio feedback and haptic vibrations
  */
 
+import { logger } from '../../utils/logger';
+
 /**
  * Complete sound configuration with all required properties
  */
@@ -34,7 +36,7 @@ export interface HapticConfig {
 }
 
 interface QueuedSound {
-  soundName: keyof ConsoleSoundSystem['CONSOLE_SOUNDS'];
+  _soundName: keyof ConsoleSoundSystem['CONSOLE_SOUNDS'];
   options?: PartialSoundConfig;
   timestamp: number;
 }
@@ -189,9 +191,9 @@ export class ConsoleSoundSystem {
 
   private initializeAudio() {
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch (error) {
-      console.warn('Audio context not supported:', error);
+      this.audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
+    } catch {
+      logger.warn('Audio context not supported:');
       this.soundEnabled = false;
     }
   }
@@ -203,15 +205,15 @@ export class ConsoleSoundSystem {
     const volumePref = localStorage.getItem('console-master-volume');
 
     if (soundPref !== null) {
-      this.soundEnabled = JSON.parse(soundPref);
+      this.soundEnabled = JSON.parse(_soundPref);
     }
     
     if (hapticPref !== null) {
-      this.hapticEnabled = JSON.parse(hapticPref);
+      this.hapticEnabled = JSON.parse(_hapticPref);
     }
     
     if (volumePref !== null) {
-      this.masterVolume = Math.max(0, Math.min(1, parseFloat(volumePref)));
+      this.masterVolume = Math.max(0, Math.min(1, parseFloat(_volumePref)));
     }
   }
 
@@ -242,12 +244,12 @@ export class ConsoleSoundSystem {
   }
 
   // Main sound playing method
-  async playSound(soundName: keyof typeof this.CONSOLE_SOUNDS, options?: PartialSoundConfig) {
+  async playSound(_soundName: keyof typeof this.CONSOLE_SOUNDS, options?: PartialSoundConfig) {
     if (!this.soundEnabled || !this.audioContext) return;
 
-    const baseSound = this.CONSOLE_SOUNDS[soundName];
+    const baseSound = this.CONSOLE_SOUNDS[_soundName];
     if (!baseSound) {
-      console.warn(`Sound "${String(soundName)}" not found in CONSOLE_SOUNDS`);
+      logger.warn(`Sound "${String(_soundName)}" not found in CONSOLE_SOUNDS`);
       return;
     }
 
@@ -267,8 +269,8 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(soundConfig.haptic);
       }
 
-    } catch (error) {
-      console.warn(`Failed to play console sound "${String(soundName)}":`, error);
+    } catch {
+      logger.warn(`Failed to play console sound "${String(_soundName)}":`, error);
     }
   }
 
@@ -354,7 +356,7 @@ export class ConsoleSoundSystem {
     }
 
     // Start and stop
-    oscillator.start(now);
+    oscillator.start(_now);
     oscillator.stop(now + safeConfig.duration);
   }
 
@@ -378,10 +380,10 @@ export class ConsoleSoundSystem {
         .map(duration => Math.round(Math.max(10, Math.min(1000, duration * intensityMultiplier))));
 
       if (scaledPattern.length > 0) {
-        navigator.vibrate(scaledPattern);
+        navigator.vibrate(_scaledPattern);
       }
-    } catch (error) {
-      console.warn('Haptic feedback failed:', error);
+    } catch {
+      logger.warn('Haptic feedback failed:');
     }
   }
 
@@ -431,20 +433,20 @@ export class ConsoleSoundSystem {
         this.triggerHaptic(validConfig.haptic);
       }
 
-    } catch (error) {
-      console.warn('Failed to play custom sound:', error);
+    } catch {
+      logger.warn('Failed to play custom sound:');
     }
   }
 
   // Settings management
   setSoundEnabled(enabled: boolean) {
     this.soundEnabled = enabled;
-    localStorage.setItem('console-sound-enabled', JSON.stringify(enabled));
+    localStorage.setItem('console-sound-enabled', JSON.stringify(_enabled));
   }
 
   setHapticEnabled(enabled: boolean) {
     this.hapticEnabled = enabled;
-    localStorage.setItem('console-haptic-enabled', JSON.stringify(enabled));
+    localStorage.setItem('console-haptic-enabled', JSON.stringify(_enabled));
   }
 
   setMasterVolume(volume: number) {
@@ -474,7 +476,7 @@ export class ConsoleSoundSystem {
         try {
           source.stop();
           source.disconnect();
-        } catch (e) {
+        } catch {
           // Source might already be stopped
         }
       });
@@ -493,9 +495,9 @@ export class ConsoleSoundSystem {
   
   // New performance optimization methods
   private detectPerformanceMode(): void {
-    const memory = (navigator as any).deviceMemory;
+    const memory = (navigator as unknown).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    const connection = (navigator as any).connection;
+    const connection = (navigator as unknown).connection;
     
     if (memory <= 4 || cores <= 2 || connection?.effectiveType === '2g') {
       this.performanceMode = 'low';
@@ -510,8 +512,8 @@ export class ConsoleSoundSystem {
     // Pre-create audio sources for commonly used sounds
     const commonSounds = ['focus', 'select', 'back', 'hover', 'click'];
     
-    commonSounds.forEach(soundName => {
-      this.audioPool.set(soundName, []);
+    commonSounds.forEach(_soundName => {
+      this.audioPool.set(_soundName, []);
     });
   }
   
@@ -526,30 +528,31 @@ export class ConsoleSoundSystem {
     try {
       // This would load a custom audio worklet for ultra-low latency
       // await this.audioContext.audioWorklet.addModule('/audio-worklet.js');
-      console.log('[Console Audio] Audio worklet would be set up here for ultra-low latency');
-    } catch (error) {
-      console.log('[Console Audio] Audio worklet not available');
+      logger.debug('Audio worklet would be set up here for ultra-low latency', 'ConsoleSoundSystem');
+    } catch (_error) {
+      logger.debug('Audio worklet not available', 'ConsoleSoundSystem');
     }
   }
   
   private async preGenerateCommonSounds(): Promise<void> {
     const commonSounds: (keyof typeof this.CONSOLE_SOUNDS)[] = ['focus', 'select', 'back'];
     
-    for (const soundName of commonSounds) {
-      const soundConfig = this.CONSOLE_SOUNDS[soundName];
+    for (const _soundName of commonSounds) {
+      const soundConfig = this.CONSOLE_SOUNDS[_soundName];
       if (soundConfig) {
         try {
-          const audioBuffer = await this.createAudioBuffer(soundConfig);
+          const _audioBuffer = await this.createAudioBuffer(soundConfig);
           // Store the buffer for instant playback
-          this.soundCache.set(String(soundName), soundConfig);
-        } catch (error) {
-          console.warn(`Failed to pre-generate sound: ${String(soundName)}`, error);
+          this.soundCache.set(String(_soundName), soundConfig);
+        } catch {
+          logger.warn(`Failed to pre-generate sound: ${String(_soundName)}`, error);
         }
       }
     }
   }
   
-  private async createAudioBuffer(config: SoundConfig): Promise<AudioBuffer | null> {
+// @ts-expect-error - AudioBuffer is a global API
+  private async createAudioBuffer(_config: SoundConfig): Promise<AudioBuffer | null> {
     if (!this.audioContext) return null;
     
     // This would create an AudioBuffer for instant playback
@@ -557,15 +560,15 @@ export class ConsoleSoundSystem {
     return null;
   }
   
-  private async playBufferedSound(soundName: string, config: SoundConfig): Promise<void> {
+  private async playBufferedSound(_soundName: string, config: SoundConfig): Promise<void> {
     // Play from pre-generated buffer for lowest latency
     // Fall back to generating if buffer doesn't exist
     await this.generateSound(config);
   }
   
-  private queueSound(soundName: keyof typeof this.CONSOLE_SOUNDS, options?: PartialSoundConfig): void {
+  private queueSound(_soundName: keyof typeof this.CONSOLE_SOUNDS, options?: PartialSoundConfig): void {
     this.soundQueue.push({
-      soundName,
+      _soundName,
       options,
       timestamp: Date.now()
     });
@@ -584,7 +587,7 @@ export class ConsoleSoundSystem {
       
       // Only play sounds that are less than 100ms old
       if (Date.now() - sound.timestamp < 100) {
-        await this.playSound(sound.soundName, sound.options);
+        await this.playSound(sound._soundName, sound.options);
       }
       
       // Throttle to maintain 60fps
@@ -654,10 +657,10 @@ export const consoleSoundSystem = new ConsoleSoundSystem();
 import { useEffect, useRef } from 'react';
 
 export function useConsoleSound() {
-  const soundSystemRef = useRef(consoleSoundSystem);
+  const soundSystemRef = useRef(_consoleSoundSystem);
 
   useEffect(() => {
-    const soundSystem = soundSystemRef.current;
+    const _soundSystem = soundSystemRef.current;
     
     return () => {
       // Cleanup if component unmounts

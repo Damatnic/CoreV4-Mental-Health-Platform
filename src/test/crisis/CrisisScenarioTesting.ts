@@ -1,10 +1,11 @@
 // Comprehensive Crisis Scenario Testing - Ensures all crisis systems work flawlessly
 // CRITICAL: These tests validate life-safety systems
 
-import { MockCrisisServer, MockCrisisSession } from '../../services/crisis/MockCrisisServer';
+import { MockCrisisServer, _MockCrisisSession } from '../../services/crisis/MockCrisisServer';
 import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
-import { assessCrisisSeverity, CRISIS_ASSESSMENT_QUESTIONS } from '../../services/crisis/emergencyServices';
+import { assessCrisisSeverity, _CRISIS_ASSESSMENT_QUESTIONS } from '../../services/crisis/emergencyServices';
 import { offlineCrisisResources } from '../../services/crisis/OfflineCrisisResources';
+import { logger } from '../../utils/logger';
 
 // Test scenario types
 export interface CrisisTestScenario {
@@ -30,7 +31,7 @@ export interface TestResult {
   errors: string[];
   warnings: string[];
   details: {
-    assessmentResult?: any;
+    assessmentResult?: unknown;
     emergencyTriggered?: boolean;
     responseTime?: number;
     counselorAssigned?: boolean;
@@ -224,7 +225,7 @@ export class CrisisScenarioTester {
 
   // Run all crisis scenarios
   public async runAllScenarios(): Promise<TestResult[]> {
-    console.log('🧪 Starting comprehensive crisis scenario testing...');
+    logger.info('Starting comprehensive crisis scenario testing...', 'CrisisScenarioTesting');
     this.testResults = [];
 
     for (const scenario of CRISIS_TEST_SCENARIOS) {
@@ -252,7 +253,7 @@ export class CrisisScenarioTester {
     };
 
     try {
-      console.log(`Running scenario: ${scenario.name}`);
+      logger.info(`Running scenario: ${scenario.name}`, 'CrisisScenarioTesting');
 
       // Test crisis assessment
       const assessmentResult = await this.testCrisisAssessment(scenario);
@@ -301,13 +302,13 @@ export class CrisisScenarioTester {
   }
 
   // Test crisis assessment algorithm
-  private async testCrisisAssessment(scenario: CrisisTestScenario): Promise<any> {
+  private async testCrisisAssessment(scenario: CrisisTestScenario): Promise<unknown> {
     const startTime = performance.now();
     const assessmentResult = assessCrisisSeverity(scenario.responses);
     const responseTime = performance.now() - startTime;
 
     if (responseTime > 200) {
-      console.warn(`⚠️ Assessment response time too slow: ${responseTime}ms`);
+      logger.warn(`⚠️ Assessment response time too slow: ${responseTime}ms`);
     }
 
     return {
@@ -329,11 +330,11 @@ export class CrisisScenarioTester {
       const session = this.mockServer.createCrisisSession('test-user', scenario.severity);
       const sessionCreated = session !== null;
       
-      if (sessionCreated) {
+      if (_sessionCreated) {
         // Test message response
         session.sendMessage('I need help right now');
         
-        // Wait for counselor response (simulated)
+        // Wait for counselor response (_simulated)
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Clean up
@@ -347,8 +348,8 @@ export class CrisisScenarioTester {
         responseTime,
         sessionCreated
       };
-    } catch (error) {
-      console.error('Crisis chat simulation test failed:', error);
+    } catch (_error) {
+      logger.error('Crisis chat simulation test failed:');
       return {
         counselorAssigned: false,
         responseTime: performance.now() - startTime,
@@ -366,12 +367,12 @@ export class CrisisScenarioTester {
     let emergencyTriggered = false;
 
     // Set up emergency protocol listener
-    const emergencyHandler = (action: string, data: any) => {
+    const _emergencyHandler = (action: string, _data: unknown) => {
       emergencyTriggered = true;
-      console.log(`🚨 Emergency protocol triggered: ${action}`);
+      logger.crisis(`Emergency protocol triggered: ${action}`, 'critical', 'CrisisScenarioTesting');
     };
 
-    this.mockServer.onEmergency(emergencyHandler);
+    this.mockServer.onEmergency(_emergencyHandler);
 
     try {
       // Create session and send critical message
@@ -386,8 +387,8 @@ export class CrisisScenarioTester {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       this.mockServer.endSession(session.sessionId);
-    } catch (error) {
-      console.error('Emergency protocol test failed:', error);
+    } catch (_error) {
+      logger.error('Emergency protocol test failed:');
     }
 
     const responseTime = performance.now() - startTime;
@@ -399,7 +400,7 @@ export class CrisisScenarioTester {
   }
 
   // Test offline resources
-  private async testOfflineResources(scenario: CrisisTestScenario): Promise<{
+  private async testOfflineResources(_scenario: CrisisTestScenario): Promise<{
     available: boolean;
     resourceCount: number;
     criticalResourcesPresent: boolean;
@@ -460,7 +461,7 @@ export class CrisisScenarioTester {
           warnings: [],
           details: {}
         });
-      } catch (error) {
+      } catch {
         this.testResults.push({
           scenarioId: `integration-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -477,11 +478,11 @@ export class CrisisScenarioTester {
   private async testWebSocketIntegration(): Promise<boolean> {
     try {
       await mockWebSocketAdapter.connect('test-user', 'test-token');
-      const session = await mockWebSocketAdapter.createCrisisSession('medium');
+      const _session = await mockWebSocketAdapter.createCrisisSession('medium');
       mockWebSocketAdapter.endCall();
       return true;
-    } catch (error) {
-      console.error('WebSocket integration test failed:', error);
+    } catch (_error) {
+      logger.error('WebSocket integration test failed:');
       return false;
     }
   }
@@ -508,7 +509,7 @@ export class CrisisScenarioTester {
       const testLink = document.createElement('a');
       testLink.href = 'tel:988';
       return testLink.href === 'tel:988';
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -565,7 +566,7 @@ export class CrisisScenarioTester {
           warnings: duration > test.target * 0.8 ? [`Close to performance limit: ${duration}ms`] : [],
           details: {}
         });
-      } catch (error) {
+      } catch {
         this.testResults.push({
           scenarioId: `performance-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -617,7 +618,7 @@ export class CrisisScenarioTester {
               emergencyContacts: ['988']
             });
             return plan && plan.id && plan.isActive;
-          } catch (error) {
+          } catch {
             return false;
           }
         }
@@ -632,13 +633,13 @@ export class CrisisScenarioTester {
         
         this.testResults.push({
           scenarioId: `offline-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
-          passed: Boolean(passed),
+          passed: Boolean(_passed),
           duration,
           errors: passed ? [] : [`Offline test failed: ${test.name}`],
           warnings: [],
           details: {}
         });
-      } catch (error) {
+      } catch {
         this.testResults.push({
           scenarioId: `offline-${test.name.toLowerCase().replace(/\s+/g, '-')}`,
           passed: false,
@@ -708,24 +709,24 @@ export const crisisScenarioTester = new CrisisScenarioTester();
 
 // Quick test runner for development
 export async function runCrisisSystemTests(): Promise<void> {
-  console.log('🚨 CRISIS SYSTEM TESTING - This validates life-safety systems');
+  logger.crisis('CRISIS SYSTEM TESTING - This validates life-safety systems', 'high', 'CrisisScenarioTesting');
   
-  const results = await crisisScenarioTester.runAllScenarios();
+  const _results = await crisisScenarioTester.runAllScenarios();
   const report = crisisScenarioTester.generateReport();
   
-  console.log('📊 CRISIS SYSTEM TEST REPORT:');
-  console.log(`Tests: ${report.passedTests}/${report.totalTests} passed`);
-  console.log(`Duration: ${report.totalDuration.toFixed(2)}ms`);
-  console.log(`Status: ${report.summary}`);
+  logger.info('CRISIS SYSTEM TEST REPORT:', 'CrisisScenarioTesting');
+  logger.info(`Tests: ${report.passedTests}/${report.totalTests} passed`, 'CrisisScenarioTesting');
+  logger.info(`Duration: ${report.totalDuration.toFixed(2)}ms`, 'CrisisScenarioTesting');
+  logger.info(`Status: ${report.summary}`, 'CrisisScenarioTesting');
   
   if (report.criticalIssues.length > 0) {
-    console.error('🚨 CRITICAL ISSUES:');
-    report.criticalIssues.forEach(issue => console.error(`  - ${issue}`));
+    logger.error('🚨 CRITICAL ISSUES:');
+    report.criticalIssues.forEach(issue => logger.error(`  - ${issue}`));
   }
   
   if (report.warnings.length > 0) {
-    console.warn('⚠️ WARNINGS:');
-    report.warnings.forEach(warning => console.warn(`  - ${warning}`));
+    logger.warn('⚠️ WARNINGS:');
+    report.warnings.forEach(warning => logger.warn(`  - ${warning}`));
   }
   
   return;

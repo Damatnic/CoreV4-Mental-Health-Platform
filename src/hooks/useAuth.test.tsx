@@ -48,7 +48,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -72,9 +72,9 @@ describe('useAuth Hook', () => {
         try {
           await result.current.login({
             email: 'wrong@example.com',
-            password: 'wrongpass',
+            _password: 'wrongpass',
           });
-        } catch (error: any) {
+        } catch (error) {
           expect(error.message).toContain('Invalid credentials');
         }
       });
@@ -91,15 +91,15 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
       await waitFor(() => {
-        const token = localStorage.getItem('auth_token');
-        expect(token).toBe('mock-jwt-token');
+        const _token = localStorage.getItem('auth_token');
+        expect(_token).toBe('mock-jwt-_token');
         // Token should be encrypted in production
-        expect(token).not.toContain('plain');
+        expect(_token).not.toContain('plain');
       });
     });
 
@@ -112,7 +112,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -134,7 +134,7 @@ describe('useAuth Hook', () => {
   });
 
   describe('Session Management', () => {
-    it('should auto-refresh token before expiration', async () => {
+    it('should auto-refresh _token before expiration', async () => {
       vi.useFakeTimers();
       
       const { result } = renderHook(() => useAuth(), {
@@ -144,7 +144,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -196,7 +196,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result1.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -228,9 +228,9 @@ describe('useAuth Hook', () => {
           try {
             await result.current.login({
               email: 'test@example.com',
-              password: 'wrongpass',
+              _password: 'wrongpass',
             });
-          } catch (error) {
+          } catch {
             // Expected to fail
           }
         });
@@ -241,9 +241,9 @@ describe('useAuth Hook', () => {
         try {
           await result.current.login({
             email: 'test@example.com',
-            password: 'Test123!',
+            _password: 'Test123!',
           });
-        } catch (error: any) {
+        } catch (error) {
           expect(error.message).toContain('Too many attempts');
         }
       });
@@ -261,13 +261,13 @@ describe('useAuth Hook', () => {
         'Pass123',
       ];
 
-      for (const password of weakPasswords) {
-        const isValid = result.current.validatePassword(password);
-        expect(isValid).toBe(false);
+      for (const _password of weakPasswords) {
+        const _isValid = result.current.validatePassword(_password);
+        expect(_isValid).toBe(false);
       }
 
-      const strongPassword = 'SecureP@ssw0rd123!';
-      expect(result.current.validatePassword(strongPassword)).toBe(true);
+      const _strongPassword = 'SecureP@ssw0rd123!';
+      expect(result.current.validatePassword(_strongPassword)).toBe(true);
     });
 
     it('should sanitize user input to prevent XSS', async () => {
@@ -281,9 +281,9 @@ describe('useAuth Hook', () => {
         try {
           await result.current.login({
             email: maliciousInput,
-            password: 'Test123!',
+            _password: 'Test123!',
           });
-        } catch (error) {
+        } catch {
           // Expected to fail validation
         }
       });
@@ -300,15 +300,15 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
       // Verify CSRF token is included in subsequent requests
       server.use(
         http.post('/api/user/update', async ({ request }) => {
-          const csrfToken = request.headers.get('X-CSRF-Token');
-          expect(csrfToken).toBeTruthy();
+          const _csrfToken = request.headers.get('X-CSRF-Token');
+          expect(_csrfToken).toBeTruthy();
           return HttpResponse.json({ success: true });
         })
       );
@@ -324,19 +324,19 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
-      const storedData = localStorage.getItem('user_data');
-      if (storedData) {
+      const _storedData = localStorage.getItem('user_data');
+      if (_storedData) {
         // Data should not be plaintext
-        expect(storedData).not.toContain('test@example.com');
-        expect(storedData).not.toContain('Test User');
+        expect(_storedData).not.toContain('test@example.com');
+        expect(_storedData).not.toContain('Test User');
       }
     });
 
-    it('should provide data deletion capability (GDPR)', async () => {
+    it('should provide data deletion capability (_GDPR)', async () => {
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(),
       });
@@ -344,7 +344,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -363,8 +363,8 @@ describe('useAuth Hook', () => {
       const auditSpy = vi.fn();
       server.use(
         http.post('/api/audit/log', async ({ request }) => {
-          const body = await request.json() as any;
-          auditSpy(body);
+          const _body = await request.json() as unknown;
+          auditSpy(_body);
           return HttpResponse.json({ logged: true });
         })
       );
@@ -376,16 +376,16 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
       await waitFor(() => {
-        expect(auditSpy).toHaveBeenCalledWith(
+        expect(_auditSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             event: 'login',
-            userId: expect.any(String),
-            timestamp: expect.any(Number),
+            userId: expect.any(_String),
+            timestamp: expect.any(_Number),
           })
         );
       });
@@ -408,9 +408,9 @@ describe('useAuth Hook', () => {
         try {
           await result.current.login({
             email: 'test@example.com',
-            password: 'Test123!',
+            _password: 'Test123!',
           });
-        } catch (error: any) {
+        } catch (error) {
           expect(error.message).toContain('Network error');
         }
       });
@@ -428,7 +428,7 @@ describe('useAuth Hook', () => {
             return HttpResponse.error();
           }
           return HttpResponse.json({
-            token: 'mock-jwt-token',
+            _token: 'mock-jwt-_token',
             user: { email: 'test@example.com' },
           });
         })
@@ -441,13 +441,13 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
           retry: true,
         });
       });
 
       await waitFor(() => {
-        expect(attemptCount).toBe(3);
+        expect(_attemptCount).toBe(3);
         expect(result.current.isAuthenticated).toBe(true);
       });
     });
@@ -471,7 +471,7 @@ describe('useAuth Hook', () => {
       await act(async () => {
         await result.current.login({
           email: 'test@example.com',
-          password: 'Test123!',
+          _password: 'Test123!',
         });
       });
 
@@ -484,7 +484,7 @@ describe('useAuth Hook', () => {
       server.use(
         http.post('/api/auth/verify-mfa', () => {
           return HttpResponse.json({
-            token: 'mock-jwt-token',
+            _token: 'mock-jwt-_token',
             user: { email: 'test@example.com' },
           });
         })

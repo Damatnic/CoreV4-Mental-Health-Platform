@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * Privacy-First Performance Monitor
@@ -36,7 +37,7 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
 
   // Record metrics locally only - never sent anywhere
   const recordMetric = useCallback((name: string, value: number, metadata?: Record<string, any>) => {
-    const metric: PerformanceMetric = {
+    const _metric: PerformanceMetric = {
       name,
       value,
       timestamp: Date.now(),
@@ -44,12 +45,12 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
     };
 
     // Only log in development for debugging
-    if (enableLogging) {
-      console.log(`[Local Performance] ${name}:`, value, metadata);
+    if (_enableLogging) {
+      logger.info(`[Local Performance] ${name}:`, value, metadata);
     }
 
     // Keep metrics in local buffer for app optimization only
-    metricsBuffer.current.push(metric);
+    metricsBuffer.current.push(_metric);
     
     // Trim buffer to prevent memory issues
     if (metricsBuffer.current.length > bufferSize) {
@@ -63,7 +64,7 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
     metricsBuffer.current = [];
     
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Privacy Mode] Metrics cleared locally - nothing sent');
+      logger.info('[Privacy Mode] Metrics cleared locally - nothing sent');
     }
   }, []);
 

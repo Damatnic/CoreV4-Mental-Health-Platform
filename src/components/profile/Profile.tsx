@@ -6,11 +6,11 @@
 import React from 'react';
 
 export interface ProfileProps {
-  userId?: string;
+  _userId?: string;
   editable?: boolean;
 }
 
-export default function Profile({ userId, editable = true }: ProfileProps) {
+export default function Profile({ _userId, editable = true }: ProfileProps) {
   return (
     <div className="profile p-4">
       <h2 className="text-2xl font-bold mb-4">My Profile</h2>

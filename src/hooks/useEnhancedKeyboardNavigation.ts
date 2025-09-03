@@ -24,7 +24,7 @@ const defaultShortcuts: EnhancedKeyboardShortcut[] = [
     key: 'h',
     alt: true,
     action: () => window.location.href = '/crisis',
-    description: 'Crisis Help (Emergency)',
+    description: 'Crisis Help (_Emergency)',
     category: 'crisis',
     global: true,
   },
@@ -138,7 +138,7 @@ const defaultShortcuts: EnhancedKeyboardShortcut[] = [
     alt: true,
     action: () => {
       document.body.classList.toggle('high-contrast');
-      toast.success('High contrast mode toggled');
+      toast.success('High contrast _mode toggled');
     },
     description: 'Toggle High Contrast',
     category: 'accessibility',
@@ -219,8 +219,8 @@ const viStyleShortcuts: EnhancedKeyboardShortcut[] = [
 
 export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboardShortcut[]) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { preferences, setSearchOpen, mode } = useNavigation();
+  const _location = useLocation();
+  const { preferences, setSearchOpen, _mode } = useNavigation();
   const [shortcuts, setShortcuts] = useState<EnhancedKeyboardShortcut[]>([]);
   const [isGMode, setIsGMode] = useState(false);
   const [viMode, setViMode] = useState(false);
@@ -230,22 +230,22 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
 
   // Initialize shortcuts based on preferences
   useEffect(() => {
-    let activeShortcuts = [...defaultShortcuts];
+    let _activeShortcuts = [...defaultShortcuts];
     
-    if (customShortcuts) {
-      activeShortcuts = [...activeShortcuts, ...customShortcuts];
+    if (_customShortcuts) {
+      _activeShortcuts = [..._activeShortcuts, ...customShortcuts];
     }
     
-    if (viMode) {
-      activeShortcuts = [...activeShortcuts, ...viStyleShortcuts];
+    if (_viMode) {
+      _activeShortcuts = [..._activeShortcuts, ...viStyleShortcuts];
     }
     
     // Filter based on user preferences
     if (!preferences.enableKeyboardShortcuts) {
-      activeShortcuts = activeShortcuts.filter(s => s.category === 'crisis');
+      _activeShortcuts = _activeShortcuts.filter(s => s.category === 'crisis');
     }
     
-    setShortcuts(activeShortcuts);
+    setShortcuts(_activeShortcuts);
   }, [customShortcuts, viMode, preferences.enableKeyboardShortcuts]);
 
   // Konami code Easter egg for fun mental health tips
@@ -280,7 +280,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
     
     // Handle 'g' prefix mode for navigation
     if (event.key === 'g' && !isInputField && !event.ctrlKey && !event.altKey && !event.shiftKey) {
-      if (isGMode) {
+      if (_isGMode) {
         // Double 'g' goes to top
         window.scrollTo(0, 0);
         setIsGMode(false);
@@ -363,7 +363,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
     
     // Listen for custom events
     const handleOpenSearch = () => setSearchOpen(true);
-    const handleShowHelp = () => {
+    const _handleShowHelp = () => {
       const event = new CustomEvent('showKeyboardHelp');
       window.dispatchEvent(event);
     };
@@ -384,7 +384,7 @@ export function useEnhancedKeyboardNavigation(customShortcuts?: EnhancedKeyboard
   }, [navigate]);
 
   const focusElement = useCallback((selector: string) => {
-    const element = document.querySelector(selector) as HTMLElement;
+    const element = document.querySelector(_selector) as HTMLElement;
     if (element) {
       element.focus();
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -420,16 +420,16 @@ export function useKeyboardShortcutsHelp() {
   const { shortcuts } = useEnhancedKeyboardNavigation();
 
   useEffect(() => {
-    const handleShowHelp = () => setIsOpen(true);
-    window.addEventListener('showKeyboardHelp', handleShowHelp);
-    return () => window.removeEventListener('showKeyboardHelp', handleShowHelp);
+    const _handleShowHelp = () => setIsOpen(true);
+    window.addEventListener('showKeyboardHelp', _handleShowHelp);
+    return () => window.removeEventListener('showKeyboardHelp', _handleShowHelp);
   }, []);
 
   const categorizedShortcuts = shortcuts.reduce((acc, shortcut) => {
     if (!acc[shortcut.category]) {
       acc[shortcut.category] = [];
     }
-    acc[shortcut.category]!.push(shortcut);
+    acc[shortcut.category]!.push(_shortcut);
     return acc;
   }, {} as Record<string, EnhancedKeyboardShortcut[]>);
 

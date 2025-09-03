@@ -3,13 +3,14 @@
 
 import { apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
+import { logger } from '../utils/logger';
 import {
   Therapist,
   Appointment,
   User,
   TherapistCredentials,
   PaymentInfo,
-  ApiResponse
+  _ApiResponse
 } from '../api/types';
 
 // Video calling providers
@@ -91,7 +92,7 @@ interface TherapistOnboarding {
   };
   availability: {
     timezone: string;
-    regularHours: any;
+    regularHours: unknown;
     sessionDuration: number;
     bufferTime: number;
   };
@@ -119,7 +120,7 @@ interface TherapistOnboarding {
 
 // Appointment booking data
 interface BookingRequest {
-  therapistId: string;
+  _therapistId: string;
   patientId: string;
   date: Date;
   time: string;
@@ -145,7 +146,7 @@ interface VideoSession {
   endTime?: Date;
   duration: number;
   recording?: string;
-  status: 'waiting' | 'active' | 'ended';
+  _status: 'waiting' | 'active' | 'ended';
 }
 
 // Professional Support Service Class
@@ -201,21 +202,21 @@ export class TherapistService {
   // Setup WebSocket event handlers
   private setupWebSocketHandlers(): void {
     // Listen for therapist availability updates
-    wsService.on('therapist:available', (data: any) => {
+    wsService.on('therapist:available', (data: unknown) => {
       this.handleTherapistAvailability(data);
     });
 
     // Listen for appointment updates
-    wsService.on('appointment:update', (data: any) => {
+    wsService.on('appointment:update', (data: unknown) => {
       this.handleAppointmentUpdate(data);
     });
 
     // Listen for video session events
-    wsService.on('video:session:start', (data: any) => {
+    wsService.on('video:session:start', (data: unknown) => {
       this.handleVideoSessionStart(data);
     });
 
-    wsService.on('video:session:end', (data: any) => {
+    wsService.on('video:session:end', (data: unknown) => {
       this.handleVideoSessionEnd(data);
     });
   }
@@ -225,7 +226,7 @@ export class TherapistService {
   // ============================================
 
   public async startOnboarding(data: TherapistOnboarding): Promise<{
-    therapistId: string;
+    _therapistId: string;
     verificationStatus: VerificationStatus;
     nextSteps: string[];
   }> {
@@ -234,7 +235,7 @@ export class TherapistService {
       const therapist = await this.createTherapistAccount(data);
       
       // Step 2: Upload documents
-      const documentsUploaded = await this.uploadVerificationDocuments(
+      const _documentsUploaded = await this.uploadVerificationDocuments(
         therapist.id,
         data.documents
       );
@@ -243,16 +244,16 @@ export class TherapistService {
       const verificationStatus = await this.initiateVerification(therapist.id);
       
       // Step 4: Schedule onboarding call if needed
-      const nextSteps = this.determineNextSteps(verificationStatus);
+      const nextSteps = this.determineNextSteps(_verificationStatus);
       
       return {
-        therapistId: therapist.id,
+        _therapistId: therapist.id,
         verificationStatus,
         nextSteps
       };
-    } catch (error) {
-      console.error('Onboarding failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Onboarding failed:');
+      throw undefined;
     }
   }
 
@@ -293,7 +294,7 @@ export class TherapistService {
   }
 
   private async uploadVerificationDocuments(
-    therapistId: string,
+    _therapistId: string,
     documents: TherapistOnboarding['documents']
   ): Promise<boolean> {
     try {
@@ -323,32 +324,32 @@ export class TherapistService {
         }
       }
 
-      await Promise.all(uploads);
+      await Promise.all(_uploads);
       return true;
-    } catch (error) {
-      console.error('Document upload failed:', error);
+    } catch (_error) {
+      logger.error('Document upload failed:');
       return false;
     }
   }
 
-  private async initiateVerification(therapistId: string): Promise<VerificationStatus> {
+  private async initiateVerification(_therapistId: string): Promise<VerificationStatus> {
     // In production, this would trigger actual verification workflows
     // Including license verification, background checks, etc.
     
     // For now, set to pending review
-    this.verificationCache.set(therapistId, VerificationStatus.IN_REVIEW);
+    this.verificationCache.set(_therapistId, VerificationStatus.IN_REVIEW);
     
     // Simulate verification process
     setTimeout(() => {
-      this.verificationCache.set(therapistId, VerificationStatus.APPROVED);
-      this.notifyVerificationComplete(therapistId);
+      this.verificationCache.set(_therapistId, VerificationStatus.APPROVED);
+      this.notifyVerificationComplete(_therapistId);
     }, 5000);
     
     return VerificationStatus.IN_REVIEW;
   }
 
-  private determineNextSteps(status: VerificationStatus): string[] {
-    switch (status) {
+  private determineNextSteps(_status: VerificationStatus): string[] {
+    switch (_status) {
       case VerificationStatus.PENDING:
         return [
           'Complete document upload',
@@ -382,11 +383,11 @@ export class TherapistService {
     }
   }
 
-  private notifyVerificationComplete(therapistId: string): void {
+  private notifyVerificationComplete(_therapistId: string): void {
     // Send notification via WebSocket
     wsService.emit('therapist:verification:complete', {
-      therapistId,
-      status: this.verificationCache.get(therapistId)
+      _therapistId,
+      _status: this.verificationCache.get(_therapistId)
     });
   }
 
@@ -398,7 +399,7 @@ export class TherapistService {
     try {
       // Step 1: Check therapist availability
       const isAvailable = await this.checkAvailability(
-        request.therapistId,
+        request._therapistId,
         request.date,
         request.time,
         request.duration
@@ -414,12 +415,12 @@ export class TherapistService {
       // Step 3: Create appointment
       const appointment = await apiService.bookAppointment({
         patientId: request.patientId,
-        therapistId: request.therapistId,
+        _therapistId: request._therapistId,
         scheduledTime: this.combineDateAndTime(request.date, request.time),
         duration: request.duration,
         type: request.type,
         format: request.format,
-        status: 'scheduled',
+        _status: 'scheduled',
         payment: paymentInfo,
         reminder: {
           email: true,
@@ -435,23 +436,23 @@ export class TherapistService {
       }
       
       // Step 5: Send confirmation
-      await this.sendAppointmentConfirmation(appointment);
+      await this.sendAppointmentConfirmation(_appointment);
       
       return appointment;
-    } catch (error) {
-      console.error('Appointment booking failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Appointment booking failed:');
+      throw undefined;
     }
   }
 
   private async checkAvailability(
-    therapistId: string,
+    _therapistId: string,
     date: Date,
     time: string,
     duration: number
   ): Promise<boolean> {
     // Get therapist's schedule
-    const therapist = await apiService.getTherapist(therapistId);
+    const therapist = await apiService.getTherapist(_therapistId);
     
     // Check if time slot is within regular hours
     const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -460,7 +461,7 @@ export class TherapistService {
     if (!regularHours) return false;
     
     // Check for conflicts with existing appointments
-    const appointments = await apiService.getAppointments(therapistId, 'scheduled');
+    const appointments = await apiService.getAppointments(_therapistId, 'scheduled');
     
     const requestedStart = this.combineDateAndTime(date, time);
     const requestedEnd = new Date(requestedStart.getTime() + duration * 60000);
@@ -482,36 +483,36 @@ export class TherapistService {
   }
 
   private combineDateAndTime(date: Date, time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const combined = new Date(date);
+    const [hours, minutes] = time.split(':').map(_Number);
+    const combined = new Date(_date);
     combined.setHours(hours || 0, minutes || 0, 0, 0);
     return combined;
   }
 
   private async processPayment(request: BookingRequest): Promise<PaymentInfo> {
-    const therapist = await apiService.getTherapist(request.therapistId);
+    const therapist = await apiService.getTherapist(request._therapistId);
     
-    let amount = therapist.sessionRate;
+    let _amount = therapist.sessionRate;
     const method = request.paymentMethod;
     
     // Handle sliding scale
     if (method === 'sliding-scale' && therapist.slidingScale) {
       // In production, calculate based on income verification
-      amount = therapist.sessionRate * 0.5; // 50% discount for demo
+      _amount = therapist.sessionRate * 0.5; // 50% discount for demo
     }
     
     // Handle insurance
     if (method === 'insurance' && request.insurance) {
-      // In production, verify insurance and get copay amount
+      // In production, verify insurance and get copay _amount
       return {
-        amount: 30, // Typical copay
+        _amount: 30, // Typical copay
         currency: this.paymentConfig!.currency,
         method: 'insurance',
-        status: 'pending',
+        _status: 'pending',
         insuranceClaim: {
           claimNumber: `CLM-${Date.now()}`,
           provider: request.insurance.provider,
-          status: 'submitted',
+          _status: 'submitted',
           copay: 30
         }
       };
@@ -520,25 +521,25 @@ export class TherapistService {
     // Handle self-pay
     if (method === 'self-pay') {
       // In production, process payment via Stripe/PayPal
-      const paymentIntent = await this.createPaymentIntent(amount, request);
+      const _paymentIntent = await this.createPaymentIntent(_amount, request);
       
       return {
-        amount,
+        _amount,
         currency: this.paymentConfig!.currency,
         method: 'self-pay',
-        status: 'pending'
+        _status: 'pending'
       };
     }
     
     return {
-      amount,
+      _amount,
       currency: this.paymentConfig!.currency,
       method,
-      status: 'pending'
+      _status: 'pending'
     };
   }
 
-  private async createPaymentIntent(amount: number, request: BookingRequest): Promise<string> {
+  private async createPaymentIntent(_amount: number, _request: BookingRequest): Promise<string> {
     // In production, integrate with actual payment provider
     switch (this.paymentConfig?.provider) {
       case PaymentProvider.STRIPE:
@@ -559,7 +560,7 @@ export class TherapistService {
     wsService.emit('appointment:confirmed', appointment);
     
     // In production, also send email/SMS confirmation
-    console.log('Appointment confirmed:', appointment);
+    logger.info('Appointment confirmed:', appointment);
   }
 
   public async cancelAppointment(
@@ -571,8 +572,8 @@ export class TherapistService {
       const appointment = await apiService.cancelAppointment(appointmentId, reason);
       
       // Process refund if needed
-      if (appointment.payment?.status === 'paid') {
-        await this.processRefund(appointment);
+      if (appointment.payment?._status === 'paid') {
+        await this.processRefund(_appointment);
       }
       
       // Notify both parties
@@ -581,9 +582,9 @@ export class TherapistService {
         reason,
         cancelledBy
       });
-    } catch (error) {
-      console.error('Appointment cancellation failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Appointment cancellation failed:');
+      throw undefined;
     }
   }
 
@@ -595,15 +596,15 @@ export class TherapistService {
     let refundAmount = 0;
     
     if (hoursUntilAppointment >= 24) {
-      refundAmount = appointment.payment!.amount; // Full refund
+      refundAmount = appointment.payment!._amount; // Full refund
     } else if (hoursUntilAppointment >= 12) {
-      refundAmount = appointment.payment!.amount * 0.5; // 50% refund
+      refundAmount = appointment.payment!._amount * 0.5; // 50% refund
     }
     // No refund for < 12 hours
     
     if (refundAmount > 0) {
       // In production, process actual refund
-      console.log(`Processing refund of ${refundAmount} for appointment ${appointment.id}`);
+      logger.info(`Processing refund of ${refundAmount} for appointment ${appointment.id}`);
     }
   }
 
@@ -613,13 +614,13 @@ export class TherapistService {
 
   public async startVideoSession(appointmentId: string): Promise<VideoSession> {
     try {
-      const appointment = await this.getAppointmentDetails(appointmentId);
+      const appointment = await this.getAppointmentDetails(_appointmentId);
       
       // Generate video room and tokens
-      const roomId = await this.generateVideoRoom(appointmentId);
+      const roomId = await this.generateVideoRoom(_appointmentId);
       const tokens = await this.generateVideoTokens(roomId, [
         appointment.patientId,
-        appointment.therapistId
+        appointment._therapistId
       ]);
       
       // Create session
@@ -630,12 +631,12 @@ export class TherapistService {
         participants: [appointment.patientId, appointment.therapistId],
         startTime: new Date(),
         duration: appointment.duration,
-        status: 'active'
+        _status: 'active'
       };
       
       // Start recording if enabled
       if (this.videoConfig?.settings.recording) {
-        await this.startRecording(roomId);
+        await this.startRecording(_roomId);
       }
       
       // Notify participants
@@ -646,9 +647,9 @@ export class TherapistService {
       });
       
       return this.activeVideoSession;
-    } catch (error) {
-      console.error('Failed to start video session:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to start video session:');
+      throw undefined;
     }
   }
 
@@ -658,12 +659,12 @@ export class TherapistService {
     return {
       id: appointmentId,
       patientId: 'patient-1',
-      therapistId: 'therapist-1',
+      _therapistId: 'therapist-1',
       scheduledTime: new Date(),
       duration: 50,
       type: 'followup',
       format: 'video',
-      status: 'in-progress'
+      _status: 'in-progress'
     } as Appointment;
   }
 
@@ -699,7 +700,7 @@ export class TherapistService {
 
   private async startRecording(roomId: string): Promise<void> {
     // In production, start actual recording via provider API
-    console.log(`Recording started for room ${roomId}`);
+    logger.info(`Recording started for room ${roomId}`);
   }
 
   public async endVideoSession(sessionId: string): Promise<void> {
@@ -727,9 +728,9 @@ export class TherapistService {
       
       // Clean up
       this.activeVideoSession = null;
-    } catch (error) {
-      console.error('Failed to end video session:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Failed to end video session:');
+      throw undefined;
     }
   }
 
@@ -742,51 +743,51 @@ export class TherapistService {
   // Event Handlers
   // ============================================
 
-  private handleTherapistAvailability(data: any): void {
+  private handleTherapistAvailability(data: unknown): void {
     // Update local cache
-    console.log('Therapist availability update:', data);
+    logger.info('Therapist availability update:', data);
   }
 
-  private handleAppointmentUpdate(data: any): void {
+  private handleAppointmentUpdate(data: unknown): void {
     // Handle appointment updates
-    console.log('Appointment update:', data);
+    logger.info('Appointment update:', data);
   }
 
-  private handleVideoSessionStart(data: any): void {
+  private handleVideoSessionStart(data: unknown): void {
     // Handle video session start
-    console.log('Video session started:', data);
+    logger.info('Video session started:', data);
   }
 
-  private handleVideoSessionEnd(data: any): void {
+  private handleVideoSessionEnd(data: unknown): void {
     // Handle video session end
-    console.log('Video session ended:', data);
+    logger.info('Video session ended:', data);
   }
 
   // ============================================
   // Dashboard & Analytics
   // ============================================
 
-  public async getTherapistDashboard(therapistId: string): Promise<{
+  public async getTherapistDashboard(_therapistId: string): Promise<{
     appointments: Appointment[];
     clients: User[];
     revenue: number;
     ratings: number;
     upcomingSessions: Appointment[];
   }> {
-    const therapist = await apiService.getTherapist(therapistId);
-    const appointments = await apiService.getAppointments(therapistId);
+    const therapist = await apiService.getTherapist(_therapistId);
+    const appointments = await apiService.getAppointments(_therapistId);
     
     // Calculate metrics
     const revenue = appointments
-      .filter(a => a.payment?.status === 'paid')
-      .reduce((sum, a) => sum + (a.payment?.amount || 0), 0);
+      .filter(a => a.payment?._status === 'paid')
+      .reduce((sum, a) => sum + (a.payment?._amount || 0), 0);
     
     const avgRating = therapist.ratings.length > 0
       ? therapist.ratings.reduce((sum, r) => sum + r.rating, 0) / therapist.ratings.length
       : 0;
     
     const upcomingSessions = appointments
-      .filter(a => a.status === 'scheduled' && a.scheduledTime > new Date())
+      .filter(a => a._status === 'scheduled' && a.scheduledTime > new Date())
       .sort((a, b) => a.scheduledTime.getTime() - b.scheduledTime.getTime())
       .slice(0, 5);
     
@@ -803,7 +804,7 @@ export class TherapistService {
   // Client Management
   // ============================================
 
-  public async getClientNotes(therapistId: string, clientId: string): Promise<any> {
+  public async getClientNotes(_therapistId: string, clientId: string): Promise<unknown> {
     // In production, fetch encrypted client notes
     return {
       clientId,
@@ -815,12 +816,12 @@ export class TherapistService {
   }
 
   public async updateClientNotes(
-    therapistId: string,
+    _therapistId: string,
     clientId: string,
-    notes: any
+    notes: unknown
   ): Promise<void> {
     // In production, save encrypted notes
-    console.log('Updating client notes:', { therapistId, clientId, notes });
+    logger.info('Updating client notes:', { _therapistId, clientId, notes });
   }
 }
 

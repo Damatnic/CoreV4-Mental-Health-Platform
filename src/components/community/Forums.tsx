@@ -6,11 +6,11 @@
 import React from 'react';
 
 export interface ForumsProps {
-  categoryId?: string;
-  searchQuery?: string;
+  _categoryId?: string;
+  _searchQuery?: string;
 }
 
-export default function Forums({ categoryId, searchQuery }: ForumsProps) {
+export default function Forums({ _categoryId, _searchQuery }: ForumsProps) {
   return (
     <div className="forums p-4">
       <h2 className="text-2xl font-bold mb-4">Community Forums</h2>

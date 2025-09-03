@@ -1,32 +1,32 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, _useEffect, useMemo } from 'react';
+import { motion, _AnimatePresence } from 'framer-motion';
 import {
   Brain,
   Wind,
   Heart,
-  Play,
-  Pause,
+  _Play,
+  _Pause,
   Clock,
-  Calendar,
+  _Calendar,
   Flame,
   TrendingUp,
-  Award,
-  Volume2,
+  _Award,
+  _Volume2,
   Headphones,
   Sun,
   Moon,
-  Cloud,
-  Zap,
+  _Cloud,
+  _Zap,
   Target,
   ChevronRight,
-  BarChart,
-  PieChart
+  _BarChart,
+  _PieChart
 } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
+import { format, _startOfWeek, _endOfWeek, _eachDayOfInterval, isToday } from 'date-fns';
 import {
-  LineChart,
-  Line,
-  BarChart as RechartsBarChart,
+  _LineChart,
+  _Line,
+  _BarChart as RechartsBarChart,
   Bar,
   XAxis,
   YAxis,
@@ -34,8 +34,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  PieChart as RechartsPieChart,
-  Pie
+  _PieChart as _RechartsPieChart,
+  _Pie
 } from 'recharts';
 
 interface MeditationSession {
@@ -68,8 +68,8 @@ export function MeditationMindfulness({
   onSetGoal
 }: MeditationMindfulnessProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [showRecommendations, setShowRecommendations] = useState(true);
-  const [activeSession, setActiveSession] = useState<string | null>(null);
+  const [showRecommendations, _setShowRecommendations] = useState(true);
+  const [activeSession, _setActiveSession] = useState<string | null>(null);
 
   // Mock data if no sessions provided
   const mockSessions: MeditationSession[] = [
@@ -84,7 +84,7 @@ export function MeditationMindfulness({
     },
     {
       id: '2',
-      timestamp: new Date(Date.now() - 86400000),
+      timestamp: new Date(Date._now() - 86400000),
       duration: 10,
       type: 'breathing',
       moodBefore: 6,
@@ -93,7 +93,7 @@ export function MeditationMindfulness({
     },
     {
       id: '3',
-      timestamp: new Date(Date.now() - 172800000),
+      timestamp: new Date(Date._now() - 172800000),
       duration: 20,
       type: 'guided',
       moodBefore: 4,
@@ -106,17 +106,17 @@ export function MeditationMindfulness({
 
   // Calculate statistics
   const stats = useMemo(() => {
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const _now = new Date();
+    const _weekAgo = new Date(_now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const _monthAgo = new Date(_now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const _yearAgo = new Date(_now.getTime() - 365 * 24 * 60 * 60 * 1000);
 
     const getSessionsInRange = (start: Date) => 
       meditationSessions.filter(s => new Date(s.timestamp) >= start);
 
-    const weekSessions = getSessionsInRange(weekAgo);
-    const monthSessions = getSessionsInRange(monthAgo);
-    const yearSessions = getSessionsInRange(yearAgo);
+    const _weekSessions = getSessionsInRange(_weekAgo);
+    const _monthSessions = getSessionsInRange(_monthAgo);
+    const _yearSessions = getSessionsInRange(_yearAgo);
 
     const calculateStats = (sessions: MeditationSession[]) => ({
       totalSessions: sessions.length,
@@ -141,9 +141,9 @@ export function MeditationMindfulness({
     });
 
     return {
-      week: calculateStats(weekSessions),
-      month: calculateStats(monthSessions),
-      year: calculateStats(yearSessions),
+      week: calculateStats(_weekSessions),
+      month: calculateStats(_monthSessions),
+      year: calculateStats(_yearSessions),
       allTime: {
         totalMinutes: totalMinutes || meditationSessions.reduce((sum, s) => sum + s.duration, 0),
         totalSessions: meditationSessions.length,
@@ -159,16 +159,16 @@ export function MeditationMindfulness({
     today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < 365; i++) {
-      const date = new Date(today);
+      const date = new Date(_today);
       date.setDate(date.getDate() - i);
       
-      const hasSession = meditationSessions.some(s => {
+      const _hasSession = meditationSessions.some(s => {
         const sessionDate = new Date(s.timestamp);
         sessionDate.setHours(0, 0, 0, 0);
         return sessionDate.getTime() === date.getTime();
       });
 
-      if (hasSession) {
+      if (_hasSession) {
         streak++;
       } else if (i > 0) {
         break;
@@ -180,17 +180,17 @@ export function MeditationMindfulness({
 
   // Get chart data
   const chartData = useMemo(() => {
-    const now = new Date();
+    const _now = new Date();
     let days = 7;
     
-    switch (selectedTimeRange) {
+    switch (_selectedTimeRange) {
       case 'month': days = 30; break;
       case 'year': days = 365; break;
     }
 
     const data = [];
     for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(now);
+      const date = new Date(_now);
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
 
@@ -215,12 +215,12 @@ export function MeditationMindfulness({
 
   // Get session type distribution
   const typeDistribution = useMemo(() => {
-    const distribution = meditationSessions.reduce((acc, s) => {
+    const _distribution = meditationSessions.reduce((acc, s) => {
       acc[s.type] = (acc[s.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    return Object.entries(distribution).map(([type, count]) => ({
+    return Object.entries(_distribution).map(([type, count]) => ({
       name: type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' '),
       value: count,
       percentage: Math.round((count / meditationSessions.length) * 100)
@@ -416,7 +416,7 @@ export function MeditationMindfulness({
             {(['week', 'month', 'year'] as const).map(range => (
               <button
                 key={range}
-                onClick={() => setSelectedTimeRange(range)}
+                onClick={() => setSelectedTimeRange(_range)}
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedTimeRange === range
                     ? 'bg-purple-100 text-purple-700'
@@ -479,7 +479,7 @@ export function MeditationMindfulness({
         </div>
       </div>
 
-      {/* Session type distribution */}
+      {/* Session type _distribution */}
       {typeDistribution.length > 0 && (
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4">
           <h4 className="font-semibold text-gray-800 mb-3">Practice Distribution</h4>
@@ -510,14 +510,14 @@ export function MeditationMindfulness({
       {showRecommendations && recommendations.length > 0 && (
         <div className="space-y-2">
           <h4 className="font-semibold text-gray-800">Insights</h4>
-          {recommendations.map((rec, idx) => {
+          {recommendations.map((rec, _idx) => {
             const Icon = rec.icon;
             return (
               <motion.div
-                key={idx}
+                key={_idx}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: _idx * 0.1 }}
                 className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-gray-200"
               >
                 <Icon className={`h-5 w-5 mt-0.5 ${rec.color}`} />
@@ -544,7 +544,7 @@ export function MeditationMindfulness({
           </button>
         </div>
         
-        {meditationSessions.slice(0, 3).map((session, idx) => (
+        {meditationSessions.slice(0, 3).map((session, _idx) => (
           <div
             key={session.id}
             className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"

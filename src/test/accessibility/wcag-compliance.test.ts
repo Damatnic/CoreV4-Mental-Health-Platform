@@ -7,7 +7,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 import userEvent from '@testing-library/user-event';
 
 // Extend expect with axe matchers
-expect.extend(toHaveNoViolations);
+expect.extend(_toHaveNoViolations);
 
 describe('WCAG 2.1 AA Compliance Tests', () => {
   
@@ -24,7 +24,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           // Alt text should be meaningful, not empty (unless decorative)
           const alt = img.getAttribute('alt');
           if (!img.hasAttribute('role') || img.getAttribute('role') !== 'presentation') {
-            expect(alt).not.toBe('');
+            expect(_alt).not.toBe('');
             expect(alt?.length).toBeGreaterThan(0);
           }
         });
@@ -35,7 +35,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           const label = icon.getAttribute('aria-label') || 
                        icon.getAttribute('title') ||
                        icon.querySelector('title')?.textContent;
-          expect(label).toBeTruthy();
+          expect(_label).toBeTruthy();
         });
         
         // Check videos have captions
@@ -49,9 +49,9 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const audioElements = container.querySelectorAll('audio');
         audioElements.forEach(audio => {
           const transcriptId = audio.getAttribute('aria-describedby');
-          if (transcriptId) {
-            const transcript = document.getElementById(transcriptId);
-            expect(transcript).toBeInTheDocument();
+          if (_transcriptId) {
+            const transcript = document.getElementById(_transcriptId);
+            expect(_transcript).toBeInTheDocument();
           }
         });
       });
@@ -61,7 +61,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Navigate to wellness tracking with charts
         const wellnessLink = await screen.findByRole('link', { name: /wellness/i });
-        fireEvent.click(wellnessLink);
+        fireEvent.click(_wellnessLink);
         
         await waitFor(() => {
           const charts = document.querySelectorAll('canvas, [role="img"][data-chart]');
@@ -70,7 +70,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             const describedBy = chart.getAttribute('aria-describedby');
             if (describedBy) {
               const description = document.getElementById(describedBy);
-              expect(description).toBeInTheDocument();
+              expect(_description).toBeInTheDocument();
               expect(description?.textContent?.length).toBeGreaterThan(20);
             } else {
               // Alternative: should have detailed aria-label
@@ -94,7 +94,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           // Check default caption track
           const defaultTrack = video.querySelector('track[default]');
-          expect(defaultTrack).toBeInTheDocument();
+          expect(_defaultTrack).toBeInTheDocument();
         });
       });
       
@@ -104,7 +104,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const videos = container.querySelectorAll('video[data-has-visual-content]');
         videos.forEach(video => {
           const audioDescTrack = video.querySelector('track[kind="descriptions"]');
-          expect(audioDescTrack).toBeInTheDocument();
+          expect(_audioDescTrack).toBeInTheDocument();
         });
       });
     });
@@ -124,14 +124,14 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Navigation should still be identifiable
         const nav = container.querySelector('nav, [role="navigation"]');
-        expect(nav).toBeInTheDocument();
+        expect(_nav).toBeInTheDocument();
         
         // Main content should be identifiable
         const main = container.querySelector('main, [role="main"]');
-        expect(main).toBeInTheDocument();
+        expect(_main).toBeInTheDocument();
         
         // Restore styles
-        originalStyles.forEach(style => document.head.appendChild(style));
+        originalStyles.forEach(style => document.head.appendChild(_style));
       });
       
       it('should have proper semantic HTML structure', async () => {
@@ -167,7 +167,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           }
         });
         
-        expect(results).toHaveNoViolations();
+        expect(_results).toHaveNoViolations();
       });
       
       it('should not use color as the only means of conveying information', async () => {
@@ -205,7 +205,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           const contentWidth = container.scrollWidth;
           
           // Content should not exceed viewport width
-          expect(contentWidth).toBeLessThanOrEqual(viewportWidth);
+          expect(_contentWidth).toBeLessThanOrEqual(_viewportWidth);
         });
         
         // Reset
@@ -232,7 +232,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           // Check element receives focus
           await waitFor(() => {
-            expect(document.activeElement).toBe(element);
+            expect(document.activeElement).toBe(_element);
           });
           
           // Ensure tab order is logical (no jumping around)
@@ -243,7 +243,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             // Generally, tab order should go left-to-right, top-to-bottom
             const isLogical = currentRect.top >= prevRect.top || 
                             (currentRect.top === prevRect.top && currentRect.left >= prevRect.left);
-            expect(isLogical).toBe(true);
+            expect(_isLogical).toBe(true);
           }
           
           previousElement = element;
@@ -255,16 +255,16 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Open a modal/dialog
         const openModalButton = await screen.findByRole('button', { name: /settings/i });
-        fireEvent.click(openModalButton);
+        fireEvent.click(_openModalButton);
         
         const modal = await screen.findByRole('dialog');
-        expect(modal).toBeInTheDocument();
+        expect(_modal).toBeInTheDocument();
         
         // Should be able to close with Escape
         userEvent.keyboard('{Escape}');
         
         await waitFor(() => {
-          expect(modal).not.toBeInTheDocument();
+          expect(_modal).not.toBeInTheDocument();
         });
       });
       
@@ -283,7 +283,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         await waitFor(() => {
           const searchInput = screen.getByRole('searchbox');
-          expect(document.activeElement).toBe(searchInput);
+          expect(document.activeElement).toBe(_searchInput);
         });
       });
     });
@@ -298,11 +298,11 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         await waitFor(() => {
           const warningDialog = screen.getByRole('dialog', { name: /session.*expire/i });
-          expect(warningDialog).toBeInTheDocument();
+          expect(_warningDialog).toBeInTheDocument();
           
           // Should have option to extend
-          const extendButton = within(warningDialog).getByRole('button', { name: /extend/i });
-          expect(extendButton).toBeInTheDocument();
+          const extendButton = within(_warningDialog).getByRole('button', { name: /extend/i });
+          expect(_extendButton).toBeInTheDocument();
         });
         
         vi.useRealTimers();
@@ -318,7 +318,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           // Should have pause control nearby
           const container = region.closest('[data-live-container]') || region.parentElement;
           const pauseButton = container?.querySelector('[aria-label*="pause"], button:has-text("pause")');
-          expect(pauseButton).toBeInTheDocument();
+          expect(_pauseButton).toBeInTheDocument();
         });
       });
     });
@@ -331,13 +331,13 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const animatedElements = container.querySelectorAll('[data-animated], .animated, [class*="pulse"], [class*="flash"]');
         
         animatedElements.forEach(element => {
-          const styles = window.getComputedStyle(element);
+          const styles = window.getComputedStyle(_element);
           const animationDuration = styles.animationDuration;
           
           if (animationDuration && animationDuration !== 'none') {
-            const duration = parseFloat(animationDuration);
+            const duration = parseFloat(_animationDuration);
             // If animation repeats, ensure it's not too fast
-            expect(duration).toBeGreaterThan(0.333); // Not faster than 3Hz
+            expect(_duration).toBeGreaterThan(0.333); // Not faster than 3Hz
           }
         });
       });
@@ -356,7 +356,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         // Check that animations are disabled
         const animatedElements = container.querySelectorAll('[data-animated], .animated');
         animatedElements.forEach(element => {
-          const styles = window.getComputedStyle(element);
+          const styles = window.getComputedStyle(_element);
           expect(styles.animationDuration).toBe('0s');
         });
       });
@@ -370,14 +370,14 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         userEvent.tab();
         
         const skipLink = await screen.findByRole('link', { name: /skip to main content/i });
-        expect(skipLink).toBeInTheDocument();
+        expect(_skipLink).toBeInTheDocument();
         
         // Click skip link
-        fireEvent.click(skipLink);
+        fireEvent.click(_skipLink);
         
         // Focus should be on main content
         const main = document.querySelector('main');
-        expect(document.activeElement).toBe(main);
+        expect(document.activeElement).toBe(_main);
       });
       
       it('should have descriptive page titles', async () => {
@@ -388,7 +388,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Navigate to different page
         const wellnessLink = await screen.findByRole('link', { name: /wellness/i });
-        fireEvent.click(wellnessLink);
+        fireEvent.click(_wellnessLink);
         
         await waitFor(() => {
           expect(document.title).toContain('Wellness');
@@ -405,7 +405,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         focusableElements.forEach(element => {
           element.focus();
           
-          const styles = window.getComputedStyle(element);
+          const styles = window.getComputedStyle(_element);
           const outline = styles.outline;
           const boxShadow = styles.boxShadow;
           const border = styles.border;
@@ -416,7 +416,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             (boxShadow && boxShadow !== 'none') ||
             (border && border !== styles.getPropertyValue('border'));
           
-          expect(hasVisibleFocus).toBe(true);
+          expect(_hasVisibleFocus).toBe(true);
         });
       });
       
@@ -425,13 +425,13 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Navigate to a sub-page
         const therapyLink = await screen.findByRole('link', { name: /therapy/i });
-        fireEvent.click(therapyLink);
+        fireEvent.click(_therapyLink);
         
         await waitFor(() => {
           const breadcrumb = screen.getByRole('navigation', { name: /breadcrumb/i });
-          expect(breadcrumb).toBeInTheDocument();
+          expect(_breadcrumb).toBeInTheDocument();
           
-          const breadcrumbLinks = within(breadcrumb).getAllByRole('link');
+          const breadcrumbLinks = within(_breadcrumb).getAllByRole('link');
           expect(breadcrumbLinks.length).toBeGreaterThan(0);
         });
       });
@@ -462,7 +462,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           // Should have alternative simple interaction
           const hasClickHandler = element.hasAttribute('onclick') || 
                                  element.matches('button, a, [role="button"]');
-          expect(hasClickHandler).toBe(true);
+          expect(_hasClickHandler).toBe(true);
         });
       });
     });
@@ -474,7 +474,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       it('should specify the language of the page', () => {
         expect(document.documentElement).toHaveAttribute('lang');
         const lang = document.documentElement.getAttribute('lang');
-        expect(lang).toMatch(/^[a-z]{2}(-[A-Z]{2})?$/); // e.g., 'en' or 'en-US'
+        expect(_lang).toMatch(/^[a-z]{2}(-[A-Z]{2})?$/); // e.g., 'en' or 'en-US'
       });
       
       it('should use clear and simple language for crisis resources', async () => {
@@ -492,12 +492,12 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
           
           // Crisis instructions should use simple words
-          expect(avgWordLength).toBeLessThan(7); // Simple words
+          expect(_avgWordLength).toBeLessThan(7); // Simple words
           
           // Should avoid jargon
           const jargonWords = ['psychiatric', 'psychotherapy', 'cognitive-behavioral'];
           jargonWords.forEach(jargon => {
-            expect(text?.toLowerCase()).not.toContain(jargon);
+            expect(text?.toLowerCase()).not.toContain(_jargon);
           });
         });
       });
@@ -515,7 +515,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           input.focus();
           
           // URL should not change
-          expect(window.location.href).toBe(initialUrl);
+          expect(window.location.href).toBe(_initialUrl);
           
           // No new windows/modals should open
           expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -526,7 +526,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const { rerender } = render(<App />);
         
         const navItems1 = screen.getAllByRole('navigation')[0].querySelectorAll('a');
-        const navOrder1 = Array.from(navItems1).map(a => a.textContent);
+        const navOrder1 = Array.from(_navItems1).map(a => a.textContent);
         
         // Navigate to different page and back
         fireEvent.click(navItems1[1]);
@@ -535,10 +535,10 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         rerender(<App />);
         
         const navItems2 = screen.getAllByRole('navigation')[0].querySelectorAll('a');
-        const navOrder2 = Array.from(navItems2).map(a => a.textContent);
+        const navOrder2 = Array.from(_navItems2).map(a => a.textContent);
         
         // Navigation order should remain consistent
-        expect(navOrder2).toEqual(navOrder1);
+        expect(_navOrder2).toEqual(_navOrder1);
       });
     });
     
@@ -548,9 +548,9 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         // Try submitting invalid form
         const form = await screen.findByRole('form', { name: /mood.*track/i });
-        const submitButton = within(form).getByRole('button', { name: /submit/i });
+        const submitButton = within(_form).getByRole('button', { name: /submit/i });
         
-        fireEvent.click(submitButton);
+        fireEvent.click(_submitButton);
         
         await waitFor(() => {
           const errorMessages = screen.getAllByRole('alert');
@@ -595,7 +595,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           
           if (describedBy) {
             const helpText = document.getElementById(describedBy);
-            expect(helpText).toBeInTheDocument();
+            expect(_helpText).toBeInTheDocument();
             expect(helpText?.textContent?.length).toBeGreaterThan(0);
           }
         });
@@ -627,14 +627,14 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
           if (labelledBy) {
             const ids = labelledBy.split(' ');
             ids.forEach(id => {
-              expect(document.getElementById(id)).toBeInTheDocument();
+              expect(document.getElementById(_id)).toBeInTheDocument();
             });
           }
           
           if (describedBy) {
             const ids = describedBy.split(' ');
             ids.forEach(id => {
-              expect(document.getElementById(id)).toBeInTheDocument();
+              expect(document.getElementById(_id)).toBeInTheDocument();
             });
           }
         });
@@ -656,7 +656,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
             'tab', 'tabpanel', 'complementary', 'article', 'img', 'heading'
           ];
           
-          expect(validRoles).toContain(role);
+          expect(_validRoles).toContain(_role);
         });
       });
       
@@ -673,7 +673,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         
         liveRegions.forEach(region => {
           const liveValue = region.getAttribute('aria-live');
-          expect(['polite', 'assertive', 'off']).toContain(liveValue);
+          expect(['polite', 'assertive', 'off']).toContain(_liveValue);
         });
       });
     });
@@ -687,14 +687,14 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         const crisisUI = screen.getByTestId('crisis-intervention-ui');
         
         // Should have simplified layout
-        const buttons = within(crisisUI).getAllByRole('button');
+        const buttons = within(_crisisUI).getAllByRole('button');
         expect(buttons.length).toBeLessThanOrEqual(5); // Limited choices
         
         // Should use clear, large text
         buttons.forEach(button => {
-          const styles = window.getComputedStyle(button);
+          const styles = window.getComputedStyle(_button);
           const fontSize = parseFloat(styles.fontSize);
-          expect(fontSize).toBeGreaterThanOrEqual(18); // Large text
+          expect(_fontSize).toBeGreaterThanOrEqual(18); // Large text
         });
       });
     });
@@ -704,7 +704,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Check for voice input option
       const voiceButton = screen.queryByRole('button', { name: /voice/i });
-      expect(voiceButton).toBeInTheDocument();
+      expect(_voiceButton).toBeInTheDocument();
       
       // Check for visual mood selection
       const moodIcons = screen.queryAllByRole('button', { name: /mood/i });
@@ -712,7 +712,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       // Check for text input option
       const textInput = screen.queryByRole('textbox', { name: /feeling/i });
-      expect(textInput).toBeInTheDocument();
+      expect(_textInput).toBeInTheDocument();
     });
     
     it('should handle users with anxiety by avoiding sudden changes', async () => {
@@ -721,12 +721,12 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       // Check for smooth transitions
       const transitionElements = container.querySelectorAll('[data-transition], .transition');
       transitionElements.forEach(element => {
-        const styles = window.getComputedStyle(element);
+        const styles = window.getComputedStyle(_element);
         const transition = styles.transition;
         
         if (transition && transition !== 'none') {
           // Transitions should be smooth, not instant
-          expect(transition).toMatch(/\d+(\.\d+)?s/); // Has duration
+          expect(_transition).toMatch(/\d+(\.\d+)?s/); // Has duration
         }
       });
       
@@ -753,7 +753,7 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
         }
       });
       
-      expect(results).toHaveNoViolations();
+      expect(_results).toHaveNoViolations();
     });
     
     it('should pass accessibility audit for crisis mode', async () => {
@@ -761,8 +761,8 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       
       await waitFor(async () => {
         const crisisUI = screen.getByTestId('crisis-intervention-ui');
-        const results = await axe(crisisUI);
-        expect(results).toHaveNoViolations();
+        const results = await axe(_crisisUI);
+        expect(_results).toHaveNoViolations();
       });
     });
     
@@ -772,17 +772,17 @@ describe('WCAG 2.1 AA Compliance Tests', () => {
       // Test light mode
       document.documentElement.setAttribute('data-theme', 'light');
       let results = await axe(container);
-      expect(results).toHaveNoViolations();
+      expect(_results).toHaveNoViolations();
       
       // Test dark mode
       document.documentElement.setAttribute('data-theme', 'dark');
       results = await axe(container);
-      expect(results).toHaveNoViolations();
+      expect(_results).toHaveNoViolations();
       
       // Test high contrast mode
       document.documentElement.setAttribute('data-theme', 'high-contrast');
       results = await axe(container);
-      expect(results).toHaveNoViolations();
+      expect(_results).toHaveNoViolations();
     });
   });
 });

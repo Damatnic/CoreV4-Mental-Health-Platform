@@ -1,6 +1,7 @@
 // Comprehensive Test Report Generator for CoreV4
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+import { logger } from '../utils/logger';
 
 interface TestResult {
   suite: string;
@@ -18,7 +19,7 @@ interface CoverageData {
 }
 
 interface PerformanceMetric {
-  metric: string;
+  _metric: string;
   value: number;
   threshold: number;
   passed: boolean;
@@ -59,16 +60,16 @@ export class TestReporter {
     this.coverage = coverage;
   }
 
-  addPerformanceMetric(metric: PerformanceMetric) {
-    this.performanceMetrics.push(metric);
+  addPerformanceMetric(_metric: PerformanceMetric) {
+    this.performanceMetrics.push(_metric);
   }
 
-  addSecurityIssue(issue: SecurityVulnerability) {
-    this.securityIssues.push(issue);
+  addSecurityIssue(_issue: SecurityVulnerability) {
+    this.securityIssues.push(_issue);
   }
 
-  addAccessibilityIssue(issue: AccessibilityViolation) {
-    this.accessibilityIssues.push(issue);
+  addAccessibilityIssue(_issue: AccessibilityViolation) {
+    this.accessibilityIssues.push(_issue);
   }
 
   finish() {
@@ -239,9 +240,9 @@ Performance traces available at: \`./performance/traces/\`
   private generatePerformanceSection(): string {
     let section = '| Metric | Value | Threshold | Status |\n|--------|-------|-----------|--------|\n';
     
-    this.performanceMetrics.forEach(metric => {
-      const icon = metric.passed ? '✅' : '❌';
-      section += `| ${metric.metric} | ${metric.value} | ${metric.threshold} | ${icon} |\n`;
+    this.performanceMetrics.forEach(_metric => {
+      const icon = _metric.passed ? '✅' : '❌';
+      section += `| ${_metric._metric} | ${_metric.value} | ${_metric.threshold} | ${icon} |\n`;
     });
 
     return section;
@@ -256,19 +257,19 @@ Performance traces available at: \`./performance/traces/\`
     const grouped = new Map<string, SecurityVulnerability[]>();
     
     this.securityIssues.forEach(issue => {
-      if (!grouped.has(issue.severity)) {
-        grouped.set(issue.severity, []);
+      if (!grouped.has(_issue.severity)) {
+        grouped.set(_issue.severity, []);
       }
-      grouped.get(issue.severity)!.push(issue);
+      grouped.get(issue.severity)!.push(_issue);
     });
 
     ['critical', 'high', 'medium', 'low'].forEach(severity => {
       const issues = grouped.get(severity) || [];
       if (issues.length > 0) {
         section += `\n#### ${severity.toUpperCase()} (${issues.length})\n`;
-        issues.forEach(issue => {
-          section += `- **${issue.type}**: ${issue.description}\n`;
-          section += `  *Recommendation*: ${issue.recommendation}\n`;
+        issues.forEach(_issue => {
+          section += `- **${_issue.type}**: ${_issue.description}\n`;
+          section += `  *Recommendation*: ${_issue.recommendation}\n`;
         });
       }
     });
@@ -285,20 +286,20 @@ Performance traces available at: \`./performance/traces/\`
     const grouped = new Map<string, AccessibilityViolation[]>();
     
     this.accessibilityIssues.forEach(issue => {
-      if (!grouped.has(issue.impact)) {
-        grouped.set(issue.impact, []);
+      if (!grouped.has(_issue.impact)) {
+        grouped.set(_issue.impact, []);
       }
-      grouped.get(issue.impact)!.push(issue);
+      grouped.get(issue.impact)!.push(_issue);
     });
 
     ['critical', 'serious', 'moderate', 'minor'].forEach(impact => {
       const issues = grouped.get(impact) || [];
       if (issues.length > 0) {
         section += `\n#### ${impact.toUpperCase()} (${issues.length})\n`;
-        issues.forEach(issue => {
-          section += `- ${issue.description}\n`;
-          section += `  Element: \`${issue.element}\`\n`;
-          section += `  Fix: ${issue.fix}\n`;
+        issues.forEach(_issue => {
+          section += `- ${_issue.description}\n`;
+          section += `  Element: \`${_issue.element}\`\n`;
+          section += `  Fix: ${_issue.fix}\n`;
         });
       }
     });
@@ -390,18 +391,18 @@ The platform does not meet all production requirements. Please address the issue
   }
 
   private getCrisisResponseTime(): number {
-    const metric = this.performanceMetrics.find(m => m.metric === 'Crisis Response Time');
-    return metric?.value || 0;
+    const _metric = this.performanceMetrics.find(m => m._metric === 'Crisis Response Time');
+    return _metric?.value || 0;
   }
 
   private getLighthouseScore(): number {
-    const metric = this.performanceMetrics.find(m => m.metric === 'Lighthouse Score');
-    return metric?.value || 0;
+    const _metric = this.performanceMetrics.find(m => m._metric === 'Lighthouse Score');
+    return _metric?.value || 0;
   }
 
-  private getMetric(name: string): number {
-    const metric = this.performanceMetrics.find(m => m.metric.toLowerCase().includes(name));
-    return metric?.value || 0;
+  private getMetric(_name: string): number {
+    const _metric = this.performanceMetrics.find(m => m._metric.toLowerCase().includes(_name));
+    return _metric?.value || 0;
   }
 
   private calculateImprovement(oldValue: number, newValue: number): number {
@@ -436,8 +437,8 @@ The platform does not meet all production requirements. Please address the issue
     return this.results.some(r => r.test.includes('GDPR') && r.status === 'passed');
   }
 
-  private checkFeature(feature: string): boolean {
-    return this.results.some(r => r.test.toLowerCase().includes(feature) && r.status === 'passed');
+  private checkFeature(_feature: string): boolean {
+    return this.results.some(r => r.test.toLowerCase().includes(_feature) && r.status === 'passed');
   }
 
   private isProductionReady(): boolean {
@@ -451,7 +452,7 @@ The platform does not meet all production requirements. Please address the issue
   }
 
   saveReport(outputPath: string = './test-results') {
-    if (!existsSync(outputPath)) {
+    if (!existsSync(_outputPath)) {
       mkdirSync(outputPath, { recursive: true });
     }
 
@@ -480,7 +481,7 @@ The platform does not meet all production requirements. Please address the issue
       JSON.stringify(jsonData, null, 2)
     );
 
-    console.log(`✅ Test report generated at ${outputPath}/test-report.md`);
+    logger.info(`✅ Test report generated at ${outputPath}/test-report.md`);
   }
 }
 

@@ -13,7 +13,7 @@ export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
   const navigate = useNavigate();
   const [showAllContacts, setShowAllContacts] = useState(false);
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>

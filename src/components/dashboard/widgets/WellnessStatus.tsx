@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Minus, Target, Flame, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, _Target, Flame, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WellnessStatus as WellnessStatusType } from '../../../types/dashboard';
 
@@ -195,7 +195,7 @@ export function WellnessStatus({ data, onViewDetails, onUpdateMood }: WellnessSt
       {/* Recommendations */}
       {statusData.recommendations && statusData.recommendations.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-700">Today's Recommendations</h4>
+          <h4 className="text-sm font-semibold text-gray-700">Today&apos;s Recommendations</h4>
           <div className="space-y-1">
             {statusData.recommendations.map((rec, idx) => (
               <div key={idx} className="flex items-start space-x-2 p-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">

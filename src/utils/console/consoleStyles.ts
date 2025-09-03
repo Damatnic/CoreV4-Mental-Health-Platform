@@ -9,8 +9,8 @@ export type ConsoleMode = 'playstation' | 'xbox' | 'switch';
 /**
  * Get console navigation style based on current console mode
  */
-export const getConsoleNavStyle = (mode: ConsoleMode = 'playstation'): string => {
-  switch (mode) {
+export const _getConsoleNavStyle = (_mode: ConsoleMode = 'playstation'): string => {
+  switch (_mode) {
     case 'playstation':
       return 'bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 border-t border-blue-700';
     case 'xbox':
@@ -25,7 +25,7 @@ export const getConsoleNavStyle = (mode: ConsoleMode = 'playstation'): string =>
 /**
  * Get console accent color with optional opacity
  */
-export const getConsoleAccentColor = (mode: ConsoleMode = 'playstation', opacity: number = 1): string => {
+export const getConsoleAccentColor = (_mode: ConsoleMode = 'playstation', opacity: number = 1): string => {
   const colors = {
     playstation: '59, 130, 246', // Blue-500 RGB
     xbox: '34, 197, 94', // Green-500 RGB
@@ -39,8 +39,8 @@ export const getConsoleAccentColor = (mode: ConsoleMode = 'playstation', opacity
 /**
  * Get console accent color as a hex value
  */
-export const getConsoleAccentColorHex = (mode: ConsoleMode = 'playstation'): string => {
-  switch (mode) {
+export const getConsoleAccentColorHex = (_mode: ConsoleMode = 'playstation'): string => {
+  switch (_mode) {
     case 'playstation':
       return '#3B82F6'; // Blue-500
     case 'xbox':
@@ -55,35 +55,35 @@ export const getConsoleAccentColorHex = (mode: ConsoleMode = 'playstation'): str
 /**
  * Get console-themed glow effect
  */
-export const getConsoleGlowEffect = (mode: ConsoleMode = 'playstation', intensity: number = 0.5): string => {
-  const color = getConsoleAccentColor(mode, intensity);
+export const _getConsoleGlowEffect = (_mode: ConsoleMode = 'playstation', intensity: number = 0.5): string => {
+  const color = getConsoleAccentColor(_mode, intensity);
   return `0 0 20px ${color}, 0 0 40px ${color}`;
 };
 
 /**
  * Get console-themed shadow effect
  */
-export const getConsoleShadowEffect = (mode: ConsoleMode = 'playstation', intensity: number = 0.3): string => {
-  const color = getConsoleAccentColor(mode, intensity);
+export const _getConsoleShadowEffect = (_mode: ConsoleMode = 'playstation', intensity: number = 0.3): string => {
+  const color = getConsoleAccentColor(_mode, intensity);
   return `0 4px 20px ${color}`;
 };
 
 /**
  * Get console button style based on state
  */
-export const getConsoleButtonStyle = (
-  mode: ConsoleMode = 'playstation', 
-  isActive: boolean = false,
-  isHovered: boolean = false
+export const _getConsoleButtonStyle = (
+  _mode: ConsoleMode = 'playstation', 
+  _isActive: boolean = false,
+  _isHovered: boolean = false
 ): string => {
   const baseStyle = 'transition-all duration-200 ease-in-out';
-  const accentColor = getConsoleAccentColorHex(mode);
+  const accentColor = getConsoleAccentColorHex(_mode);
   
-  if (isActive) {
+  if (_isActive) {
     return `${baseStyle} bg-gradient-to-b from-gray-700 to-gray-800 text-white border-2 border-${accentColor} shadow-lg`;
   }
   
-  if (isHovered) {
+  if (_isHovered) {
     return `${baseStyle} bg-gradient-to-b from-gray-600 to-gray-700 text-white border border-gray-500 shadow-md`;
   }
   
@@ -93,9 +93,9 @@ export const getConsoleButtonStyle = (
 /**
  * Get console-specific icon color
  */
-export const getConsoleIconColor = (mode: ConsoleMode = 'playstation', isActive: boolean = false): string => {
-  if (isActive) {
-    return getConsoleAccentColorHex(mode);
+export const _getConsoleIconColor = (_mode: ConsoleMode = 'playstation', _isActive: boolean = false): string => {
+  if (_isActive) {
+    return getConsoleAccentColorHex(_mode);
   }
   return '#9CA3AF'; // Gray-400
 };
@@ -103,8 +103,8 @@ export const getConsoleIconColor = (mode: ConsoleMode = 'playstation', isActive:
 /**
  * Get console-themed gradient background
  */
-export const getConsoleGradientBackground = (mode: ConsoleMode = 'playstation'): string => {
-  switch (mode) {
+export const _getConsoleGradientBackground = (_mode: ConsoleMode = 'playstation'): string => {
+  switch (_mode) {
     case 'playstation':
       return 'bg-gradient-to-br from-blue-950 via-indigo-950 to-purple-950';
     case 'xbox':
@@ -119,7 +119,7 @@ export const getConsoleGradientBackground = (mode: ConsoleMode = 'playstation'):
 /**
  * Get console loading animation style
  */
-export const getConsoleLoadingStyle = (mode: ConsoleMode = 'playstation'): string => {
-  const accentColor = getConsoleAccentColorHex(mode);
+export const _getConsoleLoadingStyle = (_mode: ConsoleMode = 'playstation'): string => {
+  const accentColor = getConsoleAccentColorHex(_mode);
   return `animate-pulse bg-gradient-to-r from-transparent via-${accentColor} to-transparent`;
 };

@@ -1,24 +1,24 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, _AnimatePresence } from 'framer-motion';
 import { 
-  FileText, Download, Upload, Share2, Lock, Shield, 
-  Activity, Heart, Brain, Pill, Calendar, Clock,
-  AlertCircle, CheckCircle, Info, TrendingUp, TrendingDown,
-  ChevronRight, Filter, Search, Eye, EyeOff, RefreshCw,
-  User, Users, Clipboard, Award, BarChart3, Database,
+  FileText, Download, Upload, _Share2, Lock, Shield, 
+  Activity, Heart, Brain, _Pill, _Calendar, _Clock,
+  AlertCircle, CheckCircle, _Info, TrendingUp, TrendingDown,
+  ChevronRight, _Filter, Search, Eye, EyeOff, RefreshCw,
+  _User, _Users, Clipboard, _Award, _BarChart3, Database,
   Minus, XCircle
 } from 'lucide-react';
 
 interface HealthRecord {
   id: string;
-  type: 'assessment' | 'diagnosis' | 'lab_result' | 'imaging' | 'procedure' | 'immunization' | 'allergy';
+  _type: 'assessment' | 'diagnosis' | 'lab_result' | 'imaging' | 'procedure' | 'immunization' | 'allergy';
   title: string;
   date: Date;
   provider: string;
   facility: string;
   status: 'final' | 'preliminary' | 'amended' | 'corrected';
   category: string;
-  results?: any;
+  results?: unknown;
   attachments?: string[];
   notes?: string;
   confidentiality: 'normal' | 'restricted' | 'very_restricted';
@@ -28,11 +28,11 @@ interface HealthRecord {
 interface Assessment {
   id: string;
   name: string;
-  type: 'PHQ-9' | 'GAD-7' | 'PCL-5' | 'MDQ' | 'AUDIT' | 'Custom';
+  _type: 'PHQ-9' | 'GAD-7' | 'PCL-5' | 'MDQ' | 'AUDIT' | 'Custom';
   date: Date;
   score: number;
   maxScore: number;
-  severity: 'minimal' | 'mild' | 'moderate' | 'severe' | 'very_severe';
+  _severity: 'minimal' | 'mild' | 'moderate' | 'severe' | 'very_severe';
   interpretation: string;
   provider: string;
   followUpRequired: boolean;
@@ -46,7 +46,7 @@ interface Diagnosis {
   dateOfDiagnosis: Date;
   provider: string;
   status: 'active' | 'resolved' | 'inactive';
-  severity: 'mild' | 'moderate' | 'severe';
+  _severity: 'mild' | 'moderate' | 'severe';
   notes?: string;
 }
 
@@ -56,7 +56,7 @@ interface LabResult {
   value: string | number;
   unit?: string;
   referenceRange?: string;
-  flag?: 'normal' | 'high' | 'low' | 'critical';
+  _flag?: 'normal' | 'high' | 'low' | 'critical';
   date: Date;
   orderedBy: string;
   laboratory: string;
@@ -117,10 +117,10 @@ interface HealthRecordsIntegrationProps {
   insurance?: InsuranceInfo;
   emergency?: EmergencyInfo;
   onExportRecords?: (format: 'pdf' | 'csv' | 'json') => void;
-  onImportRecords?: (file: File) => void;
-  onShareRecord?: (recordId: string, recipientId: string) => void;
-  onRequestRecords?: (providerId: string) => void;
-  onUpdatePrivacy?: (recordId: string, level: string) => void;
+  onImportRecords?: (_file: File) => void;
+  _onShareRecord?: (recordId: string, recipientId: string) => void;
+  _onRequestRecords?: (providerId: string) => void;
+  _onUpdatePrivacy?: (recordId: string, level: string) => void;
   onRefreshData?: () => void;
 }
 
@@ -133,14 +133,14 @@ export function HealthRecordsIntegration({
   emergency,
   onExportRecords,
   onImportRecords,
-  onShareRecord,
-  onRequestRecords,
-  onUpdatePrivacy,
+  _onShareRecord,
+  _onRequestRecords,
+  _onUpdatePrivacy,
   onRefreshData
 }: HealthRecordsIntegrationProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
-  const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const [_selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
+  const [_showDetails, setShowDetails] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [showPrivateRecords, setShowPrivateRecords] = useState(false);
@@ -159,7 +159,7 @@ export function HealthRecordsIntegration({
       totalRecords: records.length,
       recentAssessments: recentAssessments.length,
       activeDiagnoses: diagnoses.filter(d => d.status === 'active').length,
-      abnormalLabs: labResults.filter(l => l.flag && l.flag !== 'normal').length,
+      abnormalLabs: labResults.filter(l => l._flag && l._flag !== 'normal').length,
       improvementRate: Math.round(improvementRate * 100)
     };
   };
@@ -167,8 +167,8 @@ export function HealthRecordsIntegration({
   const metrics = calculateHealthMetrics();
 
   // Get record type icon
-  const getRecordIcon = (type: string) => {
-    switch (type) {
+  const getRecordIcon = (_type: string) => {
+    switch (_type) {
       case 'assessment': return <Clipboard className="h-5 w-5" />;
       case 'diagnosis': return <Brain className="h-5 w-5" />;
       case 'lab_result': return <Activity className="h-5 w-5" />;
@@ -181,8 +181,8 @@ export function HealthRecordsIntegration({
   };
 
   // Get severity color
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
+  const getSeverityColor = (_severity: string) => {
+    switch (_severity) {
       case 'minimal':
       case 'mild': return 'text-green-600 bg-green-50';
       case 'moderate': return 'text-yellow-600 bg-yellow-50';
@@ -194,8 +194,8 @@ export function HealthRecordsIntegration({
   };
 
   // Get lab flag color
-  const getLabFlagColor = (flag: string) => {
-    switch (flag) {
+  const getLabFlagColor = (_flag: string) => {
+    switch (_flag) {
       case 'normal': return 'text-green-600';
       case 'high': return 'text-orange-600';
       case 'low': return 'text-blue-600';
@@ -208,7 +208,7 @@ export function HealthRecordsIntegration({
   const filteredRecords = records.filter(record => {
     const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          record.provider.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'all' || record.type === filterType;
+    const matchesType = filterType === 'all' || record._type === filterType;
     const matchesPrivacy = showPrivateRecords || record.confidentiality === 'normal';
     return matchesSearch && matchesType && matchesPrivacy;
   });
@@ -280,10 +280,10 @@ export function HealthRecordsIntegration({
         <button
           onClick={() => {
             const input = document.createElement('input');
-            input.type = 'file';
+            input._type = '_file';
             input.onchange = (e) => {
-              const file = (e.target as HTMLInputElement).files?.[0];
-              if (file) onImportRecords?.(file);
+              const _file = (e.target as HTMLInputElement).files?.[0];
+              if (_file) onImportRecords?.(_file);
             };
             input.click();
           }}
@@ -333,7 +333,7 @@ export function HealthRecordsIntegration({
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'overview' && (
           <div className="space-y-4">
-            {/* Search and Filter */}
+            {/* Search and _Filter */}
             <div className="flex space-x-2">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -375,12 +375,12 @@ export function HealthRecordsIntegration({
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
                       <div className={`p-2 rounded-lg ${
-                        record.type === 'assessment' ? 'bg-purple-100' :
-                        record.type === 'diagnosis' ? 'bg-orange-100' :
-                        record.type === 'lab_result' ? 'bg-blue-100' :
+                        record._type === 'assessment' ? 'bg-purple-100' :
+                        record._type === 'diagnosis' ? 'bg-orange-100' :
+                        record._type === 'lab_result' ? 'bg-blue-100' :
                         'bg-gray-100'
                       }`}>
-                        {getRecordIcon(record.type)}
+                        {getRecordIcon(record._type)}
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">{record.title}</h4>
@@ -425,13 +425,13 @@ export function HealthRecordsIntegration({
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h4 className="font-medium text-gray-900">{assessment.name} ({assessment.type})</h4>
+                      <h4 className="font-medium text-gray-900">{assessment.name} ({assessment._type})</h4>
                       <p className="text-sm text-gray-600 mt-1">
                         Administered by {assessment.provider}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getSeverityColor(assessment.severity)}`}>
-                      {assessment.severity}
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getSeverityColor(assessment._severity)}`}>
+                      {assessment._severity}
                     </span>
                   </div>
 
@@ -514,8 +514,8 @@ export function HealthRecordsIntegration({
                         }`}>
                           {diagnosis.status}
                         </span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getSeverityColor(diagnosis.severity)}`}>
-                          {diagnosis.severity}
+                        <span className={`px-2 py-1 text-xs rounded-full ${getSeverityColor(diagnosis._severity)}`}>
+                          {diagnosis._severity}
                         </span>
                       </div>
                     </div>
@@ -553,7 +553,7 @@ export function HealthRecordsIntegration({
                     <div>
                       <h4 className="font-medium text-gray-900">{lab.testName}</h4>
                       <div className="flex items-center space-x-3 mt-2">
-                        <span className={`text-lg font-bold ${getLabFlagColor(lab.flag || 'normal')}`}>
+                        <span className={`text-lg font-bold ${getLabFlagColor(lab._flag || 'normal')}`}>
                           {lab.value} {lab.unit}
                         </span>
                         {lab.referenceRange && (
@@ -572,13 +572,13 @@ export function HealthRecordsIntegration({
                       <span className="text-xs text-gray-500">
                         {new Date(lab.date).toLocaleDateString()}
                       </span>
-                      {lab.flag && lab.flag !== 'normal' && (
+                      {lab._flag && lab._flag !== 'normal' && (
                         <div className={`mt-1 px-2 py-1 text-xs rounded-full inline-block ${
-                          lab.flag === 'critical' ? 'bg-red-100 text-red-700' :
-                          lab.flag === 'high' ? 'bg-orange-100 text-orange-700' :
+                          lab._flag === 'critical' ? 'bg-red-100 text-red-700' :
+                          lab._flag === 'high' ? 'bg-orange-100 text-orange-700' :
                           'bg-blue-100 text-blue-700'
                         }`}>
-                          {lab.flag}
+                          {lab._flag}
                         </div>
                       )}
                     </div>

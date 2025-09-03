@@ -32,8 +32,8 @@ describe('Performance Testing Suite', () => {
       window.__PERFORMANCE_MARKS__ = [];
       const originalMark = performance.mark.bind(performance);
       performance.mark = function(name: string) {
-        window.__PERFORMANCE_MARKS__.push({ name, time: performance.now() });
-        return originalMark(name);
+        window.__PERFORMANCE_MARKS__.push({ name, _time: performance.now() });
+        return originalMark(_name);
       };
     });
   });
@@ -43,23 +43,23 @@ describe('Performance Testing Suite', () => {
   });
 
   describe('Core Web Vitals', () => {
-    it('should meet Largest Contentful Paint (LCP) threshold', async () => {
+    it('should meet Largest Contentful Paint (_LCP) threshold', async () => {
       await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
       
-      const lcp = await page.evaluate(() => {
+      const _lcp = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
           new PerformanceObserver((list) => {
             const entries = list.getEntries();
-            const lastEntry = entries[entries.length - 1] as any;
-            resolve(lastEntry.renderTime || lastEntry.loadTime);
+            const lastEntry = entries[entries.length - 1] as unknown;
+            resolve(lastEntry.renderTime || lastEntry._loadTime);
           }).observe({ entryTypes: ['largest-contentful-paint'] });
         });
       });
 
-      expect(lcp).toBeLessThan(THRESHOLDS.LARGEST_CONTENTFUL_PAINT);
+      expect(_lcp).toBeLessThan(THRESHOLDS.LARGEST_CONTENTFUL_PAINT);
     });
 
-    it('should meet First Input Delay (FID) threshold', async () => {
+    it('should meet First Input Delay (_FID) threshold', async () => {
       await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
       
       // Simulate user interaction
@@ -67,47 +67,47 @@ describe('Performance Testing Suite', () => {
       await page.click('button');
       const endTime = await page.evaluate(() => performance.now());
       
-      const fid = endTime - startTime;
-      expect(fid).toBeLessThan(THRESHOLDS.FIRST_INPUT_DELAY);
+      const _fid = endTime - startTime;
+      expect(_fid).toBeLessThan(THRESHOLDS.FIRST_INPUT_DELAY);
     });
 
-    it('should meet Cumulative Layout Shift (CLS) threshold', async () => {
+    it('should meet Cumulative Layout Shift (_CLS) threshold', async () => {
       await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
       
-      const cls = await page.evaluate(() => {
+      const _cls = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
-          let clsValue = 0;
+          let _clsValue = 0;
           new PerformanceObserver((list) => {
             for (const entry of list.getEntries()) {
-              if (!(entry as any).hadRecentInput) {
-                clsValue += (entry as any).value;
+              if (!(entry as unknown).hadRecentInput) {
+                _clsValue += (entry as unknown).value;
               }
             }
-            resolve(clsValue);
+            resolve(_clsValue);
           }).observe({ entryTypes: ['layout-shift'] });
           
           // Trigger some interactions that might cause layout shifts
           setTimeout(() => {
             window.scrollTo(0, 100);
-            setTimeout(() => resolve(clsValue), 1000);
+            setTimeout(() => resolve(_clsValue), 1000);
           }, 1000);
         });
       });
 
-      expect(cls).toBeLessThan(THRESHOLDS.CUMULATIVE_LAYOUT_SHIFT);
+      expect(_cls).toBeLessThan(THRESHOLDS.CUMULATIVE_LAYOUT_SHIFT);
     });
 
-    it('should meet First Contentful Paint (FCP) threshold', async () => {
+    it('should meet First Contentful Paint (_FCP) threshold', async () => {
       const startTime = Date.now();
       await page.goto('http://localhost:5173');
       
       await page.waitForSelector('[data-testid="app-ready"]');
-      const fcp = Date.now() - startTime;
+      const _fcp = Date.now() - startTime;
       
-      expect(fcp).toBeLessThan(THRESHOLDS.FIRST_CONTENTFUL_PAINT);
+      expect(_fcp).toBeLessThan(THRESHOLDS.FIRST_CONTENTFUL_PAINT);
     });
 
-    it('should meet Time to Interactive (TTI) threshold', async () => {
+    it('should meet Time to Interactive (_TTI) threshold', async () => {
       const startTime = Date.now();
       await page.goto('http://localhost:5173');
       
@@ -122,8 +122,8 @@ describe('Performance Testing Suite', () => {
         });
       });
       
-      const tti = Date.now() - startTime;
-      expect(tti).toBeLessThan(THRESHOLDS.TIME_TO_INTERACTIVE);
+      const _tti = Date.now() - startTime;
+      expect(_tti).toBeLessThan(THRESHOLDS.TIME_TO_INTERACTIVE);
     });
   });
 
@@ -132,16 +132,17 @@ describe('Performance Testing Suite', () => {
       await page.goto('http://localhost:5173');
       await page.waitForSelector('[data-testid="crisis-button"]');
       
-      const responseTime = await page.evaluate(() => {
+      const _responseTime = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
           const button = document.querySelector('[data-testid="crisis-button"]') as HTMLElement;
           const startTime = performance.now();
           
           button.click();
           
+// @ts-expect-error - MutationObserver is a global API
           const observer = new MutationObserver(() => {
-            const modal = document.querySelector('[data-testid="crisis-modal"]');
-            if (modal) {
+            const _modal = document.querySelector('[data-testid="crisis-_modal"]');
+            if (_modal) {
               resolve(performance.now() - startTime);
               observer.disconnect();
             }
@@ -151,7 +152,7 @@ describe('Performance Testing Suite', () => {
         });
       });
 
-      expect(responseTime).toBeLessThan(THRESHOLDS.CRISIS_RESPONSE);
+      expect(_responseTime).toBeLessThan(THRESHOLDS.CRISIS_RESPONSE);
     });
 
     it('should load dashboard within performance budget', async () => {
@@ -159,48 +160,48 @@ describe('Performance Testing Suite', () => {
       await page.goto('http://localhost:5173/dashboard');
       await page.waitForSelector('[data-testid="dashboard-loaded"]');
       
-      const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD);
+      const _loadTime = Date.now() - startTime;
+      expect(_loadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD);
     });
 
     it('should maintain 60fps during animations', async () => {
       await page.goto('http://localhost:5173');
       
-      const fps = await page.evaluate(() => {
+      const _fps = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
-          let frames = 0;
+          let _frames = 0;
           const startTime = performance.now();
           
-          function measureFPS() {
-            frames++;
+          function _measureFPS() {
+            _frames++;
             const currentTime = performance.now();
             const elapsed = currentTime - startTime;
             
             if (elapsed >= 1000) {
-              resolve(frames);
+              resolve(_frames);
             } else {
-              requestAnimationFrame(measureFPS);
+              requestAnimationFrame(_measureFPS);
             }
           }
           
           // Trigger animation
-          const element = document.querySelector('[data-testid="animated-element"]') as HTMLElement;
-          if (element) {
-            element.style.animation = 'pulse 1s infinite';
+          const _element = document.querySelector('[data-testid="animated-element"]') as HTMLElement;
+          if (_element) {
+            _element.style.animation = 'pulse 1s infinite';
           }
           
-          requestAnimationFrame(measureFPS);
+          requestAnimationFrame(_measureFPS);
         });
       });
 
-      expect(fps).toBeGreaterThanOrEqual(55); // Allow slight variance from 60fps
+      expect(_fps).toBeGreaterThanOrEqual(55); // Allow slight variance from 60fps
     });
   });
 
   describe('Memory Management', () => {
     it('should not have memory leaks during navigation', async () => {
       const getMemoryUsage = () => page.evaluate(() => {
-        return (performance as any).memory ? (performance as any).memory.usedJSHeapSize : 0;
+        return (performance as unknown).memory ? (performance as unknown).memory.usedJSHeapSize : 0;
       });
 
       const initialMemory = await getMemoryUsage();
@@ -214,29 +215,29 @@ describe('Performance Testing Suite', () => {
       
       // Force garbage collection if available
       await page.evaluate(() => {
-        if ((global as any).gc) {
-          (global as any).gc();
+        if ((global as unknown).gc) {
+          (global as unknown).gc();
         }
       });
       
       const finalMemory = await getMemoryUsage();
-      const memoryIncrease = finalMemory - initialMemory;
+      const _memoryIncrease = finalMemory - initialMemory;
       
       // Memory should not increase by more than 10MB
-      expect(memoryIncrease).toBeLessThan(10 * 1024 * 1024);
+      expect(_memoryIncrease).toBeLessThan(10 * 1024 * 1024);
     });
 
     it('should properly clean up event listeners', async () => {
       await page.goto('http://localhost:5173');
       
-      const listenerCount = await page.evaluate(() => {
-        const getEventListeners = (element: any) => {
-          const listeners = (window as any).getEventListeners?.(element) || {};
-          return Object.values(listeners).flat().length;
+      const _listenerCount = await page.evaluate(() => {
+        const getEventListeners = (_element: unknown) => {
+          const _listeners = (window as unknown).getEventListeners?.(_element) || {};
+          return Object.values(_listeners).flat().length;
         };
         
         // Get initial count
-        const initialCount = getEventListeners(window) + getEventListeners(document);
+        const initialCount = getEventListeners(_window) + getEventListeners(_document);
         
         // Trigger component mount/unmount cycle
         const button = document.querySelector('[data-testid="toggle-component"]') as HTMLElement;
@@ -248,13 +249,13 @@ describe('Performance Testing Suite', () => {
         // Return difference after cleanup
         return new Promise<number>((resolve) => {
           setTimeout(() => {
-            const finalCount = getEventListeners(window) + getEventListeners(document);
+            const finalCount = getEventListeners(_window) + getEventListeners(_document);
             resolve(finalCount - initialCount);
           }, 200);
         });
       });
 
-      expect(listenerCount).toBeLessThanOrEqual(0);
+      expect(_listenerCount).toBeLessThanOrEqual(0);
     });
   });
 
@@ -289,8 +290,8 @@ describe('Performance Testing Suite', () => {
         r.size === 0 || r.size < (firstLoadMetrics[i]?.size || 0) * 0.1
       ).length;
       
-      const cacheHitRate = cacheHits / secondLoadMetrics.length;
-      expect(cacheHitRate).toBeGreaterThan(0.7); // 70% cache hit rate
+      const _cacheHitRate = cacheHits / secondLoadMetrics.length;
+      expect(_cacheHitRate).toBeGreaterThan(0.7); // 70% cache hit rate
     });
 
     it('should minimize API response times', async () => {
@@ -314,25 +315,25 @@ describe('Performance Testing Suite', () => {
             fetch('/api/user/profile'),
             fetch('/api/wellness/data'),
             fetch('/api/community/groups'),
-          ]).then(() => resolve(times));
+          ]).then(() => resolve(_times));
         });
       });
 
       apiTimes.forEach(time => {
-        expect(time).toBeLessThan(THRESHOLDS.API_RESPONSE);
+        expect(_time).toBeLessThan(THRESHOLDS.API_RESPONSE);
       });
     });
 
     it('should implement request batching for efficiency', async () => {
       await page.goto('http://localhost:5173');
       
-      const requestCount = await page.evaluate(() => {
+      const _requestCount = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
-          let count = 0;
+          let _count = 0;
           
           // Monitor network requests
           const observer = new PerformanceObserver((list) => {
-            count += list.getEntries().filter(e => 
+            _count += list.getEntries().filter(e => 
               e.name.includes('/api/')
             ).length;
           });
@@ -342,12 +343,12 @@ describe('Performance Testing Suite', () => {
           const buttons = document.querySelectorAll('[data-action]');
           buttons.forEach(b => (b as HTMLElement).click());
           
-          setTimeout(() => resolve(count), 1000);
+          setTimeout(() => resolve(_count), 1000);
         });
       });
 
       // Should batch requests instead of making many individual calls
-      expect(requestCount).toBeLessThan(5);
+      expect(_requestCount).toBeLessThan(5);
     });
   });
 
@@ -355,14 +356,14 @@ describe('Performance Testing Suite', () => {
     it('should keep JavaScript bundle under size limit', async () => {
       await page.goto('http://localhost:5173');
       
-      const bundleSize = await page.evaluate(() => {
+      const _bundleSize = await page.evaluate(() => {
         const scripts = performance.getEntriesByType('resource')
           .filter(r => r.name.endsWith('.js')) as PerformanceResourceTiming[];
         
         return scripts.reduce((total, script) => total + script.transferSize, 0);
       });
 
-      expect(bundleSize).toBeLessThan(THRESHOLDS.BUNDLE_SIZE_LIMIT);
+      expect(_bundleSize).toBeLessThan(THRESHOLDS.BUNDLE_SIZE_LIMIT);
     });
 
     it('should implement code splitting effectively', async () => {
@@ -384,7 +385,7 @@ describe('Performance Testing Suite', () => {
       });
       
       // Should have loaded additional chunks
-      const newBundles = afterNavigationBundles.filter(b => !initialBundles.includes(b));
+      const newBundles = afterNavigationBundles.filter(b => !initialBundles.includes(_b));
       expect(newBundles.length).toBeGreaterThan(0);
     });
 
@@ -392,8 +393,8 @@ describe('Performance Testing Suite', () => {
       await page.goto('http://localhost:5173');
       
       const imageMetrics = await page.evaluate(() => {
-        const images = document.querySelectorAll('img');
-        return Array.from(images).map(img => ({
+        const _images = document.querySelectorAll('img');
+        return Array.from(_images).map(img => ({
           src: img.src,
           loading: img.loading,
           srcset: img.srcset,
@@ -427,15 +428,15 @@ describe('Performance Testing Suite', () => {
           .then(data => data.queryTimes);
       });
 
-      queryTimes.forEach((time: number) => {
-        expect(time).toBeLessThan(50); // 50ms per query
+      queryTimes.forEach((_time: number) => {
+        expect(_time).toBeLessThan(50); // 50ms per query
       });
     });
 
     it('should implement efficient pagination', async () => {
       await page.goto('http://localhost:5173/community');
       
-      const loadTime = await page.evaluate(() => {
+      const _loadTime = await page.evaluate(() => {
         return new Promise<number>((resolve) => {
           const startTime = performance.now();
           
@@ -445,7 +446,7 @@ describe('Performance Testing Suite', () => {
         });
       });
 
-      expect(loadTime).toBeLessThan(200);
+      expect(_loadTime).toBeLessThan(200);
     });
   });
 
@@ -468,11 +469,11 @@ describe('Performance Testing Suite', () => {
         const startTime = Date.now();
         await page.goto('http://localhost:5173');
         await page.waitForSelector('[data-testid="app-ready"]');
-        const loadTime = Date.now() - startTime;
+        const _loadTime = Date.now() - startTime;
 
         // Adjust threshold based on network condition
-        const adjustedThreshold = condition.name === '3G' ? THRESHOLDS.PAGE_LOAD * 2 : THRESHOLDS.PAGE_LOAD;
-        expect(loadTime).toBeLessThan(adjustedThreshold);
+        const _adjustedThreshold = condition.name === '3G' ? THRESHOLDS.PAGE_LOAD * 2 : THRESHOLDS.PAGE_LOAD;
+        expect(_loadTime).toBeLessThan(_adjustedThreshold);
       }
     });
 
@@ -485,7 +486,7 @@ describe('Performance Testing Suite', () => {
       for (let i = 0; i < userCount; i++) {
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
-        browsers.push(browser);
+        browsers.push(_browser);
         pages.push(page);
       }
 
@@ -500,11 +501,11 @@ describe('Performance Testing Suite', () => {
       );
 
       // Calculate statistics
-      const avgLoadTime = loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length;
-      const maxLoadTime = Math.max(...loadTimes);
+      const _avgLoadTime = loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length;
+      const _maxLoadTime = Math.max(...loadTimes);
 
-      expect(avgLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD);
-      expect(maxLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD * 1.5);
+      expect(_avgLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD);
+      expect(_maxLoadTime).toBeLessThan(THRESHOLDS.PAGE_LOAD * 1.5);
 
       // Cleanup
       await Promise.all(browsers.map(b => b.close()));

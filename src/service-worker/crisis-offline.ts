@@ -1,5 +1,6 @@
 // Crisis offline resources and caching strategies
 import { openDB } from 'idb';
+import { logger } from '../utils/logger';
 
 interface CrisisDB {
   safetyPlans: {
@@ -7,7 +8,7 @@ interface CrisisDB {
     value: {
       id: string;
       userId: string;
-      plan: any;
+      plan: unknown;
       lastUpdated: string;
       syncStatus: 'synced' | 'pending' | 'offline';
     };
@@ -47,7 +48,7 @@ interface CrisisDB {
 }
 
 // Critical offline resources that must be cached
-const CRITICAL_RESOURCES = [
+const _CRITICAL_RESOURCES = [
   '/crisis',
   '/crisis/emergency-contacts',
   '/crisis/safety-plan',
@@ -124,7 +125,7 @@ export async function precacheCrisisResources() {
   const cache = await caches.open('crisis-v1');
   
   // Cache critical pages
-  await cache.addAll(CRITICAL_RESOURCES);
+  await cache.addAll(_CRITICAL_RESOURCES);
   
   // Create offline crisis page
   const offlineCrisisHTML = generateOfflineCrisisPage();
@@ -389,15 +390,15 @@ export async function handleOfflineCrisis(request: Request): Promise<Response> {
   const cache = await caches.open('crisis-v1');
   
   // Try cache first
-  const cachedResponse = await cache.match(request);
-  if (cachedResponse) {
+  const cachedResponse = await cache.match(_request);
+  if (_cachedResponse) {
     return cachedResponse;
   }
   
   // Return offline crisis page for navigation requests
   if (request.mode === 'navigate') {
     const offlinePage = await cache.match('/offline-crisis.html');
-    if (offlinePage) {
+    if (_offlinePage) {
       return offlinePage;
     }
   }
@@ -428,7 +429,7 @@ export async function syncOfflineData() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(unsyncedLogs),
+        body: JSON.stringify(_unsyncedLogs),
       });
       
       if (response.ok) {
@@ -440,14 +441,14 @@ export async function syncOfflineData() {
         }
         await tx.done;
       }
-    } catch (error) {
-      console.error('Failed to sync crisis data:', error);
+    } catch (_error) {
+      logger.error('Failed to sync crisis data:');
     }
   }
 }
 
 // Log crisis interaction for offline sync
-export async function logCrisisInteraction(data: any) {
+export async function logCrisisInteraction(data: unknown) {
   const db = await initCrisisDB();
   
   const log = {

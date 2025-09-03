@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * Privacy-First Analytics Hook
@@ -14,45 +15,45 @@ import { useCallback } from 'react';
 interface AnalyticsEvent {
   category: string;
   action: string;
-  label?: string;
-  value?: number;
+  _label?: string;
+  _value?: number;
   metadata?: Record<string, any>;
 }
 
 export const useAnalytics = () => {
   // All tracking methods are no-ops - we never collect any data
-  const trackEvent = useCallback(async (event: AnalyticsEvent | string, properties?: Record<string, any>) => {
+  const trackEvent = useCallback(async (event: AnalyticsEvent | string, _properties?: Record<string, any>) => {
     // Intentionally empty - no data collection
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Privacy Mode] Analytics disabled - No data collected:', typeof event === 'string' ? event : event.action);
+      logger.info('[Privacy Mode] Analytics disabled - No data collected:', typeof event === 'string' ? event : event.action);
     }
   }, []);
 
   const trackPageView = useCallback(async (page: string, properties?: Record<string, any>) => {
     // Intentionally empty - no page tracking
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Privacy Mode] Page view not tracked:', page);
+      logger.info('[Privacy Mode] Page view not tracked:', page);
     }
   }, []);
 
   const trackError = useCallback(async (errorType: string, errorDetails: Record<string, any>) => {
     // Only log errors locally for debugging, never send anywhere
     if (process.env.NODE_ENV === 'development') {
-      console.error('[Local Error Log]', errorType, errorDetails);
+      logger.error('[Local Error Log]', errorType, errorDetails);
     }
   }, []);
 
-  const trackTiming = useCallback(async (category: string, variable: string, time: number, label?: string) => {
+  const trackTiming = useCallback(async (category: string, variable: string, _time: number, label?: string) => {
     // Intentionally empty - no performance tracking
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Privacy Mode] Timing not tracked:', category, variable);
+      logger.info('[Privacy Mode] Timing not tracked:', category, variable);
     }
   }, []);
 
-  const trackInteraction = useCallback(async (element: string, action: string, value?: any) => {
+  const trackInteraction = useCallback(async (element: string, action: string, value?: unknown) => {
     // Intentionally empty - no interaction tracking
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Privacy Mode] Interaction not tracked:', element, action);
+      logger.info('[Privacy Mode] Interaction not tracked:', element, action);
     }
   }, []);
 
@@ -63,11 +64,11 @@ export const useAnalytics = () => {
     trackTiming,
     trackInteraction,
     // These methods also do nothing - maintaining interface compatibility
-    setUserId: (id: string) => {
+    setUserId: (_id: string) => {
       // Never store user IDs - we're anonymous only
     },
-    setUserProperties: (properties: Record<string, any>) => {
-      // Never store user properties - complete privacy
+    setUserProperties: (_properties: Record<string, any>) => {
+      // Never store user _properties - complete privacy
     }
   };
 };

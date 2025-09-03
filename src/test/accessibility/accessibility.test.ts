@@ -2,6 +2,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { AxePuppeteer } from '@axe-core/puppeteer';
+import { logger } from '../../utils/logger';
 
 describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
   let browser: Browser;
@@ -26,7 +27,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should pass all axe-core AAA tests on homepage', async () => {
       await page.goto('http://localhost:5173');
       
-      const results = await new AxePuppeteer(page)
+      const results = await new AxePuppeteer(_page)
         .withTags(['wcag2aaa', 'wcag21aaa'])
         .analyze();
       
@@ -34,72 +35,72 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       
       // Log any violations for debugging
       if (results.violations.length > 0) {
-        console.log('Accessibility violations:', JSON.stringify(results.violations, null, 2));
+        logger.debug('Accessibility violations:', JSON.stringify(results.violations, null, 2));
       }
     });
 
     it('should provide enhanced color contrast (7:1 for normal text)', async () => {
       await page.goto('http://localhost:5173');
       
-      const contrastRatios = await page.evaluate(() => {
+      const _contrastRatios = await page.evaluate(() => {
         const elements = document.querySelectorAll('p, span, div, button, a');
         const ratios: number[] = [];
         
         elements.forEach(el => {
           const styles = window.getComputedStyle(el);
-          const bgColor = styles.backgroundColor;
-          const textColor = styles.color;
+          const _bgColor = styles.backgroundColor;
+          const _textColor = styles.color;
           
           // Simple contrast calculation (would use proper library in production)
           const getLuminance = (color: string) => {
             const rgb = color.match(/\d+/g);
             if (!rgb) return 0;
-            const [r, g, b] = rgb.map(Number);
+            const [r, g, b] = rgb.map(_Number);
             return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           };
           
-          const bgLum = getLuminance(bgColor);
-          const textLum = getLuminance(textColor);
+          const bgLum = getLuminance(_bgColor);
+          const textLum = getLuminance(_textColor);
           const ratio = (Math.max(bgLum, textLum) + 0.05) / (Math.min(bgLum, textLum) + 0.05);
           
-          if (ratio < 7) ratios.push(ratio);
+          if (ratio < 7) ratios.push(_ratio);
         });
         
         return ratios;
       });
       
-      expect(contrastRatios).toHaveLength(0);
+      expect(_contrastRatios).toHaveLength(0);
     });
 
     it('should support advanced screen reader features', async () => {
       await page.goto('http://localhost:5173');
       
-      // Check for proper ARIA landmarks
-      const landmarks = await page.evaluate(() => {
+      // Check for proper ARIA _landmarks
+      const _landmarks = await page.evaluate(() => {
         const requiredLandmarks = ['banner', 'navigation', 'main', 'contentinfo'];
         const foundLandmarks: string[] = [];
         
         requiredLandmarks.forEach(role => {
-          const element = document.querySelector(`[role="${role}"]`) || 
+          const _element = document.querySelector(`[role="${role}"]`) || 
                          document.querySelector(role === 'banner' ? 'header' :
                                               role === 'navigation' ? 'nav' :
                                               role === 'contentinfo' ? 'footer' : 'main');
-          if (element) foundLandmarks.push(role);
+          if (_element) foundLandmarks.push(_role);
         });
         
         return foundLandmarks;
       });
       
-      expect(landmarks).toContain('banner');
-      expect(landmarks).toContain('navigation');
-      expect(landmarks).toContain('main');
-      expect(landmarks).toContain('contentinfo');
+      expect(_landmarks).toContain('banner');
+      expect(_landmarks).toContain('navigation');
+      expect(_landmarks).toContain('main');
+      expect(_landmarks).toContain('contentinfo');
     });
 
     it('should provide detailed focus indicators', async () => {
       await page.goto('http://localhost:5173');
       
-      const focusIndicators = await page.evaluate(() => {
+      const _focusIndicators = await page.evaluate(() => {
         const focusableElements = document.querySelectorAll('a, button, input, select, textarea, [tabindex]');
         const inadequateIndicators: string[] = [];
         
@@ -120,7 +121,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return inadequateIndicators;
       });
       
-      expect(focusIndicators).toHaveLength(0);
+      expect(_focusIndicators).toHaveLength(0);
     });
   });
 
@@ -164,8 +165,8 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       // Check for keyboard shortcut documentation
       await page.keyboard.press('Shift+?'); // Common help shortcut
       
-      const helpModal = await page.$('[data-testid="keyboard-help"]');
-      expect(helpModal).toBeTruthy();
+      const _helpModal = await page.$('[data-testid="keyboard-help"]');
+      expect(_helpModal).toBeTruthy();
       
       // Verify shortcuts work
       const shortcuts = [
@@ -176,12 +177,12 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       
       for (const shortcut of shortcuts) {
         await page.keyboard.press(shortcut.key);
-        const actionPerformed = await page.evaluate((action) => {
+        const _actionPerformed = await page.evaluate((action) => {
           return document.querySelector(`[data-action-performed="${action}"]`) !== null;
         }, shortcut.action);
         
         // Some action should be performed
-        // expect(actionPerformed).toBeTruthy();
+        // expect(_actionPerformed).toBeTruthy();
       }
     });
 
@@ -192,12 +193,12 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       await page.click('[data-testid="open-modal"]');
       
       // Check focus is trapped
-      const focusTrap = await page.evaluate(() => {
+      const _focusTrap = await page.evaluate(() => {
         const modal = document.querySelector('[role="dialog"]');
         if (!modal) return false;
         
         const focusableElements = modal.querySelectorAll('button, input, select, textarea, a, [tabindex]');
-        const currentIndex = 0;
+        const _currentIndex = 0;
         
         // Tab through elements
         for (let i = 0; i < focusableElements.length + 2; i++) {
@@ -209,7 +210,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return modal.contains(document.activeElement);
       });
       
-      expect(focusTrap).toBe(true);
+      expect(_focusTrap).toBe(true);
     });
   });
 
@@ -217,7 +218,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should provide comprehensive ARIA labels', async () => {
       await page.goto('http://localhost:5173');
       
-      const missingLabels = await page.evaluate(() => {
+      const _missingLabels = await page.evaluate(() => {
         const elements = document.querySelectorAll('button, a, input, select, textarea');
         const missing: string[] = [];
         
@@ -235,16 +236,16 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return missing;
       });
       
-      expect(missingLabels).toHaveLength(0);
+      expect(_missingLabels).toHaveLength(0);
     });
 
     it('should announce dynamic content changes', async () => {
       await page.goto('http://localhost:5173');
       
-      // Check for live regions
+      // Check for live _regions
       const liveRegions = await page.evaluate(() => {
-        const regions = document.querySelectorAll('[aria-live]');
-        return Array.from(regions).map(r => ({
+        const _regions = document.querySelectorAll('[aria-live]');
+        return Array.from(_regions).map(r => ({
           type: r.getAttribute('aria-live'),
           atomic: r.getAttribute('aria-atomic'),
           relevant: r.getAttribute('aria-relevant'),
@@ -254,14 +255,14 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       expect(liveRegions.length).toBeGreaterThan(0);
       
       // Crisis alerts should be assertive
-      const crisisRegion = liveRegions.find(r => r.type === 'assertive');
-      expect(crisisRegion).toBeTruthy();
+      const _crisisRegion = liveRegions.find(r => r.type === 'assertive');
+      expect(_crisisRegion).toBeTruthy();
     });
 
     it('should provide context for form inputs', async () => {
       await page.goto('http://localhost:5173/register');
       
-      const formAccessibility = await page.evaluate(() => {
+      const _formAccessibility = await page.evaluate(() => {
         const inputs = document.querySelectorAll('input, select, textarea');
         const issues: string[] = [];
         
@@ -290,7 +291,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return issues;
       });
       
-      expect(formAccessibility).toHaveLength(0);
+      expect(_formAccessibility).toHaveLength(0);
     });
   });
 
@@ -298,7 +299,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should use clear and simple language', async () => {
       await page.goto('http://localhost:5173');
       
-      const readabilityScore = await page.evaluate(() => {
+      const _readabilityScore = await page.evaluate(() => {
         const textContent = document.body.innerText;
         const sentences = textContent.split(/[.!?]+/).filter(s => s.trim().length > 0);
         const words = textContent.split(/\s+/).filter(w => w.length > 0);
@@ -319,7 +320,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       });
       
       // Score should be above 60 (plain English)
-      expect(readabilityScore).toBeGreaterThan(60);
+      expect(_readabilityScore).toBeGreaterThan(60);
     });
 
     it('should provide consistent navigation', async () => {
@@ -329,7 +330,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       for (const pagePath of pages) {
         await page.goto(`http://localhost:5173${pagePath}`);
         
-        const navStructure = await page.evaluate(() => {
+        const _navStructure = await page.evaluate(() => {
           const nav = document.querySelector('nav');
           if (!nav) return '';
           
@@ -338,12 +339,12 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
             .join(',');
         });
         
-        navigationStructures.push(navStructure);
+        navigationStructures.push(_navStructure);
       }
       
       // All pages should have the same navigation structure
-      const uniqueStructures = [...new Set(navigationStructures)];
-      expect(uniqueStructures).toHaveLength(1);
+      const _uniqueStructures = [...new Set(_navigationStructures)];
+      expect(_uniqueStructures).toHaveLength(1);
     });
 
     it('should provide clear error messages', async () => {
@@ -353,11 +354,11 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       await page.click('[type="submit"]');
       
       const errorMessages = await page.evaluate(() => {
-        const errors = document.querySelectorAll('[role="alert"]');
-        return Array.from(errors).map(e => ({
+        const _errors = document.querySelectorAll('[role="alert"]');
+        return Array.from(_errors).map(e => ({
           text: e.textContent,
           hasIcon: e.querySelector('svg, img') !== null,
-          hasColor: window.getComputedStyle(e).color !== 'rgb(0, 0, 0)',
+          hasColor: window.getComputedStyle(_e).color !== 'rgb(0, 0, 0)',
         }));
       });
       
@@ -374,7 +375,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should support user preferences', async () => {
       await page.goto('http://localhost:5173/settings');
       
-      const preferences = await page.evaluate(() => {
+      const _preferences = await page.evaluate(() => {
         const settings: string[] = [];
         
         // Check for various preference options
@@ -386,9 +387,9 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return settings;
       });
       
-      expect(preferences).toContain('reduce-motion');
-      expect(preferences).toContain('high-contrast');
-      expect(preferences).toContain('large-text');
+      expect(_preferences).toContain('reduce-motion');
+      expect(_preferences).toContain('high-contrast');
+      expect(_preferences).toContain('large-text');
     });
   });
 
@@ -397,7 +398,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       await page.setViewport({ width: 375, height: 667 });
       await page.goto('http://localhost:5173');
       
-      const touchTargets = await page.evaluate(() => {
+      const _touchTargets = await page.evaluate(() => {
         const interactive = document.querySelectorAll('button, a, input, select, [onclick]');
         const inadequate: string[] = [];
         
@@ -411,7 +412,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return inadequate;
       });
       
-      expect(touchTargets).toHaveLength(0);
+      expect(_touchTargets).toHaveLength(0);
     });
 
     it('should support gesture alternatives', async () => {
@@ -425,16 +426,16 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         elements.forEach(el => {
           // Check for button alternatives
           const parent = el.parentElement;
-          const hasAlternative = parent?.querySelector('button') !== null;
-          alternatives.push(hasAlternative);
+          const _hasAlternative = parent?.querySelector('button') !== null;
+          alternatives.push(_hasAlternative);
         });
         
         return alternatives;
       });
       
       // All gesture-based interactions should have alternatives
-      gestureElements.forEach(hasAlt => {
-        expect(hasAlt).toBe(true);
+      gestureElements.forEach(_hasAlt => {
+        expect(_hasAlt).toBe(true);
       });
     });
 
@@ -444,18 +445,18 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         { width: 667, height: 375 }, // Landscape
       ];
       
-      for (const orientation of orientations) {
-        await page.setViewport(orientation);
+      for (const _orientation of orientations) {
+        await page.setViewport(_orientation);
         await page.goto('http://localhost:5173');
         
         // Check that content is not cut off
-        const overflow = await page.evaluate(() => {
+        const _overflow = await page.evaluate(() => {
           const body = document.body;
           return body.scrollWidth > window.innerWidth || body.scrollHeight > window.innerHeight;
         });
         
         // Some scrolling is okay, but check critical elements are visible
-        const criticalVisible = await page.evaluate(() => {
+        const _criticalVisible = await page.evaluate(() => {
           const critical = document.querySelector('[data-testid="crisis-button"]');
           if (!critical) return false;
           
@@ -465,7 +466,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
                  rect.right <= window.innerWidth;
         });
         
-        expect(criticalVisible).toBe(true);
+        expect(_criticalVisible).toBe(true);
       }
     });
   });
@@ -475,8 +476,8 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
       await page.goto('http://localhost:5173/resources');
       
       const videos = await page.evaluate(() => {
-        const videoElements = document.querySelectorAll('video');
-        return Array.from(videoElements).map(video => ({
+        const _videoElements = document.querySelectorAll('video');
+        return Array.from(_videoElements).map(video => ({
           hasCaptions: video.querySelector('track[kind="captions"]') !== null,
           hasTranscript: video.parentElement?.querySelector('[data-transcript]') !== null,
         }));
@@ -490,7 +491,7 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
     it('should provide alt text for images', async () => {
       await page.goto('http://localhost:5173');
       
-      const images = await page.evaluate(() => {
+      const _images = await page.evaluate(() => {
         const imgs = document.querySelectorAll('img');
         const missing: string[] = [];
         
@@ -504,15 +505,15 @@ describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
         return missing;
       });
       
-      expect(images).toHaveLength(0);
+      expect(_images).toHaveLength(0);
     });
 
     it('should provide audio descriptions where needed', async () => {
       await page.goto('http://localhost:5173/resources');
       
       const complexMedia = await page.evaluate(() => {
-        const media = document.querySelectorAll('[data-complex-visual]');
-        return Array.from(media).map(m => ({
+        const _media = document.querySelectorAll('[data-complex-visual]');
+        return Array.from(_media).map(m => ({
           hasDescription: m.getAttribute('aria-describedby') !== null ||
                          m.querySelector('[data-audio-description]') !== null,
         }));

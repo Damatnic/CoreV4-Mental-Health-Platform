@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
 import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { CrisisChat } from './CrisisChat';
+import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { logger, LogCategory } from '../../services/logging/logger';
 
 interface CrisisLevel {
@@ -61,7 +61,7 @@ export function CrisisInterventionSystem() {
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => setUserLocation(position),
+        (_position) => setUserLocation(_position),
         (error) => logger.error('Location access denied', new Error(error.message), { category: LogCategory.CRISIS }),
         { enableHighAccuracy: true, timeout: 5000 }
       );
@@ -105,9 +105,9 @@ export function CrisisInterventionSystem() {
   }, [trackCrisisInteraction]);
 
   // Crisis level assessment
-  const assessCrisisLevel = (responses: Record<string, number>) => {
-    const score = Object.values(responses).reduce((sum, val) => sum + val, 0);
-    const maxScore = Object.keys(responses).length * 5;
+  const assessCrisisLevel = (_responses: Record<string, number>) => {
+    const score = Object.values(_responses).reduce((sum, val) => sum + val, 0);
+    const maxScore = Object.keys(_responses).length * 5;
     const percentage = (score / maxScore) * 100;
 
     if (percentage >= 80) {
@@ -180,7 +180,7 @@ export function CrisisInterventionSystem() {
                   Current Status: {currentCrisisLevel.description}
                 </h2>
                 <p className={`mt-2 ${currentCrisisLevel.color}`}>
-                  We're here to help. You're not alone in this.
+                  We&apos;re here to help. You&apos;re not alone in this.
                 </p>
               </div>
               <Heart className={`h-12 w-12 ${currentCrisisLevel.color}`} />
@@ -200,7 +200,7 @@ export function CrisisInterventionSystem() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'assessment' | 'resources' | 'safety' | 'chat')}
                   className={`flex-1 py-4 px-6 flex items-center justify-center space-x-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
                       ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50'
@@ -228,7 +228,9 @@ export function CrisisInterventionSystem() {
               </Suspense>
             )}
             {activeTab === 'chat' && (
-              <CrisisChat />
+              <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
+                <CrisisChatLazy />
+              </Suspense>
             )}
           </div>
         </div>
@@ -270,8 +272,8 @@ export function CrisisInterventionSystem() {
 }
 
 // Crisis Assessment Component
-function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (responses: Record<string, number>) => void }) {
-  const [responses, setResponses] = useState<Record<string, number>>({});
+function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (_responses: Record<string, number>) => void }) {
+  const [_responses, setResponses] = useState<Record<string, number>>({});
   
   const questions = [
     { id: 'safety', text: 'Do you feel safe right now?', inverse: true },
@@ -282,11 +284,11 @@ function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (res
   ];
 
   const handleResponse = (questionId: string, value: number) => {
-    const newResponses = { ...responses, [questionId]: value };
-    setResponses(newResponses);
+    const _newResponses = { ..._responses, [questionId]: value };
+    setResponses(_newResponses);
     
-    if (Object.keys(newResponses).length === questions.length) {
-      onAssessmentComplete(newResponses);
+    if (Object.keys(_newResponses).length === questions.length) {
+      onAssessmentComplete(_newResponses);
     }
   };
 
@@ -305,7 +307,7 @@ function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (res
                   key={value}
                   onClick={() => handleResponse(question.id, question.inverse ? 6 - value : value)}
                   className={`flex-1 py-2 px-3 rounded-lg transition-colors ${
-                    responses[question.id] === (question.inverse ? 6 - value : value)
+                    _responses[question.id] === (question.inverse ? 6 - value : value)
                       ? 'bg-blue-500 text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
@@ -322,7 +324,14 @@ function CrisisAssessment({ onAssessmentComplete }: { onAssessmentComplete: (res
 }
 
 // Quick Tool Card Component
-function QuickToolCard({ title, description, icon, onClick }: any) {
+interface QuickToolCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}
+
+function QuickToolCard({ title, description, icon, onClick }: QuickToolCardProps) {
   return (
     <button
       onClick={onClick}

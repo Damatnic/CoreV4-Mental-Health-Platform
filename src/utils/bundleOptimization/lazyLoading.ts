@@ -1,3 +1,4 @@
+import { logger } from '../logger';
 /**
  * Bundle Splitting and Lazy Loading Configuration
  * Optimizes bundle size and loading performance for better mobile experience
@@ -9,7 +10,7 @@ import { lazy, ComponentType } from 'react';
 import { performanceMonitor } from '../performance/performanceMonitor';
 
 // Component loader with performance monitoring
-export function createLazyComponent<T extends ComponentType<any>>(
+export function createLazyComponent<T extends ComponentType<unknown>>(
   importFunc: () => Promise<{ default: T }>,
   chunkName?: string
 ): T {
@@ -34,12 +35,12 @@ export function createLazyComponent<T extends ComponentType<any>>(
       
       return module;
     } catch (error) {
-      console.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, error);
+      logger.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, error);
       
       // Record error
       performanceMonitor.recordMetric('lazy_load_error', 1, {
         chunkName,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: 'Processing error'
       });
       
       throw error;
@@ -47,13 +48,13 @@ export function createLazyComponent<T extends ComponentType<any>>(
   });
 
   // Add display name for debugging (cast to any to avoid type error)
-  (LazyComponent as any).displayName = chunkName ? `Lazy(${chunkName})` : 'LazyComponent';
+  (LazyComponent as unknown).displayName = chunkName ? `Lazy(${chunkName})` : 'LazyComponent';
   
   return LazyComponent as unknown as T;
 }
 
 // Crisis-related components (highest priority)
-export const CrisisInterventionLazy = createLazyComponent(
+export const _CrisisInterventionLazy = createLazyComponent(
   () => import('../../components/crisis/CrisisInterventionSystem').then(m => ({ default: m.CrisisInterventionSystem })),
   'CrisisInterventionSystem'
 );
@@ -74,65 +75,65 @@ export const CrisisChatLazy = createLazyComponent(
 );
 
 // Wellness components (medium priority)
-export const MoodTrackerLazy = createLazyComponent(
+export const _MoodTrackerLazy = createLazyComponent(
   () => import('../../components/wellness/MoodTracker'),
   'MoodTracker'
 );
 
-export const BreathingExerciseLazy = createLazyComponent(
+export const _BreathingExerciseLazy = createLazyComponent(
   () => import('../../components/wellness/BreathingExercises').then(m => ({ default: m.BreathingExercises })),
   'BreathingExercises'
 );
 
-export const MeditationLazy = createLazyComponent(
+export const _MeditationLazy = createLazyComponent(
   () => import('../../components/wellness/MeditationTimer').then(m => ({ default: m.MeditationTimer })),
   'MeditationTimer'
 );
 
-export const JournalLazy = createLazyComponent(
+export const _JournalLazy = createLazyComponent(
   () => import('../../components/wellness/TherapeuticJournal').then(m => ({ default: m.TherapeuticJournal })),
   'TherapeuticJournal'
 );
 
 // Community components (lower priority)
-export const CommunityFeedLazy = createLazyComponent(
+export const _CommunityFeedLazy = createLazyComponent(
   () => import('../../components/community/CommunityFeed'),
   'CommunityFeed'
 );
 
-export const SupportGroupsLazy = createLazyComponent(
+export const _SupportGroupsLazy = createLazyComponent(
   () => import('../../components/community/SupportGroups').then(m => ({ default: m.SupportGroups })),
   'SupportGroups'
 );
 
-export const ForumsLazy = createLazyComponent(
+export const _ForumsLazy = createLazyComponent(
   () => import('../../components/community/Forums'),
   'Forums'
 );
 
 // Professional components
-export const TherapistFinderLazy = createLazyComponent(
+export const _TherapistFinderLazy = createLazyComponent(
   () => import('../../components/professional/TherapistFinder'),
   'TherapistFinder'
 );
 
-export const AppointmentBookingLazy = createLazyComponent(
+export const _AppointmentBookingLazy = createLazyComponent(
   () => import('../../components/professional/AppointmentBooking').then(m => ({ default: m.AppointmentBooking })),
   'AppointmentBooking'
 );
 
 // Settings and administrative components (lowest priority)
-export const SettingsLazy = createLazyComponent(
+export const _SettingsLazy = createLazyComponent(
   () => import('../../components/settings/Settings'),
   'Settings'
 );
 
-export const ProfileLazy = createLazyComponent(
+export const _ProfileLazy = createLazyComponent(
   () => import('../../components/profile/Profile'),
   'Profile'
 );
 
-export const PerformanceDashboardLazy = createLazyComponent(
+export const _PerformanceDashboardLazy = createLazyComponent(
   () => import('../../components/performance/PerformanceDashboard').then(m => ({ default: m.PerformanceDashboard })),
   'PerformanceDashboard'
 );
@@ -171,7 +172,7 @@ export class ComponentPreloader {
       );
     }
 
-    await Promise.allSettled(promises);
+    await Promise.allSettled(_promises);
   }
 
   /**
@@ -198,7 +199,7 @@ export class ComponentPreloader {
       }
     }
 
-    await Promise.allSettled(promises);
+    await Promise.allSettled(_promises);
   }
 
   /**
@@ -206,6 +207,7 @@ export class ComponentPreloader {
    */
   static preloadDuringIdle(): void {
     if ('requestIdleCallback' in window) {
+// @ts-expect-error - requestIdleCallback is a global API
       requestIdleCallback(() => {
         this.preloadLowPriorityComponents();
       }, { timeout: 5000 });
@@ -219,7 +221,7 @@ export class ComponentPreloader {
 
   private static async preloadComponent(
     name: string,
-    importFunc: () => Promise<any>
+    importFunc: () => Promise<unknown>
   ): Promise<void> {
     if (this.preloadedComponents.has(name)) {
       return this.preloadPromises.get(name);
@@ -233,7 +235,7 @@ export class ComponentPreloader {
 
   private static async performPreload(
     name: string,
-    importFunc: () => Promise<any>
+    importFunc: () => Promise<unknown>
   ): Promise<void> {
     try {
       const startTime = performance.now();
@@ -245,13 +247,13 @@ export class ComponentPreloader {
       
       this.preloadedComponents.add(name);
     } catch (error) {
-      console.warn(`Failed to preload component ${name}:`, error);
+    logger.warn(`Failed to preload component ${name}:`, error);
       performanceMonitor.recordMetric('preload_error', 1, { componentName: name });
     }
   }
 
   private static async preloadComponentByFeatureName(feature: string): Promise<void> {
-    const componentMap: Record<string, () => Promise<any>> = {
+    const componentMap: Record<string, () => Promise<unknown>> = {
       'mood-tracker': () => import('../../components/wellness/MoodTracker'),
       'breathing': () => import('../../components/wellness/BreathingExercises').then(m => ({ default: m.BreathingExercises })),
       'meditation': () => import('../../components/wellness/MeditationTimer').then(m => ({ default: m.MeditationTimer })),
@@ -335,7 +337,7 @@ export class BundleAnalyzer {
         for (const entry of list.getEntries()) {
           if (entry.name.includes('chunk') || entry.name.includes('lazy')) {
             const resourceEntry = entry as PerformanceResourceTiming;
-            console.log(`Chunk loaded: ${entry.name}, Size: ${resourceEntry.transferSize || 0} bytes, Time: ${entry.duration}ms`);
+            logger.info(`Chunk loaded: ${entry.name}, Size: ${resourceEntry.transferSize || 0} bytes, Time: ${entry.duration}ms`);
             
             performanceMonitor.recordMetric('chunk_load', entry.duration, {
               chunkName: entry.name,
@@ -410,7 +412,7 @@ export function initializeBundleOptimization(): void {
     // Generate initial bundle report after page load
     setTimeout(() => {
       const report = BundleAnalyzer.generateBundleReport();
-      console.log('Bundle Performance Report:', report);
+      logger.info('Bundle Performance Report:', report);
       
       performanceMonitor.recordMetric('bundle_analysis', 1, report);
     }, 1000);

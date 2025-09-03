@@ -1,37 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, _useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
-  MapPin,
+  _MapPin,
   Phone,
   Globe,
-  Calendar,
+  _Calendar,
   Clock,
   Heart,
   Shield,
-  Users,
-  Video,
+  _Users,
+  _Video,
   MessageSquare,
   CheckCircle,
-  Info,
+  _Info,
   ExternalLink,
-  Mail,
+  _Mail,
   Languages,
-  GraduationCap,
-  Building,
+  _GraduationCap,
+  _Building,
   Sparkles,
   HandHeart,
-  Star,
-  DollarSign,
-  UserCheck,
-  Filter,
-  SortAsc,
-  BookOpen,
-  Briefcase,
-  Award,
-  Zap
+  _Star,
+  _DollarSign,
+  _UserCheck,
+  _Filter,
+  _SortAsc,
+  _BookOpen,
+  _Briefcase,
+  _Award,
+  _Zap
 } from 'lucide-react';
-import { therapistService } from '../../services/professional/TherapistService';
+import { _therapistService } from '../../services/professional/TherapistService';
 
 /**
  * Professional Support - Enhanced Therapist Matching & Free Resources
@@ -45,7 +45,7 @@ import { therapistService } from '../../services/professional/TherapistService';
  */
 
 // Professional categories and specializations
-const PROFESSIONAL_SPECIALIZATIONS = [
+const _PROFESSIONAL_SPECIALIZATIONS = [
   'Anxiety Disorders',
   'Depression',
   'Trauma & PTSD',
@@ -64,10 +64,10 @@ const PROFESSIONAL_SPECIALIZATIONS = [
   'Sleep Disorders'
 ];
 
-const THERAPY_APPROACHES = [
-  'Cognitive Behavioral Therapy (CBT)',
-  'Dialectical Behavior Therapy (DBT)',
-  'Acceptance & Commitment Therapy (ACT)',
+const _THERAPY_APPROACHES = [
+  'Cognitive Behavioral Therapy (_CBT)',
+  'Dialectical Behavior Therapy (_DBT)',
+  'Acceptance & Commitment Therapy (_ACT)',
   'Psychodynamic Therapy',
   'Mindfulness-Based Therapy',
   'Solution-Focused Therapy',
@@ -77,7 +77,7 @@ const THERAPY_APPROACHES = [
   'Somatic Therapy'
 ];
 
-const INSURANCE_PROVIDERS = [
+const _INSURANCE_PROVIDERS = [
   'Blue Cross Blue Shield',
   'Aetna',
   'United Healthcare',
@@ -104,7 +104,7 @@ const RESOURCE_CATEGORIES = [
   'Emergency Services'
 ];
 
-interface ProfessionalTherapist {
+interface _ProfessionalTherapist {
   id: string;
   name: string;
   credentials: string[];
@@ -165,7 +165,7 @@ interface FreeResource {
   anonymous?: boolean;
 }
 
-interface MatchingFilters {
+interface _MatchingFilters {
   specializations: string[];
   approaches: string[];
   insurance: string[];
@@ -188,7 +188,7 @@ const FREE_RESOURCES: FreeResource[] = [
     availability: {
       hours: '24/7',
       languages: ['English', 'Spanish', '150+ languages via interpretation'],
-      accessibility: ['TTY', 'Text', 'Voice', 'Video Phone for ASL']
+      accessibility: ['TTY', 'Text', 'Voice', '_Video Phone for ASL']
     },
     contact: {
       phone: '988',
@@ -261,7 +261,7 @@ const FREE_RESOURCES: FreeResource[] = [
     availability: {
       hours: 'Varies by provider',
       languages: ['Multiple languages available'],
-      accessibility: ['In-person', 'Video', 'Phone']
+      accessibility: ['In-person', '_Video', 'Phone']
     },
     contact: {
       website: 'https://openpathcollective.org'
@@ -326,14 +326,14 @@ export function ProfessionalSupport() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showOnlyEmergency, setShowOnlyEmergency] = useState(false);
 
-  // Filter resources based on search and category
+  // _Filter resources based on search and category
   const filteredResources = FREE_RESOURCES.filter(resource => {
     const matchesSearch = searchTerm === '' || 
       resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === 'all' || 
-      resource.categories.includes(selectedCategory);
+      resource.categories.includes(_selectedCategory);
     
     const matchesEmergency = !showOnlyEmergency || resource.isEmergency;
     
@@ -382,7 +382,7 @@ export function ProfessionalSupport() {
           <div className="flex items-center gap-3">
             <HandHeart className="h-6 w-6 text-purple-400" />
             <p className="text-gray-200">
-              <span className="font-semibold text-purple-300">Your Privacy Matters:</span> We don't collect any personal data. 
+              <span className="font-semibold text-purple-300">Your Privacy Matters:</span> We don&apos;t collect any personal data. 
               All resources listed are free and many offer anonymous support. 
               You deserve help without barriers.
             </p>
@@ -421,7 +421,7 @@ export function ProfessionalSupport() {
               {RESOURCE_CATEGORIES.map(category => (
                 <button
                   key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(_category)}
                   className={`px-4 py-2 rounded-full transition-all duration-300 ${
                     selectedCategory === category
                       ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-console-glow'
@@ -521,7 +521,7 @@ export function ProfessionalSupport() {
                     )}
                   </div>
 
-                  {/* Availability Info */}
+                  {/* Availability _Info */}
                   <div className="mt-4 pt-4 border-t border-gray-700/50">
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Clock className="h-4 w-4 text-blue-400" />
@@ -559,7 +559,7 @@ export function ProfessionalSupport() {
             <h3 className="text-lg font-semibold text-white">You Deserve Support</h3>
             <p className="mt-2 text-gray-300 max-w-2xl mx-auto">
               All resources listed are completely free and many offer anonymous support. 
-              There's no shame in seeking help - it's a sign of strength. 
+              There&apos;s no shame in seeking help - it&apos;s a sign of strength. 
               Your mental health matters, and support is available without any barriers.
             </p>
           </div>

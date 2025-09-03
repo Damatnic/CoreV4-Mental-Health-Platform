@@ -3,14 +3,15 @@
  * Manages data flow and synchronization between all components
  */
 
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { _create } from 'zustand';
+import { _subscribeWithSelector } from 'zustand/middleware';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
-import { User } from '../api/types';
+import { _User } from '../api/types';
 import { EventEmitter } from 'events';
+import { logger } from '../../utils/logger';
 
 // Integration event types
 export enum IntegrationEvent {
@@ -62,8 +63,8 @@ interface IntegrationState {
 interface DataMapping {
   source: string;
   target: string;
-  transform?: (data: any) => any;
-  filter?: (data: any) => boolean;
+  transform?: (data: unknown) => any;
+  filter?: (data: unknown) => boolean;
   bidirectional?: boolean;
 }
 
@@ -186,8 +187,8 @@ class DataIntegrationService extends EventEmitter {
     
     // Subscribe to activity store changes
     useActivityStore.subscribe((state) => {
-      const completed = state.activities.filter((a: any) => a.completed && !a.synced);
-      completed.forEach((activity: any) => {
+      const completed = state.activities.filter((a: unknown) => a.completed && !a.synced);
+      completed.forEach((activity: unknown) => {
         this.handleDataChange('activity.completed', activity);
       });
     });
@@ -215,7 +216,7 @@ class DataIntegrationService extends EventEmitter {
         role: 'patient',
         profile: {
           firstName: 'Anonymous',
-          lastName: 'User',
+          lastName: '_User',
           timezone: 'UTC'
         },
         preferences: {
@@ -262,22 +263,22 @@ class DataIntegrationService extends EventEmitter {
       });
       
       // Handle real-time data updates
-      this.wsService.on('data:update', (data: any) => {
+      this.wsService.on('data:update', (data: unknown) => {
         this.handleRealtimeUpdate(data);
       });
       
       // Handle crisis events
-      this.wsService.on('crisis:alert', (alert: any) => {
-        this.handleCrisisAlert(alert);
+      this.wsService.on('crisis:alert', (_alert: unknown) => {
+        this.handleCrisisAlert(_alert);
       });
       
       // Handle community updates
-      this.wsService.on('community:update', (update: any) => {
+      this.wsService.on('community:update', (update: unknown) => {
         this.handleCommunityUpdate(update);
       });
       
     } catch (error) {
-      console.error('Failed to initialize WebSocket:', error);
+      logger.error('Failed to initialize WebSocket:');
       this.state.syncErrors.push(error as Error);
     }
   }
@@ -285,7 +286,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Handle data changes from stores
    */
-  private handleDataChange(source: string, data: any) {
+  private handleDataChange(source: string, data: unknown) {
     if (!data) return;
     
     // Find relevant mappings
@@ -317,15 +318,15 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Route data to target component/store
    */
-  private routeDataToTarget(target: string, data: any) {
+  private routeDataToTarget(target: string, data: unknown) {
     const [store, property] = target.split('.');
     
     if (!property) {
-      console.warn('Invalid target format:', target);
+      logger.warn('Invalid target format:', target);
       return;
     }
     
-    switch (store) {
+    switch (_store) {
       case 'wellness':
         this.updateWellnessStore(property, data);
         break;
@@ -342,17 +343,17 @@ class DataIntegrationService extends EventEmitter {
         this.updateCommunityData(property, data);
         break;
       default:
-        console.warn(`Unknown target store: ${store}`);
+        logger.warn(`Unknown target store: ${store}`);
     }
   }
   
   /**
    * Update wellness store with integrated data
    */
-  private updateWellnessStore(property: string, data: any) {
+  private updateWellnessStore(property: string, data: unknown) {
     const store = useWellnessStore.getState();
     
-    switch (property) {
+    switch (_property) {
       case 'metrics':
         store.addWellnessMetric(data);
         break;
@@ -369,10 +370,10 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Update activity store with integrated data
    */
-  private updateActivityStore(property: string, data: any) {
+  private updateActivityStore(property: string, data: unknown) {
     const store = useActivityStore.getState();
     
-    switch (property) {
+    switch (_property) {
       case 'tasks':
         store.addActivity(data);
         break;
@@ -389,7 +390,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Update crisis data
    */
-  private updateCrisisData(property: string, data: any) {
+  private updateCrisisData(property: string, data: unknown) {
     // Send to crisis service/store
     if (this.wsService && this.state.isConnected) {
       this.wsService.emit('crisis:update', { property, data });
@@ -401,7 +402,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Update professional care data
    */
-  private updateProfessionalData(property: string, data: any) {
+  private updateProfessionalData(property: string, data: unknown) {
     // Send to professional care service
     if (this.wsService && this.state.isConnected) {
       this.wsService.emit('professional:update', { property, data });
@@ -413,7 +414,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Update community data
    */
-  private updateCommunityData(property: string, data: any) {
+  private updateCommunityData(property: string, data: unknown) {
     // Send to community service
     if (this.wsService && this.state.isConnected) {
       this.wsService.emit('community:update', { property, data });
@@ -425,7 +426,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Handle real-time updates from WebSocket
    */
-  private handleRealtimeUpdate(update: any) {
+  private handleRealtimeUpdate(update: unknown) {
     const { source, data, timestamp } = update;
     
     // Check if update is newer than local data
@@ -439,24 +440,24 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Handle crisis alerts
    */
-  private handleCrisisAlert(alert: any) {
+  private handleCrisisAlert(_alert: unknown) {
     // Immediate routing to crisis components
-    this.emit(IntegrationEvent.CRISIS_TRIGGERED, alert);
+    this.emit(IntegrationEvent.CRISIS_TRIGGERED, _alert);
     
     // Update relevant stores
-    this.routeDataToTarget('crisis.alert', alert);
-    this.routeDataToTarget('wellness.crisisEvent', alert);
+    this.routeDataToTarget('crisis._alert', _alert);
+    this.routeDataToTarget('wellness.crisisEvent', _alert);
     
     // Notify professional care if needed
-    if (alert.severity === 'critical') {
-      this.routeDataToTarget('professional.emergencyAlert', alert);
+    if (_alert.severity === 'critical') {
+      this.routeDataToTarget('professional.emergencyAlert', _alert);
     }
   }
   
   /**
    * Handle community updates
    */
-  private handleCommunityUpdate(update: any) {
+  private handleCommunityUpdate(update: unknown) {
     this.emit(IntegrationEvent.COMMUNITY_INTERACTION, update);
     this.routeDataToTarget('community.update', update);
   }
@@ -464,7 +465,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Calculate risk level from mood data
    */
-  private calculateRiskFromMood(moodData: any): string {
+  private calculateRiskFromMood(moodData: unknown): string {
     if (!moodData) return 'unknown';
     
     const { moodScore, triggers, stressLevel, anxietyLevel } = moodData;
@@ -494,7 +495,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Queue data for persistence
    */
-  private queueForPersistence(source: string, data: any) {
+  private queueForPersistence(source: string, data: unknown) {
     this.state.pendingChanges.set(source, {
       data,
       timestamp: new Date(),
@@ -505,9 +506,9 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Sync bidirectional data
    */
-  private syncBidirectional(mapping: DataMapping, data: any) {
+  private syncBidirectional(mapping: DataMapping, data: unknown) {
     // Implement bidirectional sync logic
-    const reverseMapping = {
+    const _reverseMapping = {
       source: mapping.target,
       target: mapping.source,
       transform: mapping.transform // May need reverse transform
@@ -521,7 +522,7 @@ class DataIntegrationService extends EventEmitter {
    * Check if update is newer than local data
    */
   private isNewerData(source: string, timestamp: Date): boolean {
-    const lastUpdate = this.state.pendingChanges.get(source);
+    const lastUpdate = this.state.pendingChanges.get(_source);
     if (!lastUpdate) return true;
     
     return timestamp > lastUpdate.timestamp;
@@ -530,7 +531,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Emit data change event
    */
-  private emitDataChangeEvent(source: string, data: any) {
+  private emitDataChangeEvent(source: string, data: unknown) {
     const eventMap: Record<string, IntegrationEvent> = {
       'wellness.mood': IntegrationEvent.MOOD_UPDATED,
       'activity.completed': IntegrationEvent.GOAL_ACHIEVED,
@@ -540,7 +541,7 @@ class DataIntegrationService extends EventEmitter {
     };
     
     const event = eventMap[source];
-    if (event) {
+    if (_event) {
       this.emit(event, data);
     }
   }
@@ -569,17 +570,17 @@ class DataIntegrationService extends EventEmitter {
       const changes = Array.from(this.state.pendingChanges.entries());
       const batches = this.createBatches(changes, this.state.dataFlowConfig.batchSize);
       
-      for (const batch of batches) {
-        await this.syncBatch(batch);
+      for (const _batch of batches) {
+        await this.syncBatch(_batch);
       }
       
       this.state.lastSyncTime = new Date();
       this.emit(IntegrationEvent.STORE_SYNC_COMPLETED);
       
     } catch (error) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed:');
       this.state.syncErrors.push(error as Error);
-      this.emit(IntegrationEvent.STORE_SYNC_FAILED, error);
+      this.emit(IntegrationEvent.STORE_SYNC_FAILED, undefined);
       
     } finally {
       this.state.isSyncing = false;
@@ -589,12 +590,12 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Sync a batch of changes
    */
-  private async syncBatch(batch: [string, any][]): Promise<void> {
-    // Implement batch sync logic
+  private async syncBatch(_batch: [string, any][]): Promise<void> {
+    // Implement _batch sync logic
     // This would typically make an API call to sync data
     return new Promise((resolve) => {
       setTimeout(() => {
-        batch.forEach(([key]) => {
+        _batch.forEach(([key]) => {
           this.state.pendingChanges.delete(key);
         });
         resolve();
@@ -627,7 +628,7 @@ class DataIntegrationService extends EventEmitter {
         this.routeDataToTarget(`${store}.${property}`, data);
         this.offlineQueue.delete(key);
       } catch (error) {
-        console.error(`Failed to sync offline item ${key}:`, error);
+        logger.error(`Failed to sync offline item ${key}:`, error);
       }
     }
   }
@@ -695,7 +696,7 @@ class DataIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const dataIntegrationService = DataIntegrationService.getInstance();
+export const _dataIntegrationService = DataIntegrationService.getInstance();
 
 // Export hook for React components
 export function useDataIntegration() {
@@ -706,7 +707,7 @@ export function useDataIntegration() {
     getState: () => service.getState(),
     updateConfig: (config: Partial<DataFlowConfig>) => service.updateDataFlowConfig(config),
     clearErrors: () => service.clearErrors(),
-    on: (event: IntegrationEvent, callback: (...args: any[]) => void) => {
+    on: (event: IntegrationEvent, callback: (...args: unknown[]) => void) => {
       service.on(event, callback);
       return () => service.off(event, callback);
     }

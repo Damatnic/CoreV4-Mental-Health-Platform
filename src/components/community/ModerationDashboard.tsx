@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Shield, AlertTriangle, Flag, CheckCircle, XCircle, Clock, TrendingUp, Users, MessageSquare, Activity, Ban, Eye } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { communityService } from '../../services/community/communityService';
 import { websocketService } from '../../services/realtime/websocketService';
@@ -9,7 +9,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface ModerationItem {
   id: string;
-  type: 'post' | 'comment' | 'message' | 'user';
+  _type: 'post' | 'comment' | 'message' | 'user';
   contentId: string;
   content: string;
   reportedBy: string[];
@@ -18,7 +18,7 @@ interface ModerationItem {
   username: string;
   timestamp: Date;
   status: 'pending' | 'reviewed' | 'resolved';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  _priority: 'low' | 'medium' | 'high' | 'critical';
   crisisDetected: boolean;
   autoFlagged: boolean;
   actionTaken?: {
@@ -29,7 +29,7 @@ interface ModerationItem {
   };
 }
 
-interface ModeratorStats {
+interface _ModeratorStats {
   itemsReviewed: number;
   averageResponseTime: number;
   accuracyRate: number;
@@ -40,8 +40,8 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
   const [showDetails, setShowDetails] = useState(false);
   const [actionNotes, setActionNotes] = useState('');
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const getPriorityColor = (_priority: string) => {
+    switch (_priority) {
       case 'critical': return 'bg-red-100 text-red-700 border-red-200';
       case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
@@ -49,8 +49,8 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
+  const getTypeIcon = (_type: string) => {
+    switch (_type) {
       case 'post': return MessageSquare;
       case 'comment': return MessageSquare;
       case 'user': return Users;
@@ -61,12 +61,12 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
   const TypeIcon = getTypeIcon(item.type);
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border-2 ${getPriorityColor(item.priority)}`}>
+    <div className={`bg-white rounded-lg shadow-sm border-2 ${getPriorityColor(item._priority)}`}>
       <div className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg ${getPriorityColor(item.priority)}`}>
+            <div className={`p-2 rounded-lg ${getPriorityColor(item._priority)}`}>
               <TypeIcon className="h-5 w-5" />
             </div>
             <div>
@@ -192,10 +192,10 @@ export function ModerationDashboard() {
   });
 
   // Mock moderation queue (in production, this would come from the API)
-  const moderationQueue: ModerationItem[] = [
+  const moderationQueue: ModerationItem[] = useMemo(() => [
     {
       id: '1',
-      type: 'post',
+      _type: 'post',
       contentId: 'post-123',
       content: 'I\'m feeling really overwhelmed and don\'t know if I can continue like this...',
       reportedBy: ['user1', 'user2'],
@@ -204,13 +204,13 @@ export function ModerationDashboard() {
       username: 'AnxiousUser123',
       timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
       status: 'pending',
-      priority: 'high',
+      _priority: 'high',
       crisisDetected: true,
       autoFlagged: true,
     },
     {
       id: '2',
-      type: 'comment',
+      _type: 'comment',
       contentId: 'comment-789',
       content: 'This advice is completely wrong and could be harmful to people...',
       reportedBy: ['user3'],
@@ -219,23 +219,23 @@ export function ModerationDashboard() {
       username: 'ConcernedMember',
       timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
       status: 'pending',
-      priority: 'medium',
+      _priority: 'medium',
       crisisDetected: false,
       autoFlagged: false,
     },
-  ];
+  ], []);
 
   // Set up WebSocket listeners for real-time moderation alerts
   useEffect(() => {
-    const handleModerationAlert = (data: any) => {
-      toast.error(`New ${data.priority} priority item in moderation queue`, {
+    const handleModerationAlert = (data: unknown) => {
+      toast.error(`New ${data._priority} priority item in moderation queue`, {
         duration: 5000,
         icon: '🚨',
       });
       queryClient.invalidateQueries({ queryKey: ['moderation-queue'] });
     };
 
-    const handleCrisisAlert = (data: any) => {
+    const handleCrisisAlert = (_data: unknown) => {
       toast.error('Crisis content detected - immediate review needed', {
         duration: 10000,
         icon: '🆘',
@@ -254,7 +254,7 @@ export function ModerationDashboard() {
   // Handle moderation actions
   const handleAction = async (itemId: string, action: string, notes?: string) => {
     try {
-      await communityService.moderateContent(itemId, action as any, notes);
+      await communityService.moderateContent(itemId, action as unknown, notes);
       toast.success(`Action "${action}" completed successfully`);
       queryClient.invalidateQueries({ queryKey: ['moderation-queue'] });
       
@@ -262,7 +262,7 @@ export function ModerationDashboard() {
       if (action === 'escalate-crisis') {
         websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to complete moderation action');
     }
   };
@@ -273,7 +273,7 @@ export function ModerationDashboard() {
     if (selectedFilter === 'auto-flagged' && !item.autoFlagged) return false;
     if (selectedFilter === 'user-reported' && item.autoFlagged) return false;
     
-    if (selectedPriority !== 'all' && item.priority !== selectedPriority) return false;
+    if (selectedPriority !== 'all' && item._priority !== selectedPriority) return false;
     
     return true;
   });
@@ -281,15 +281,15 @@ export function ModerationDashboard() {
   // Calculate stats
   useEffect(() => {
     const pending = moderationQueue.filter(item => item.status === 'pending').length;
-    const critical = moderationQueue.filter(item => item.priority === 'critical').length;
-    const avgWait = moderationQueue.reduce((acc, item) => {
+    const critical = moderationQueue.filter(item => item._priority === 'critical').length;
+    const _avgWait = moderationQueue.reduce((acc, item) => {
       return acc + (Date.now() - item.timestamp.getTime());
     }, 0) / moderationQueue.length / 1000 / 60; // in minutes
 
     setStats({
       pendingItems: pending,
       criticalItems: critical,
-      averageWaitTime: Math.round(avgWait),
+      averageWaitTime: Math.round(_avgWait),
       activeModerators: 3, // Mock value
     });
   }, [moderationQueue]);
@@ -377,7 +377,7 @@ export function ModerationDashboard() {
             <label className="text-sm font-medium text-gray-700">Filter:</label>
             <select
               value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value as any)}
+              onChange={(e) => setSelectedFilter(e.target.value as unknown)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Items</option>
@@ -391,7 +391,7 @@ export function ModerationDashboard() {
             <label className="text-sm font-medium text-gray-700">Priority:</label>
             <select
               value={selectedPriority}
-              onChange={(e) => setSelectedPriority(e.target.value as any)}
+              onChange={(e) => setSelectedPriority(e.target.value as unknown)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Priorities</option>

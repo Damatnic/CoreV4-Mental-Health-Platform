@@ -97,7 +97,7 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
     // Cleanup function
     return () => {
       if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
+        navigator.geolocation.clearWatch(_watchId);
       }
     };
   }, [

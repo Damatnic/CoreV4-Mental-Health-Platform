@@ -32,8 +32,8 @@ const gradientMap = {
   crisis: 'from-pink-500 to-red-600',
 };
 
-const getMobileSizeMap = (isMobile: boolean, isSmallScreen: boolean) => {
-  if (isSmallScreen) {
+const getMobileSizeMap = (_isMobile: boolean, _isSmallScreen: boolean) => {
+  if (_isSmallScreen) {
     return {
       small: 'col-span-1 row-span-1 h-40 min-h-[10rem]',
       medium: 'col-span-1 row-span-1 h-48 min-h-[12rem]',
@@ -41,7 +41,7 @@ const getMobileSizeMap = (isMobile: boolean, isSmallScreen: boolean) => {
     };
   }
   
-  if (isMobile) {
+  if (_isMobile) {
     return {
       small: 'col-span-1 row-span-1 h-36 min-h-[9rem]',
       medium: 'col-span-1 sm:col-span-2 row-span-1 h-44 min-h-[11rem]',
@@ -72,18 +72,18 @@ export function ConsoleTile({
   children,
 }: ConsoleTileProps) {
   const navigate = useNavigate();
-  const { isMobileDevice, isSmallScreen, deviceInfo } = useMobileFeatures();
+  const { isMobileDevice, _isSmallScreen, deviceInfo } = useMobileFeatures();
   const { isPerformanceMode } = useConsoleNavigation();
   const { vibrate } = useVibration();
   const [isPressed, setIsPressed] = useState(false);
   const tileRef = useRef<HTMLDivElement>(null);
   
-  const sizeMap = getMobileSizeMap(isMobileDevice, isSmallScreen);
+  const sizeMap = getMobileSizeMap(isMobileDevice, _isSmallScreen);
   const tileVariants = {
     hidden: {
       opacity: 0,
       scale: 0.8,
-      y: isSmallScreen ? 20 : 40,
+      y: _isSmallScreen ? 20 : 40,
     },
     visible: {
       opacity: 1,
@@ -179,7 +179,7 @@ export function ConsoleTile({
         className="h-full"
         onActivate={() => {
           vibrate(urgent ? [80, 40] : [40]);
-          navigate(to);
+          navigate(_to);
         }}
       >
         <motion.div
@@ -199,7 +199,7 @@ export function ConsoleTile({
               hover:border-gray-600/70 focus:outline-none focus:ring-2 focus:ring-blue-400/50
               ${urgent ? 'border-red-400/60' : ''}
               ${isMobileDevice ? 'p-4 touch-manipulation' : 'p-6'}
-              ${isSmallScreen ? 'p-3 rounded-xl' : ''}
+              ${_isSmallScreen ? 'p-3 rounded-xl' : ''}
               ${deviceInfo.hasTouch ? 'console-tile-touch' : ''}
             `}
             aria-label={`${title} - Touch to open`}
@@ -215,21 +215,21 @@ export function ConsoleTile({
             isMobileDevice ? 'mb-3' : 'mb-4'
           }`}>
             <div className={`flex items-center ${
-              isSmallScreen ? 'space-x-2' : 'space-x-3'
+              _isSmallScreen ? 'space-x-2' : 'space-x-3'
             }`}>
               <div className={`
                 rounded-xl bg-gradient-to-r ${gradientMap[gradient]} shadow-lg
-                ${isSmallScreen ? 'p-2' : isMobileDevice ? 'p-2.5' : 'p-3'}
+                ${_isSmallScreen ? 'p-2' : isMobileDevice ? 'p-2.5' : 'p-3'}
               `}>
                 {React.cloneElement(icon as React.ReactElement, {
-                  className: `text-white ${isSmallScreen ? 'h-5 w-5' : 'h-6 w-6'}`
+                  className: `text-white ${_isSmallScreen ? 'h-5 w-5' : 'h-6 w-6'}`
                 })}
               </div>
               {status && (
                 <div className={`
                   bg-green-500/20 border border-green-400/30 rounded-full
                   text-green-300 font-medium
-                  ${isSmallScreen ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'}
+                  ${_isSmallScreen ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'}
                 `}>
                   {status}
                 </div>
@@ -273,13 +273,13 @@ export function ConsoleTile({
           <div className="relative z-10 flex-1">
             <h3 className={`
               font-bold text-white group-hover:text-blue-200 transition-colors
-              ${isSmallScreen ? 'text-lg mb-1.5' : isMobileDevice ? 'text-lg mb-2' : 'text-xl mb-2'}
+              ${_isSmallScreen ? 'text-lg mb-1.5' : isMobileDevice ? 'text-lg mb-2' : 'text-xl mb-2'}
             `}>
               {title}
             </h3>
             <p className={`
               text-gray-300 line-clamp-3
-              ${isSmallScreen ? 'text-xs mb-2' : isMobileDevice ? 'text-sm mb-3' : 'text-sm mb-4'}
+              ${_isSmallScreen ? 'text-xs mb-2' : isMobileDevice ? 'text-sm mb-3' : 'text-sm mb-4'}
             `}>
               {description}
             </p>
@@ -287,7 +287,7 @@ export function ConsoleTile({
             {/* Badges - Mobile Optimized */}
             {badges.length > 0 && (
               <div className={`flex flex-wrap gap-1.5 ${
-                isSmallScreen ? 'mb-2' : isMobileDevice ? 'mb-3' : 'mb-4'
+                _isSmallScreen ? 'mb-2' : isMobileDevice ? 'mb-3' : 'mb-4'
               }`}>
                 {badges.map((badge, index) => (
                   <span
@@ -295,7 +295,7 @@ export function ConsoleTile({
                     className={`
                       bg-blue-500/20 border border-blue-400/30 rounded-full
                       text-blue-300 font-medium
-                      ${isSmallScreen ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'}
+                      ${_isSmallScreen ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'}
                     `}
                   >
                     {badge}

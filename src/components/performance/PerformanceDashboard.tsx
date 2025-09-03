@@ -1,21 +1,16 @@
+import { logger } from '@/utils/logger';
 /**
  * Performance Monitoring Dashboard
  * Displays real-time performance metrics for crisis response and general app performance
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
   AlertTriangle,
-  BarChart3,
-  Clock,
-  Cpu,
-  Database,
-  Globe,
   Heart,
   MemoryStick,
-  Monitor,
   TrendingUp,
   TrendingDown,
   Wifi,
@@ -24,10 +19,7 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Smartphone,
-  Timer,
-  Eye,
-  Shield
+  Smartphone
 } from 'lucide-react';
 import { performanceMonitor, PERFORMANCE_THRESHOLDS } from '../../utils/performance/performanceMonitor';
 import { useMobileFeatures } from '../../hooks/useMobileFeatures';
@@ -36,7 +28,7 @@ interface MetricSummary {
   name: string;
   value: number;
   threshold: number;
-  status: 'good' | 'warning' | 'critical';
+  _status: 'good' | 'warning' | 'critical';
   trend: 'up' | 'down' | 'stable';
 }
 
@@ -52,7 +44,7 @@ interface PerformanceStats {
     TTFB: number;
   };
   networkSpeed: string;
-  deviceInfo: any;
+  deviceInfo: unknown;
 }
 
 export function PerformanceDashboard() {
@@ -63,45 +55,18 @@ export function PerformanceDashboard() {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
-  // Initialize performance monitoring
-  useEffect(() => {
-    const initializeMonitoring = async () => {
-      try {
-        // Start monitoring
-        performanceMonitor.recordMetric('dashboard_load_start', Date.now());
-        
-        // Get initial stats
-        await refreshStats();
-        
-        performanceMonitor.recordMetric('dashboard_load_complete', Date.now());
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to initialize performance monitoring:', error);
-        setIsLoading(false);
-      }
-    };
-
-    initializeMonitoring();
-  }, []);
-
-  // Auto-refresh performance data
-  useEffect(() => {
-    const interval = setInterval(refreshStats, refreshInterval);
-    return () => clearInterval(interval);
-  }, [refreshInterval]);
-
-  const refreshStats = async () => {
+  const refreshStats = useCallback(async () => {
     try {
       const summary = performanceMonitor.getPerformanceSummary();
-      const metrics = performanceMonitor.getMetrics();
+      const _metrics = performanceMonitor.getMetrics();
       
       // Get memory info if available
-      const memoryInfo = (performance as any).memory || {};
+      const memoryInfo = (performance as unknown).memory || {};
       
       // Get connection info if available
-      const connection = (navigator as any).connection || {};
+      const connection = (navigator as unknown).connection || {};
       
-      const newStats: PerformanceStats = {
+      const _newStats: PerformanceStats = {
         crisisResponseTime: summary.crisis_response_time?.avg || 0,
         pageLoadTime: summary.navigation_timing?.avg || 0,
         memoryUsage: memoryInfo.usedJSHeapSize ? 
@@ -117,11 +82,39 @@ export function PerformanceDashboard() {
         deviceInfo
       };
       
-      setStats(newStats);
-    } catch (error) {
-      console.error('Failed to refresh performance stats:', error);
+      setStats(_newStats);
+    } catch (_error) {
+      logger.error('Failed to refresh performance stats:');
     }
-  };
+  }, [deviceInfo]);
+
+  // Initialize performance monitoring
+  useEffect(() => {
+    const initializeMonitoring = async () => {
+      try {
+        // Start monitoring
+        performanceMonitor.recordMetric('dashboard_load_start', Date.now());
+        
+        // Get initial stats
+        await refreshStats();
+        
+        performanceMonitor.recordMetric('dashboard_load_complete', Date.now());
+        setIsLoading(false);
+      } catch (_error) {
+        logger.error('Failed to initialize performance monitoring:');
+        setIsLoading(false);
+      }
+    };
+
+    initializeMonitoring();
+    refreshStats();
+  }, [refreshStats]);
+
+  // Auto-refresh performance data
+  useEffect(() => {
+    const _interval = setInterval(refreshStats, refreshInterval);
+    return () => clearInterval(_interval);
+  }, [refreshInterval, refreshStats]);
 
   // Generate metric summaries with status and trends
   const metricSummaries: MetricSummary[] = useMemo(() => {
@@ -132,7 +125,7 @@ export function PerformanceDashboard() {
         name: 'Crisis Response',
         value: stats.crisisResponseTime,
         threshold: PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD,
-        status: stats.crisisResponseTime <= PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD ? 'good' : 
+        _status: stats.crisisResponseTime <= PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD ? 'good' : 
                 stats.crisisResponseTime <= PERFORMANCE_THRESHOLDS.CRISIS_PAGE_LOAD * 1.5 ? 'warning' : 'critical',
         trend: 'stable'
       },
@@ -140,7 +133,7 @@ export function PerformanceDashboard() {
         name: 'Page Load Time',
         value: stats.pageLoadTime,
         threshold: 3000,
-        status: stats.pageLoadTime <= 3000 ? 'good' : 
+        _status: stats.pageLoadTime <= 3000 ? 'good' : 
                 stats.pageLoadTime <= 5000 ? 'warning' : 'critical',
         trend: 'stable'
       },
@@ -148,7 +141,7 @@ export function PerformanceDashboard() {
         name: 'Memory Usage',
         value: stats.memoryUsage,
         threshold: PERFORMANCE_THRESHOLDS.MAX_MEMORY_MB,
-        status: stats.memoryUsage <= PERFORMANCE_THRESHOLDS.MAX_MEMORY_MB * 0.7 ? 'good' : 
+        _status: stats.memoryUsage <= PERFORMANCE_THRESHOLDS.MAX_MEMORY_MB * 0.7 ? 'good' : 
                 stats.memoryUsage <= PERFORMANCE_THRESHOLDS.MAX_MEMORY_MB ? 'warning' : 'critical',
         trend: 'up'
       },
@@ -156,7 +149,7 @@ export function PerformanceDashboard() {
         name: 'Largest Contentful Paint',
         value: stats.coreWebVitals.LCP,
         threshold: PERFORMANCE_THRESHOLDS.LCP,
-        status: stats.coreWebVitals.LCP <= PERFORMANCE_THRESHOLDS.LCP ? 'good' : 
+        _status: stats.coreWebVitals.LCP <= PERFORMANCE_THRESHOLDS.LCP ? 'good' : 
                 stats.coreWebVitals.LCP <= PERFORMANCE_THRESHOLDS.LCP * 1.5 ? 'warning' : 'critical',
         trend: 'stable'
       },
@@ -164,7 +157,7 @@ export function PerformanceDashboard() {
         name: 'First Input Delay',
         value: stats.coreWebVitals.FID,
         threshold: PERFORMANCE_THRESHOLDS.FID,
-        status: stats.coreWebVitals.FID <= PERFORMANCE_THRESHOLDS.FID ? 'good' : 
+        _status: stats.coreWebVitals.FID <= PERFORMANCE_THRESHOLDS.FID ? 'good' : 
                 stats.coreWebVitals.FID <= PERFORMANCE_THRESHOLDS.FID * 1.5 ? 'warning' : 'critical',
         trend: 'stable'
       },
@@ -172,15 +165,15 @@ export function PerformanceDashboard() {
         name: 'Cumulative Layout Shift',
         value: stats.coreWebVitals.CLS,
         threshold: PERFORMANCE_THRESHOLDS.CLS,
-        status: stats.coreWebVitals.CLS <= PERFORMANCE_THRESHOLDS.CLS ? 'good' : 
+        _status: stats.coreWebVitals.CLS <= PERFORMANCE_THRESHOLDS.CLS ? 'good' : 
                 stats.coreWebVitals.CLS <= PERFORMANCE_THRESHOLDS.CLS * 2 ? 'warning' : 'critical',
         trend: 'stable'
       }
     ];
   }, [stats]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
+  const getStatusIcon = (_status: string) => {
+    switch (_status) {
       case 'good': return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'warning': return <AlertCircle className="h-5 w-5 text-yellow-500" />;
       case 'critical': return <XCircle className="h-5 w-5 text-red-500" />;
@@ -188,8 +181,8 @@ export function PerformanceDashboard() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (_status: string) => {
+    switch (_status) {
       case 'good': return 'text-green-600 bg-green-50';
       case 'warning': return 'text-yellow-600 bg-yellow-50';
       case 'critical': return 'text-red-600 bg-red-50';
@@ -207,7 +200,7 @@ export function PerformanceDashboard() {
     }
   };
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -244,7 +237,7 @@ export function PerformanceDashboard() {
       </div>
 
       {/* Critical Metrics Alert */}
-      {metricSummaries.some(m => m.status === 'critical') && (
+      {metricSummaries.some(m => m._status === 'critical') && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -329,7 +322,7 @@ export function PerformanceDashboard() {
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
-                  {getStatusIcon(metric.status)}
+                  {getStatusIcon(metric._status)}
                   <span className="ml-2 text-sm font-medium text-gray-700">
                     {metric.name}
                   </span>
@@ -346,8 +339,8 @@ export function PerformanceDashboard() {
                   <span className="text-2xl font-bold text-gray-900">
                     {formatValue(metric.name, metric.value)}
                   </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(metric.status)}`}>
-                    {metric.status.toUpperCase()}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(metric._status)}`}>
+                    {metric._status.toUpperCase()}
                   </span>
                 </div>
 
@@ -355,8 +348,8 @@ export function PerformanceDashboard() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      metric.status === 'good' ? 'bg-green-500' :
-                      metric.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                      metric._status === 'good' ? 'bg-green-500' :
+                      metric._status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
                     }`}
                     style={{
                       width: `${Math.min(100, (metric.value / metric.threshold) * 100)}%`
@@ -463,11 +456,11 @@ export function PerformanceDashboard() {
         
         <div className="space-y-3">
           {metricSummaries
-            .filter(m => m.status !== 'good')
+            .filter(m => m._status !== 'good')
             .map(metric => (
               <div key={metric.name} className="flex items-start space-x-3">
                 <div className={`w-2 h-2 rounded-full mt-2 ${
-                  metric.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+                  metric._status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
                 }`} />
                 <div className="flex-1">
                   <div className="text-sm font-medium text-blue-800">
@@ -485,11 +478,11 @@ export function PerformanceDashboard() {
               </div>
             ))}
           
-          {metricSummaries.every(m => m.status === 'good') && (
+          {metricSummaries.every(m => m._status === 'good') && (
             <div className="flex items-center space-x-3">
               <CheckCircle className="w-5 h-5 text-green-500" />
               <span className="text-sm text-green-700">
-                All performance metrics are within optimal ranges!
+                All performance _metrics are within optimal ranges!
               </span>
             </div>
           )}

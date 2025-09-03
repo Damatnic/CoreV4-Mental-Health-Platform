@@ -1,18 +1,19 @@
+import { logger } from '@/utils/logger';
 /**
  * Therapeutic Progress Tracker Component
  * Tracks and visualizes mental health progress with evidence-based metrics
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, Activity, Brain, Heart, Target,
-  Calendar, Clock, Award, ChevronRight, Filter, Download,
-  AlertCircle, CheckCircle, Info, BarChart3, LineChart,
-  Zap, Moon, Sun, Cloud, CloudRain, User, MessageSquare
+  _TrendingUp, _TrendingDown, Activity, Brain, Heart, _Target,
+  _Calendar, _Clock, _Award, _ChevronRight, _Filter, Download,
+  AlertCircle, CheckCircle, Info, _BarChart3, LineChart,
+  Zap, _Moon, Sun, Cloud, CloudRain, _User, _MessageSquare
 } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, 
-         subDays, differenceInDays, isToday } from 'date-fns';
+import { format, _startOfWeek, _endOfWeek, _eachDayOfInterval, 
+         subDays, _differenceInDays, _isToday } from 'date-fns';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 import { detectCrisisLevel } from '../../utils/crisis';
 
@@ -48,11 +49,11 @@ interface ProgressInsight {
   category: string;
   message: string;
   severity: 'info' | 'success' | 'warning' | 'alert';
-  data?: any;
+  _data?: unknown;
   timestamp: Date;
 }
 
-interface WeeklyReport {
+interface _WeeklyReport {
   weekStart: Date;
   weekEnd: Date;
   averageMood: number;
@@ -108,33 +109,33 @@ export const TherapeuticProgressTracker: React.FC = () => {
   // Generate insights when data changes
   useEffect(() => {
     generateProgressInsights();
-  }, [metrics, sessions]);
+  }, [metrics, sessions, generateProgressInsights]);
 
   const loadProgressData = () => {
     try {
-      const savedMetrics = secureStorage.getItem('therapeuticMetrics');
-      const savedSessions = secureStorage.getItem('therapySessions');
+      const _savedMetrics = secureStorage.getItem('therapeuticMetrics');
+      const _savedSessions = secureStorage.getItem('therapySessions');
       
-      if (savedMetrics) {
-        const parsed = JSON.parse(savedMetrics);
-        setMetrics(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
+      if (_savedMetrics) {
+        const parsed = JSON.parse(_savedMetrics);
+        setMetrics(parsed.map((m: unknown) => ({ ...m, timestamp: new Date(m.timestamp) })));
       }
       
-      if (savedSessions) {
-        const parsed = JSON.parse(savedSessions);
-        setSessions(parsed.map((s: any) => ({ ...s, date: new Date(s.date) })));
+      if (_savedSessions) {
+        const parsed = JSON.parse(_savedSessions);
+        setSessions(parsed.map((s: unknown) => ({ ...s, date: new Date(s.date) })));
       }
-    } catch (error) {
-      console.error('Failed to load progress data:', error);
+    } catch (_error) {
+      logger.error('Failed to load progress _data:');
     }
   };
 
-  const saveProgressData = () => {
+  const _saveProgressData = () => {
     try {
-      secureStorage.setItem('therapeuticMetrics', JSON.stringify(metrics));
-      secureStorage.setItem('therapySessions', JSON.stringify(sessions));
-    } catch (error) {
-      console.error('Failed to save progress data:', error);
+      secureStorage.setItem('therapeuticMetrics', JSON.stringify(_metrics));
+      secureStorage.setItem('therapySessions', JSON.stringify(_sessions));
+    } catch (_error) {
+      logger.error('Failed to save progress _data:');
     }
   };
 
@@ -152,9 +153,9 @@ export const TherapeuticProgressTracker: React.FC = () => {
       copingUsed: newMetric.copingUsed
     };
 
-    const updatedMetrics = [...metrics, metric];
-    setMetrics(updatedMetrics);
-    secureStorage.setItem('therapeuticMetrics', JSON.stringify(updatedMetrics));
+    const _updatedMetrics = [...metrics, metric];
+    setMetrics(_updatedMetrics);
+    secureStorage.setItem('therapeuticMetrics', JSON.stringify(_updatedMetrics));
     
     setShowAddMetric(false);
     setNewMetric({ category: 'mood', value: 5 });
@@ -168,7 +169,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
     }
   };
 
-  const generateProgressInsights = () => {
+  const generateProgressInsights = useCallback(() => {
     const newInsights: ProgressInsight[] = [];
     const now = new Date();
     const weekAgo = subDays(now, 7);
@@ -187,7 +188,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
       });
     } else {
       // Calculate averages by category
-      const categoryAverages = Object.keys(METRIC_CATEGORIES).reduce((acc, cat) => {
+      const categoryAverages = Object.keys(_METRIC_CATEGORIES).reduce((acc, cat) => {
         const catMetrics = recentMetrics.filter(m => m.category === cat);
         if (catMetrics.length > 0) {
           acc[cat] = catMetrics.reduce((sum, m) => sum + m.value, 0) / catMetrics.length;
@@ -214,7 +215,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
             category: 'mood',
             message: `Your mood has improved by ${Math.round((secondAvg - firstAvg) * 10) / 10} points this week!`,
             severity: 'success',
-            data: { firstAvg, secondAvg },
+            _data: { firstAvg, secondAvg },
             timestamp: now
           });
         } else if (firstAvg - secondAvg > 1) {
@@ -224,7 +225,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
             category: 'mood',
             message: 'Your mood has been declining. Consider reaching out for support.',
             severity: 'warning',
-            data: { firstAvg, secondAvg },
+            _data: { firstAvg, secondAvg },
             timestamp: now
           });
         }
@@ -277,12 +278,12 @@ export const TherapeuticProgressTracker: React.FC = () => {
 
       // Pattern detection
       const triggers = recentMetrics.flatMap(m => m.triggers || []);
-      const triggerCounts = triggers.reduce((acc, trigger) => {
+      const _triggerCounts = triggers.reduce((acc, trigger) => {
         acc[trigger] = (acc[trigger] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       
-      const commonTriggers = Object.entries(triggerCounts)
+      const commonTriggers = Object.entries(_triggerCounts)
         .filter(([_, count]) => count >= 3)
         .map(([trigger]) => trigger);
       
@@ -293,14 +294,14 @@ export const TherapeuticProgressTracker: React.FC = () => {
           category: 'triggers',
           message: `Common triggers identified: ${commonTriggers.join(', ')}. Awareness is the first step to management.`,
           severity: 'info',
-          data: { triggers: commonTriggers },
+          _data: { triggers: commonTriggers },
           timestamp: now
         });
       }
     }
 
-    setInsights(newInsights);
-  };
+    setInsights(_newInsights);
+  }, [metrics, sessions]);
 
   const generateCrisisInsight = (level: string) => {
     const insight: ProgressInsight = {
@@ -320,7 +321,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
     const now = new Date();
     let startDate: Date;
     
-    switch (selectedTimeRange) {
+    switch (_selectedTimeRange) {
       case 'week':
         startDate = subDays(now, 7);
         break;
@@ -342,7 +343,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
   }, [metrics, selectedTimeRange, selectedCategory]);
 
   const chartData = useMemo(() => {
-    const data = getMetricsByTimeRange.reduce((acc, metric) => {
+    const _data = getMetricsByTimeRange.reduce((acc, metric) => {
       const date = format(metric.timestamp, 'MMM dd');
       if (!acc[date]) {
         acc[date] = { date, values: [] };
@@ -351,7 +352,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
       return acc;
     }, {} as Record<string, { date: string; values: number[] }>);
     
-    return Object.values(data).map(d => ({
+    return Object.values(_data).map(d => ({
       date: d.date,
       value: d.values.reduce((sum, v) => sum + v, 0) / d.values.length
     }));
@@ -359,13 +360,13 @@ export const TherapeuticProgressTracker: React.FC = () => {
 
   const exportProgressReport = () => {
     const report = generateProgressReport();
-    const blob = new Blob([report], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+    const _blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(_blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `progress-report-${format(new Date(), 'yyyy-MM-dd')}.txt`;
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(_url);
   };
 
   const generateProgressReport = () => {
@@ -444,7 +445,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
             {(['week', 'month', 'year'] as const).map(range => (
               <button
                 key={range}
-                onClick={() => setSelectedTimeRange(range)}
+                onClick={() => setSelectedTimeRange(_range)}
                 className={`px-3 py-1 rounded-md transition-colors ${
                   selectedTimeRange === range
                     ? 'bg-purple-500 text-white'
@@ -467,7 +468,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
             >
               All
             </button>
-            {Object.entries(METRIC_CATEGORIES).map(([key, cat]) => {
+            {Object.entries(_METRIC_CATEGORIES).map(([key, cat]) => {
               const Icon = cat.icon;
               return (
                 <button
@@ -496,19 +497,19 @@ export const TherapeuticProgressTracker: React.FC = () => {
           
           {chartData.length > 0 ? (
             <div className="h-64 flex items-end justify-between space-x-2">
-              {chartData.map((data, index) => (
+              {chartData.map((_data, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${(data.value / 10) * 100}%` }}
+                    animate={{ height: `${(_data.value / 10) * 100}%` }}
                     transition={{ delay: index * 0.05 }}
                     className="w-full bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-lg relative group"
                   >
                     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                      {data.value.toFixed(1)}
+                      {_data.value.toFixed(1)}
                     </div>
                   </motion.div>
-                  <span className="text-xs text-gray-400 mt-2 rotate-45 origin-left">{data.date}</span>
+                  <span className="text-xs text-gray-400 mt-2 rotate-45 origin-left">{_data.date}</span>
                 </div>
               ))}
             </div>
@@ -641,10 +642,10 @@ export const TherapeuticProgressTracker: React.FC = () => {
                 <label className="block text-sm text-gray-300 mb-2">Category</label>
                 <select
                   value={newMetric.category}
-                  onChange={(e) => setNewMetric({ ...newMetric, category: e.target.value as any })}
+                  onChange={(e) => setNewMetric({ ...newMetric, category: e.target.value as unknown })}
                   className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
                 >
-                  {Object.entries(METRIC_CATEGORIES).map(([key, cat]) => (
+                  {Object.entries(_METRIC_CATEGORIES).map(([key, cat]) => (
                     <option key={key} value={key}>{cat.name}</option>
                   ))}
                 </select>
@@ -673,7 +674,7 @@ export const TherapeuticProgressTracker: React.FC = () => {
               
               {/* Notes */}
               <div className="mb-4">
-                <label className="block text-sm text-gray-300 mb-2">Notes (optional)</label>
+                <label className="block text-sm text-gray-300 mb-2">Notes (_optional)</label>
                 <textarea
                   value={newMetric.notes || ''}
                   onChange={(e) => setNewMetric({ ...newMetric, notes: e.target.value })}

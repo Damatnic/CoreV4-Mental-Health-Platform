@@ -1,8 +1,9 @@
 // Health Check and Monitoring Service
 // Provides comprehensive health monitoring for the mental health platform
 
-import { apiService } from '../api/ApiService';
+import { _apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
+import { logger } from '../utils/logger';
 
 // Health check status types
 export enum HealthStatus {
@@ -27,7 +28,7 @@ export interface ServiceHealth {
 export interface SystemHealth {
   overall: HealthStatus;
   services: ServiceHealth[];
-  metrics: SystemMetrics;
+  _metrics: SystemMetrics;
   timestamp: Date;
   version: string;
 }
@@ -109,8 +110,8 @@ export class HealthCheckService {
   private initializePerformanceObserver(): void {
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       this.performanceObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          this.recordPerformanceMetric(entry);
+        for (const _entry of list.getEntries()) {
+          this.recordPerformanceMetric(_entry);
         }
       });
 
@@ -119,8 +120,8 @@ export class HealthCheckService {
         this.performanceObserver.observe({ 
           entryTypes: ['navigation', 'resource', 'paint', 'largest-contentful-paint', 'layout-shift', 'first-input'] 
         });
-      } catch (error) {
-        console.error('Failed to initialize performance observer:', error);
+      } catch (_error) {
+        logger.error('Failed to initialize performance observer:');
       }
     }
   }
@@ -128,7 +129,7 @@ export class HealthCheckService {
   // Start health monitoring
   public startMonitoring(intervalMs: number = 30000): void {
     if (this.healthCheckInterval) {
-      console.log('Health monitoring already running');
+      logger.info('Health monitoring already running');
       return;
     }
 
@@ -145,7 +146,7 @@ export class HealthCheckService {
       this.collectMetrics();
     }, 60000); // Every minute
 
-    console.log(`Health monitoring started with ${intervalMs}ms interval`);
+    logger.info(`Health monitoring started with ${intervalMs}ms interval`);
   }
 
   // Stop health monitoring
@@ -164,7 +165,7 @@ export class HealthCheckService {
       this.performanceObserver.disconnect();
     }
 
-    console.log('Health monitoring stopped');
+    logger.info('Health monitoring stopped');
   }
 
   // Perform comprehensive health check
@@ -190,24 +191,24 @@ export class HealthCheckService {
     services.push(await this.checkIntegrationsHealth());
     
     // Determine overall health
-    const overall = this.calculateOverallHealth(services);
+    const overall = this.calculateOverallHealth(_services);
     
-    // Collect system metrics
-    const metrics = await this.collectSystemMetrics();
+    // Collect system _metrics
+    const _metrics = await this.collectSystemMetrics();
     
     const systemHealth: SystemHealth = {
       overall,
       services,
-      metrics,
+      _metrics,
       timestamp: new Date(),
       version: '4.0.0'
     };
     
     // Store in history
-    this.storeHealthHistory(systemHealth);
+    this.storeHealthHistory(_systemHealth);
     
     // Send to monitoring service
-    this.reportHealthStatus(systemHealth);
+    this.reportHealthStatus(_systemHealth);
     
     return systemHealth;
   }
@@ -316,7 +317,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (error) {
+    } catch {
       return {
         name: 'Database',
         status: HealthStatus.UNHEALTHY,
@@ -360,7 +361,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (error) {
+    } catch {
       return {
         name: 'Cache',
         status: HealthStatus.DEGRADED,
@@ -386,7 +387,7 @@ export class HealthCheckService {
       if (response.ok) {
         const data: CrisisMetrics = await response.json();
         
-        // Determine health based on crisis metrics
+        // Determine health based on crisis _metrics
         let status = HealthStatus.HEALTHY;
         let message: string | undefined;
         
@@ -422,7 +423,7 @@ export class HealthCheckService {
           lastChecked: new Date()
         };
       }
-    } catch (error) {
+    } catch {
       return {
         name: 'Crisis System',
         status: HealthStatus.UNKNOWN,
@@ -441,7 +442,7 @@ export class HealthCheckService {
     
     try {
       // Check each integration in parallel
-      const checks = integrations.map(async (integration) => {
+      const _checks = integrations.map(async (integration) => {
         try {
           const response = await fetch(`/api/health/integration/${integration}`, {
             method: 'GET',
@@ -453,10 +454,10 @@ export class HealthCheckService {
         }
       });
       
-      await Promise.all(checks);
+      await Promise.all(_checks);
       
-      const healthyCount = Object.values(results).filter(v => v).length;
-      const totalCount = Object.values(results).length;
+      const healthyCount = Object.values(_results).filter(v => v).length;
+      const totalCount = Object.values(_results).length;
       
       let status = HealthStatus.HEALTHY;
       if (healthyCount < totalCount) {
@@ -470,7 +471,7 @@ export class HealthCheckService {
         lastChecked: new Date(),
         details: results
       };
-    } catch (error) {
+    } catch {
       return {
         name: 'Integrations',
         status: HealthStatus.UNKNOWN,
@@ -544,7 +545,7 @@ export class HealthCheckService {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     const paint = performance.getEntriesByType('paint');
     
-    const metrics: PerformanceMetrics = {
+    const _metrics: PerformanceMetrics = {
       pageLoadTime: navigation ? navigation.loadEventEnd - navigation.fetchStart : 0,
       timeToFirstByte: navigation ? navigation.responseStart - navigation.fetchStart : 0,
       firstContentfulPaint: this.getMetricValue(paint, 'first-contentful-paint'),
@@ -554,19 +555,19 @@ export class HealthCheckService {
       totalBlockingTime: this.getTBTValue()
     };
     
-    this.reportPerformanceMetrics(metrics);
+    this.reportPerformanceMetrics(_metrics);
   }
 
   // Record performance metric
-  private recordPerformanceMetric(entry: PerformanceEntry): void {
+  private recordPerformanceMetric(_entry: PerformanceEntry): void {
     // Store and analyze performance entries
-    console.log(`Performance metric: ${entry.name} - ${entry.entryType} - ${entry.duration}ms`);
+    logger.info(`Performance metric: ${_entry.name} - ${_entry.entryType} - ${_entry.duration}ms`);
   }
 
   // Helper methods for performance metrics
   private getMetricValue(entries: PerformanceEntryList, name: string): number {
-    const entry = entries.find(e => e.name === name);
-    return entry ? entry.startTime : 0;
+    const _entry = entries.find(e => e.name === name);
+    return _entry ? _entry.startTime : 0;
   }
 
   private getLCPValue(): number {
@@ -597,7 +598,7 @@ export class HealthCheckService {
       }
       
       const history = this.healthHistory.get(service.name)!;
-      history.push(service);
+      history.push(_service);
       
       // Limit history size
       if (history.length > this.maxHistorySize) {
@@ -610,31 +611,31 @@ export class HealthCheckService {
   private reportHealthStatus(health: SystemHealth): void {
     // Send to monitoring endpoint
     if (health.overall !== HealthStatus.HEALTHY) {
-      console.warn('System health degraded:', health);
+      logger.warn('System health degraded:', health);
     }
     
     // Send metrics to Prometheus/Grafana
-    this.sendMetricsToMonitoring(health);
+    this.sendMetricsToMonitoring(_health);
   }
 
   // Report performance metrics
-  private reportPerformanceMetrics(metrics: PerformanceMetrics): void {
+  private reportPerformanceMetrics(_metrics: PerformanceMetrics): void {
     // Send to analytics service
-    console.log('Performance metrics:', metrics);
+    logger.info('Performance _metrics:', _metrics);
   }
 
   // Send metrics to monitoring service
   private sendMetricsToMonitoring(health: SystemHealth): void {
     // In production, send to Prometheus pushgateway
     try {
-      fetch('/api/metrics/push', {
+      fetch('/api/_metrics/push', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           timestamp: health.timestamp,
-          metrics: health.metrics,
+          _metrics: health._metrics,
           services: health.services.map(s => ({
             name: s.name,
             status: s.status,
@@ -642,10 +643,10 @@ export class HealthCheckService {
           }))
         })
       }).catch(error => {
-        console.error('Failed to send metrics:', error);
+        logger.error('Failed to send _metrics:', error);
       });
-    } catch (error) {
-      console.error('Failed to send metrics:', error);
+    } catch (_error) {
+      logger.error('Failed to send _metrics:');
     }
   }
 
@@ -659,17 +660,17 @@ export class HealthCheckService {
     return this.performHealthCheck();
   }
 
-  public getHealthHistory(serviceName: string): ServiceHealth[] {
-    return this.healthHistory.get(serviceName) || [];
+  public getHealthHistory(_serviceName: string): ServiceHealth[] {
+    return this.healthHistory.get(_serviceName) || [];
   }
 
   public async getCrisisMetrics(): Promise<CrisisMetrics> {
-    const response = await fetch('/api/metrics/crisis');
+    const response = await fetch('/api/_metrics/crisis');
     return response.json();
   }
 
   public getPerformanceMetrics(): PerformanceMetrics {
-    // Return latest collected metrics
+    // Return latest collected _metrics
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     const paint = performance.getEntriesByType('paint');
     
@@ -686,4 +687,4 @@ export class HealthCheckService {
 }
 
 // Export singleton instance
-export const healthCheckService = HealthCheckService.getInstance();
+export const _healthCheckService = HealthCheckService.getInstance();

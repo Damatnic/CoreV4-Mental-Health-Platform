@@ -9,10 +9,10 @@ interface ThemeContextType {
   applyComponentStyles: (component: string, variant?: string, size?: string) => string;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | undefined>(_undefined);
 
 export const useWellnessTheme = () => {
-  const context = useContext(ThemeContext);
+  const context = useContext(_ThemeContext);
   if (!context) {
     throw new Error('useWellnessTheme must be used within a WellnessThemeProvider');
   }
@@ -21,20 +21,20 @@ export const useWellnessTheme = () => {
 
 interface WellnessThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: 'light' | 'dark';
+  _defaultTheme?: 'light' | 'dark';
 }
 
 export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
   children,
-  defaultTheme = 'light'
+  _defaultTheme = 'light'
 }) => {
-  const [theme, setTheme] = useState<'light' | 'dark'>(defaultTheme);
+  const [theme, setTheme] = useState<'light' | 'dark'>(_defaultTheme);
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('wellness-theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
+    const _savedTheme = localStorage.getItem('wellness-theme') as 'light' | 'dark' | null;
+    if (_savedTheme) {
+      setTheme(_savedTheme);
     }
   }, []);
 
@@ -54,17 +54,17 @@ export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
   };
 
   const getGradient = (type: string) => {
-    const gradients = wellnessTheme.gradients as any;
+    const gradients = wellnessTheme.gradients as unknown;
     return `bg-gradient-to-r ${gradients[type] || gradients.primary}`;
   };
 
   const getToolGradient = (tool: string) => {
-    const tools = wellnessTheme.gradients.tools as any;
+    const tools = wellnessTheme.gradients.tools as unknown;
     return `bg-gradient-to-r ${tools[tool] || wellnessTheme.gradients.primary}`;
   };
 
   const applyComponentStyles = (component: string, variant?: string, size?: string) => {
-    const comp = (wellnessTheme.components as any)[component];
+    const comp = (wellnessTheme.components as unknown)[component];
     if (!comp) return '';
     
     let styles = comp.base || '';

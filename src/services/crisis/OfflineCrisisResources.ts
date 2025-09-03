@@ -2,6 +2,7 @@
 // CRITICAL: These resources must be available 24/7 regardless of connectivity
 
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 // Offline Crisis Resource Types
 export interface OfflineCrisisResource {
@@ -315,16 +316,16 @@ export class OfflineCrisisResourceManager {
       // Load default emergency contacts
       this.emergencyContacts = [...DEFAULT_EMERGENCY_CONTACTS];
       
-      // Load any saved custom resources
+      // Load any _saved custom resources
       await this.loadCustomResources();
       
       // Load safety plans
       await this.loadSafetyPlans();
       
       this.isInitialized = true;
-      console.log('✅ Offline crisis resources initialized successfully');
-    } catch (error) {
-      console.error('Failed to initialize offline crisis resources:', error);
+      logger.info('Offline crisis resources initialized successfully', 'OfflineCrisisResources');
+    } catch (_error) {
+      logger.error('Failed to initialize offline crisis resources:');
       // Even if loading fails, ensure critical resources are available
       this.resources = [...CRITICAL_OFFLINE_RESOURCES];
       this.emergencyContacts = [...DEFAULT_EMERGENCY_CONTACTS];
@@ -335,31 +336,31 @@ export class OfflineCrisisResourceManager {
   // Load custom resources from storage
   private async loadCustomResources(): Promise<void> {
     try {
-      const saved = secureStorage.getItem('offline_crisis_resources');
-      if (saved) {
-        const customResources = JSON.parse(saved) as OfflineCrisisResource[];
-        this.resources = [...this.resources, ...customResources];
+      const _saved = secureStorage.getItem('offline_crisis_resources');
+      if (_saved) {
+        const _customResources = JSON.parse(_saved) as OfflineCrisisResource[];
+        this.resources = [...this.resources, ..._customResources];
       }
 
-      const savedContacts = secureStorage.getItem('offline_emergency_contacts');
-      if (savedContacts) {
-        const customContacts = JSON.parse(savedContacts) as OfflineEmergencyContact[];
-        this.emergencyContacts = [...this.emergencyContacts, ...customContacts];
+      const _savedContacts = secureStorage.getItem('offline_emergency_contacts');
+      if (_savedContacts) {
+        const _customContacts = JSON.parse(_savedContacts) as OfflineEmergencyContact[];
+        this.emergencyContacts = [...this.emergencyContacts, ..._customContacts];
       }
-    } catch (error) {
-      console.error('Failed to load custom offline resources:', error);
+    } catch (_error) {
+      logger.error('Failed to load custom offline resources:');
     }
   }
 
   // Load safety plans
   private async loadSafetyPlans(): Promise<void> {
     try {
-      const saved = secureStorage.getItem('offline_safety_plans');
-      if (saved) {
-        this.safetyPlans = JSON.parse(saved);
+      const _saved = secureStorage.getItem('offline_safety_plans');
+      if (_saved) {
+        this.safetyPlans = JSON.parse(_saved);
       }
-    } catch (error) {
-      console.error('Failed to load safety plans:', error);
+    } catch (_error) {
+      logger.error('Failed to load safety plans:');
       this.safetyPlans = [];
     }
   }
@@ -414,13 +415,13 @@ export class OfflineCrisisResourceManager {
 
   // Search resources
   public searchResources(query: string): OfflineCrisisResource[] {
-    const lowercaseQuery = query.toLowerCase();
+    const _lowercaseQuery = query.toLowerCase();
     return this.resources.filter(resource =>
-      resource.title.toLowerCase().includes(lowercaseQuery) ||
-      resource.content.toLowerCase().includes(lowercaseQuery) ||
-      resource.category.toLowerCase().includes(lowercaseQuery) ||
+      resource.title.toLowerCase().includes(_lowercaseQuery) ||
+      resource.content.toLowerCase().includes(_lowercaseQuery) ||
+      resource.category.toLowerCase().includes(_lowercaseQuery) ||
       resource.instructions?.some(instruction => 
-        instruction.toLowerCase().includes(lowercaseQuery)
+        instruction.toLowerCase().includes(_lowercaseQuery)
       )
     );
   }
@@ -436,20 +437,20 @@ export class OfflineCrisisResourceManager {
   // Add custom emergency contact
   public addCustomEmergencyContact(contact: OfflineEmergencyContact): void {
     contact.id = `custom-${Date.now()}`;
-    this.emergencyContacts.push(contact);
+    this.emergencyContacts.push(_contact);
     this.saveCustomResources();
   }
 
   // Save custom resources to storage
   private saveCustomResources(): void {
     try {
-      const customResources = this.resources.filter(r => r.id.startsWith('custom-'));
-      secureStorage.setItem('offline_crisis_resources', JSON.stringify(customResources));
+      const _customResources = this.resources.filter(r => r.id.startsWith('custom-'));
+      secureStorage.setItem('offline_crisis_resources', JSON.stringify(_customResources));
       
-      const customContacts = this.emergencyContacts.filter(c => c.id.startsWith('custom-'));
-      secureStorage.setItem('offline_emergency_contacts', JSON.stringify(customContacts));
-    } catch (error) {
-      console.error('Failed to save custom resources:', error);
+      const _customContacts = this.emergencyContacts.filter(c => c.id.startsWith('custom-'));
+      secureStorage.setItem('offline_emergency_contacts', JSON.stringify(_customContacts));
+    } catch (_error) {
+      logger.error('Failed to save custom resources:');
     }
   }
 
@@ -472,7 +473,7 @@ export class OfflineCrisisResourceManager {
     this.safetyPlans = this.safetyPlans.filter(p => p.id !== safetyPlan.id);
     
     // Add new plan
-    this.safetyPlans.push(safetyPlan);
+    this.safetyPlans.push(_safetyPlan);
     this.saveSafetyPlans();
     
     return safetyPlan;
@@ -494,8 +495,8 @@ export class OfflineCrisisResourceManager {
   private saveSafetyPlans(): void {
     try {
       secureStorage.setItem('offline_safety_plans', JSON.stringify(this.safetyPlans));
-    } catch (error) {
-      console.error('Failed to save safety plans:', error);
+    } catch (_error) {
+      logger.error('Failed to save safety plans:');
     }
   }
 
@@ -523,13 +524,13 @@ export class OfflineCrisisResourceManager {
   // Update resource cache (when online)
   public async updateResourceCache(): Promise<void> {
     if (!navigator.onLine) {
-      console.warn('Cannot update resource cache - offline');
+      logger.warn('Cannot update resource cache - offline');
       return;
     }
 
     try {
       // In production, this would fetch updated resources from server
-      console.log('📦 Updating offline resource cache...');
+      logger.info('Updating offline resource cache...', 'OfflineCrisisResources');
       
       // Update timestamps for existing resources
       this.resources.forEach(resource => {
@@ -539,9 +540,9 @@ export class OfflineCrisisResourceManager {
       });
       
       this.saveCustomResources();
-      console.log('✅ Offline resource cache updated');
-    } catch (error) {
-      console.error('Failed to update resource cache:', error);
+      logger.info('Offline resource cache updated', 'OfflineCrisisResources');
+    } catch (_error) {
+      logger.error('Failed to update resource cache:');
     }
   }
 
@@ -583,4 +584,4 @@ Remember: This feeling is temporary. You have support. Help is available.
 }
 
 // Export singleton instance
-export const offlineCrisisResources = OfflineCrisisResourceManager.getInstance();
+export const _offlineCrisisResources = OfflineCrisisResourceManager.getInstance();

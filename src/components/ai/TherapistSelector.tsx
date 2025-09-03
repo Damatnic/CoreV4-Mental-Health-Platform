@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Brain, Heart, Users, Shield, Sparkles, 
-  CheckCircle, Star, Award, Clock, User
+  Brain, Heart, Shield, 
+  CheckCircle, Star, Clock, User
 } from 'lucide-react';
 
 export interface Therapist {
@@ -138,13 +138,13 @@ const therapists: Therapist[] = [
 interface TherapistSelectorProps {
   onSelectTherapist: (therapist: Therapist) => void;
   selectedTherapist?: Therapist;
-  showDetailedView?: boolean;
+  _showDetailedView?: boolean;
 }
 
 export const TherapistSelector: React.FC<TherapistSelectorProps> = ({ 
   onSelectTherapist, 
   selectedTherapist,
-  showDetailedView = true
+  _showDetailedView = true
 }) => {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [filterSpecialty, setFilterSpecialty] = useState<string>('all');
@@ -323,7 +323,7 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
             These AI therapists are advanced conversational companions designed to provide personalized mental health support. 
             They combine evidence-based therapeutic approaches with AI technology to offer accessible, immediate help. 
             <strong className="text-white"> They complement but do not replace professional mental health treatment.</strong> 
-            If you're experiencing a mental health emergency, please contact emergency services or call 988.
+            If you&apos;re experiencing a mental health emergency, please contact emergency services or call 988.
           </p>
         </div>
       </motion.div>

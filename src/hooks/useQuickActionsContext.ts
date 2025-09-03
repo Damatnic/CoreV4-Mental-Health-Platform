@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, _useMemo } from 'react';
 import { QuickAction } from '../types/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { secureStorage } from '../services/security/SecureLocalStorage';
+import { logger } from '../utils/logger';
 
 interface QuickActionsContext {
   actions: QuickAction[];
@@ -183,30 +184,30 @@ export function useQuickActionsContext(): QuickActionsContext {
     }
   ];
 
-  const [actions, setActions] = useState<QuickAction[]>(defaultActions);
+  const [actions, setActions] = useState<QuickAction[]>(_defaultActions);
   const [customActions, setCustomActions] = useState<QuickAction[]>([]);
   const [actionHistory, setActionHistory] = useState<string[]>([]);
 
   // Load custom actions and history from localStorage
   useEffect(() => {
-    const savedCustomActions = secureStorage.getItem('customQuickActions');
-    const savedHistory = secureStorage.getItem('actionHistory');
+    const _savedCustomActions = secureStorage.getItem('customQuickActions');
+    const _savedHistory = secureStorage.getItem('actionHistory');
     
-    if (savedCustomActions) {
+    if (_savedCustomActions) {
       try {
-        const parsed = JSON.parse(savedCustomActions);
-        setCustomActions(parsed);
+        const parsed = JSON.parse(_savedCustomActions);
+        setCustomActions(_parsed);
         setActions([...defaultActions, ...parsed]);
-      } catch (error) {
-        console.error('Error loading custom actions:', error);
+      } catch (_error) {
+        logger.error('Error loading custom actions:');
       }
     }
     
-    if (savedHistory) {
+    if (_savedHistory) {
       try {
-        setActionHistory(JSON.parse(savedHistory));
-      } catch (error) {
-        console.error('Error loading action history:', error);
+        setActionHistory(JSON.parse(_savedHistory));
+      } catch (_error) {
+        logger.error('Error loading action history:');
       }
     }
   }, []);
@@ -249,11 +250,11 @@ export function useQuickActionsContext(): QuickActionsContext {
     } else if (action.action.startsWith('function:')) {
       // Custom function (would need to be implemented based on your app's needs)
       const functionName = action.action.replace('function:', '');
-      console.log(`Executing function: ${functionName}`);
+      logger.info(`Executing function: ${functionName}`);
     }
     
     // Log analytics
-    console.log('Action executed:', {
+    logger.info('Action executed:', {
       id: action.id,
       label: action.label,
       category: action.category,
@@ -282,30 +283,30 @@ export function useQuickActionsContext(): QuickActionsContext {
 
   // Update action
   const updateAction = useCallback((actionId: string, updates: Partial<QuickAction>) => {
-    const updateFn = (action: QuickAction) => 
+    const _updateFn = (action: QuickAction) => 
       action.id === actionId ? { ...action, ...updates } : action;
     
-    setActions(prev => prev.map(updateFn));
+    setActions(prev => prev.map(_updateFn));
     
     if (actionId.startsWith('custom-')) {
-      setCustomActions(prev => prev.map(updateFn));
+      setCustomActions(prev => prev.map(_updateFn));
     }
   }, []);
 
   // Get frequent actions based on history
   const getFrequentActions = useCallback((): QuickAction[] => {
-    const frequency = actionHistory.reduce((acc, id) => {
+    const _frequency = actionHistory.reduce((acc, id) => {
       acc[id] = (acc[id] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
-    const sortedIds = Object.entries(frequency)
+    const sortedIds = Object.entries(_frequency)
       .sort(([, a], [, b]) => b - a)
       .map(([id]) => id);
     
     return sortedIds
       .map(id => actions.find(a => a.id === id))
-      .filter(Boolean) as QuickAction[];
+      .filter(_Boolean) as QuickAction[];
   }, [actionHistory, actions]);
 
   // Get recent actions
@@ -314,18 +315,18 @@ export function useQuickActionsContext(): QuickActionsContext {
     
     return recentIds
       .map(id => actions.find(a => a.id === id))
-      .filter(Boolean) as QuickAction[];
+      .filter(_Boolean) as QuickAction[];
   }, [actionHistory, actions]);
 
   // Search actions
   const searchActions = useCallback((query: string): QuickAction[] => {
-    const lowerQuery = query.toLowerCase();
+    const _lowerQuery = query.toLowerCase();
     
     return actions.filter(action => 
-      action.label.toLowerCase().includes(lowerQuery) ||
-      action.description?.toLowerCase().includes(lowerQuery) ||
-      action.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-      action.category.toLowerCase().includes(lowerQuery)
+      action.label.toLowerCase().includes(_lowerQuery) ||
+      action.description?.toLowerCase().includes(_lowerQuery) ||
+      action.tags?.some(tag => tag.toLowerCase().includes(_lowerQuery)) ||
+      action.category.toLowerCase().includes(_lowerQuery)
     );
   }, [actions]);
 

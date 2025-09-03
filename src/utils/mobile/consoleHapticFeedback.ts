@@ -77,12 +77,12 @@ class ConsoleHapticFeedbackSystem {
 
   private loadSettings(): HapticSettings {
     try {
-      const stored = localStorage.getItem('consoleHapticSettings');
-      if (stored) {
-        return { ...this.getDefaultSettings(), ...JSON.parse(stored) };
+      const _stored = localStorage.getItem('consoleHapticSettings');
+      if (_stored) {
+        return { ...this.getDefaultSettings(), ...JSON.parse(_stored) };
       }
-    } catch (error) {
-      console.warn('Failed to load haptic settings:', error);
+    } catch {
+      logger.warn('Failed to load haptic settings:');
     }
     return this.getDefaultSettings();
   }
@@ -100,8 +100,8 @@ class ConsoleHapticFeedbackSystem {
   private saveSettings(): void {
     try {
       localStorage.setItem('consoleHapticSettings', JSON.stringify(this.settings));
-    } catch (error) {
-      console.warn('Failed to save haptic settings:', error);
+    } catch {
+      logger.warn('Failed to save haptic settings:');
     }
   }
 
@@ -109,8 +109,8 @@ class ConsoleHapticFeedbackSystem {
     // Check for system haptic preferences
     if (this.settings.respectSystemSettings) {
       // Check for reduced motion preference as a proxy for haptic sensitivity
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReducedMotion) {
+      const _prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (_prefersReducedMotion) {
         this.settings.masterIntensity *= 0.5;
       }
     }
@@ -126,7 +126,7 @@ class ConsoleHapticFeedbackSystem {
 
     // Listen for battery status changes
     if ('getBattery' in navigator) {
-      (navigator as any).getBattery().then((battery: any) => {
+      (navigator as unknown).getBattery().then((battery: unknown) => {
         const updateBatteryMode = () => {
           if (battery.level < 0.2) {
             this.settings.masterIntensity = Math.min(this.settings.masterIntensity, 0.3);
@@ -185,37 +185,37 @@ class ConsoleHapticFeedbackSystem {
 
     let pattern: number | number[];
     
-    if (customPattern) {
+    if (_customPattern) {
       pattern = customPattern;
     } else {
-      const consolePatterns = this.hapticPatterns[this.settings.consoleType];
-      pattern = consolePatterns[actionType]?.pattern || consolePatterns.tap.pattern;
+      const _consolePatterns = this.hapticPatterns[this.settings.consoleType];
+      pattern = _consolePatterns[actionType]?.pattern || _consolePatterns.tap.pattern;
     }
 
-    const adjustedPattern = this.adjustPatternForIntensity(pattern, this.settings.masterIntensity);
-    const optimizedPattern = this.adjustPatternForPerformance(adjustedPattern);
+    const _adjustedPattern = this.adjustPatternForIntensity(pattern, this.settings.masterIntensity);
+    const _optimizedPattern = this.adjustPatternForPerformance(_adjustedPattern);
 
-    this.executeHaptic(optimizedPattern);
+    this.executeHaptic(_optimizedPattern);
     this.lastHapticTime = Date.now();
   }
 
   private executeHaptic(pattern: number[]): void {
     try {
       navigator.vibrate(pattern);
-    } catch (error) {
-      console.warn('Haptic feedback failed:', error);
+    } catch {
+      logger.warn('Haptic feedback failed:');
     }
   }
 
   public queueHaptic(actionType: ActionType, delay: number = 0): void {
     if (!this.settings.enabled) return;
 
-    const consolePatterns = this.hapticPatterns[this.settings.consoleType];
-    const pattern = consolePatterns[actionType]?.pattern || consolePatterns.tap.pattern;
-    const adjustedPattern = this.adjustPatternForIntensity(pattern, this.settings.masterIntensity);
-    const optimizedPattern = this.adjustPatternForPerformance(adjustedPattern);
+    const _consolePatterns = this.hapticPatterns[this.settings.consoleType];
+    const pattern = _consolePatterns[actionType]?.pattern || _consolePatterns.tap.pattern;
+    const _adjustedPattern = this.adjustPatternForIntensity(pattern, this.settings.masterIntensity);
+    const _optimizedPattern = this.adjustPatternForPerformance(_adjustedPattern);
 
-    this.hapticQueue.push({ pattern: optimizedPattern, delay });
+    this.hapticQueue.push({ pattern: _optimizedPattern, delay });
     
     if (!this.isProcessingQueue) {
       this.processHapticQueue();
@@ -245,8 +245,8 @@ class ConsoleHapticFeedbackSystem {
     this.isProcessingQueue = false;
   }
 
-  public triggerSequence(sequence: Array<{ action: ActionType; delay?: number }>): void {
-    sequence.forEach(({ action, delay = 0 }, index) => {
+  public triggerSequence(_sequence: Array<{ action: ActionType; delay?: number }>): void {
+    _sequence.forEach(({ _action, delay = 0 }, index) => {
       setTimeout(() => {
         this.triggerHaptic(action);
       }, delay + (index * 150)); // 150ms base delay between sequence items
@@ -299,17 +299,17 @@ class ConsoleHapticFeedbackSystem {
   }
 
   public getAvailablePatterns(): Record<ActionType, string> {
-    const consolePatterns = this.hapticPatterns[this.settings.consoleType];
-    const result: Record<ActionType, string> = {} as any;
+    const _consolePatterns = this.hapticPatterns[this.settings.consoleType];
+    const result: Record<ActionType, string> = {} as unknown;
     
-    Object.entries(consolePatterns).forEach(([action, pattern]) => {
+    Object.entries(_consolePatterns).forEach(([action, _pattern]) => {
       result[action as ActionType] = pattern.description;
     });
     
     return result;
   }
 
-  public testHaptic(pattern?: number | number[]): void {
+  public testHaptic(_pattern?: number | number[]): void {
     if (pattern) {
       this.executeHaptic(Array.isArray(pattern) ? pattern : [pattern]);
     } else {
@@ -361,8 +361,8 @@ export function useConsoleHaptic() {
     queue: (action: ActionType, delay?: number) => 
       consoleHapticFeedback.queueHaptic(action, delay),
     
-    sequence: (sequence: Array<{ action: ActionType; delay?: number }>) => 
-      consoleHapticFeedback.triggerSequence(sequence),
+    _sequence: (_sequence: Array<{ action: ActionType; delay?: number }>) => 
+      consoleHapticFeedback.triggerSequence(_sequence),
     
     gaming: (type: 'hit' | 'reload' | 'powerup' | 'damage' | 'victory' | 'defeat') => 
       consoleHapticFeedback.triggerGamingFeedback(type),
@@ -375,7 +375,7 @@ export function useConsoleHaptic() {
     accessibility: (type: 'focus' | 'error' | 'success' | 'navigation') => 
       consoleHapticFeedback.triggerAccessibilityFeedback(type),
     
-    test: (pattern?: number | number[]) => consoleHapticFeedback.testHaptic(pattern)
+    test: (_pattern?: number | number[]) => consoleHapticFeedback.testHaptic(pattern)
   }), []);
 
   return {
@@ -389,6 +389,7 @@ export function useConsoleHaptic() {
 
 // Additional React import for the hook
 import React from 'react';
+import { logger } from '../logger';
 
 // Export types for use in other components
 export type { ConsoleType, ActionType, HapticIntensity, HapticSettings };

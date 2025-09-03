@@ -1,0 +1,1625 @@
+{
+  "totals": {
+    "errors": 6412,
+    "warnings": 364,
+    "total": 6776
+  },
+  "errorTypes": [
+    {
+      "rule": "no-undef",
+      "errors": 4322,
+      "warnings": 0,
+      "total": 4322
+    },
+    {
+      "rule": "@typescript-eslint/no-unused-vars",
+      "errors": 1893,
+      "warnings": 0,
+      "total": 1893
+    },
+    {
+      "rule": "@typescript-eslint/no-explicit-any",
+      "errors": 0,
+      "warnings": 213,
+      "total": 213
+    },
+    {
+      "rule": "jsx-a11y/label-has-associated-control",
+      "errors": 87,
+      "warnings": 0,
+      "total": 87
+    },
+    {
+      "rule": "no-console",
+      "errors": 0,
+      "warnings": 86,
+      "total": 86
+    },
+    {
+      "rule": "react-hooks/exhaustive-deps",
+      "errors": 0,
+      "warnings": 44,
+      "total": 44
+    },
+    {
+      "rule": "react/no-unescaped-entities",
+      "errors": 23,
+      "warnings": 0,
+      "total": 23
+    },
+    {
+      "rule": "react-refresh/only-export-components",
+      "errors": 0,
+      "warnings": 21,
+      "total": 21
+    },
+    {
+      "rule": "@typescript-eslint/no-unsafe-function-type",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "rule": "@typescript-eslint/ban-ts-comment",
+      "errors": 12,
+      "warnings": 0,
+      "total": 12
+    },
+    {
+      "rule": "jsx-a11y/no-static-element-interactions",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "rule": "jsx-a11y/click-events-have-key-events",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "rule": "unknown",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "rule": "no-case-declarations",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "rule": "@typescript-eslint/no-empty-object-type",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "rule": "no-useless-escape",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "rule": "react-hooks/rules-of-hooks",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "rule": "react/display-name",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "rule": "no-constant-condition",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "rule": "no-unreachable",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "rule": "jsx-a11y/no-redundant-roles",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "rule": "no-redeclare",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "rule": "jsx-a11y/no-noninteractive-tabindex",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "react/jsx-no-undef",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "jsx-a11y/media-has-caption",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "no-cond-assign",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "no-prototype-builtins",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "no-var",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "@typescript-eslint/triple-slash-reference",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "rule": "@typescript-eslint/no-this-alias",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    }
+  ],
+  "fileErrors": [
+    {
+      "file": ".\\src\\types\\globals.d.ts",
+      "errors": 280,
+      "warnings": 67,
+      "total": 347
+    },
+    {
+      "file": ".\\src\\utils\\performance\\MemoryLeakPrevention.ts",
+      "errors": 113,
+      "warnings": 3,
+      "total": 116
+    },
+    {
+      "file": ".\\src\\hooks\\useAITherapist.ts",
+      "errors": 96,
+      "warnings": 4,
+      "total": 100
+    },
+    {
+      "file": ".\\src\\services\\security\\cryptoService.ts",
+      "errors": 94,
+      "warnings": 0,
+      "total": 94
+    },
+    {
+      "file": ".\\src\\utils\\performance\\memoryManagement.ts",
+      "errors": 90,
+      "warnings": 4,
+      "total": 94
+    },
+    {
+      "file": ".\\src\\hooks\\useAIInsights.ts",
+      "errors": 93,
+      "warnings": 0,
+      "total": 93
+    },
+    {
+      "file": ".\\src\\test\\performance\\performance.test.ts",
+      "errors": 91,
+      "warnings": 0,
+      "total": 91
+    },
+    {
+      "file": ".\\src\\services\\security\\secureStorage.ts",
+      "errors": 87,
+      "warnings": 1,
+      "total": 88
+    },
+    {
+      "file": ".\\src\\services\\websocket\\EnhancedWebSocketService.ts",
+      "errors": 86,
+      "warnings": 0,
+      "total": 86
+    },
+    {
+      "file": ".\\src\\test\\accessibility\\accessibility.test.ts",
+      "errors": 86,
+      "warnings": 0,
+      "total": 86
+    },
+    {
+      "file": ".\\src\\types\\webworker.d.ts",
+      "errors": 55,
+      "warnings": 29,
+      "total": 84
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\GoalProgressDashboard.tsx",
+      "errors": 79,
+      "warnings": 0,
+      "total": 79
+    },
+    {
+      "file": ".\\src\\test\\security\\security.test.ts",
+      "errors": 74,
+      "warnings": 0,
+      "total": 74
+    },
+    {
+      "file": ".\\src\\contexts\\AuthContext.tsx",
+      "errors": 69,
+      "warnings": 2,
+      "total": 71
+    },
+    {
+      "file": ".\\src\\services\\auth\\mfaService.ts",
+      "errors": 65,
+      "warnings": 4,
+      "total": 69
+    },
+    {
+      "file": ".\\src\\services\\security\\fieldEncryption.ts",
+      "errors": 62,
+      "warnings": 7,
+      "total": 69
+    },
+    {
+      "file": ".\\src\\components\\wellness\\WellnessDashboard.tsx",
+      "errors": 68,
+      "warnings": 0,
+      "total": 68
+    },
+    {
+      "file": ".\\src\\middleware\\securityMiddleware.tsx",
+      "errors": 61,
+      "warnings": 6,
+      "total": 67
+    },
+    {
+      "file": ".\\src\\components\\wellness\\TherapeuticProgressTracker.tsx",
+      "errors": 60,
+      "warnings": 3,
+      "total": 63
+    },
+    {
+      "file": ".\\src\\components\\wellness\\MeditationTimer.tsx",
+      "errors": 59,
+      "warnings": 3,
+      "total": 62
+    },
+    {
+      "file": ".\\src\\components\\professional\\CareTeamCommunication.tsx",
+      "errors": 61,
+      "warnings": 0,
+      "total": 61
+    },
+    {
+      "file": ".\\src\\services\\notifications\\ComprehensiveNotificationService.ts",
+      "errors": 54,
+      "warnings": 7,
+      "total": 61
+    },
+    {
+      "file": ".\\src\\components\\crisis\\EnhancedCrisisChat.tsx",
+      "errors": 57,
+      "warnings": 3,
+      "total": 60
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\HabitTracker.tsx",
+      "errors": 60,
+      "warnings": 0,
+      "total": 60
+    },
+    {
+      "file": ".\\src\\components\\wellness\\TherapeuticJournal.tsx",
+      "errors": 58,
+      "warnings": 1,
+      "total": 59
+    },
+    {
+      "file": ".\\src\\services\\privacy\\privacyService.ts",
+      "errors": 51,
+      "warnings": 8,
+      "total": 59
+    },
+    {
+      "file": ".\\src\\services\\security\\SecureLocalStorage.ts",
+      "errors": 57,
+      "warnings": 0,
+      "total": 57
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisButton.test.tsx",
+      "errors": 56,
+      "warnings": 0,
+      "total": 56
+    },
+    {
+      "file": ".\\src\\services\\accessibility\\AdvancedAccessibilityService.ts",
+      "errors": 53,
+      "warnings": 1,
+      "total": 54
+    },
+    {
+      "file": ".\\src\\services\\integration\\RealtimeSyncService.ts",
+      "errors": 53,
+      "warnings": 1,
+      "total": 54
+    },
+    {
+      "file": ".\\src\\services\\api\\secureApi.ts",
+      "errors": 46,
+      "warnings": 7,
+      "total": 53
+    },
+    {
+      "file": ".\\src\\utils\\performance\\performanceMonitor.ts",
+      "errors": 49,
+      "warnings": 4,
+      "total": 53
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\wellness\\MeditationMindfulness.tsx",
+      "errors": 50,
+      "warnings": 2,
+      "total": 52
+    },
+    {
+      "file": ".\\src\\services\\crisis\\MockCrisisServer.ts",
+      "errors": 52,
+      "warnings": 0,
+      "total": 52
+    },
+    {
+      "file": ".\\src\\test\\integration\\crisis-workflow.test.tsx",
+      "errors": 52,
+      "warnings": 0,
+      "total": 52
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\TreatmentPlanProgress.tsx",
+      "errors": 51,
+      "warnings": 0,
+      "total": 51
+    },
+    {
+      "file": ".\\src\\components\\navigation\\MobileBottomNav.tsx",
+      "errors": 51,
+      "warnings": 0,
+      "total": 51
+    },
+    {
+      "file": ".\\src\\services\\websocket\\WebSocketService.ts",
+      "errors": 51,
+      "warnings": 0,
+      "total": 51
+    },
+    {
+      "file": ".\\src\\utils\\crisis.ts",
+      "errors": 48,
+      "warnings": 3,
+      "total": 51
+    },
+    {
+      "file": ".\\src\\services\\security\\rateLimiter.ts",
+      "errors": 50,
+      "warnings": 0,
+      "total": 50
+    },
+    {
+      "file": ".\\src\\stores\\activityStore.ts",
+      "errors": 50,
+      "warnings": 0,
+      "total": 50
+    },
+    {
+      "file": ".\\src\\types\\utilities.d.ts",
+      "errors": 44,
+      "warnings": 6,
+      "total": 50
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\wellness\\MoodAnalytics.tsx",
+      "errors": 47,
+      "warnings": 2,
+      "total": 49
+    },
+    {
+      "file": ".\\src\\test\\performance\\bundle-optimization.test.ts",
+      "errors": 48,
+      "warnings": 0,
+      "total": 48
+    },
+    {
+      "file": ".\\src\\services\\community\\communityService.ts",
+      "errors": 42,
+      "warnings": 4,
+      "total": 46
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\ActivityAnalytics.tsx",
+      "errors": 43,
+      "warnings": 2,
+      "total": 45
+    },
+    {
+      "file": ".\\src\\components\\accessibility\\AccessibilityControlPanel.tsx",
+      "errors": 44,
+      "warnings": 0,
+      "total": 44
+    },
+    {
+      "file": ".\\src\\components\\crisis\\SafetyPlanGenerator.tsx",
+      "errors": 44,
+      "warnings": 0,
+      "total": 44
+    },
+    {
+      "file": ".\\src\\components\\ui\\EnhancedLayout.tsx",
+      "errors": 44,
+      "warnings": 0,
+      "total": 44
+    },
+    {
+      "file": ".\\src\\services\\auth\\authService.ts",
+      "errors": 43,
+      "warnings": 1,
+      "total": 44
+    },
+    {
+      "file": ".\\src\\services\\monitoring\\HealthCheckService.ts",
+      "errors": 38,
+      "warnings": 6,
+      "total": 44
+    },
+    {
+      "file": ".\\src\\components\\professional\\TherapySessionLogger.tsx",
+      "errors": 42,
+      "warnings": 0,
+      "total": 42
+    },
+    {
+      "file": ".\\src\\hooks\\useAuth.test.tsx",
+      "errors": 42,
+      "warnings": 0,
+      "total": 42
+    },
+    {
+      "file": ".\\src\\hooks\\useConsoleNavigation.ts",
+      "errors": 41,
+      "warnings": 1,
+      "total": 42
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\MedicationManagement.tsx",
+      "errors": 41,
+      "warnings": 0,
+      "total": 41
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\CrisisQuickActionsHub.tsx",
+      "errors": 41,
+      "warnings": 0,
+      "total": 41
+    },
+    {
+      "file": ".\\src\\components\\performance\\OptimizedChart.tsx",
+      "errors": 38,
+      "warnings": 2,
+      "total": 40
+    },
+    {
+      "file": ".\\src\\hooks\\useMobileFeatures.ts",
+      "errors": 39,
+      "warnings": 0,
+      "total": 39
+    },
+    {
+      "file": ".\\src\\services\\compliance\\hipaaService.ts",
+      "errors": 38,
+      "warnings": 1,
+      "total": 39
+    },
+    {
+      "file": ".\\src\\services\\security\\securityMonitor.ts",
+      "errors": 35,
+      "warnings": 4,
+      "total": 39
+    },
+    {
+      "file": ".\\src\\services\\security\\HIPAAComplianceService.ts",
+      "errors": 31,
+      "warnings": 7,
+      "total": 38
+    },
+    {
+      "file": ".\\src\\services\\security\\sessionManager.ts",
+      "errors": 38,
+      "warnings": 0,
+      "total": 38
+    },
+    {
+      "file": ".\\src\\utils\\pwa\\pwaManager.ts",
+      "errors": 28,
+      "warnings": 10,
+      "total": 38
+    },
+    {
+      "file": ".\\src\\components\\professional\\AppointmentBooking.tsx",
+      "errors": 36,
+      "warnings": 1,
+      "total": 37
+    },
+    {
+      "file": ".\\src\\components\\professional\\MedicationSmartReminders.tsx",
+      "errors": 37,
+      "warnings": 0,
+      "total": 37
+    },
+    {
+      "file": ".\\src\\components\\professional\\TreatmentPlanManager.tsx",
+      "errors": 37,
+      "warnings": 0,
+      "total": 37
+    },
+    {
+      "file": ".\\src\\utils\\runtimeGuards.ts",
+      "errors": 35,
+      "warnings": 2,
+      "total": 37
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\AIInsightsDashboard.tsx",
+      "errors": 36,
+      "warnings": 0,
+      "total": 36
+    },
+    {
+      "file": ".\\src\\services\\crisis\\MockWebSocketAdapter.ts",
+      "errors": 36,
+      "warnings": 0,
+      "total": 36
+    },
+    {
+      "file": ".\\src\\components\\community\\CommunityPosts.tsx",
+      "errors": 35,
+      "warnings": 0,
+      "total": 35
+    },
+    {
+      "file": ".\\src\\services\\logging\\logger.ts",
+      "errors": 29,
+      "warnings": 6,
+      "total": 35
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\ActivityTracker.tsx",
+      "errors": 34,
+      "warnings": 0,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CareTeamDashboard.tsx",
+      "errors": 34,
+      "warnings": 0,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\DailyActivityPlanner.tsx",
+      "errors": 33,
+      "warnings": 1,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\components\\navigation\\GlobalSearch.tsx",
+      "errors": 33,
+      "warnings": 1,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\components\\wellness\\MoodTracker.test.tsx",
+      "errors": 34,
+      "warnings": 0,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\hooks\\useEnhancedKeyboardNavigation.ts",
+      "errors": 34,
+      "warnings": 0,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\services\\integration\\CrisisIntegrationService.ts",
+      "errors": 32,
+      "warnings": 2,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\services\\professional\\TherapistService.ts",
+      "errors": 26,
+      "warnings": 8,
+      "total": 34
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\BehavioralActivation.tsx",
+      "errors": 32,
+      "warnings": 1,
+      "total": 33
+    },
+    {
+      "file": ".\\src\\components\\notifications\\NotificationCenter.tsx",
+      "errors": 32,
+      "warnings": 1,
+      "total": 33
+    },
+    {
+      "file": ".\\src\\hooks\\useUserPreferences.ts",
+      "errors": 33,
+      "warnings": 0,
+      "total": 33
+    },
+    {
+      "file": ".\\src\\services\\realtime\\websocketService.ts",
+      "errors": 33,
+      "warnings": 0,
+      "total": 33
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\HealthRecordsIntegration.tsx",
+      "errors": 32,
+      "warnings": 0,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\ProviderCommunication.tsx",
+      "errors": 32,
+      "warnings": 0,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\services\\pushNotifications.ts",
+      "errors": 31,
+      "warnings": 1,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\test\\crisis\\CrisisScenarioTesting.ts",
+      "errors": 32,
+      "warnings": 0,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\test\\scripts\\run-all-tests.ts",
+      "errors": 21,
+      "warnings": 11,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\utils\\mobile\\consoleHapticFeedback.ts",
+      "errors": 32,
+      "warnings": 0,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\utils\\mobile\\touchOptimization.ts",
+      "errors": 31,
+      "warnings": 1,
+      "total": 32
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\VoiceCommandInterface.tsx",
+      "errors": 31,
+      "warnings": 0,
+      "total": 31
+    },
+    {
+      "file": ".\\src\\components\\wellness\\MoodTracker.tsx",
+      "errors": 31,
+      "warnings": 0,
+      "total": 31
+    },
+    {
+      "file": ".\\src\\contexts\\AnonymousAuthContext.tsx",
+      "errors": 25,
+      "warnings": 6,
+      "total": 31
+    },
+    {
+      "file": ".\\src\\utils\\performance\\gamingOptimizations.ts",
+      "errors": 30,
+      "warnings": 1,
+      "total": 31
+    },
+    {
+      "file": ".\\src\\components\\crisis\\EmergencyServicesInterface.tsx",
+      "errors": 30,
+      "warnings": 0,
+      "total": 30
+    },
+    {
+      "file": ".\\src\\stores\\wellnessStore.ts",
+      "errors": 30,
+      "warnings": 0,
+      "total": 30
+    },
+    {
+      "file": ".\\src\\components\\crisis\\EmergencyContacts.tsx",
+      "errors": 29,
+      "warnings": 0,
+      "total": 29
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\TherapySessionWidget.tsx",
+      "errors": 29,
+      "warnings": 0,
+      "total": 29
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\AccessibilityCommandCenter.tsx",
+      "errors": 29,
+      "warnings": 0,
+      "total": 29
+    },
+    {
+      "file": ".\\src\\services\\api\\ApiService.ts",
+      "errors": 29,
+      "warnings": 0,
+      "total": 29
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\wellness\\AdvancedJournal.tsx",
+      "errors": 27,
+      "warnings": 1,
+      "total": 28
+    },
+    {
+      "file": ".\\src\\components\\community\\CommunityEvents.tsx",
+      "errors": 27,
+      "warnings": 0,
+      "total": 27
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisDemonstrationHub.tsx",
+      "errors": 27,
+      "warnings": 0,
+      "total": 27
+    },
+    {
+      "file": ".\\src\\components\\wellness\\BreathingExercises.tsx",
+      "errors": 27,
+      "warnings": 0,
+      "total": 27
+    },
+    {
+      "file": ".\\src\\services\\crisis\\OfflineCrisisResources.ts",
+      "errors": 27,
+      "warnings": 0,
+      "total": 27
+    },
+    {
+      "file": ".\\src\\components\\community\\SupportGroups.tsx",
+      "errors": 26,
+      "warnings": 0,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\SmartQuickActionsWidget.tsx",
+      "errors": 24,
+      "warnings": 2,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\wellness\\WellnessMetricsDashboard.tsx",
+      "errors": 25,
+      "warnings": 1,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\hooks\\useFeatureFlag.ts",
+      "errors": 26,
+      "warnings": 0,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\hooks\\useQuickActionsContext.ts",
+      "errors": 23,
+      "warnings": 3,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\services\\emergency\\GeolocationEmergencyService.ts",
+      "errors": 26,
+      "warnings": 0,
+      "total": 26
+    },
+    {
+      "file": ".\\src\\components\\crisis\\RealTimeCrisisChat.tsx",
+      "errors": 24,
+      "warnings": 1,
+      "total": 25
+    },
+    {
+      "file": ".\\src\\utils\\performance\\concurrentFeatures.tsx",
+      "errors": 14,
+      "warnings": 11,
+      "total": 25
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisButton.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\crisis\\SafetyPlan.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\KeyboardNavigator.tsx",
+      "errors": 23,
+      "warnings": 1,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\navigation\\FloatingCrisisButton.tsx",
+      "errors": 23,
+      "warnings": 1,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\performance\\PerformanceDashboard.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\professional\\ProfessionalSupport.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\professional\\TherapistProfile.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\components\\pwa\\PWAInstallPrompt.tsx",
+      "errors": 24,
+      "warnings": 0,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\services\\console\\ConsoleSoundSystem.ts",
+      "errors": 23,
+      "warnings": 1,
+      "total": 24
+    },
+    {
+      "file": ".\\src\\services\\security\\auditLogger.ts",
+      "errors": 20,
+      "warnings": 2,
+      "total": 22
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\EnhancedCrisisPanel.tsx",
+      "errors": 21,
+      "warnings": 0,
+      "total": 21
+    },
+    {
+      "file": ".\\src\\services\\integration\\DataIntegrationService.ts",
+      "errors": 17,
+      "warnings": 4,
+      "total": 21
+    },
+    {
+      "file": ".\\src\\types\\global.d.ts",
+      "errors": 12,
+      "warnings": 9,
+      "total": 21
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisChat.tsx",
+      "errors": 20,
+      "warnings": 0,
+      "total": 20
+    },
+    {
+      "file": ".\\src\\hooks\\useKeyboardNavigation.ts",
+      "errors": 18,
+      "warnings": 2,
+      "total": 20
+    },
+    {
+      "file": ".\\src\\components\\ErrorBoundary.tsx",
+      "errors": 14,
+      "warnings": 5,
+      "total": 19
+    },
+    {
+      "file": ".\\src\\components\\navigation\\NavigationContext.tsx",
+      "errors": 17,
+      "warnings": 2,
+      "total": 19
+    },
+    {
+      "file": ".\\src\\test\\reports\\test-reporter.ts",
+      "errors": 18,
+      "warnings": 1,
+      "total": 19
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisResources.tsx",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CrisisSupportNetwork.tsx",
+      "errors": 16,
+      "warnings": 2,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\components\\performance\\OptimizedCrisisIntervention.tsx",
+      "errors": 17,
+      "warnings": 1,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\services\\websocket\\SecureWebSocketClient.ts",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\test\\mocks\\server.ts",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\test\\setup.ts",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\utils\\console\\consoleStyles.ts",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\utils\\performance\\index.ts",
+      "errors": 18,
+      "warnings": 0,
+      "total": 18
+    },
+    {
+      "file": ".\\src\\components\\performance\\VirtualizedList.tsx",
+      "errors": 16,
+      "warnings": 1,
+      "total": 17
+    },
+    {
+      "file": ".\\src\\main.tsx",
+      "errors": 17,
+      "warnings": 0,
+      "total": 17
+    },
+    {
+      "file": ".\\src\\services\\ai\\CrisisDetectionService.ts",
+      "errors": 17,
+      "warnings": 0,
+      "total": 17
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CrisisPreventionDashboard.tsx",
+      "errors": 16,
+      "warnings": 0,
+      "total": 16
+    },
+    {
+      "file": ".\\src\\hooks\\useAnalytics.ts",
+      "errors": 7,
+      "warnings": 9,
+      "total": 16
+    },
+    {
+      "file": ".\\src\\components\\accessibility\\VoiceNavigation.tsx",
+      "errors": 14,
+      "warnings": 1,
+      "total": 15
+    },
+    {
+      "file": ".\\src\\components\\analytics\\MentalHealthAnalyticsDashboard.tsx",
+      "errors": 15,
+      "warnings": 0,
+      "total": 15
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\DashboardOnboarding.tsx",
+      "errors": 15,
+      "warnings": 0,
+      "total": 15
+    },
+    {
+      "file": ".\\src\\components\\crisis\\CrisisInterventionSystem.tsx",
+      "errors": 14,
+      "warnings": 0,
+      "total": 14
+    },
+    {
+      "file": ".\\src\\components\\crisis\\UnifiedCrisisButton.tsx",
+      "errors": 13,
+      "warnings": 0,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\console\\ConsoleUserStats.tsx",
+      "errors": 13,
+      "warnings": 0,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\GestureHandler.tsx",
+      "errors": 13,
+      "warnings": 0,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\services\\crisis\\emergencyServices.ts",
+      "errors": 13,
+      "warnings": 0,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\types\\react-components.d.ts",
+      "errors": 2,
+      "warnings": 11,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\utils\\bundleOptimization\\lazyLoading.ts",
+      "errors": 11,
+      "warnings": 2,
+      "total": 13
+    },
+    {
+      "file": ".\\src\\components\\community\\ModerationDashboard.tsx",
+      "errors": 12,
+      "warnings": 0,
+      "total": 12
+    },
+    {
+      "file": ".\\src\\services\\security\\securityHeaders.ts",
+      "errors": 12,
+      "warnings": 0,
+      "total": 12
+    },
+    {
+      "file": ".\\backend\\src\\server-minimal.ts",
+      "errors": 3,
+      "warnings": 8,
+      "total": 11
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CommunityFeedWidget.tsx",
+      "errors": 11,
+      "warnings": 0,
+      "total": 11
+    },
+    {
+      "file": ".\\src\\components\\wellness\\WellnessToolsSuite.tsx",
+      "errors": 11,
+      "warnings": 0,
+      "total": 11
+    },
+    {
+      "file": ".\\src\\hooks\\useToast.tsx",
+      "errors": 9,
+      "warnings": 2,
+      "total": 11
+    },
+    {
+      "file": ".\\src\\types\\performance.d.ts",
+      "errors": 9,
+      "warnings": 2,
+      "total": 11
+    },
+    {
+      "file": ".\\src\\components\\console\\ConsoleBootSequence.tsx",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\components\\crisis\\MobileCrisisInterface.tsx",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\DashboardWidget.tsx",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\components\\heartbeat\\HeartbeatCheckin.tsx",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\hooks\\useCrisisAssessment.ts",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\service-worker\\crisis-offline.ts",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\utils\\logger.ts",
+      "errors": 10,
+      "warnings": 0,
+      "total": 10
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\KeyboardShortcutsHelp.tsx",
+      "errors": 9,
+      "warnings": 0,
+      "total": 9
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\console\\ConsoleTile.tsx",
+      "errors": 9,
+      "warnings": 0,
+      "total": 9
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\TodaySchedule.tsx",
+      "errors": 8,
+      "warnings": 1,
+      "total": 9
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\quickActions\\ActionRecommendationEngine.tsx",
+      "errors": 9,
+      "warnings": 0,
+      "total": 9
+    },
+    {
+      "file": ".\\src\\components\\settings\\Settings.tsx",
+      "errors": 9,
+      "warnings": 0,
+      "total": 9
+    },
+    {
+      "file": ".\\src\\components\\ui\\MobileNavigation.tsx",
+      "errors": 9,
+      "warnings": 0,
+      "total": 9
+    },
+    {
+      "file": ".\\backend\\src\\routes\\auth-simple.ts",
+      "errors": 8,
+      "warnings": 0,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\components\\crisis\\ConsoleCrisisSystem.tsx",
+      "errors": 8,
+      "warnings": 0,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\components\\theme\\WellnessThemeProvider.tsx",
+      "errors": 7,
+      "warnings": 1,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\config\\securityValidation.ts",
+      "errors": 8,
+      "warnings": 0,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\hooks\\usePerformanceMonitor.ts",
+      "errors": 3,
+      "warnings": 5,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\services\\ai\\WellnessRecommendationService.ts",
+      "errors": 8,
+      "warnings": 0,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\services\\api\\mockData.ts",
+      "errors": 8,
+      "warnings": 0,
+      "total": 8
+    },
+    {
+      "file": ".\\src\\services\\community\\gamificationService.ts",
+      "errors": 6,
+      "warnings": 2,
+      "total": 8
+    },
+    {
+      "file": ".\\backend\\src\\routes\\crisis.ts",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "file": ".\\backend\\src\\server.ts",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\TodaysScheduleWidget.tsx",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "file": ".\\src\\components\\professional\\TherapistFinder.tsx",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "file": ".\\src\\hooks\\useDashboardData.ts",
+      "errors": 7,
+      "warnings": 0,
+      "total": 7
+    },
+    {
+      "file": ".\\src\\components\\ai\\TherapistChat.tsx",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\ProfessionalCareDashboard.tsx",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\hooks\\useVibration.ts",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\services\\integration\\index.ts",
+      "errors": 5,
+      "warnings": 1,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\stores\\accessibilityStore.ts",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\utils\\mobile\\consoleMobilePerformance.ts",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\workers\\chartProcessor.worker.ts",
+      "errors": 6,
+      "warnings": 0,
+      "total": 6
+    },
+    {
+      "file": ".\\src\\App.tsx",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\components\\ai\\TherapistSelector.tsx",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\InsightsWidget.tsx",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\components\\profile\\Profile.tsx",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\hooks\\useGeolocation.ts",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\pages\\WellnessPage.tsx",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\utils\\responsiveTest.ts",
+      "errors": 5,
+      "warnings": 0,
+      "total": 5
+    },
+    {
+      "file": ".\\src\\components\\ai\\AITherapyHub.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\console\\ConsoleDashboard.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CrisisPanel.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\CrisisPanelWidget.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\GoalsProgressWidget.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\MedicationTrackerWidget.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\TherapyProgressWidget.tsx",
+      "errors": 4,
+      "warnings": 0,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\pages\\CommunityPage.tsx",
+      "errors": 3,
+      "warnings": 1,
+      "total": 4
+    },
+    {
+      "file": ".\\src\\types\\chart.d.ts",
+      "errors": 3,
+      "warnings": 1,
+      "total": 4
+    },
+    {
+      "file": ".\\backend\\src\\routes\\auth.ts",
+      "errors": 2,
+      "warnings": 1,
+      "total": 3
+    },
+    {
+      "file": ".\\backend\\src\\routes\\crisis-simple.ts",
+      "errors": 2,
+      "warnings": 1,
+      "total": 3
+    },
+    {
+      "file": ".\\src\\components\\console\\ConsoleFocusable.tsx",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\WellnessStatusWidget.tsx",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "file": ".\\src\\hooks\\useBatteryStatus.ts",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "file": ".\\src\\types\\speech.d.ts",
+      "errors": 3,
+      "warnings": 0,
+      "total": 3
+    },
+    {
+      "file": ".\\e2e\\crisis-intervention.spec.ts",
+      "errors": 0,
+      "warnings": 2,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\community\\CommunityFeed.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\community\\Forums.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\console\\ConsoleGrid.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\console\\ConsoleQuickLinks.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\MoodTrendsWidget.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\QuickActionsWidget.tsx",
+      "errors": 1,
+      "warnings": 1,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\components\\ui\\PrivacyBanner.tsx",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\config\\security.config.ts",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\hooks\\useNavigatorOnLine.ts",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\hooks\\useNetworkStatus.ts",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\services\\therapy\\therapeuticContent.ts",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\src\\utils\\supportiveLanguage.ts",
+      "errors": 2,
+      "warnings": 0,
+      "total": 2
+    },
+    {
+      "file": ".\\e2e\\crisis-flow.spec.ts",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\QuickActions.tsx",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\components\\dashboard\\widgets\\WellnessStatus.tsx",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\components\\navigation\\Breadcrumbs.tsx",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\accessibility\\a11y-crisis.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\accessibility\\wcag-compliance.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\compatibility\\cross-platform.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\crisis\\crisis-intervention.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\performance\\crisis-performance.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    },
+    {
+      "file": ".\\src\\test\\performance\\load-performance.test.ts",
+      "errors": 1,
+      "warnings": 0,
+      "total": 1
+    }
+  ]
+}

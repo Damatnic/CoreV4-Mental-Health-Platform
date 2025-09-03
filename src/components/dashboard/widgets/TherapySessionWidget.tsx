@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Clock, Video, MapPin, FileText, CheckCircle, 
-  AlertCircle, ChevronRight, Edit2, Phone, MessageSquare,
+  _Calendar, Clock, Video, MapPin, _FileText, CheckCircle, 
+  _AlertCircle, ChevronRight, Edit2, Phone, _MessageSquare,
   Target, Brain, Heart, Clipboard, TrendingUp, Star
 } from 'lucide-react';
 
@@ -14,11 +14,11 @@ interface TherapySession {
   providerImage?: string;
   dateTime: Date;
   duration: number; // minutes
-  type: 'individual' | 'group' | 'family' | 'couples';
+  _type: 'individual' | 'group' | 'family' | 'couples';
   format: 'in-person' | 'telehealth' | 'phone';
   location?: string;
   meetingUrl?: string;
-  status: 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'rescheduled';
+  _status: 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'rescheduled';
   preparationNotes?: string[];
   sessionGoals?: SessionGoal[];
   homework?: TherapyHomework[];
@@ -41,7 +41,7 @@ interface TherapyHomework {
   id: string;
   title: string;
   description: string;
-  type: 'worksheet' | 'practice' | 'reading' | 'journaling' | 'behavior';
+  _type: 'worksheet' | 'practice' | 'reading' | 'journaling' | 'behavior';
   dueDate?: Date;
   completed: boolean;
   completedDate?: Date;
@@ -63,7 +63,7 @@ interface TherapySessionWidgetProps {
   onJoinTelehealth?: (session: TherapySession) => void;
   onReschedule?: (session: TherapySession) => void;
   onCompleteHomework?: (homework: TherapyHomework) => void;
-  onAddNote?: (sessionId: string, note: string) => void;
+  _onAddNote?: (sessionId: string, note: string) => void;
 }
 
 export function TherapySessionWidget({
@@ -73,7 +73,7 @@ export function TherapySessionWidget({
   onJoinTelehealth,
   onReschedule,
   onCompleteHomework,
-  onAddNote
+  _onAddNote
 }: TherapySessionWidgetProps) {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
   const [selectedSession, setSelectedSession] = useState<TherapySession | null>(null);
@@ -83,7 +83,7 @@ export function TherapySessionWidget({
 
   // Get next upcoming session
   const nextSession = sessions
-    .filter(s => s.status === 'scheduled' || s.status === 'confirmed')
+    .filter(s => s._status === 'scheduled' || s._status === 'confirmed')
     .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())[0];
 
   // Get all homework across sessions
@@ -117,8 +117,8 @@ export function TherapySessionWidget({
   };
 
   // Session type icons
-  const getSessionIcon = (type: string) => {
-    switch (type) {
+  const getSessionIcon = (_type: string) => {
+    switch (_type) {
       case 'individual': return <Brain className="h-4 w-4" />;
       case 'group': return <Heart className="h-4 w-4" />;
       case 'family': return <Heart className="h-4 w-4" />;
@@ -128,8 +128,8 @@ export function TherapySessionWidget({
   };
 
   // Session status color
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const _getStatusColor = (_status: string) => {
+    switch (_status) {
       case 'confirmed': return 'text-green-600 bg-green-50';
       case 'scheduled': return 'text-blue-600 bg-blue-50';
       case 'in-progress': return 'text-purple-600 bg-purple-50';
@@ -146,7 +146,7 @@ export function TherapySessionWidget({
         {(['upcoming', 'homework', 'history'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => setActiveTab(_tab)}
             className={`px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -187,7 +187,7 @@ export function TherapySessionWidget({
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-primary-600">
-                      {getTimeUntilSession(nextSession)}
+                      {getTimeUntilSession(_nextSession)}
                     </div>
                     <div className="text-xs text-gray-600">
                       {new Date(nextSession.dateTime).toLocaleTimeString('en-US', {
@@ -222,8 +222,8 @@ export function TherapySessionWidget({
                 {/* Session Details */}
                 <div className="flex flex-wrap gap-3 mb-3 text-sm">
                   <div className="flex items-center text-gray-600">
-                    {getSessionIcon(nextSession.type)}
-                    <span className="ml-1 capitalize">{nextSession.type}</span>
+                    {getSessionIcon(nextSession._type)}
+                    <span className="ml-1 capitalize">{nextSession._type}</span>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Clock className="h-4 w-4" />
@@ -253,13 +253,13 @@ export function TherapySessionWidget({
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">Preparation Progress</span>
                       <span className="text-primary-600 font-medium">
-                        {Math.round(calculatePreparationProgress(nextSession))}%
+                        {Math.round(calculatePreparationProgress(_nextSession))}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-primary-600 h-2 rounded-full transition-all"
-                        style={{ width: `${calculatePreparationProgress(nextSession)}%` }}
+                        style={{ width: `${calculatePreparationProgress(_nextSession)}%` }}
                       />
                     </div>
                   </div>
@@ -269,7 +269,7 @@ export function TherapySessionWidget({
                 <div className="flex space-x-2">
                   {nextSession.format === 'telehealth' && (
                     <button
-                      onClick={() => onJoinTelehealth?.(nextSession)}
+                      onClick={() => onJoinTelehealth?.(_nextSession)}
                       className="flex-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center text-sm"
                     >
                       <Video className="h-4 w-4 mr-1" />
@@ -278,7 +278,7 @@ export function TherapySessionWidget({
                   )}
                   <button
                     onClick={() => {
-                      setSelectedSession(nextSession);
+                      setSelectedSession(_nextSession);
                       setShowPreparation(true);
                     }}
                     className="flex-1 px-3 py-2 bg-white text-primary-600 border border-primary-600 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center text-sm"
@@ -287,7 +287,7 @@ export function TherapySessionWidget({
                     Prepare
                   </button>
                   <button
-                    onClick={() => onReschedule?.(nextSession)}
+                    onClick={() => onReschedule?.(_nextSession)}
                     className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -300,7 +300,7 @@ export function TherapySessionWidget({
             <div className="space-y-2">
               {sessions
                 .filter(s => s.id !== nextSession?.id && 
-                  (s.status === 'scheduled' || s.status === 'confirmed'))
+                  (s._status === 'scheduled' || s._status === 'confirmed'))
                 .slice(0, 3)
                 .map((session) => (
                   <motion.div
@@ -331,8 +331,8 @@ export function TherapySessionWidget({
                             {session.providerName}
                           </p>
                           <div className="flex items-center space-x-2 text-xs text-gray-600">
-                            {getSessionIcon(session.type)}
-                            <span>{session.type}</span>
+                            {getSessionIcon(session._type)}
+                            <span>{session._type}</span>
                             {session.format === 'telehealth' && <Video className="h-3 w-3" />}
                           </div>
                         </div>
@@ -375,13 +375,13 @@ export function TherapySessionWidget({
                   
                   <div className="flex items-center space-x-3 text-xs">
                     <span className={`px-2 py-1 rounded-full ${
-                      homework.type === 'worksheet' ? 'bg-blue-100 text-blue-700' :
-                      homework.type === 'practice' ? 'bg-green-100 text-green-700' :
-                      homework.type === 'reading' ? 'bg-purple-100 text-purple-700' :
-                      homework.type === 'journaling' ? 'bg-yellow-100 text-yellow-700' :
+                      homework._type === 'worksheet' ? 'bg-blue-100 text-blue-700' :
+                      homework._type === 'practice' ? 'bg-green-100 text-green-700' :
+                      homework._type === 'reading' ? 'bg-purple-100 text-purple-700' :
+                      homework._type === 'journaling' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-gray-100 text-gray-700'
                     }`}>
-                      {homework.type}
+                      {homework._type}
                     </span>
                     {homework.dueDate && (
                       <span className="text-gray-600">
@@ -398,7 +398,7 @@ export function TherapySessionWidget({
         {activeTab === 'history' && (
           <div className="space-y-3">
             {sessions
-              .filter(s => s.status === 'completed')
+              .filter(s => s._status === 'completed')
               .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
               .slice(0, 5)
               .map((session) => (
@@ -419,7 +419,7 @@ export function TherapySessionWidget({
                         })}
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {session.providerName} - {session.type}
+                        {session.providerName} - {session._type}
                       </p>
                       {session.outcome && (
                         <div className="flex items-center space-x-3 mt-2">
@@ -505,7 +505,7 @@ export function TherapySessionWidget({
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
-                    onPrepareSession?.(selectedSession);
+                    onPrepareSession?.(_selectedSession);
                     setShowPreparation(false);
                   }}
                   className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"

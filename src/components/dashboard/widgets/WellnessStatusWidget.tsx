@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus, Heart, Brain, Target, Award } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, _Heart, _Brain, Target, Award } from 'lucide-react';
 import { WellnessStatus } from '../../../types/dashboard';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ interface WellnessStatusWidgetProps {
 export function WellnessStatusWidget({ data, error }: WellnessStatusWidgetProps) {
   const navigate = useNavigate();
 
-  if (error) {
+  if (_error) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-red-600">{error}</p>

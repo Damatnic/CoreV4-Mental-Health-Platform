@@ -1,5 +1,5 @@
 // End-to-End Tests for Crisis Flow
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 // Crisis response must be under 200ms
 const CRISIS_RESPONSE_THRESHOLD = 200;
@@ -193,7 +193,7 @@ test.describe('Crisis Intervention Flow', () => {
     await expect(crisisBar).toContainText('988');
   });
 
-  test('should validate crisis response on mobile devices', async ({ page, browser }) => {
+  test('should validate crisis response on mobile devices', async ({ _page, browser }) => {
     // Create mobile context
     const iPhone = {
       viewport: { width: 375, height: 667 },

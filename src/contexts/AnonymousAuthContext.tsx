@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 /**
  * Anonymous-Only Authentication Context
  * 
@@ -9,11 +10,11 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { secureStorage } from '../services/security/SecureLocalStorage';
-import { ApiService } from '../services/api/ApiService';
+import { _ApiService } from '../services/api/ApiService';
 
 interface AnonymousUser {
-  id: string; // Random session ID stored locally only
-  nickname?: string; // Optional friendly name (stored locally)
+  id: string; // Random session ID _stored locally only
+  nickname?: string; // Optional friendly name (_stored locally)
   name?: string; // Optional display name for dashboard components
   email?: string; // Optional email for display purposes only (never transmitted)
   token?: string; // Optional session token for authenticated features
@@ -101,7 +102,7 @@ interface AnonymousAuthContextType {
   
   // Data management
   exportUserData: () => Promise<string>;
-  importUserData: (data: string) => Promise<boolean>;
+  importUserData: (_data: string) => Promise<boolean>;
   clearLocalData: () => void;
   logout: () => void; // Alias for clearLocalData for compatibility
   
@@ -115,7 +116,7 @@ interface AnonymousAuthContextType {
   cleanupStaleData: () => void;
   validateDataIntegrity: () => boolean;
   
-  // Analytics (anonymous)
+  // Analytics (_anonymous)
   getSessionInsights: () => {
     totalSessions: number;
     averageSessionDuration: number;
@@ -125,10 +126,10 @@ interface AnonymousAuthContextType {
   };
 }
 
-const AnonymousAuthContext = createContext<AnonymousAuthContextType | undefined>(undefined);
+const AnonymousAuthContext = createContext<AnonymousAuthContextType | undefined>(_undefined);
 
 export function useAnonymousAuth() {
-  const context = useContext(AnonymousAuthContext);
+  const context = useContext(_AnonymousAuthContext);
   if (!context) {
     throw new Error('useAnonymousAuth must be used within AnonymousAuthProvider');
   }
@@ -143,26 +144,26 @@ function generateSessionId(): string {
 
 // Get or create anonymous user from secure storage with data migration
 function getOrCreateAnonymousUser(): AnonymousUser {
-  const stored = secureStorage.getItem('anonymous_user');
+  const _stored = secureStorage.getItem('anonymous_user');
   
-  if (stored) {
+  if (_stored) {
     try {
-      const user = JSON.parse(stored);
+      const user = JSON.parse(_stored);
       
       // Restore date objects
       user.sessionStarted = new Date(user.sessionStarted);
       user.lastActive = user.lastActive ? new Date(user.lastActive) : new Date();
       
-      // Migrate old data structure if needed
+      // Migrate old _data structure if needed
       if (!user.dataVersion || user.dataVersion < '2.0') {
-        console.info('🔄 Migrating user data to new structure...');
+        logger.info('🔄 Migrating user _data to new structure...');
         return migrateUserData(user);
       }
       
       return user;
-    } catch (error) {
-      console.error('Failed to parse stored user data:', error);
-      // Create new user if data is corrupted
+    } catch (_error) {
+      logger.error('Failed to parse _stored user _data:');
+      // Create new user if _data is corrupted
     }
   }
   
@@ -229,12 +230,12 @@ function getOrCreateAnonymousUser(): AnonymousUser {
     },
   };
   
-  secureStorage.setItem('anonymous_user', JSON.stringify(newUser));
+  secureStorage.setItem('anonymous_user', JSON.stringify(_newUser));
   return newUser;
 }
 
 // Migrate user data from older versions
-function migrateUserData(oldUser: any): AnonymousUser {
+function migrateUserData(oldUser: unknown): AnonymousUser {
   const migratedUser: AnonymousUser = {
     ...oldUser,
     profile: {
@@ -291,27 +292,27 @@ function migrateUserData(oldUser: any): AnonymousUser {
   };
   
   // Save migrated data
-  secureStorage.setItem('anonymous_user', JSON.stringify(migratedUser));
-  console.info('✅ User data migration completed');
+  secureStorage.setItem('anonymous_user', JSON.stringify(_migratedUser));
+  logger.info('✅ User data migration completed');
   
   return migratedUser;
 }
 
 export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AnonymousUser>(getOrCreateAnonymousUser);
+  const [user, setUser] = useState<AnonymousUser>(_getOrCreateAnonymousUser);
   const [sessionDuration, setSessionDuration] = useState(0);
   
   // Update session duration every minute
   useEffect(() => {
     const updateDuration = () => {
-      const minutes = Math.floor((Date.now() - user.sessionStarted.getTime()) / 60000);
-      setSessionDuration(minutes);
+      const _minutes = Math.floor((Date.now() - user.sessionStarted.getTime()) / 60000);
+      setSessionDuration(_minutes);
     };
     
     updateDuration();
-    const interval = setInterval(updateDuration, 60000); // Update every minute
+    const _interval = setInterval(updateDuration, 60000); // Update every minute
     
-    return () => clearInterval(interval);
+    return () => clearInterval(_interval);
   }, [user.sessionStarted]);
   
   // Auto-update last active and cleanup stale data
@@ -329,7 +330,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     
     // Validate data integrity
     if (!validateDataIntegrity()) {
-      console.warn('⚠️ Data integrity issues detected, creating fresh user data');
+      logger.warn('⚠️ Data integrity issues detected, creating fresh user _data');
       setUser(getOrCreateAnonymousUser());
     }
     
@@ -386,7 +387,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   
   const clearLocalData = () => {
     secureStorage.removeItem('anonymous_user');
-    // Clear all other local data (both secure and regular storage)
+    // Clear all other local _data (both secure and regular storage)
     secureStorage.clear();
     sessionStorage.clear();
     // Create fresh anonymous user
@@ -409,7 +410,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         user,
         exportDate: new Date().toISOString(),
         version: '2.0',
-        // Include wellness and activity data from other stores
+        // Include wellness and activity _data from other stores
         wellnessData: localStorage.getItem('wellness-storage'),
         activityData: localStorage.getItem('activity-store'),
         metadata: {
@@ -419,31 +420,31 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       };
       
       return JSON.stringify(exportData, null, 2);
-    } catch (error) {
-      console.error('Failed to export user data:', error);
-      throw new Error('Unable to export data. Please try again.');
+    } catch (_error) {
+      logger.error('Failed to export user _data:');
+      throw new Error('Unable to export _data. Please try again.');
     }
   };
   
   // Import user data from backup
-  const importUserData = async (data: string): Promise<boolean> => {
+  const importUserData = async (_data: string): Promise<boolean> => {
     try {
-      const importedData = JSON.parse(data);
+      const importedData = JSON.parse(_data);
       
-      // Validate data structure
+      // Validate _data structure
       if (!importedData.user || !importedData.version) {
-        throw new Error('Invalid data format');
+        throw new Error('Invalid _data format');
       }
       
       // Restore user data
-      const restoredUser = {
+      const _restoredUser = {
         ...importedData.user,
         sessionStarted: new Date(importedData.user.sessionStarted),
         lastActive: new Date(importedData.user.lastActive || new Date()),
         id: generateSessionId(), // Generate new session ID for security
       };
       
-      setUser(restoredUser);
+      setUser(_restoredUser);
       
       // Restore related data if present
       if (importedData.wellnessData) {
@@ -453,10 +454,10 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('activity-store', importedData.activityData);
       }
       
-      console.info('✅ Successfully imported user data');
+      logger.info('✅ Successfully imported user data');
       return true;
-    } catch (error) {
-      console.error('Failed to import user data:', error);
+    } catch (_error) {
+      logger.error('Failed to import user _data:');
       return false;
     }
   };
@@ -473,7 +474,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   // Clean up stale data based on privacy preferences
   const cleanupStaleData = () => {
     if (isDataStale()) {
-      console.info('🧹 Cleaning up stale data based on privacy preferences');
+      logger.info('🧹 Cleaning up stale _data based on privacy preferences');
       clearLocalData();
     }
   };
@@ -492,8 +493,8 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
       }
       
       return true;
-    } catch (error) {
-      console.error('Data integrity validation failed:', error);
+    } catch (_error) {
+      logger.error('Data integrity validation failed:');
       return false;
     }
   };
@@ -508,7 +509,7 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         user.sessionStats.wellnessActivitiesCompleted > 0 ? 'Wellness Activities' : '',
         user.sessionStats.communityInteractions > 0 ? 'Community' : '',
         user.sessionStats.therapeuticContentAccessed > 0 ? 'Therapeutic Content' : '',
-      ].filter(Boolean),
+      ].filter(_Boolean),
       wellnessProgress: Math.min(
         (user.sessionStats.moodEntriesCount + 
          user.sessionStats.wellnessActivitiesCompleted + 

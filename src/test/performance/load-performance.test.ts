@@ -36,8 +36,8 @@ const simulateNetwork = (type: 'fast' | 'slow' | '3g' | 'offline') => {
   const config = conditions[type];
   
   // Mock fetch with network simulation
-  global.fetch = vi.fn((url) => {
-    return new Promise((resolve) => {
+  global.fetch = vi.fn((_url) => {
+    return new Promise((_resolve) => {
       setTimeout(() => {
         resolve({
           ok: type !== 'offline',
@@ -60,7 +60,7 @@ describe('Performance Testing', () => {
         await screen.findByRole('button', { name: /988/i });
       });
       
-      expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);
+      expect(_duration).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);
     });
     
     it('should load safety plan within 200ms', async () => {
@@ -77,7 +77,7 @@ describe('Performance Testing', () => {
         await screen.findByTestId('safety-plan');
       });
       
-      expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);
+      expect(_duration).toBeLessThan(PERFORMANCE_THRESHOLDS.CRISIS_RESPONSE);
     });
     
     it('should connect to crisis counselor quickly', async () => {
@@ -87,11 +87,11 @@ describe('Performance Testing', () => {
       const chatButton = await screen.findByRole('button', { name: /chat.*counselor/i });
       
       const duration = await measurePerformance(async () => {
-        fireEvent.click(chatButton);
+        fireEvent.click(_chatButton);
         await screen.findByText(/connecting/i);
       });
       
-      expect(duration).toBeLessThan(500); // Initial connection UI should be immediate
+      expect(_duration).toBeLessThan(500); // Initial connection UI should be immediate
     });
   });
   
@@ -103,7 +103,7 @@ describe('Performance Testing', () => {
         await screen.findByRole('main');
       });
       
-      expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.PAGE_LOAD);
+      expect(_duration).toBeLessThan(PERFORMANCE_THRESHOLDS.PAGE_LOAD);
     });
     
     it('should progressively load non-critical content', async () => {
@@ -115,7 +115,7 @@ describe('Performance Testing', () => {
         await screen.findByRole('button', { name: /crisis.*help/i });
       });
       
-      expect(criticalLoadTime).toBeLessThan(1000);
+      expect(_criticalLoadTime).toBeLessThan(1000);
       
       // Non-critical content can load later
       const nonCriticalLoadTime = await measurePerformance(async () => {
@@ -124,7 +124,7 @@ describe('Performance Testing', () => {
       });
       
       // Non-critical should load after critical
-      expect(nonCriticalLoadTime).toBeGreaterThan(criticalLoadTime);
+      expect(_nonCriticalLoadTime).toBeGreaterThan(_criticalLoadTime);
     });
     
     it('should implement code splitting effectively', async () => {
@@ -132,11 +132,11 @@ describe('Performance Testing', () => {
       
       // Check initial bundle size
       const scripts = Array.from(document.querySelectorAll('script'));
-      const initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
+      const _initialScripts = scripts.filter(s => s.src && !s.src.includes('chunk'));
       
       // Navigate to feature that should be code-split
       const therapyLink = await screen.findByRole('link', { name: /therapy/i });
-      fireEvent.click(therapyLink);
+      fireEvent.click(_therapyLink);
       
       await waitFor(() => {
         const newScripts = Array.from(document.querySelectorAll('script'));
@@ -156,10 +156,10 @@ describe('Performance Testing', () => {
       
       for (const button of buttons.slice(0, 5)) { // Test first 5 buttons
         const duration = await measurePerformance(() => {
-          fireEvent.click(button);
+          fireEvent.click(_button);
         });
         
-        expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.INTERACTION);
+        expect(_duration).toBeLessThan(PERFORMANCE_THRESHOLDS.INTERACTION);
       }
     });
     
@@ -176,7 +176,7 @@ describe('Performance Testing', () => {
       
       // Average time per keystroke
       const avgTime = duration / 10;
-      expect(avgTime).toBeLessThan(50); // Should handle at least 20 keystrokes per second
+      expect(_avgTime).toBeLessThan(50); // Should handle at least 20 keystrokes per second
     });
     
     it('should debounce search appropriately', async () => {
@@ -235,7 +235,7 @@ describe('Performance Testing', () => {
       
       // Memory increase should be minimal
       const memoryIncrease = finalMemory - initialMemory;
-      expect(memoryIncrease).toBeLessThan(5 * 1024 * 1024); // Less than 5MB increase
+      expect(_memoryIncrease).toBeLessThan(5 * 1024 * 1024); // Less than 5MB increase
     });
     
     it('should efficiently handle large datasets', async () => {
@@ -247,16 +247,16 @@ describe('Performance Testing', () => {
         notes: `Entry ${i}`
       }));
       
-      localStorage.setItem('mood_history', JSON.stringify(moodEntries));
+      localStorage.setItem('mood_history', JSON.stringify(_moodEntries));
       
       const duration = await measurePerformance(async () => {
         render(<App />);
         const historyButton = await screen.findByRole('button', { name: /mood.*history/i });
-        fireEvent.click(historyButton);
+        fireEvent.click(_historyButton);
         await screen.findByTestId('mood-history-list');
       });
       
-      expect(duration).toBeLessThan(1000); // Should handle 1000 entries in under 1 second
+      expect(_duration).toBeLessThan(1000); // Should handle 1000 entries in under 1 second
       
       // Check if virtualization is used
       const visibleItems = screen.getAllByTestId(/mood-entry-/);
@@ -279,14 +279,14 @@ describe('Performance Testing', () => {
       
       // Interact with the app
       const buttons = await screen.findAllByRole('button');
-      buttons.forEach(button => fireEvent.click(button));
+      buttons.forEach(button => fireEvent.click(_button));
       
       // Unmount
       unmount();
       
       // Check that listeners were cleaned up
       const finalCount = getEventListenerCount();
-      expect(finalCount).toBeLessThanOrEqual(initialCount);
+      expect(_finalCount).toBeLessThanOrEqual(_initialCount);
     });
   });
   
@@ -321,7 +321,7 @@ describe('Performance Testing', () => {
       const { rerender } = render(<App />);
       
       // Wait for initial data fetch
-      await waitFor(() => expect(fetchCount).toBeGreaterThan(0));
+      await waitFor(() => expect(_fetchCount).toBeGreaterThan(0));
       const initialFetchCount = fetchCount;
       
       // Rerender (simulate navigation back)
@@ -329,14 +329,14 @@ describe('Performance Testing', () => {
       
       // Should use cached data instead of fetching again
       await new Promise(resolve => setTimeout(resolve, 100));
-      expect(fetchCount).toBe(initialFetchCount);
+      expect(_fetchCount).toBe(_initialFetchCount);
     });
     
     it('should batch API requests efficiently', async () => {
       const apiCalls: string[] = [];
       
       global.fetch = vi.fn((url: string) => {
-        apiCalls.push(url);
+        apiCalls.push(_url);
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({})
@@ -350,9 +350,9 @@ describe('Performance Testing', () => {
       const moodButton = await screen.findByRole('button', { name: /mood/i });
       const journalButton = await screen.findByRole('button', { name: /journal/i });
       
-      fireEvent.click(wellnessButton);
-      fireEvent.click(moodButton);
-      fireEvent.click(journalButton);
+      fireEvent.click(_wellnessButton);
+      fireEvent.click(_moodButton);
+      fireEvent.click(_journalButton);
       
       await waitFor(() => {
         // Should batch requests instead of making many individual calls
@@ -379,13 +379,13 @@ describe('Performance Testing', () => {
         const delta = currentTime - lastTime;
         
         if (delta >= 1000) {
-          frameRates.push(frameCount);
+          frameRates.push(_frameCount);
           frameCount = 0;
           lastTime = currentTime;
         }
         
         if (frameRates.length < 3) {
-          requestAnimationFrame(measureFPS);
+          requestAnimationFrame(_measureFPS);
         }
       };
       
@@ -394,14 +394,14 @@ describe('Performance Testing', () => {
         el.classList.add('animating');
       });
       
-      requestAnimationFrame(measureFPS);
+      requestAnimationFrame(_measureFPS);
       
       // Wait for measurements
       await new Promise(resolve => setTimeout(resolve, 3500));
       
       // Average FPS should be close to 60
       const avgFPS = frameRates.reduce((a, b) => a + b, 0) / frameRates.length;
-      expect(avgFPS).toBeGreaterThan(50); // Allow some variance
+      expect(_avgFPS).toBeGreaterThan(50); // Allow some variance
     });
     
     it('should use CSS transforms for animations', async () => {
@@ -410,15 +410,15 @@ describe('Performance Testing', () => {
       const animatedElements = container.querySelectorAll('[data-animated], .transition');
       
       animatedElements.forEach(element => {
-        const styles = window.getComputedStyle(element);
+        const styles = window.getComputedStyle(_element);
         const transition = styles.transition;
         
         if (transition && transition !== 'none') {
           // Should animate transform or opacity (GPU-accelerated)
-          expect(transition).toMatch(/transform|opacity/);
+          expect(_transition).toMatch(/transform|opacity/);
           
           // Should not animate properties that cause reflow
-          expect(transition).not.toMatch(/width|height|padding|margin/);
+          expect(_transition).not.toMatch(/width|height|padding|margin/);
         }
       });
     });
@@ -431,17 +431,17 @@ describe('Performance Testing', () => {
         
         // Simulate user actions
         const buttons = container.querySelectorAll('button');
-        buttons.forEach(button => fireEvent.click(button));
+        buttons.forEach(button => fireEvent.click(_button));
         
         return container;
       });
       
       const start = performance.now();
-      const containers = await Promise.all(userSimulations);
+      const containers = await Promise.all(_userSimulations);
       const duration = performance.now() - start;
       
       // Should handle 10 concurrent users efficiently
-      expect(duration).toBeLessThan(5000);
+      expect(_duration).toBeLessThan(5000);
       
       // All instances should render correctly
       containers.forEach(container => {
@@ -457,13 +457,13 @@ describe('Performance Testing', () => {
       const duration = await measurePerformance(async () => {
         // Simulate rapid clicking (stress test)
         for (let i = 0; i < 50; i++) {
-          fireEvent.click(moodButton);
+          fireEvent.click(_moodButton);
           await new Promise(resolve => setTimeout(resolve, 10));
         }
       });
       
       // Should handle rapid interactions without crashing
-      expect(duration).toBeLessThan(2000);
+      expect(_duration).toBeLessThan(2000);
       
       // App should still be responsive
       expect(screen.getByRole('main')).toBeInTheDocument();
@@ -477,16 +477,16 @@ describe('Performance Testing', () => {
         content: `Content for item ${i}`
       }));
       
-      localStorage.setItem('community_posts', JSON.stringify(largeDataset));
+      localStorage.setItem('community_posts', JSON.stringify(_largeDataset));
       
       const duration = await measurePerformance(async () => {
         render(<App />);
         const communityLink = await screen.findByRole('link', { name: /community/i });
-        fireEvent.click(communityLink);
+        fireEvent.click(_communityLink);
         await screen.findByTestId('community-feed');
       });
       
-      expect(duration).toBeLessThan(2000);
+      expect(_duration).toBeLessThan(2000);
       
       // Check that virtualization or pagination is used
       const visiblePosts = screen.getAllByTestId(/post-/);
@@ -500,7 +500,7 @@ describe('Performance Testing', () => {
       
       // Open chat
       const chatButton = await screen.findByRole('button', { name: /chat/i });
-      fireEvent.click(chatButton);
+      fireEvent.click(_chatButton);
       
       const chatInput = await screen.findByRole('textbox', { name: /message/i });
       
@@ -518,7 +518,7 @@ describe('Performance Testing', () => {
       
       // Average message handling time
       const avgTime = messages.reduce((a, b) => a + b) / messages.length;
-      expect(avgTime).toBeLessThan(100);
+      expect(_avgTime).toBeLessThan(100);
     });
     
     it('should handle WebSocket reconnection efficiently', async () => {
@@ -530,7 +530,7 @@ describe('Performance Testing', () => {
         readyState: WebSocket.OPEN
       };
       
-      global.WebSocket = vi.fn(() => mockWebSocket) as any;
+      global.WebSocket = vi.fn(() => mockWebSocket) as unknown;
       
       render(<App />);
       
@@ -539,7 +539,7 @@ describe('Performance Testing', () => {
       const disconnectEvent = new Event('close');
       mockWebSocket.addEventListener.mock.calls
         .filter(([event]) => event === 'close')
-        .forEach(([, handler]) => handler(disconnectEvent));
+        .forEach(([, handler]) => handler(_disconnectEvent));
       
       // Should attempt reconnection
       await waitFor(() => {
@@ -578,17 +578,17 @@ describe('Performance Testing', () => {
         
         // Should use appropriate image formats
         const src = img.getAttribute('src');
-        expect(src).toMatch(/\.(webp|jpg|png|svg)$/);
+        expect(_src).toMatch(/\.(webp|jpg|png|svg)$/);
       });
     });
   });
   
   describe('Performance Monitoring', () => {
     it('should track and report performance metrics', async () => {
-      const metrics: any[] = [];
+      const metrics: unknown[] = [];
       
       // Mock performance observer
-      global.PerformanceObserver = vi.fn().mockImplementation((callback) => ({
+      global.PerformanceObserver = vi.fn().mockImplementation((_callback) => ({
         observe: vi.fn(() => {
           // Simulate performance entries
           callback({

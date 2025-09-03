@@ -4,6 +4,7 @@
  */
 
 import { performanceMonitor } from './performanceMonitor';
+import { logger } from '../logger';
 
 interface GamePerformanceConfig {
   targetFPS: number;
@@ -61,7 +62,7 @@ class GamePerformanceOptimizer {
     this.setupMemoryManagement();
     this.enableConsoleOptimizations();
     
-    console.log(`[Gaming Performance] Initialized with ${this.performanceLevel} performance profile`);
+    logger.info(`Initialized with ${this.performanceLevel} performance profile`, 'GamingOptimizations');
   }
   
   private detectDeviceCapabilities(): void {
@@ -171,15 +172,17 @@ class GamePerformanceOptimizer {
     });
     
     // Monitor for new elements
+// @ts-expect-error - MutationObserver is a global API
     const observer = new MutationObserver((mutations) => {
-      let shouldOptimize = false;
+      let _shouldOptimize = false;
       mutations.forEach(mutation => {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          shouldOptimize = true;
+          _shouldOptimize = true;
         }
       });
       
-      if (shouldOptimize) {
+// @ts-expect-error - requestIdleCallback is a global API
+      if (_shouldOptimize) {
         requestIdleCallback(applyGPUAcceleration, { timeout: 1000 });
       }
     });
@@ -194,7 +197,7 @@ class GamePerformanceOptimizer {
     let frameCount = 0;
     let lastTime = performance.now();
     
-    const measureFrame = (timestamp: number) => {
+    const _measureFrame = (timestamp: number) => {
       frameCount++;
       const deltaTime = timestamp - this.metrics.lastFrameTimestamp;
       this.metrics.frameTime = deltaTime;
@@ -225,13 +228,13 @@ class GamePerformanceOptimizer {
         });
       }
       
-      this.rafId = requestAnimationFrame(measureFrame);
+      this.rafId = requestAnimationFrame(_measureFrame);
     };
     
-    this.rafId = requestAnimationFrame(measureFrame);
+    this.rafId = requestAnimationFrame(_measureFrame);
   }
   
-  private adaptQualityBasedOnPerformance(currentFPS: number): void {
+  private adaptQualityBasedOnPerformance(_currentFPS: number): void {
     const now = Date.now();
     if (now - this.lastOptimizationCheck < 2000) return; // Check every 2 seconds
     
@@ -249,7 +252,7 @@ class GamePerformanceOptimizer {
   }
   
   private reduceQuality(): void {
-    console.log('[Gaming Performance] Reducing quality due to low FPS');
+    logger.info('Reducing quality due to low FPS', 'GamingOptimizations');
     
     // Disable expensive animations
     document.documentElement.classList.add('performance-mode');
@@ -272,7 +275,7 @@ class GamePerformanceOptimizer {
   }
   
   private increaseQuality(): void {
-    console.log('[Gaming Performance] Increasing quality due to good FPS');
+    logger.info('Increasing quality due to good FPS', 'GamingOptimizations');
     
     // Re-enable animations gradually
     document.documentElement.classList.remove('performance-mode');
@@ -286,7 +289,7 @@ class GamePerformanceOptimizer {
   }
   
   private handleLongTask(task: any): void {
-    console.warn(`[Gaming Performance] Long task detected: ${task.duration}ms`);
+    logger.warn(`[Gaming Performance] Long task detected: ${task.duration}ms`);
     
     // If we're in crisis mode, this is critical
     const inCrisisMode = window.location.pathname.includes('crisis') || 
@@ -308,7 +311,7 @@ class GamePerformanceOptimizer {
   }
   
   private optimizeLayoutStability(): void {
-    console.log('[Gaming Performance] Optimizing layout stability');
+    logger.info('Optimizing layout stability', 'GamingOptimizations');
     
     // Add contain properties to isolate layouts
     document.querySelectorAll('.console-focusable, [data-console-group]').forEach(el => {
@@ -324,7 +327,7 @@ class GamePerformanceOptimizer {
                       entry.name.includes('console');
     
     if (isCritical && entry.duration > 200) {
-      console.warn(`[Gaming Performance] Critical resource slow: ${entry.name}`);
+      logger.warn(`[Gaming Performance] Critical resource slow: ${entry.name}`);
       performanceMonitor.recordMetric('critical_resource_slow', entry.duration, {
         resourceName: entry.name,
         size: entry.encodedBodySize
@@ -360,7 +363,7 @@ class GamePerformanceOptimizer {
   }
   
   private triggerGarbageCollection(): void {
-    console.log('[Gaming Performance] Triggering garbage collection optimizations');
+    logger.info('Triggering garbage collection optimizations', 'GamingOptimizations');
     
     // Force garbage collection if available (development only)
     if ('gc' in window && process.env.NODE_ENV === 'development') {
@@ -472,7 +475,7 @@ class GamePerformanceOptimizer {
   
   private throttleMouseMove = (() => {
     let lastMoveTime = 0;
-    return (event: MouseEvent) => {
+    return (_event: MouseEvent) => {
       const now = performance.now();
       const timeSinceLastMove = now - lastMoveTime;
       
@@ -529,11 +532,11 @@ class GamePerformanceOptimizer {
   
   public setConfig(newConfig: Partial<GamePerformanceConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('[Gaming Performance] Configuration updated:', newConfig);
+    logger.info('Configuration updated', 'GamingOptimizations', newConfig);
   }
   
   public enableCrisisMode(): void {
-    console.log('[Gaming Performance] Crisis mode enabled - maximum performance');
+    logger.crisis('Crisis mode enabled - maximum performance', 'high', 'GamingOptimizations');
     
     // Highest priority for crisis features
     document.documentElement.classList.add('crisis-performance-mode');
@@ -549,7 +552,7 @@ class GamePerformanceOptimizer {
   }
   
   public disableCrisisMode(): void {
-    console.log('[Gaming Performance] Crisis mode disabled - restoring normal performance');
+    logger.info('Crisis mode disabled - restoring normal performance', 'GamingOptimizations');
     
     document.documentElement.classList.remove('crisis-performance-mode');
     document.documentElement.style.removeProperty('--animation-duration');
@@ -588,7 +591,7 @@ class GamePerformanceOptimizer {
     this.observers.forEach(observer => observer.disconnect());
     this.observers.clear();
     
-    console.log('[Gaming Performance] Performance optimizer destroyed');
+    logger.info('Performance optimizer destroyed', 'GamingOptimizations');
   }
 }
 
@@ -609,5 +612,5 @@ export function useGamePerformance() {
 
 // Initialize on import
 export function initializeGamingPerformance(): void {
-  console.log('[Gaming Performance] Gaming-grade optimizations initialized');
+  logger.info('Gaming-grade optimizations initialized', 'GamingOptimizations');
 }

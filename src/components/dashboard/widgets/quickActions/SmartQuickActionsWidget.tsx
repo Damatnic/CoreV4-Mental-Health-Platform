@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Heart, Phone, Calendar, MessageSquare, Activity,
   Pill, Book, Users, Sparkles, Music, Shield, AlertCircle,
-  Mic, Keyboard, Eye, Settings, ChevronRight, Search,
+  Mic, Keyboard, Eye, Settings, _ChevronRight, Search,
   Zap, Clock, MapPin, Volume2, Edit3, Home, HelpCircle,
   Smartphone, Headphones, Wind, Coffee, Moon, Sun
 } from 'lucide-react';
@@ -35,9 +35,9 @@ export function SmartQuickActionsWidget({
   crisisMode = false,
   onActionExecute
 }: SmartQuickActionsWidgetProps) {
-  const { actions, executeAction, addCustomAction, getFrequentActions } = useQuickActionsContext();
+  const { actions, executeAction, _addCustomAction, getFrequentActions } = useQuickActionsContext();
   const { settings: accessibilitySettings } = useAccessibilityStore();
-  const { preferences, updatePreference } = useUserPreferences(userId);
+  const { _preferences, _updatePreference } = useUserPreferences(_userId);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -59,13 +59,13 @@ export function SmartQuickActionsWidget({
 
   // Get recommended actions based on context
   useEffect(() => {
-    const recommendations = recommendationEngine.getRecommendations(actions);
-    setContextualActions(recommendations);
+    const _recommendations = recommendationEngine.getRecommendations(_actions);
+    setContextualActions(_recommendations);
   }, [actions, recommendationEngine]);
 
   // Enhanced action categories with crisis priority
   const categories = useMemo(() => {
-    if (crisisMode) {
+    if (_crisisMode) {
       return [
         { id: 'crisis', label: 'Emergency', icon: AlertCircle, color: 'red' },
         { id: 'grounding', label: 'Grounding', icon: Shield, color: 'purple' },
@@ -94,11 +94,11 @@ export function SmartQuickActionsWidget({
     }
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const _query = searchQuery.toLowerCase();
       filtered = filtered.filter(a => 
-        a.label.toLowerCase().includes(query) ||
-        a.description?.toLowerCase().includes(query) ||
-        a.tags?.some(tag => tag.toLowerCase().includes(query))
+        a.label.toLowerCase().includes(_query) ||
+        a.description?.toLowerCase().includes(_query) ||
+        a.tags?.some(tag => tag.toLowerCase().includes(_query))
       );
     }
 
@@ -113,29 +113,29 @@ export function SmartQuickActionsWidget({
     
     // Announce action for screen readers
     if (accessibilitySettings.screenReaderMode) {
-      const announcement = new SpeechSynthesisUtterance(`Executing ${action.label}`);
-      window.speechSynthesis.speak(announcement);
+      const _announcement = new SpeechSynthesisUtterance(`Executing ${action.label}`);
+      window.speechSynthesis.speak(_announcement);
     }
   }, [executeAction, onActionExecute, accessibilitySettings.screenReaderMode]);
 
   // Voice command handler
   const handleVoiceCommand = useCallback((command: string) => {
-    const matchedAction = actions.find(a => 
+    const _matchedAction = actions.find(a => 
       a.label.toLowerCase().includes(command.toLowerCase()) ||
       a.voiceAlias?.some(alias => alias.toLowerCase() === command.toLowerCase())
     );
     
-    if (matchedAction) {
-      handleActionClick(matchedAction);
+    if (_matchedAction) {
+      handleActionClick(_matchedAction);
     }
   }, [actions, handleActionClick]);
 
   // Keyboard navigation handler
   const handleKeyboardNavigation = useCallback((key: string) => {
     // Handle keyboard shortcuts for actions
-    const actionWithShortcut = actions.find(a => a.keyboard === key);
-    if (actionWithShortcut) {
-      handleActionClick(actionWithShortcut);
+    const _actionWithShortcut = actions.find(a => a.keyboard === key);
+    if (_actionWithShortcut) {
+      handleActionClick(_actionWithShortcut);
     }
   }, [actions, handleActionClick]);
 

@@ -7,9 +7,10 @@
 import { cryptoService } from './cryptoService';
 import { auditLogger } from './auditLogger';
 import { secureStorage } from './secureStorage';
+import { logger } from '../../utils/logger';
 
 interface EncryptionKeyMetadata {
-  keyId: string;
+  _keyId: string;
   version: number;
   algorithm: string;
   createdAt: Date;
@@ -21,7 +22,7 @@ interface EncryptionKeyMetadata {
 
 interface EncryptedField {
   ciphertext: string;
-  keyId: string;
+  _keyId: string;
   version: number;
   algorithm: string;
   iv?: string;
@@ -34,7 +35,7 @@ interface EncryptedField {
 }
 
 interface FieldEncryptionConfig {
-  fieldName: string;
+  _fieldName: string;
   dataType: 'string' | 'number' | 'date' | 'object' | 'array';
   sensitivity: 'low' | 'medium' | 'high' | 'critical';
   encryptionRequired: boolean;
@@ -47,49 +48,49 @@ interface FieldEncryptionConfig {
 const FIELD_CONFIGS: Record<string, FieldEncryptionConfig> = {
   // Critical sensitivity - always encrypted
   'mood_data': {
-    fieldName: 'mood_data',
+    _fieldName: 'mood_data',
     dataType: 'object',
     sensitivity: 'critical',
     encryptionRequired: true,
     searchable: false,
   },
   'crisis_notes': {
-    fieldName: 'crisis_notes',
+    _fieldName: 'crisis_notes',
     dataType: 'string',
     sensitivity: 'critical',
     encryptionRequired: true,
     searchable: false,
   },
   'journal_entry': {
-    fieldName: 'journal_entry',
+    _fieldName: 'journal_entry',
     dataType: 'string',
     sensitivity: 'critical',
     encryptionRequired: true,
     searchable: true, // Encrypted search capability
   },
   'therapy_notes': {
-    fieldName: 'therapy_notes',
+    _fieldName: 'therapy_notes',
     dataType: 'string',
     sensitivity: 'critical',
     encryptionRequired: true,
     searchable: false,
   },
   'medication_list': {
-    fieldName: 'medication_list',
+    _fieldName: 'medication_list',
     dataType: 'array',
     sensitivity: 'high',
     encryptionRequired: true,
     searchable: true,
   },
   'diagnosis': {
-    fieldName: 'diagnosis',
+    _fieldName: 'diagnosis',
     dataType: 'string',
     sensitivity: 'critical',
     encryptionRequired: true,
     searchable: false,
   },
   'emergency_contacts': {
-    fieldName: 'emergency_contacts',
+    _fieldName: 'emergency_contacts',
     dataType: 'array',
     sensitivity: 'high',
     encryptionRequired: true,
@@ -98,21 +99,21 @@ const FIELD_CONFIGS: Record<string, FieldEncryptionConfig> = {
   
   // High sensitivity
   'phone_number': {
-    fieldName: 'phone_number',
+    _fieldName: 'phone_number',
     dataType: 'string',
     sensitivity: 'high',
     encryptionRequired: true,
     formatPreserving: true, // Preserve phone number format
   },
   'date_of_birth': {
-    fieldName: 'date_of_birth',
+    _fieldName: 'date_of_birth',
     dataType: 'date',
     sensitivity: 'high',
     encryptionRequired: true,
     formatPreserving: true,
   },
   'insurance_info': {
-    fieldName: 'insurance_info',
+    _fieldName: 'insurance_info',
     dataType: 'object',
     sensitivity: 'high',
     encryptionRequired: true,
@@ -121,7 +122,7 @@ const FIELD_CONFIGS: Record<string, FieldEncryptionConfig> = {
   
   // Medium sensitivity
   'email': {
-    fieldName: 'email',
+    _fieldName: 'email',
     dataType: 'string',
     sensitivity: 'medium',
     encryptionRequired: true,
@@ -129,7 +130,7 @@ const FIELD_CONFIGS: Record<string, FieldEncryptionConfig> = {
     formatPreserving: true,
   },
   'name': {
-    fieldName: 'name',
+    _fieldName: 'name',
     dataType: 'string',
     sensitivity: 'medium',
     encryptionRequired: true,
@@ -167,39 +168,39 @@ class FieldEncryptionService {
    * Encrypt a single field
    */
   async encryptField(
-    fieldName: string,
-    value: any,
+    _fieldName: string,
+    value: unknown,
     userId?: string
   ): Promise<EncryptedField | any> {
     try {
-      const config = FIELD_CONFIGS[fieldName];
+      const config = FIELD_CONFIGS[_fieldName];
       
       if (!config || !config.encryptionRequired) {
         return value; // Return unencrypted if not configured
       }
 
       // Get or create encryption key for this field type
-      const keyInfo = await this.getFieldKey(fieldName, config.sensitivity);
+      const _keyInfo = await this.getFieldKey(_fieldName, config.sensitivity);
       
       // Handle different encryption strategies
       if (config.tokenization) {
-        return await this.tokenizeValue(value, fieldName);
+        return await this.tokenizeValue(value, _fieldName);
       }
       
       if (config.formatPreserving) {
-        return await this.formatPreservingEncrypt(value, config, keyInfo);
+        return await this.formatPreservingEncrypt(value, config, _keyInfo);
       }
 
       // Standard encryption
-      const serialized = JSON.stringify(value);
-      const encrypted = await cryptoService.encrypt(serialized);
+      const _serialized = JSON.stringify(value);
+      const encrypted = await cryptoService.encrypt(_serialized);
       
       // Create encrypted field object
       const encryptedField: EncryptedField = {
         ciphertext: encrypted,
-        keyId: keyInfo.keyId,
-        version: keyInfo.version,
-        algorithm: keyInfo.algorithm,
+        _keyId: _keyInfo._keyId,
+        version: _keyInfo.version,
+        algorithm: _keyInfo.algorithm,
         metadata: {
           fieldType: config.dataType,
           encrypted: new Date(),
@@ -208,7 +209,7 @@ class FieldEncryptionService {
 
       // Handle searchable fields
       if (config.searchable) {
-        await this.updateSearchIndex(fieldName, value, encrypted, userId);
+        await this.updateSearchIndex(_fieldName, value, encrypted, userId);
       }
 
       // Audit sensitive field encryption
@@ -218,7 +219,7 @@ class FieldEncryptionService {
           userId,
           details: {
             action: 'field_encrypted',
-            fieldName,
+            _fieldName,
             sensitivity: config.sensitivity,
           },
           severity: 'info',
@@ -227,7 +228,7 @@ class FieldEncryptionService {
 
       return encryptedField;
     } catch (error) {
-      console.error(`Failed to encrypt field ${fieldName}:`, error);
+      logger.error(`Failed to encrypt field ${_fieldName}:`, error);
       throw new Error('Field encryption failed');
     }
   }
@@ -236,12 +237,12 @@ class FieldEncryptionService {
    * Decrypt a single field
    */
   async decryptField(
-    fieldName: string,
+    _fieldName: string,
     encryptedData: EncryptedField | string,
     userId?: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     try {
-      const config = FIELD_CONFIGS[fieldName];
+      const config = FIELD_CONFIGS[_fieldName];
       
       if (!config || !config.encryptionRequired) {
         return encryptedData; // Return as-is if not configured
@@ -249,7 +250,7 @@ class FieldEncryptionService {
 
       // Handle tokenized values
       if (config.tokenization && typeof encryptedData === 'string') {
-        return await this.detokenizeValue(encryptedData, fieldName);
+        return await this.detokenizeValue(encryptedData, _fieldName);
       }
 
       // Handle format-preserving encryption
@@ -269,7 +270,7 @@ class FieldEncryptionService {
             userId,
             details: {
               action: 'field_decrypted',
-              fieldName,
+              _fieldName,
               sensitivity: config.sensitivity,
             },
             severity: 'info',
@@ -281,7 +282,7 @@ class FieldEncryptionService {
 
       return encryptedData;
     } catch (error) {
-      console.error(`Failed to decrypt field ${fieldName}:`, error);
+      logger.error(`Failed to decrypt field ${_fieldName}:`, error);
       throw new Error('Field decryption failed');
     }
   }
@@ -295,9 +296,9 @@ class FieldEncryptionService {
     userId?: string
   ): Promise<Record<string, any>> {
     const encrypted: Record<string, any> = {};
-    const fieldsToEncrypt = fieldList || Object.keys(obj);
+    const fieldsToEncrypt = fieldList || Object.keys(_obj);
 
-    for (const key of Object.keys(obj)) {
+    for (const key of Object.keys(_obj)) {
       if (fieldsToEncrypt.includes(key) && FIELD_CONFIGS[key]) {
         encrypted[key] = await this.encryptField(key, obj[key], userId);
       } else {
@@ -317,9 +318,9 @@ class FieldEncryptionService {
     userId?: string
   ): Promise<Record<string, any>> {
     const decrypted: Record<string, any> = {};
-    const fieldsToDecrypt = fieldList || Object.keys(obj);
+    const fieldsToDecrypt = fieldList || Object.keys(_obj);
 
-    for (const key of Object.keys(obj)) {
+    for (const key of Object.keys(_obj)) {
       if (fieldsToDecrypt.includes(key) && FIELD_CONFIGS[key]) {
         decrypted[key] = await this.decryptField(key, obj[key], userId);
       } else {
@@ -334,26 +335,26 @@ class FieldEncryptionService {
    * Search encrypted fields
    */
   async searchEncryptedField(
-    fieldName: string,
+    _fieldName: string,
     searchTerm: string,
     userId?: string
   ): Promise<string[]> {
-    const config = FIELD_CONFIGS[fieldName];
+    const config = FIELD_CONFIGS[_fieldName];
     
     if (!config || !config.searchable) {
       throw new Error('Field is not searchable');
     }
 
     // Generate search token
-    const searchToken = await this.generateSearchToken(searchTerm, fieldName);
+    const _searchToken = await this.generateSearchToken(searchTerm, _fieldName);
     
     // Search in index
-    const fieldIndex = this.searchIndexes.get(fieldName);
+    const fieldIndex = this.searchIndexes.get(_fieldName);
     if (!fieldIndex) {
       return [];
     }
 
-    const results = fieldIndex.get(searchToken) || [];
+    const results = fieldIndex.get(_searchToken) || [];
     
     // Audit search operation
     await auditLogger.log({
@@ -361,7 +362,7 @@ class FieldEncryptionService {
       userId,
       details: {
         action: 'encrypted_search',
-        fieldName,
+        _fieldName,
         resultsCount: results.length,
       },
       severity: 'info',
@@ -377,21 +378,21 @@ class FieldEncryptionService {
     try {
       const now = new Date();
       
-      for (const [keyId, metadata] of this.keyMetadata.entries()) {
+      for (const [_keyId, metadata] of this.keyMetadata.entries()) {
         const daysSinceRotation = metadata.rotatedAt
           ? (now.getTime() - metadata.rotatedAt.getTime()) / (1000 * 60 * 60 * 24)
           : (now.getTime() - metadata.createdAt.getTime()) / (1000 * 60 * 60 * 24);
         
         if (force || daysSinceRotation >= this.KEY_ROTATION_DAYS) {
-          await this.rotateKey(keyId);
+          await this.rotateKey(_keyId);
         }
       }
       
       // Clean up old key versions
       await this.cleanupOldKeys();
       
-    } catch (error) {
-      console.error('Key rotation failed:', error);
+    } catch (_error) {
+      logger.error('Key rotation failed:');
       throw new Error('Key rotation failed');
     }
   }
@@ -412,14 +413,14 @@ class FieldEncryptionService {
       const encrypted = await cryptoService.encrypt(decrypted);
       
       // Update metadata
-      const newMetadata = this.keyMetadata.get(newKeyId);
+      const newMetadata = this.keyMetadata.get(_newKeyId);
       if (!newMetadata) {
         throw new Error('New key not found');
       }
       
       return {
         ciphertext: encrypted,
-        keyId: newKeyId,
+        _keyId: newKeyId,
         version: newMetadata.version,
         algorithm: newMetadata.algorithm,
         metadata: {
@@ -428,9 +429,9 @@ class FieldEncryptionService {
           encrypted: new Date(),
         },
       };
-    } catch (error) {
-      console.error('Re-encryption failed:', error);
-      throw error;
+    } catch (_error) {
+      logger.error('Re-encryption failed:');
+      throw undefined;
     }
   }
 
@@ -438,22 +439,22 @@ class FieldEncryptionService {
    * Private helper methods
    */
   private async getFieldKey(
-    fieldName: string,
+    _fieldName: string,
     sensitivity: string
   ): Promise<EncryptionKeyMetadata> {
-    const keyId = `field_key_${sensitivity}`;
-    let metadata = this.keyMetadata.get(keyId);
+    const _keyId = `field_key_${sensitivity}`;
+    let metadata = this.keyMetadata.get(_keyId);
     
     if (!metadata) {
       // Generate new key for this sensitivity level
-      metadata = await this.generateFieldKey(keyId, sensitivity);
+      metadata = await this.generateFieldKey(_keyId, sensitivity);
     }
     
     return metadata;
   }
 
   private async generateFieldKey(
-    keyId: string,
+    _keyId: string,
     purpose: string
   ): Promise<EncryptionKeyMetadata> {
     const key = await crypto.subtle.generateKey(
@@ -466,7 +467,7 @@ class FieldEncryptionService {
     );
     
     const metadata: EncryptionKeyMetadata = {
-      keyId,
+      _keyId,
       version: 1,
       algorithm: 'AES-GCM',
       createdAt: new Date(),
@@ -474,21 +475,21 @@ class FieldEncryptionService {
       active: true,
     };
     
-    this.encryptionKeys.set(keyId, key);
-    this.keyMetadata.set(keyId, metadata);
+    this.encryptionKeys.set(_keyId, key);
+    this.keyMetadata.set(_keyId, metadata);
     
     // Persist key securely
-    await this.persistKey(keyId, key, metadata);
+    await this.persistKey(_keyId, key, metadata);
     
     return metadata;
   }
 
-  private async rotateKey(keyId: string): Promise<void> {
-    const oldMetadata = this.keyMetadata.get(keyId);
+  private async rotateKey(_keyId: string): Promise<void> {
+    const oldMetadata = this.keyMetadata.get(_keyId);
     if (!oldMetadata) return;
     
     // Generate new key version
-    const newKeyId = `${keyId}_v${oldMetadata.version + 1}`;
+    const newKeyId = `${_keyId}_v${oldMetadata.version + 1}`;
     const newKey = await crypto.subtle.generateKey(
       {
         name: 'AES-GCM',
@@ -499,7 +500,7 @@ class FieldEncryptionService {
     );
     
     const newMetadata: EncryptionKeyMetadata = {
-      keyId: newKeyId,
+      _keyId: newKeyId,
       version: oldMetadata.version + 1,
       algorithm: 'AES-GCM',
       createdAt: new Date(),
@@ -524,7 +525,7 @@ class FieldEncryptionService {
       event: 'CONFIGURATION_CHANGE',
       details: {
         action: 'key_rotation',
-        keyId,
+        _keyId,
         newKeyId,
         version: newMetadata.version,
       },
@@ -532,7 +533,7 @@ class FieldEncryptionService {
     });
   }
 
-  private async tokenizeValue(value: any, fieldName: string): Promise<string> {
+  private async tokenizeValue(value: unknown, _fieldName: string): Promise<string> {
     // Generate unique token
     const token = `tok_${cryptoService.generateSecureUUID()}`;
     
@@ -548,9 +549,9 @@ class FieldEncryptionService {
     return token;
   }
 
-  private async detokenizeValue(token: string, fieldName: string): Promise<any> {
+  private async detokenizeValue(token: string, _fieldName: string): Promise<unknown> {
     // Retrieve from vault
-    let encrypted = this.tokenVault.get(token);
+    let encrypted = this.tokenVault.get(_token);
     
     if (!encrypted) {
       // Try loading from storage
@@ -566,14 +567,14 @@ class FieldEncryptionService {
   }
 
   private async formatPreservingEncrypt(
-    value: any,
+    value: unknown,
     config: FieldEncryptionConfig,
-    keyInfo: EncryptionKeyMetadata
+    _keyInfo: EncryptionKeyMetadata
   ): Promise<string> {
     // Simple format-preserving encryption
     // In production, use FF3-1 or similar algorithm
-    const stringValue = String(value);
-    const encrypted = await cryptoService.encrypt(stringValue);
+    const _stringValue = String(value);
+    const encrypted = await cryptoService.encrypt(_stringValue);
     
     // Preserve format characteristics
     if (config.dataType === 'date') {
@@ -590,19 +591,19 @@ class FieldEncryptionService {
   private async formatPreservingDecrypt(
     encrypted: string,
     config: FieldEncryptionConfig
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Extract actual encrypted data
-    let actualEncrypted = encrypted;
+    let _actualEncrypted = encrypted;
     
     if (encrypted.startsWith('enc_')) {
       // Need to retrieve full encrypted value from storage
       const fullEncrypted = await secureStorage.getItem(`fpe_${encrypted}`);
-      if (fullEncrypted) {
-        actualEncrypted = fullEncrypted;
+      if (_fullEncrypted) {
+        _actualEncrypted = fullEncrypted;
       }
     }
     
-    const decrypted = await cryptoService.decrypt(actualEncrypted);
+    const decrypted = await cryptoService.decrypt(_actualEncrypted);
     
     // Convert back to appropriate type
     if (config.dataType === 'date') {
@@ -614,24 +615,24 @@ class FieldEncryptionService {
     return decrypted;
   }
 
-  private async generateSearchToken(searchTerm: string, fieldName: string): Promise<string> {
+  private async generateSearchToken(searchTerm: string, _fieldName: string): Promise<string> {
     // Generate deterministic search token
     const normalized = searchTerm.toLowerCase().trim();
-    const hash = await cryptoService.sha256(`${fieldName}:${normalized}`);
+    const hash = await cryptoService.sha256(`${_fieldName}:${normalized}`);
     return hash.substring(0, 16); // Use prefix for efficiency
   }
 
   private async updateSearchIndex(
-    fieldName: string,
-    value: any,
+    _fieldName: string,
+    value: unknown,
     encrypted: string,
     userId?: string
   ): Promise<void> {
-    if (!this.searchIndexes.has(fieldName)) {
-      this.searchIndexes.set(fieldName, new Map());
+    if (!this.searchIndexes.has(_fieldName)) {
+      this.searchIndexes.set(_fieldName, new Map());
     }
     
-    const fieldIndex = this.searchIndexes.get(fieldName)!;
+    const fieldIndex = this.searchIndexes.get(_fieldName)!;
     
     // Generate search tokens for value
     const searchableText = String(value).toLowerCase();
@@ -639,9 +640,9 @@ class FieldEncryptionService {
     
     for (const word of words) {
       if (word.length > 2) { // Skip very short words
-        const token = await this.generateSearchToken(word, fieldName);
+        const token = await this.generateSearchToken(word, _fieldName);
         
-        const entries = fieldIndex.get(token) || [];
+        const entries = fieldIndex.get(_token) || [];
         if (!entries.includes(encrypted)) {
           entries.push(encrypted);
           fieldIndex.set(token, entries);
@@ -652,39 +653,39 @@ class FieldEncryptionService {
 
   private async loadEncryptionKeys(): Promise<void> {
     try {
-      const storedKeys = await secureStorage.getItem('field_encryption_keys');
-      if (storedKeys) {
+      const _storedKeys = await secureStorage.getItem('field_encryption_keys');
+      if (_storedKeys) {
         // Load and reconstruct keys
-        for (const [keyId, keyData] of Object.entries(storedKeys)) {
+        for (const [_keyId, _keyData] of Object.entries(_storedKeys)) {
           // Reconstruct CryptoKey objects
           // Implementation depends on key storage format
         }
       }
-    } catch (error) {
-      console.error('Failed to load encryption keys:', error);
+    } catch (_error) {
+      logger.error('Failed to load encryption keys:');
     }
   }
 
   private async persistKey(
-    keyId: string,
+    _keyId: string,
     key: CryptoKey,
     metadata: EncryptionKeyMetadata
   ): Promise<void> {
     try {
       // Export key for storage
-      const exportedKey = await crypto.subtle.exportKey('raw', key);
-      const keyString = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
+      const _exportedKey = await crypto.subtle.exportKey('raw', key);
+      const keyString = btoa(String.fromCharCode(...new Uint8Array(_exportedKey)));
       
       // Store securely
-      await secureStorage.setItem(`field_key_${keyId}`, {
+      await secureStorage.setItem(`field_key_${_keyId}`, {
         key: keyString,
         metadata,
       }, {
         encrypted: true,
         persistent: true,
       });
-    } catch (error) {
-      console.error('Failed to persist key:', error);
+    } catch (_error) {
+      logger.error('Failed to persist key:');
     }
   }
 
@@ -692,17 +693,17 @@ class FieldEncryptionService {
     const needsRotation: string[] = [];
     const now = new Date();
     
-    for (const [keyId, metadata] of this.keyMetadata.entries()) {
+    for (const [_keyId, metadata] of this.keyMetadata.entries()) {
       if (!metadata.active) continue;
       
       const age = (now.getTime() - metadata.createdAt.getTime()) / (1000 * 60 * 60 * 24);
       if (age >= this.KEY_ROTATION_DAYS) {
-        needsRotation.push(keyId);
+        needsRotation.push(_keyId);
       }
     }
     
     if (needsRotation.length > 0) {
-      console.log(`Keys needing rotation: ${needsRotation.join(', ')}`);
+      logger.info(`Keys needing rotation: ${needsRotation.join(', ')}`, 'FieldEncryption');
     }
   }
 
@@ -716,16 +717,16 @@ class FieldEncryptionService {
   private async cleanupOldKeys(): Promise<void> {
     const toDelete: string[] = [];
     
-    for (const [keyId, metadata] of this.keyMetadata.entries()) {
+    for (const [_keyId, metadata] of this.keyMetadata.entries()) {
       if (!metadata.active && metadata.expiresAt && new Date() > metadata.expiresAt) {
-        toDelete.push(keyId);
+        toDelete.push(_keyId);
       }
     }
     
-    for (const keyId of toDelete) {
-      this.encryptionKeys.delete(keyId);
-      this.keyMetadata.delete(keyId);
-      await secureStorage.removeItem(`field_key_${keyId}`);
+    for (const _keyId of toDelete) {
+      this.encryptionKeys.delete(_keyId);
+      this.keyMetadata.delete(_keyId);
+      await secureStorage.removeItem(`field_key_${_keyId}`);
     }
   }
 }

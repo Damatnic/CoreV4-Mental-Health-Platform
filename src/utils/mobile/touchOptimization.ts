@@ -1,3 +1,5 @@
+import { logger } from '../logger';
+
 /**
  * Mobile Touch Optimization Utilities
  * Provides enhanced touch interactions, gestures, and mobile-specific optimizations
@@ -68,10 +70,10 @@ class TouchOptimizationManager {
 
   private initializeEventListeners(): void {
     // Use passive listeners for better performance
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-    this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
-    this.element.addEventListener('touchcancel', this.handleTouchCancel.bind(this), { passive: true });
+    this.element.addEventListener('touchstart', this.handleTouchStart.bind(_this), { passive: true });
+    this.element.addEventListener('touchmove', this.handleTouchMove.bind(_this), { passive: false });
+    this.element.addEventListener('touchend', this.handleTouchEnd.bind(_this), { passive: true });
+    this.element.addEventListener('touchcancel', this.handleTouchCancel.bind(_this), { passive: true });
 
     // Prevent default touch behaviors that interfere with custom gestures
     this.element.addEventListener('gesturestart', this.preventDefault, { passive: false });
@@ -101,14 +103,14 @@ class TouchOptimizationManager {
     const timestamp = performance.now();
 
     // Store touch history for gesture recognition
-    const touchPoints: TouchPoint[] = touches.map((touch, index) => ({
+    const _touchPoints: TouchPoint[] = touches.map((touch, _index) => ({
       id: touch.identifier,
       x: touch.clientX,
       y: touch.clientY,
       timestamp,
     }));
 
-    this.touchHistory.push(touchPoints);
+    this.touchHistory.push(_touchPoints);
 
     // Handle single touch
     if (touches.length === 1 && touches[0]) {
@@ -156,8 +158,8 @@ class TouchOptimizationManager {
   private handleMultiTouchStart(touches: Touch[], timestamp: number): void {
     if (touches.length === 2 && touches[0] && touches[1]) {
       // Initialize pinch/zoom gesture
-      const distance = this.calculateDistance(touches[0], touches[1]);
-      const angle = this.calculateAngle(touches[0], touches[1]);
+      const _distance = this.calculateDistance(touches[0], touches[1]);
+      const _angle = this.calculateAngle(touches[0], touches[1]);
       
       const gesture: TouchGesture = {
         type: 'pinch',
@@ -229,7 +231,7 @@ class TouchOptimizationManager {
       const velocity = distance / duration;
       let direction: 'up' | 'down' | 'left' | 'right';
 
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
         direction = deltaX > 0 ? 'right' : 'left';
       } else {
         direction = deltaY > 0 ? 'down' : 'up';
@@ -296,7 +298,7 @@ class TouchOptimizationManager {
     }
 
     // Trigger rotation gesture if rotation threshold is exceeded
-    if (this.options.enableRotation && Math.abs(rotation) > this.options.rotationThreshold) {
+    if (this.options.enableRotation && Math.abs(_rotation) > this.options.rotationThreshold) {
       this.triggerGesture({ ...pinchGesture, type: 'rotate' });
     }
   }
@@ -410,11 +412,11 @@ class TouchOptimizationManager {
   private triggerGesture(gesture: TouchGesture): void {
     const listeners = this.gestureListeners.get(gesture.type);
     if (listeners) {
-      listeners.forEach(callback => {
+      listeners.forEach(_callback => {
         try {
-          callback(gesture);
+          _callback(_gesture);
         } catch (error) {
-          console.error(`Error in gesture listener for ${gesture.type}:`, error);
+          logger.error(`Error in gesture listener for ${gesture.type}:`, error);
         }
       });
     }
@@ -422,11 +424,11 @@ class TouchOptimizationManager {
     // Also trigger generic gesture listener
     const genericListeners = this.gestureListeners.get('*');
     if (genericListeners) {
-      genericListeners.forEach(callback => {
+      genericListeners.forEach(_callback => {
         try {
-          callback(gesture);
-        } catch (error) {
-          console.error('Error in generic gesture listener:', error);
+          _callback(_gesture);
+        } catch (_error) {
+          logger.error('Error in generic gesture listener:');
         }
       });
     }
@@ -436,12 +438,12 @@ class TouchOptimizationManager {
     event.preventDefault();
   }
 
-  private vibrate(pattern: number | number[]): void {
+  private vibrate(_pattern: number | number[]): void {
     if ('vibrate' in navigator) {
       try {
-        navigator.vibrate(pattern);
-      } catch (error) {
-        console.warn('Vibration not supported or failed:', error);
+        navigator.vibrate(_pattern);
+      } catch (_error) {
+    logger.warn('Vibration not supported or failed:');
       }
     }
   }
@@ -473,17 +475,17 @@ class TouchOptimizationManager {
   private optimizeScrolling(): void {
     // Enable smooth scrolling and optimize scroll performance
     this.element.style.scrollBehavior = 'smooth';
-    (this.element.style as any).webkitOverflowScrolling = 'touch';
+    (this.element.style as unknown).webkitOverflowScrolling = 'touch';
     
     // Optimize scroll handling
-    this.element.addEventListener('scroll', this.throttleScroll(this.handleScroll.bind(this), 16), { passive: true });
+    this.element.addEventListener('scroll', this.throttleScroll(this.handleScroll.bind(_this), 16), { passive: true });
   }
 
   private implementMomentumScrolling(): void {
     // Fix iOS momentum scrolling issues
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      (this.element.style as any).webkitOverflowScrolling = 'touch';
-      (this.element.style as any).overflowScrolling = 'touch';
+      (this.element.style as unknown).webkitOverflowScrolling = 'touch';
+      (this.element.style as unknown).overflowScrolling = 'touch';
     }
   }
 
@@ -530,7 +532,7 @@ class TouchOptimizationManager {
     });
   }
 
-  private throttleScroll<T extends (...args: any[]) => any>(func: T, delay: number): T {
+  private throttleScroll<T extends (...args: unknown[]) => any>(func: T, delay: number): T {
     let timeoutId: number | null = null;
     let lastExecTime = 0;
     
@@ -567,17 +569,17 @@ class TouchOptimizationManager {
   private scrollTimeout: number = 0;
 
   // Public API methods
-  public on(gestureType: string, callback: (gesture: TouchGesture) => void): void {
-    if (!this.gestureListeners.has(gestureType)) {
-      this.gestureListeners.set(gestureType, new Set());
+  public on(_gestureType: string, _callback: (gesture: TouchGesture) => void): void {
+    if (!this.gestureListeners.has(_gestureType)) {
+      this.gestureListeners.set(_gestureType, new Set());
     }
-    this.gestureListeners.get(gestureType)!.add(callback);
+    this.gestureListeners.get(_gestureType)!.add(_callback);
   }
 
-  public off(gestureType: string, callback: (gesture: TouchGesture) => void): void {
-    const listeners = this.gestureListeners.get(gestureType);
+  public off(_gestureType: string, _callback: (gesture: TouchGesture) => void): void {
+    const listeners = this.gestureListeners.get(_gestureType);
     if (listeners) {
-      listeners.delete(callback);
+      listeners.delete(_callback);
     }
   }
 
@@ -622,7 +624,7 @@ export type { TouchGesture, TouchOptimizationOptions, TouchPoint };
 export { TouchOptimizationManager };
 
 // Additional mobile optimization utilities
-export const MobileOptimizationUtils = {
+export const _MobileOptimizationUtils = {
   // Prevent zoom on double-tap
   preventDoubleTapZoom(element: HTMLElement): void {
     element.addEventListener('touchend', (event) => {

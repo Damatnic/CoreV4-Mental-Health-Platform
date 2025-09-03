@@ -4,6 +4,7 @@ import App from './App';
 import './styles/index.css';
 import { EmergencyErrorBoundary, setupGlobalErrorHandling } from './components/ErrorBoundary';
 import { setupRuntimeGuards } from './utils/runtimeGuards';
+import { logger } from './utils/logger';
 // CRITICAL SECURITY: Validate environment configuration before app startup
 import './config/securityValidation';
 
@@ -22,18 +23,18 @@ setupRuntimeGuards();
 if (import.meta.env.PROD) {
   import('web-vitals').then((vitals) => {
     // Send to analytics instead of console.log in production
-    const logMetric = (metric: any) => {
+    const _logMetric = (metric: unknown) => {
       // Only log critical performance issues, not every metric
       if (metric.rating === 'poor' && import.meta.env.DEV) {
-        console.log(`${metric.name}: ${metric.value} (${metric.rating})`);
+        logger.warn(`Poor performance metric: ${metric.name}: ${metric.value}`, 'WebVitals');
       }
     };
     
-    vitals.onCLS(logMetric);
-    vitals.onFID(logMetric);
-    vitals.onFCP(logMetric);
-    vitals.onLCP(logMetric);
-    vitals.onTTFB(logMetric);
+    vitals.onCLS(_logMetric);
+    vitals.onFID(_logMetric);
+    vitals.onFCP(_logMetric);
+    vitals.onLCP(_logMetric);
+    vitals.onTTFB(_logMetric);
   });
 }
 
@@ -85,7 +86,7 @@ if ('serviceWorker' in navigator) {
         });
       })
       .catch((error) => {
-        console.error('[Service Worker] Registration failed:', error);
+        logger.error('[Service Worker] Registration failed:', error);
       });
   });
 }
@@ -106,7 +107,7 @@ function initializeReact() {
     // If DOM is ready but no root element, create it
     const newRoot = document.createElement('div');
     newRoot.id = 'root';
-    document.body.appendChild(newRoot);
+    document.body.appendChild(_newRoot);
     
     // Retry initialization
     setTimeout(() => {
@@ -116,7 +117,7 @@ function initializeReact() {
   }
 
   try {
-    const root = ReactDOM.createRoot(rootElement);
+    const root = ReactDOM.createRoot(_rootElement);
 
     root.render(
       <React.StrictMode>
@@ -125,8 +126,8 @@ function initializeReact() {
         </EmergencyErrorBoundary>
       </React.StrictMode>
     );
-  } catch (error) {
-    console.error('🚨 React initialization failed:', error);
+  } catch (_error) {
+    logger.error('🚨 React initialization failed:');
     // Show emergency fallback
     rootElement.innerHTML = `
       <div style="padding: 2rem; text-align: center; font-family: system-ui; color: #dc2626;">

@@ -13,7 +13,7 @@ const PostSchema = z.object({
   userAvatar: z.string().optional(),
   groupId: z.string().optional(),
   title: z.string().min(1).max(200),
-  content: z.string().min(1).max(5000),
+  _content: z.string().min(1).max(5000),
   tags: z.array(z.string()),
   triggerWarning: z.boolean().default(false),
   triggerWarningType: z.array(z.string()).optional(),
@@ -38,7 +38,7 @@ const CommentSchema = z.object({
   userId: z.string(),
   username: z.string(),
   userAvatar: z.string().optional(),
-  content: z.string().min(1).max(1000),
+  _content: z.string().min(1).max(1000),
   parentId: z.string().optional(),
   likes: z.number().default(0),
   isLiked: z.boolean().default(false),
@@ -105,7 +105,7 @@ export type Event = z.infer<typeof EventSchema>;
 
 export interface CreatePostDto {
   title: string;
-  content: string;
+  _content: string;
   groupId?: string;
   tags: string[];
   triggerWarning: boolean;
@@ -115,7 +115,7 @@ export interface CreatePostDto {
 }
 
 export interface CreateCommentDto {
-  content: string;
+  _content: string;
   parentId?: string;
 }
 
@@ -165,13 +165,13 @@ class CommunityService {
 
     // Add response interceptor for error handling
     this.apiClient.interceptors.response.use(
-      (response) => response,
-      (error) => {
+      (_response) => response,
+      (_error) => {
         if (error.response?.status === 401) {
           // Handle unauthorized access
           window.location.href = '/login';
         }
-        return Promise.reject(error);
+        return Promise.reject(_error);
       }
     );
   }
@@ -197,16 +197,16 @@ class CommunityService {
   }
 
   async createPost(data: CreatePostDto): Promise<Post> {
-    // Validate content for harmful language before posting
-    await this.validateContent(data.content);
+    // Validate _content for harmful language before posting
+    await this.validateContent(data._content);
     
     const response = await this.apiClient.post('/community/posts', data);
     return PostSchema.parse(response.data);
   }
 
   async updatePost(postId: string, data: Partial<CreatePostDto>): Promise<Post> {
-    if (data.content) {
-      await this.validateContent(data.content);
+    if (data._content) {
+      await this.validateContent(data._content);
     }
     
     const response = await this.apiClient.put(`/community/posts/${postId}`, data);
@@ -247,7 +247,7 @@ class CommunityService {
   }
 
   async createComment(postId: string, data: CreateCommentDto): Promise<Comment> {
-    await this.validateContent(data.content);
+    await this.validateContent(data._content);
     
     const response = await this.apiClient.post(
       `/community/posts/${postId}/comments`,
@@ -256,12 +256,12 @@ class CommunityService {
     return CommentSchema.parse(response.data);
   }
 
-  async updateComment(commentId: string, content: string): Promise<Comment> {
-    await this.validateContent(content);
+  async updateComment(commentId: string, _content: string): Promise<Comment> {
+    await this.validateContent(_content);
     
     const response = await this.apiClient.put(
       `/community/comments/${commentId}`,
-      { content }
+      { _content }
     );
     return CommentSchema.parse(response.data);
   }
@@ -318,7 +318,7 @@ class CommunityService {
   }
 
   async getGroupMembers(groupId: string, page = 1, limit = 50): Promise<{
-    members: any[];
+    members: unknown[];
     total: number;
     hasMore: boolean;
   }> {
@@ -402,8 +402,8 @@ class CommunityService {
 
   // =============== Content Validation & Safety ===============
 
-  private async validateContent(content: string): Promise<void> {
-    // Check for harmful content
+  private async validateContent(_content: string): Promise<void> {
+    // Check for harmful _content
     const harmfulPatterns = [
       /\b(kill\s+yourself|kys)\b/gi,
       /\b(self[\s-]?harm|cutting|burning)\b/gi,
@@ -412,7 +412,7 @@ class CommunityService {
     ];
 
     for (const pattern of harmfulPatterns) {
-      if (pattern.test(content)) {
+      if (pattern.test(_content)) {
         throw new Error('Content contains potentially harmful language. Please review our community guidelines.');
       }
     }
@@ -425,7 +425,7 @@ class CommunityService {
     ];
 
     for (const pattern of spamPatterns) {
-      if (pattern.test(content)) {
+      if (pattern.test(_content)) {
         throw new Error('Content appears to be spam. Please ensure your post follows community guidelines.');
       }
     }
@@ -482,7 +482,7 @@ class CommunityService {
     type?: 'posts' | 'groups' | 'events' | 'users';
     category?: string;
     dateRange?: { start: Date; end: Date };
-  }): Promise<any> {
+  }): Promise<unknown> {
     const response = await this.apiClient.get('/community/search', {
       params: {
         q: query,

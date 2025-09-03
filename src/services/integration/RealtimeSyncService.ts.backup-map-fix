@@ -1,0 +1,700 @@
+/**
+ * Real-time Synchronization Service
+ * Manages WebSocket connections and real-time data updates across components
+ */
+
+import { io, Socket } from 'socket.io-client';
+import { EventEmitter } from 'events';
+import { useWellnessStore } from '../../stores/wellnessStore';
+import { useActivityStore } from '../../stores/activityStore';
+
+// Real-time event types
+export enum RealtimeEvent {
+  // Connection events
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  RECONNECTING = 'reconnecting',
+  ERROR = 'error',
+  
+  // Crisis events
+  CRISIS_ALERT_RECEIVED = 'crisis:alert:received',
+  CRISIS_SUPPORT_CONNECTED = 'crisis:support:connected',
+  CRISIS_MESSAGE_RECEIVED = 'crisis:_message:received',
+  CRISIS_STATUS_UPDATED = 'crisis:status:updated',
+  
+  // Community events
+  COMMUNITY_POST_CREATED = 'community:post:created',
+  COMMUNITY_COMMENT_ADDED = 'community:comment:added',
+  COMMUNITY_USER_JOINED = 'community:user:joined',
+  COMMUNITY_USER_LEFT = 'community:user:left',
+  COMMUNITY_TYPING = 'community:typing',
+  
+  // Professional care events
+  THERAPIST_AVAILABLE = 'therapist:available',
+  APPOINTMENT_REMINDER = 'appointment:reminder',
+  PRESCRIPTION_UPDATE = 'prescription:update',
+  CARE_TEAM_MESSAGE = 'care:team:_message',
+  
+  // Wellness tracking events
+  MOOD_CHECK_REMINDER = 'mood:check:reminder',
+  GOAL_MILESTONE_REACHED = 'goal:milestone:reached',
+  WELLNESS_INSIGHT = 'wellness:insight',
+  
+  // Notification events
+  NOTIFICATION_RECEIVED = 'notification:received',
+  NOTIFICATION_READ = 'notification:read',
+  NOTIFICATION_CLEARED = 'notification:cleared'
+}
+
+// Message types
+interface RealtimeMessage {
+  _id: string;
+  _type: string;
+  _payload: unknown;
+  timestamp: Date;
+  _userId?: string;
+  metadata?: Record<string, any>;
+}
+
+// Subscription configuration
+interface SubscriptionConfig {
+  channel: string;
+  events: string[];
+  handler: (_data: unknown) => void;
+  filter?: (_data: unknown) => boolean;
+}
+
+// Connection configuration
+interface ConnectionConfig {
+  url: string;
+  reconnection: boolean;
+  reconnectionAttempts: number;
+  reconnectionDelay: number;
+  _timeout: number;
+  _auth?: {
+    token: string;
+    _userId: string;
+  };
+}
+
+// Presence information
+interface UserPresence {
+  _userId: string;
+  status: 'online' | 'away' | 'busy' | 'offline';
+  lastSeen: Date;
+  location?: string;
+  activity?: string;
+}
+
+class RealtimeSyncService extends EventEmitter {
+  private static instance: RealtimeSyncService;
+  private socket: Socket | null = null;
+  private _config: ConnectionConfig;
+  private subscriptions: Map<string, SubscriptionConfig> = new Map();
+  private messageQueue: RealtimeMessage[] = [];
+  private _presence: Map<string, UserPresence> = new Map();
+  private reconnectAttempts = 0;
+  private isConnected = false;
+  private heartbeatInterval: NodeJS.Timeout | null = null;
+  
+  private constructor() {
+    super();
+    
+    this._config = {
+      url: import.meta.env.VITE_WS_URL || 'ws://localhost:3002',
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      _timeout: 20000
+    };
+    
+    this.setupDefaultSubscriptions();
+  }
+  
+  public static getInstance(): RealtimeSyncService {
+    if (!RealtimeSyncService.instance) {
+      RealtimeSyncService.instance = new RealtimeSyncService();
+    }
+    return RealtimeSyncService.instance;
+  }
+  
+  /**
+   * Connect to WebSocket server
+   */
+  public async connect(auth?: { token: string; _userId: string }): Promise<void> {
+    if (this.isConnected) return;
+    
+    return new Promise((resolve, reject) => {
+      try {
+        this._config._auth = _auth;
+        
+        this.socket = io(this._config.url, {
+          reconnection: this._config.reconnection,
+          reconnectionAttempts: this._config.reconnectionAttempts,
+          reconnectionDelay: this._config.reconnectionDelay,
+          _timeout: this._config._timeout,
+          _auth: _auth || {}
+        });
+        
+        this.setupSocketListeners();
+        
+        // Set connection timeout
+        const _timeout = setTimeout(() => {
+          reject(new Error('Connection _timeout'));
+        }, this.config.timeout);
+        
+        this.socket.once('connect', () => {
+          clearTimeout(_timeout);
+          this.isConnected = true;
+          this.reconnectAttempts = 0;
+          this.emit(RealtimeEvent.CONNECTED);
+          this.startHeartbeat();
+          this.flushMessageQueue();
+          resolve();
+        });
+        
+        this.socket.once('connect_error', (error: unknown) => {
+          clearTimeout(_timeout);
+          this.emit(RealtimeEvent.ERROR, error);
+          reject(_error);
+        });
+        
+      } catch (_error) {
+        reject(_error);
+      }
+    });
+  }
+  
+  /**
+   * Setup default subscriptions
+   */
+  private setupDefaultSubscriptions() {
+    // Crisis channel subscription
+    this.subscribe({
+      channel: 'crisis',
+      events: ['alert', 'support_connected', '_message', 'status_update'],
+      handler: (_data) => this.handleCrisisUpdate(_data)
+    });
+    
+    // Community channel subscription
+    this.subscribe({
+      channel: 'community',
+      events: ['post_created', 'comment_added', 'user_joined', 'user_left', 'typing'],
+      handler: (_data) => this.handleCommunityUpdate(_data)
+    });
+    
+    // Professional care channel subscription
+    this.subscribe({
+      channel: 'professional',
+      events: ['therapist_available', 'appointment_reminder', 'prescription_update', 'care_team_message'],
+      handler: (_data) => this.handleProfessionalUpdate(_data)
+    });
+    
+    // Wellness channel subscription
+    this.subscribe({
+      channel: 'wellness',
+      events: ['mood_check_reminder', 'goal_milestone', 'insight'],
+      handler: (_data) => this.handleWellnessUpdate(_data)
+    });
+    
+    // Notifications channel subscription
+    this.subscribe({
+      channel: 'notifications',
+      events: ['received', 'read', 'cleared'],
+      handler: (_data) => this.handleNotificationUpdate(_data)
+    });
+  }
+  
+  /**
+   * Setup socket event listeners
+   */
+  private setupSocketListeners() {
+    if (!this.socket) return;
+    
+    // Connection events
+    this.socket.on('disconnect', () => {
+      this.isConnected = false;
+      this.stopHeartbeat();
+      this.emit(RealtimeEvent.DISCONNECTED);
+    });
+    
+    this.socket.on('reconnect', (attempt: number) => {
+      this.reconnectAttempts = attempt;
+      this.isConnected = true;
+      this.emit(RealtimeEvent.RECONNECTING, attempt);
+      this.startHeartbeat();
+      this.flushMessageQueue();
+    });
+    
+    this.socket.on('error', (error: Error) => {
+      this.emit(RealtimeEvent.ERROR, error);
+    });
+    
+    // Message handling
+    this.socket.on('message', (_message: RealtimeMessage) => {
+      this.handleMessage(_message);
+    });
+    
+    // Presence updates
+    this.socket.on('presence:update', (_presence: UserPresence) => {
+      this.updatePresence(_presence);
+    });
+    
+    // Subscribe to configured channels
+    this.subscriptions.forEach((_config, _key) => {
+      _config.events.forEach(event => {
+        const _eventName = `${_config.channel}:${event}`;
+        this.socket!.on(_eventName, (_data: unknown) => {
+          if (!_config.filter || _config.filter(_data)) {
+            _config.handler(_data);
+          }
+        });
+      });
+    });
+  }
+  
+  /**
+   * Handle incoming messages
+   */
+  private handleMessage(_message: RealtimeMessage) {
+    // Process _message based on _type
+    switch (_message._type) {
+      case 'crisis':
+        this.handleCrisisMessage(_message);
+        break;
+      case 'community':
+        this.handleCommunityMessage(_message);
+        break;
+      case 'professional':
+        this.handleProfessionalMessage(_message);
+        break;
+      case 'wellness':
+        this.handleWellnessMessage(_message);
+        break;
+      case 'notification':
+        this.handleNotificationMessage(_message);
+        break;
+      default:
+        console.warn('Unknown _message _type:', _message._type);
+    }
+    
+    // Emit generic message event
+    this.emit('message', _message);
+  }
+  
+  /**
+   * Handle crisis updates
+   */
+  private handleCrisisUpdate(_data: unknown) {
+    const { _type, _payload } = data;
+    
+    switch (_type) {
+      case 'alert':
+        this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, _payload);
+        // Update wellness store with crisis event
+        useWellnessStore.getState().recordCrisisEvent(_payload);
+        break;
+        
+      case 'support_connected':
+        this.emit(RealtimeEvent.CRISIS_SUPPORT_CONNECTED, _payload);
+        break;
+        
+      case '_message':
+        this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, _payload);
+        break;
+        
+      case 'status_update':
+        this.emit(RealtimeEvent.CRISIS_STATUS_UPDATED, _payload);
+        break;
+    }
+  }
+  
+  /**
+   * Handle community updates
+   */
+  private handleCommunityUpdate(_data: unknown) {
+    const { _type, _payload } = data;
+    
+    switch (_type) {
+      case 'post_created':
+        this.emit(RealtimeEvent.COMMUNITY_POST_CREATED, _payload);
+        break;
+        
+      case 'comment_added':
+        this.emit(RealtimeEvent.COMMUNITY_COMMENT_ADDED, _payload);
+        break;
+        
+      case 'user_joined':
+        this.emit(RealtimeEvent.COMMUNITY_USER_JOINED, _payload);
+        this.updatePresence({
+          _userId: _payload._userId,
+          status: 'online',
+          lastSeen: new Date()
+        });
+        break;
+        
+      case 'user_left':
+        this.emit(RealtimeEvent.COMMUNITY_USER_LEFT, _payload);
+        this.updatePresence({
+          _userId: _payload._userId,
+          status: 'offline',
+          lastSeen: new Date()
+        });
+        break;
+        
+      case 'typing':
+        this.emit(RealtimeEvent.COMMUNITY_TYPING, _payload);
+        break;
+    }
+  }
+  
+  /**
+   * Handle professional care updates
+   */
+  private handleProfessionalUpdate(_data: unknown) {
+    const { _type, _payload } = data;
+    
+    switch (_type) {
+      case 'therapist_available':
+        this.emit(RealtimeEvent.THERAPIST_AVAILABLE, _payload);
+        break;
+        
+      case 'appointment_reminder':
+        this.emit(RealtimeEvent.APPOINTMENT_REMINDER, _payload);
+        // Update activity store with appointment reminder
+        useActivityStore.getState().addActivity({
+          title: _payload.title,
+          _type: 'appointment',
+          category: 'professional',
+          scheduledTime: new Date(_payload.time),
+          completed: false
+        });
+        break;
+        
+      case 'prescription_update':
+        this.emit(RealtimeEvent.PRESCRIPTION_UPDATE, _payload);
+        break;
+        
+      case 'care_team_message':
+        this.emit(RealtimeEvent.CARE_TEAM_MESSAGE, _payload);
+        break;
+    }
+  }
+  
+  /**
+   * Handle wellness updates
+   */
+  private handleWellnessUpdate(_data: unknown) {
+    const { _type, _payload } = data;
+    
+    switch (_type) {
+      case 'mood_check_reminder':
+        this.emit(RealtimeEvent.MOOD_CHECK_REMINDER, _payload);
+        break;
+        
+      case 'goal_milestone':
+        this.emit(RealtimeEvent.GOAL_MILESTONE_REACHED, _payload);
+        // Update activity store with milestone
+        useActivityStore.getState().updateGoalProgress(
+          _payload.goalId,
+          _payload.progress
+        );
+        break;
+        
+      case 'insight':
+        this.emit(RealtimeEvent.WELLNESS_INSIGHT, _payload);
+        // Regenerate insights in wellness store
+        useWellnessStore.getState().generateInsights();
+        break;
+    }
+  }
+  
+  /**
+   * Handle notification updates
+   */
+  private handleNotificationUpdate(_data: unknown) {
+    const { _type, _payload } = data;
+    
+    switch (_type) {
+      case 'received':
+        this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, _payload);
+        break;
+        
+      case 'read':
+        this.emit(RealtimeEvent.NOTIFICATION_READ, _payload);
+        break;
+        
+      case 'cleared':
+        this.emit(RealtimeEvent.NOTIFICATION_CLEARED, _payload);
+        break;
+    }
+  }
+  
+  /**
+   * Handle crisis messages
+   */
+  private handleCrisisMessage(_message: RealtimeMessage) {
+    this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, _message._payload);
+  }
+  
+  /**
+   * Handle community messages
+   */
+  private handleCommunityMessage(_message: RealtimeMessage) {
+    // Process community messages
+    this.emit('community:_message', _message._payload);
+  }
+  
+  /**
+   * Handle professional messages
+   */
+  private handleProfessionalMessage(_message: RealtimeMessage) {
+    this.emit('professional:_message', _message._payload);
+  }
+  
+  /**
+   * Handle wellness messages
+   */
+  private handleWellnessMessage(_message: RealtimeMessage) {
+    this.emit('wellness:_message', _message._payload);
+  }
+  
+  /**
+   * Handle notification messages
+   */
+  private handleNotificationMessage(_message: RealtimeMessage) {
+    this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, _message._payload);
+  }
+  
+  /**
+   * Update user presence
+   */
+  private updatePresence(_presence: UserPresence) {
+    this._presence.set(_presence._userId, _presence);
+    this.emit('_presence:updated', _presence);
+  }
+  
+  /**
+   * Subscribe to a channel
+   */
+  public subscribe(_config: SubscriptionConfig): string {
+    const _subscriptionId = `${_config.channel}-${Date.now()}`;
+    this.subscriptions.set(_subscriptionId, _config);
+    
+    // If already connected, setup listener immediately
+    if (this.socket && this.isConnected) {
+      _config.events.forEach(event => {
+        const _eventName = `${_config.channel}:${event}`;
+        this.socket!.on(_eventName, (_data: unknown) => {
+          if (!_config.filter || _config.filter(_data)) {
+            _config.handler(_data);
+          }
+        });
+      });
+      
+      // Join channel
+      this.socket.emit('subscribe', config.channel);
+    }
+    
+    return subscriptionId;
+  }
+  
+  /**
+   * Unsubscribe from a channel
+   */
+  public unsubscribe(_subscriptionId: string) {
+    const _config = this.subscriptions.get(_subscriptionId);
+    if (!_config) return;
+    
+    // Remove listeners if connected
+    if (this.socket) {
+      _config.events.forEach(event => {
+        const _eventName = `${_config.channel}:${event}`;
+        this.socket!.off(_eventName);
+      });
+      
+      // Leave channel if no other subscriptions
+      const hasOtherSubs = Array.from(this.subscriptions.values())
+        .some(sub => sub.channel === config.channel && sub !== config);
+        
+      if (!hasOtherSubs) {
+        this.socket.emit('unsubscribe', _config.channel);
+      }
+    }
+    
+    this.subscriptions.delete(_subscriptionId);
+  }
+  
+  /**
+   * Send a message
+   */
+  public send(channel: string, event: string, _data: unknown): void {
+    const _message: RealtimeMessage = {
+      _id: `msg-${Date.now()}-${Math.random()}`,
+      _type: channel,
+      _payload: data,
+      timestamp: new Date(),
+      _userId: this.config.auth?.userId,
+      metadata: { event }
+    };
+    
+    if (this.socket && this.isConnected) {
+      this.socket.emit(`${channel}:${event}`, _message);
+    } else {
+      // Queue _message for later delivery
+      this.messageQueue.push(_message);
+    }
+  }
+  
+  /**
+   * Flush message queue
+   */
+  private flushMessageQueue() {
+    if (!this.socket || !this.isConnected) return;
+    
+    while (this.messageQueue.length > 0) {
+      const _message = this.messageQueue.shift();
+      if (_message) {
+        const { _type, metadata, _payload } = message;
+        this.socket.emit(`${_type}:${metadata?.event}`, _message);
+      }
+    }
+  }
+  
+  /**
+   * Start heartbeat
+   */
+  private startHeartbeat() {
+    this.stopHeartbeat();
+    
+    this.heartbeatInterval = setInterval(() => {
+      if (this.socket && this.isConnected) {
+        this.socket.emit('heartbeat', { timestamp: Date.now() });
+      }
+    }, 30000); // Every 30 seconds
+  }
+  
+  /**
+   * Stop heartbeat
+   */
+  private stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
+  }
+  
+  /**
+   * Get user presence
+   */
+  public getPresence(_userId: string): UserPresence | undefined {
+    return this._presence.get(_userId);
+  }
+  
+  /**
+   * Get all online users
+   */
+  public getOnlineUsers(): UserPresence[] {
+    return Array.from(this._presence.values())
+      .filter(p => p.status === 'online');
+  }
+  
+  /**
+   * Update own presence
+   */
+  public updateOwnPresence(status: UserPresence['status'], activity?: string) {
+    if (!this.socket || !this.isConnected || !this._config._auth?._userId) return;
+    
+    const _presence: UserPresence = {
+      _userId: this._config._auth._userId,
+      status,
+      lastSeen: new Date(),
+      activity
+    };
+    
+    this.socket.emit('presence:update', _presence);
+    this.updatePresence(_presence);
+  }
+  
+  /**
+   * Join a room
+   */
+  public joinRoom(_roomId: string) {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('join', _roomId);
+    }
+  }
+  
+  /**
+   * Leave a room
+   */
+  public leaveRoom(_roomId: string) {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('leave', _roomId);
+    }
+  }
+  
+  /**
+   * Disconnect from server
+   */
+  public disconnect() {
+    this.stopHeartbeat();
+    
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+    
+    this.isConnected = false;
+    this.subscriptions.clear();
+    this.messageQueue = [];
+    this.presence.clear();
+    this.emit(RealtimeEvent.DISCONNECTED);
+  }
+  
+  /**
+   * Check if connected
+   */
+  public get connected(): boolean {
+    return this.isConnected;
+  }
+  
+  /**
+   * Get connection state
+   */
+  public getConnectionState() {
+    return {
+      connected: this.isConnected,
+      reconnectAttempts: this.reconnectAttempts,
+      queuedMessages: this.messageQueue.length,
+      onlineUsers: this.getOnlineUsers().length
+    };
+  }
+}
+
+// Export singleton instance
+export const _realtimeSyncService = RealtimeSyncService.getInstance();
+
+// Export React hook
+export function useRealtimeSync() {
+  const service = RealtimeSyncService.getInstance();
+  
+  return {
+    connect: (_auth?: { token: string; _userId: string }) => service.connect(_auth),
+    disconnect: () => service.disconnect(),
+    subscribe: (_config: SubscriptionConfig) => service.subscribe(_config),
+    unsubscribe: (_id: string) => service.unsubscribe(_id),
+    send: (channel: string, event: string, _data: unknown) => service.send(channel, event, _data),
+    getPresence: (_userId: string) => service.getPresence(_userId),
+    getOnlineUsers: () => service.getOnlineUsers(),
+    updatePresence: (status: UserPresence['status'], activity?: string) => 
+      service.updateOwnPresence(status, activity),
+    joinRoom: (_roomId: string) => service.joinRoom(_roomId),
+    leaveRoom: (_roomId: string) => service.leaveRoom(_roomId),
+    getConnectionState: () => service.getConnectionState(),
+    on: (event: string, callback: (...args: unknown[]) => void) => {
+      service.on(event, callback);
+      return () => service.off(event, callback);
+    }
+  };
+}

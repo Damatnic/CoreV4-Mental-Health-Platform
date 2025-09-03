@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Heart, Shield, Zap } from 'lucide-react';
 import { useConsoleSound } from '../../services/console/ConsoleSoundSystem';
@@ -13,13 +13,13 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
   const [showSkip, setShowSkip] = useState(false);
   const { playSound } = useConsoleSound();
 
-  // Boot sequence stages
-  const bootStages = [
+  // Boot sequence stages - wrapped in useMemo to prevent recreating on every render
+  const bootStages = useMemo(() => [
     { id: 0, duration: 1500, name: 'initializing' },
     { id: 1, duration: 2000, name: 'logo' },
     { id: 2, duration: 1500, name: 'loading' },
     { id: 3, duration: 1000, name: 'ready' },
-  ];
+  ], []);
 
   useEffect(() => {
     if (skipBoot) {
@@ -28,7 +28,7 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
     }
 
     // Show skip button after 2 seconds
-    const skipTimer = setTimeout(() => {
+    const _skipTimer = setTimeout(() => {
       setShowSkip(true);
     }, 2000);
 
@@ -36,7 +36,7 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
     playSound('startup');
 
     // Progress through boot stages
-    const timer = setTimeout(() => {
+    const _timer = setTimeout(() => {
       if (bootStage < bootStages.length - 1) {
         setBootStage(bootStage + 1);
       } else {
@@ -46,10 +46,10 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
     }, bootStages[bootStage]?.duration || 1000);
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(skipTimer);
+      clearTimeout(_timer);
+      clearTimeout(_skipTimer);
     };
-  }, [bootStage, onBootComplete, skipBoot, playSound]);
+  }, [bootStage, onBootComplete, skipBoot, playSound, bootStages]);
 
   const handleSkip = () => {
     onBootComplete();

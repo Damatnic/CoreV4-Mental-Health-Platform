@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
   Pause,
   RotateCcw,
-  Volume2,
+  _Volume2,
   VolumeX,
   Settings,
   Bell,
@@ -14,8 +14,8 @@ import {
   TrendingUp,
   Calendar,
   Award,
-  ChevronLeft,
-  ChevronRight,
+  _ChevronLeft,
+  _ChevronRight,
   Zap,
   Heart,
   Brain,
@@ -71,7 +71,7 @@ const AMBIENT_SOUNDS = {
 };
 
 // Bell intervals
-const BELL_INTERVALS = {
+const _BELL_INTERVALS = {
   none: 'No bells',
   start_end: 'Start & End only',
   '1': 'Every minute',
@@ -124,23 +124,23 @@ export const MeditationTimer: React.FC = () => {
   // Initialize audio context
   useEffect(() => {
     if (typeof window !== 'undefined' && !audioContext.current) {
-      audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContext.current = new (window.AudioContext || (window as unknown).webkitAudioContext)();
     }
     
     // Load saved sessions and streak
-    const savedSessions = secureStorage.getItem('meditationSessions');
-    const savedStreak = secureStorage.getItem('meditationStreak');
+    const _savedSessions = secureStorage.getItem('meditationSessions');
+    const _savedStreak = secureStorage.getItem('meditationStreak');
     
-    if (savedSessions) {
-      const parsed = JSON.parse(savedSessions);
-      setSessions(parsed.map((s: any) => ({
+    if (_savedSessions) {
+      const parsed = JSON.parse(_savedSessions);
+      setSessions(parsed.map((s: unknown) => ({
         ...s,
         timestamp: new Date(s.timestamp)
       })));
     }
     
-    if (savedStreak) {
-      setStreak(JSON.parse(savedStreak));
+    if (_savedStreak) {
+      setStreak(JSON.parse(_savedStreak));
     }
     
     return () => {
@@ -149,7 +149,7 @@ export const MeditationTimer: React.FC = () => {
   }, []);
 
   // Play bell sound
-  const playBell = (type: 'start' | 'end' | 'interval' = 'interval') => {
+  const playBell = useCallback((type: 'start' | 'end' | 'interval' = 'interval') => {
     if (!audioContext.current) return;
     
     const oscillator = audioContext.current.createOscillator();
@@ -174,9 +174,9 @@ export const MeditationTimer: React.FC = () => {
     gainNode.gain.linearRampToValueAtTime(volume / 100 * 0.3, now + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
     
-    oscillator.start(now);
+    oscillator.start(_now);
     oscillator.stop(now + 1.5);
-  };
+  }, []);
 
   // Start ambient sound
   const startAmbientSound = () => {
@@ -233,7 +233,7 @@ export const MeditationTimer: React.FC = () => {
   };
 
   // Stop ambient sound
-  const stopAmbientSound = () => {
+  const stopAmbientSound = useCallback(() => {
     if (ambientOscillator.current) {
       ambientOscillator.current.stop();
       ambientOscillator.current = null;
@@ -242,18 +242,18 @@ export const MeditationTimer: React.FC = () => {
       ambientGain.current.disconnect();
       ambientGain.current = null;
     }
-  };
+  }, []);
 
   // Start meditation
   const startMeditation = () => {
     setIsPreparing(true);
-    setTimeRemaining(preparationTime);
+    setTimeRemaining(_preparationTime);
     
     // Start preparation countdown
-    const prepInterval = setInterval(() => {
+    const _prepInterval = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          clearInterval(prepInterval);
+          clearInterval(_prepInterval);
           setIsPreparing(false);
           actuallyStartMeditation();
           return duration * 60;
@@ -278,7 +278,7 @@ export const MeditationTimer: React.FC = () => {
   // Pause/Resume meditation
   const togglePause = () => {
     setIsPaused(!isPaused);
-    if (isPaused) {
+    if (_isPaused) {
       startAmbientSound();
     } else {
       stopAmbientSound();
@@ -286,7 +286,7 @@ export const MeditationTimer: React.FC = () => {
   };
 
   // Stop meditation
-  const stopMeditation = () => {
+  const stopMeditation = useCallback(() => {
     setIsActive(false);
     setIsPaused(false);
     setIsPreparing(false);
@@ -308,9 +308,9 @@ export const MeditationTimer: React.FC = () => {
         timestamp: sessionStartTime.current
       };
       
-      const updatedSessions = [...sessions, session];
-      setSessions(updatedSessions);
-      secureStorage.setItem('meditationSessions', JSON.stringify(updatedSessions));
+      const _updatedSessions = [...sessions, session];
+      setSessions(_updatedSessions);
+      secureStorage.setItem('meditationSessions', JSON.stringify(_updatedSessions));
       
       // Update streak
       updateStreak();
@@ -322,17 +322,17 @@ export const MeditationTimer: React.FC = () => {
     }
     
     setTimeRemaining(0);
-  };
+  }, [duration, sessions, selectedType, stopAmbientSound, updateStreak]);
 
   // Update meditation streak
-  const updateStreak = () => {
+  const updateStreak = useCallback(() => {
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     
     const newStreak = { ...streak };
     
     if (streak.lastSessionDate === today) {
-      // Already meditated today, don't change streak
+      // Already meditated today, don&apos;t change streak
     } else if (streak.lastSessionDate === yesterday) {
       // Continuing streak
       newStreak.current += 1;
@@ -344,9 +344,9 @@ export const MeditationTimer: React.FC = () => {
     }
     
     newStreak.lastSessionDate = today;
-    setStreak(newStreak);
-    secureStorage.setItem('meditationStreak', JSON.stringify(newStreak));
-  };
+    setStreak(_newStreak);
+    secureStorage.setItem('meditationStreak', JSON.stringify(_newStreak));
+  }, [streak]);
 
   // Main timer effect
   useEffect(() => {
@@ -363,7 +363,7 @@ export const MeditationTimer: React.FC = () => {
         
         // Check for bell intervals
         if (bellInterval !== 'none' && bellInterval !== 'start_end') {
-          const intervalSeconds = parseInt(bellInterval) * 60;
+          const intervalSeconds = parseInt(_bellInterval) * 60;
           if (elapsedTime.current % intervalSeconds === 0) {
             playBell('interval');
           }
@@ -378,7 +378,7 @@ export const MeditationTimer: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isActive, isPaused, bellInterval]);
+  }, [isActive, isPaused, bellInterval, playBell, stopMeditation]);
 
   // Format time display
   const formatTime = (seconds: number) => {
@@ -483,7 +483,7 @@ export const MeditationTimer: React.FC = () => {
             Choose Your Practice
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(MEDITATION_TYPES).map(([key, type]) => {
+            {Object.entries(_MEDITATION_TYPES).map(([key, type]) => {
               const Icon = type.icon;
               return (
                 <motion.div
@@ -570,7 +570,7 @@ export const MeditationTimer: React.FC = () => {
                     className="text-center"
                   >
                     <p className="text-5xl font-mono font-bold text-gray-900 dark:text-white mb-2">
-                      {formatTime(timeRemaining)}
+                      {formatTime(_timeRemaining)}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {isPaused ? 'Paused' : MEDITATION_TYPES[selectedType].name}
@@ -691,7 +691,7 @@ export const MeditationTimer: React.FC = () => {
                     disabled={isActive}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {Object.entries(AMBIENT_SOUNDS).map(([key, sound]) => (
+                    {Object.entries(_AMBIENT_SOUNDS).map(([key, sound]) => (
                       <option key={key} value={key}>{sound.name}</option>
                     ))}
                   </select>
@@ -708,7 +708,7 @@ export const MeditationTimer: React.FC = () => {
                     disabled={isActive}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {Object.entries(BELL_INTERVALS).map(([key, label]) => (
+                    {Object.entries(_BELL_INTERVALS).map(([key, label]) => (
                       <option key={key} value={key}>{label}</option>
                     ))}
                   </select>
@@ -748,7 +748,7 @@ export const MeditationTimer: React.FC = () => {
                 {/* Custom Message */}
                 <div className="md:col-span-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                    Meditation Intention (optional)
+                    Meditation Intention (_optional)
                   </label>
                   <input
                     type="text"

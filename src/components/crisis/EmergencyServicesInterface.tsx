@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -50,16 +51,16 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       const permission = geolocationEmergencyService.getPermissionStatus();
       setPermissionStatus(permission);
       
-      // Get current location if available
-      const location = geolocationEmergencyService.getCurrentLocation();
-      setCurrentLocation(location);
+      // Get current _location if available
+      const _location = geolocationEmergencyService.getCurrentLocation();
+      setCurrentLocation(_location);
       
-      // Load nearby services
-      const services = await geolocationEmergencyService.findNearbyEmergencyServices();
-      setNearbyServices(services);
+      // Load nearby _services
+      const _services = await geolocationEmergencyService.findNearbyEmergencyServices();
+      setNearbyServices(_services);
       
-    } catch (error) {
-      console.error('Failed to initialize emergency services:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize emergency _services:');
     } finally {
       setIsLoadingServices(false);
     }
@@ -72,15 +73,15 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       setPermissionStatus(permission);
       
       if (permission.granted) {
-        const location = geolocationEmergencyService.getCurrentLocation();
-        setCurrentLocation(location);
+        const _location = geolocationEmergencyService.getCurrentLocation();
+        setCurrentLocation(_location);
         
-        // Refresh nearby services with new location
-        const services = await geolocationEmergencyService.findNearbyEmergencyServices();
-        setNearbyServices(services);
+        // Refresh nearby _services with new _location
+        const _services = await geolocationEmergencyService.findNearbyEmergencyServices();
+        setNearbyServices(_services);
       }
-    } catch (error) {
-      console.error('Location permission request failed:', error);
+    } catch (_error) {
+      logger.error('Location permission request failed:');
     } finally {
       setIsRequestingLocation(false);
     }
@@ -97,23 +98,23 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       );
       
       if (response.success) {
-        onEmergencyTriggered?.(service);
+        onEmergencyTriggered?.(_service);
         
         // For critical situations, auto-initiate call
         if (crisisProfile.riskLevel === 'critical' || service.phone === '911') {
-          window.location.href = `tel:${service.phone}`;
+          window._location.href = `tel:${service.phone}`;
         }
       }
       
-    } catch (error) {
-      console.error('Emergency response failed:', error);
+    } catch (_error) {
+      logger.error('Emergency response failed:');
     } finally {
       setTimeout(() => setEmergencyTriggered(null), 3000);
     }
   };
 
-  const getServiceIcon = (type: EmergencyServiceProvider['type']) => {
-    switch (type) {
+  const getServiceIcon = (_type: EmergencyServiceProvider['type']) => {
+    switch (_type) {
       case 'crisis_center': return MessageCircle;
       case 'hospital': return Shield;
       case 'ems': case 'police': case 'fire': return Phone;
@@ -121,8 +122,8 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
     }
   };
 
-  const getServiceColor = (type: EmergencyServiceProvider['type']) => {
-    switch (type) {
+  const getServiceColor = (_type: EmergencyServiceProvider['type']) => {
+    switch (_type) {
       case 'crisis_center': return 'from-purple-500 to-indigo-600';
       case 'hospital': return 'from-blue-500 to-cyan-600';
       case 'ems': return 'from-red-500 to-pink-600';
@@ -141,7 +142,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
     return `~${responseTime}min response`;
   };
 
-  if (isLoadingServices) {
+  if (_isLoadingServices) {
     return (
       <div className={`bg-white rounded-xl shadow-lg p-6 ${className}`}>
         <div className="flex items-center justify-center space-x-3">
@@ -189,7 +190,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
           <div className="flex items-center space-x-2 text-green-700">
             <CheckCircle className="w-5 h-5" />
             <span className="text-sm font-medium">
-              Location shared - Emergency services can find you
+              Location shared - Emergency _services can find you
             </span>
           </div>
         </div>
@@ -197,7 +198,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
 
       {/* Emergency Services List */}
       <div className="divide-y divide-gray-200">{nearbyServices.map((service, index) => {
-          const ServiceIcon = getServiceIcon(service.type);
+          const ServiceIcon = getServiceIcon(service._type);
           const isTriggered = emergencyTriggered === service.id;
           
           return (
@@ -211,7 +212,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 flex-1">
                   {/* Service Icon */}
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${getServiceColor(service.type)} text-white flex-shrink-0`}>
+                  <div className={`p-3 rounded-xl bg-gradient-to-r ${getServiceColor(service._type)} text-white flex-shrink-0`}>
                     <ServiceIcon className="w-6 h-6" />
                   </div>
                   
@@ -264,10 +265,10 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
                 {/* Action Button */}
                 <div className="flex flex-col space-y-2 ml-4">
                   <button
-                    onClick={() => triggerEmergencyResponse(service)}
+                    onClick={() => triggerEmergencyResponse(_service)}
                     disabled={isTriggered}
                     className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                      service.type === 'crisis_center'
+                      service._type === 'crisis_center'
                         ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl'
                         : service.phone === '911'
                           ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl'
@@ -289,7 +290,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
                     )}
                   </button>
                   
-                  {service.type === 'crisis_center' && service.specialties.includes('text_support') && (
+                  {service._type === 'crisis_center' && service.specialties.includes('text_support') && (
                     <button
                       onClick={() => window.open(`sms:${service.phone}`, '_blank')}
                       className="px-4 py-2 border border-purple-300 text-purple-700 hover:bg-purple-50 rounded-lg text-sm font-medium transition-colors"

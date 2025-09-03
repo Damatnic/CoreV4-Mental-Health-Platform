@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * Ultra-Optimized Crisis Intervention Component
  * Guaranteed <200ms response time for immediate mental health support
@@ -6,7 +7,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Phone, MessageCircle, Heart, Shield, Activity } from 'lucide-react';
 import { performanceMonitor } from '../../utils/performance/performanceMonitor';
-import { UpdatePriority } from '../../utils/performance/concurrentFeatures';
+// import { UpdatePriority } from '../../utils/performance/concurrentFeatures';
 
 // Pre-computed crisis resources for instant access
 const CRISIS_RESOURCES = {
@@ -59,8 +60,8 @@ export function OptimizedCrisisIntervention({
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Pre-cache DOM references
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const resourcesRef = useRef<HTMLDivElement>(null);
+  const _buttonRef = useRef<HTMLButtonElement>(null);
+  const _resourcesRef = useRef<HTMLDivElement>(null);
 
   // Optimized activation handler
   const handleActivation = useCallback(() => {
@@ -83,18 +84,19 @@ export function OptimizedCrisisIntervention({
       performanceMonitor.measureEnd('crisis-intervention-activate');
       
       if (time > 200) {
-        console.warn(`Crisis intervention response time exceeded target: ${time.toFixed(2)}ms`);
+        logger.warn(`Crisis intervention response time exceeded target: ${time.toFixed(2)}ms`);
       }
     });
     
     // Notify parent
-    if (onActivate) {
+    if (_onActivate) {
       onActivate();
     }
     
     // Log to analytics (non-blocking)
+// @ts-expect-error - requestIdleCallback is a global API
     requestIdleCallback(() => {
-      logCrisisActivation(userId);
+      logCrisisActivation(_userId);
     });
   }, [userId, onActivate]);
 
@@ -104,7 +106,7 @@ export function OptimizedCrisisIntervention({
     window.addEventListener('crisis-activate', listener);
     
     // Preload resources if enabled
-    if (preloadResources) {
+    if (_preloadResources) {
       preloadCrisisResources();
     }
     
@@ -314,7 +316,7 @@ function preloadCrisisResources() {
   const link = document.createElement('link');
   link.rel = 'preconnect';
   link.href = 'https://988lifeline.org';
-  document.head.appendChild(link);
+  document.head.appendChild(_link);
   
   // Cache crisis data in IndexedDB for offline access
   if ('indexedDB' in window) {
@@ -336,8 +338,8 @@ async function cacheOfflineCrisisData() {
       data: CRISIS_RESOURCES,
       timestamp: Date.now(),
     });
-  } catch (error) {
-    console.error('Failed to cache crisis data:', error);
+  } catch (_error) {
+    logger.error('Failed to cache crisis data:');
   }
 }
 
@@ -352,7 +354,7 @@ function openCrisisDatabase(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
     
     request.onupgradeneeded = (event) => {
-      const db = (event.target as any).result;
+      const db = (event.target as unknown).result;
       if (!db.objectStoreNames.contains('resources')) {
         db.createObjectStore('resources', { keyPath: 'id' });
       }

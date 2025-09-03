@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 /**
  * Unified Crisis Button Component
  * Consolidates all crisis button implementations with theming, haptic feedback, and accessibility
@@ -16,7 +17,7 @@ import {
 } from '../../utils/crisis';
 import { 
   CRISIS_ACTIONS, 
-  EMERGENCY_CONTACTS, 
+  _EMERGENCY_CONTACTS, 
   HAPTIC_PATTERNS, 
   CRISIS_THEMES,
   CrisisLevel,
@@ -56,7 +57,7 @@ export function UnifiedCrisisButton({
   onActionTaken
 }: UnifiedCrisisButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [location, setLocation] = useState<GeolocationCoordinates | null>(null);
+  const [location, _setLocation] = useState<GeolocationCoordinates | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const { consoleVibrate } = useVibration();
@@ -66,8 +67,8 @@ export function UnifiedCrisisButton({
   useEffect(() => {
     if (variant === 'emergency' || crisisLevel === 'critical') {
       getEmergencyLocation()
-        .then(setLocation)
-        .catch(error => console.warn('Could not get location:', error));
+        .then(_setLocation)
+        .catch(error => logger.warn('Could not get location:', error));
     }
   }, [variant, crisisLevel]);
 
@@ -104,10 +105,10 @@ export function UnifiedCrisisButton({
         }
       }
 
-      onActionTaken?.(actionId);
-    } catch (error) {
-      console.error('Crisis action failed:', error);
-      consoleVibrate('error', HAPTIC_PATTERNS.error);
+      onActionTaken?.(_actionId);
+    } catch (_error) {
+      logger.error('Crisis action failed:');
+      consoleVibrate('undefined', HAPTIC_PATTERNS.undefined);
     } finally {
       setIsLoading(false);
       setIsExpanded(false);
@@ -219,7 +220,7 @@ export function UnifiedCrisisButton({
               exit={{ opacity: 0, y: 20 }}
               className="absolute bottom-16 right-0 space-y-2 mb-2"
             >
-              {getRecommendedContacts(crisisLevel).slice(0, 3).map((contact) => {
+              {getRecommendedContacts(_crisisLevel).slice(0, 3).map((contact) => {
                 const IconComponent = iconMap[contact.type === 'phone' ? 'Phone' : 'MessageSquare'];
                 return (
                   <motion.button

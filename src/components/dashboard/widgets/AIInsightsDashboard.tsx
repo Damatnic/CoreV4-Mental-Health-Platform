@@ -1,7 +1,7 @@
 // AI Insights Dashboard Widget
 // Displays AI-powered mental health insights, patterns, and recommendations
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, _useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
@@ -9,11 +9,11 @@ import {
   AlertCircle,
   Target,
   Activity,
-  Calendar,
+  _Calendar,
   ChevronRight,
   Info,
   CheckCircle,
-  XCircle,
+  _XCircle,
   BarChart3,
   Sparkles,
   Shield,
@@ -30,43 +30,43 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Star,
-  TrendingDown,
+  _Star,
+  _TrendingDown,
   Users,
   Sun,
   Moon,
   Cloud,
   Pill,
-  BookOpen,
+  _BookOpen,
   Settings,
 } from 'lucide-react';
-import { useAIInsights, useProgressMetrics, useTherapeuticIntelligence } from '../../../hooks/useAIInsights';
+import { useAIInsights, _useProgressMetrics, _useTherapeuticIntelligence } from '../../../hooks/useAIInsights';
 import {
-  AIInsight,
-  PatternAnalysis,
-  PredictiveModel,
-  PersonalizedRecommendation,
+  _AIInsight,
+  _PatternAnalysis,
+  _PredictiveModel,
+  _PersonalizedRecommendation,
   InsightCategory,
-  ProgressMetrics,
-  TherapeuticIntelligence,
+  _ProgressMetrics,
+  _TherapeuticIntelligence,
 } from '../../../types/ai-insights';
 
 export function AIInsightsDashboard() {
   const {
     insightsDashboard,
     filteredInsights,
-    isLoading,
-    error,
+    _isLoading,
+    _error,
     selectedInsightCategory,
     setSelectedInsightCategory,
     insightTimeRange,
     setInsightTimeRange,
     markInsightActioned,
-    dismissInsight,
+    _dismissInsight,
     requestRefresh,
     insightStats,
     isMarkingActioned,
-    isDismissing,
+    _isDismissing,
   } = useAIInsights();
 
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
@@ -74,23 +74,23 @@ export function AIInsightsDashboard() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Category icons and colors
-  const categoryConfig: Record<InsightCategory | 'all', { icon: React.ElementType; color: string; bgColor: string }> = {
-    all: { icon: Brain, color: 'text-purple-600', bgColor: 'bg-purple-50' },
-    mood: { icon: Heart, color: 'text-pink-600', bgColor: 'bg-pink-50' },
-    behavior: { icon: Activity, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-    sleep: { icon: Moon, color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-    social: { icon: Users, color: 'text-green-600', bgColor: 'bg-green-50' },
-    activity: { icon: Zap, color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
-    medication: { icon: Pill, color: 'text-orange-600', bgColor: 'bg-orange-50' },
-    therapy: { icon: MessageSquare, color: 'text-purple-600', bgColor: 'bg-purple-50' },
-    crisis: { icon: AlertCircle, color: 'text-red-600', bgColor: 'bg-red-50' },
-    wellness: { icon: Sun, color: 'text-amber-600', bgColor: 'bg-amber-50' },
-    environmental: { icon: Cloud, color: 'text-sky-600', bgColor: 'bg-sky-50' },
+  const categoryConfig: Record<InsightCategory | 'all', { icon: React.ElementType; _color: string; bgColor: string }> = {
+    all: { icon: Brain, _color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    mood: { icon: Heart, _color: 'text-pink-600', bgColor: 'bg-pink-50' },
+    behavior: { icon: Activity, _color: 'text-blue-600', bgColor: 'bg-blue-50' },
+    sleep: { icon: Moon, _color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
+    social: { icon: Users, _color: 'text-green-600', bgColor: 'bg-green-50' },
+    activity: { icon: Zap, _color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    medication: { icon: Pill, _color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    therapy: { icon: MessageSquare, _color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    crisis: { icon: AlertCircle, _color: 'text-red-600', bgColor: 'bg-red-50' },
+    wellness: { icon: Sun, _color: 'text-amber-600', bgColor: 'bg-amber-50' },
+    environmental: { icon: Cloud, _color: 'text-sky-600', bgColor: 'bg-sky-50' },
   };
 
   // Severity colors
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
+  const getSeverityColor = (_severity: string) => {
+    switch (_severity) {
       case 'critical': return 'text-red-600 bg-red-50 border-red-200';
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
@@ -100,8 +100,8 @@ export function AIInsightsDashboard() {
   };
 
   // Convert trend values to expected format
-  const convertTrend = (trend: string): 'up' | 'down' | 'stable' => {
-    switch (trend) {
+  const convertTrend = (_trend: string): 'up' | 'down' | 'stable' => {
+    switch (_trend) {
       case 'improving': return 'up';
       case 'declining': return 'down';
       case 'stable': return 'stable';
@@ -110,20 +110,20 @@ export function AIInsightsDashboard() {
   };
 
   // Trend indicator
-  const TrendIndicator = ({ trend, value }: { trend: 'up' | 'down' | 'stable'; value?: number }) => {
+  const TrendIndicator = ({ trend, value }: { _trend: 'up' | 'down' | 'stable'; value?: number }) => {
     const config = {
-      up: { icon: ArrowUpRight, color: 'text-green-600', bg: 'bg-green-50' },
-      down: { icon: ArrowDownRight, color: 'text-red-600', bg: 'bg-red-50' },
-      stable: { icon: Minus, color: 'text-gray-600', bg: 'bg-gray-50' },
+      up: { icon: ArrowUpRight, _color: 'text-green-600', bg: 'bg-green-50' },
+      down: { icon: ArrowDownRight, _color: 'text-red-600', bg: 'bg-red-50' },
+      stable: { icon: Minus, _color: 'text-gray-600', bg: 'bg-gray-50' },
     };
-    const { icon: Icon, color, bg } = config[trend];
+    const { icon: Icon, _color, bg } = config[trend];
     
     return (
       <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full ${bg}`}>
-        <Icon className={`w-4 h-4 ${color}`} />
+        <Icon className={`w-4 h-4 ${_color}`} />
         {value !== undefined && (
-          <span className={`text-sm font-medium ${color}`}>
-            {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{Math.abs(value)}%
+          <span className={`text-sm font-medium ${_color}`}>
+            {_trend === 'up' ? '+' : _trend === 'down' ? '-' : ''}{Math.abs(_value)}%
           </span>
         )}
       </div>
@@ -131,10 +131,10 @@ export function AIInsightsDashboard() {
   };
 
   // Progress bar component
-  const ProgressBar = ({ value, max = 100, color = 'bg-primary-600' }: { value: number; max?: number; color?: string }) => (
+  const ProgressBar = ({ value, max = 100, _color = 'bg-primary-600' }: { value: number; max?: number; _color?: string }) => (
     <div className="w-full bg-gray-200 rounded-full h-2">
       <div
-        className={`h-2 rounded-full transition-all duration-500 ${color}`}
+        className={`h-2 rounded-full transition-all duration-500 ${_color}`}
         style={{ width: `${(value / max) * 100}%` }}
       />
     </div>
@@ -143,17 +143,17 @@ export function AIInsightsDashboard() {
   // Confidence indicator
   const ConfidenceIndicator = ({ confidence }: { confidence: number }) => {
     const percentage = Math.round(confidence * 100);
-    const color = confidence >= 0.8 ? 'text-green-600' : confidence >= 0.6 ? 'text-yellow-600' : 'text-orange-600';
+    const _color = confidence >= 0.8 ? 'text-green-600' : confidence >= 0.6 ? 'text-yellow-600' : 'text-orange-600';
     
     return (
       <div className="flex items-center gap-2">
-        <Shield className={`w-4 h-4 ${color}`} />
-        <span className={`text-sm font-medium ${color}`}>{percentage}% confidence</span>
+        <Shield className={`w-4 h-4 ${_color}`} />
+        <span className={`text-sm font-medium ${_color}`}>{percentage}% confidence</span>
       </div>
     );
   };
 
-  if (isLoading) {
+  if (_isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center">
@@ -164,7 +164,7 @@ export function AIInsightsDashboard() {
     );
   }
 
-  if (error) {
+  if (_error) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6">
         <div className="flex items-center gap-3 text-red-600">
@@ -262,11 +262,11 @@ export function AIInsightsDashboard() {
               <div className="flex flex-wrap gap-2 mb-3">
                 <span className="text-sm font-medium text-gray-700">Category:</span>
                 {(['all', 'mood', 'behavior', 'sleep', 'activity', 'social', 'wellness'] as const).map(category => {
-                  const { icon: Icon, color } = categoryConfig[category];
+                  const { icon: Icon, _color } = categoryConfig[category];
                   return (
                     <button
                       key={category}
-                      onClick={() => setSelectedInsightCategory(category)}
+                      onClick={() => setSelectedInsightCategory(_category)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
                         selectedInsightCategory === category
                           ? 'bg-primary-100 text-primary-700 border border-primary-300'
@@ -284,7 +284,7 @@ export function AIInsightsDashboard() {
                 {(['week', 'month', 'quarter', 'year'] as const).map(range => (
                   <button
                     key={range}
-                    onClick={() => setInsightTimeRange(range)}
+                    onClick={() => setInsightTimeRange(_range)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       insightTimeRange === range
                         ? 'bg-primary-100 text-primary-700 border border-primary-300'
@@ -314,7 +314,7 @@ export function AIInsightsDashboard() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as unknown)}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                   activeTab === tab.id
                     ? 'bg-white text-primary-600 shadow-sm'
@@ -348,14 +348,14 @@ export function AIInsightsDashboard() {
                 </div>
               ) : (
                 filteredInsights.map(insight => {
-                  const { icon: CategoryIcon, color: categoryColor, bgColor } = categoryConfig[insight.category];
+                  const { icon: CategoryIcon, _color: categoryColor, bgColor } = categoryConfig[insight.category];
                   const isExpanded = expandedInsight === insight.id;
 
                   return (
                     <motion.div
                       key={insight.id}
                       layout
-                      className={`border rounded-lg p-4 transition-all ${getSeverityColor(insight.severity)}`}
+                      className={`border rounded-lg p-4 transition-all ${getSeverityColor(insight._severity)}`}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
@@ -809,7 +809,7 @@ export function AIInsightsDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Overall Wellness Score</h3>
                   <TrendIndicator 
-                    trend={convertTrend(insightsDashboard.progressMetrics.overallWellness.trend)}
+                    trend={convertTrend(insightsDashboard.progressMetrics.overallWellness._trend)}
                     value={insightsDashboard.progressMetrics.overallWellness.changeRate}
                   />
                 </div>
@@ -834,7 +834,7 @@ export function AIInsightsDashboard() {
                     <div key={component.name} className="bg-white/80 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-medium text-gray-600">{component.name}</span>
-                        <TrendIndicator trend={convertTrend(component.trend)} />
+                        <TrendIndicator trend={convertTrend(component._trend)} />
                       </div>
                       <div className="text-2xl font-bold text-gray-900">{component.score}</div>
                       <ProgressBar value={component.score} color="bg-gray-400" />
@@ -849,15 +849,15 @@ export function AIInsightsDashboard() {
                   { label: 'Short Term (7 days)', data: insightsDashboard.progressMetrics.trendAnalysis.shortTerm },
                   { label: 'Medium Term (30 days)', data: insightsDashboard.progressMetrics.trendAnalysis.mediumTerm },
                   { label: 'Long Term (90 days)', data: insightsDashboard.progressMetrics.trendAnalysis.longTerm },
-                ].map(trend => (
-                  <div key={trend.label} className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{trend.label}</h4>
+                ].map(_trend => (
+                  <div key={_trend.label} className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{_trend.label}</h4>
                     <div className="flex items-center justify-between mb-2">
-                      <TrendIndicator trend={trend.data.direction} value={trend.data.magnitude} />
-                      <ConfidenceIndicator confidence={trend.data.confidence} />
+                      <TrendIndicator trend={_trend.data.direction} value={_trend.data.magnitude} />
+                      <ConfidenceIndicator confidence={_trend.data.confidence} />
                     </div>
                     <div className="text-xs text-gray-500">
-                      Key factors: {trend.data.keyFactors.join(', ')}
+                      Key factors: {_trend.data.keyFactors.join(', ')}
                     </div>
                   </div>
                 ))}

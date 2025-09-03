@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  BookOpen, 
+  _BookOpen, 
   Edit3, 
   Heart, 
   Brain, 
-  Shield, 
+  _Shield, 
   Download,
-  Upload,
-  Calendar,
-  Tag,
+  _Upload,
+  _Calendar,
+  _Tag,
   Lock,
   Unlock,
   Search,
-  Filter,
+  _Filter,
   ChevronRight,
   Sparkles,
   Sun,
@@ -23,11 +23,11 @@ import {
   Moon,
   Star,
   TrendingUp,
-  AlertCircle,
+  _AlertCircle,
   Save,
-  Trash2,
-  Share2,
-  FileText
+  _Trash2,
+  _Share2,
+  _FileText
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
@@ -64,7 +64,7 @@ const JOURNAL_TYPES = {
       evidence_for: 'Evidence supporting the thought',
       evidence_against: 'Evidence against the thought',
       balanced_thought: 'More balanced perspective',
-      outcome: 'How do you feel now? (Rate 0-100)'
+      outcome: 'How do you feel _now? (Rate 0-100)'
     }
   },
   emotion: {
@@ -133,11 +133,11 @@ interface JournalPrompt {
 const THERAPEUTIC_PROMPTS: JournalPrompt[] = [
   // CBT Prompts
   { id: '1', category: 'CBT', prompt: 'Identify three negative thoughts you had today. How can you reframe them more realistically?', therapeutic_approach: 'Cognitive Restructuring' },
-  { id: '2', category: 'CBT', prompt: 'What evidence do you have for and against your biggest worry right now?', therapeutic_approach: 'Evidence Examination' },
+  { id: '2', category: 'CBT', prompt: 'What evidence do you have for and against your biggest worry right _now?', therapeutic_approach: 'Evidence Examination' },
   { id: '3', category: 'CBT', prompt: 'Describe a situation where your thoughts influenced your emotions and behaviors.', therapeutic_approach: 'Thought-Emotion-Behavior Connection' },
   
   // DBT Prompts
-  { id: '4', category: 'DBT', prompt: 'Practice radical acceptance: What situation do you need to accept right now?', therapeutic_approach: 'Radical Acceptance' },
+  { id: '4', category: 'DBT', prompt: 'Practice radical acceptance: What situation do you need to accept right _now?', therapeutic_approach: 'Radical Acceptance' },
   { id: '5', category: 'DBT', prompt: 'Describe a time today when you used wise mind (balancing emotion and logic).', therapeutic_approach: 'Wise Mind' },
   { id: '6', category: 'DBT', prompt: 'What opposite action could you take to change an unhelpful emotion?', therapeutic_approach: 'Opposite Action' },
   
@@ -179,10 +179,10 @@ export const TherapeuticJournal: React.FC = () => {
 
   // Load entries from localStorage
   useEffect(() => {
-    const savedEntries = secureStorage.getItem('journalEntries');
-    if (savedEntries) {
-      const parsed = JSON.parse(savedEntries);
-      setEntries(parsed.map((e: any) => ({
+    const _savedEntries = secureStorage.getItem('journalEntries');
+    if (_savedEntries) {
+      const parsed = JSON.parse(_savedEntries);
+      setEntries(parsed.map((e: unknown) => ({
         ...e,
         timestamp: new Date(e.timestamp),
         edited: e.edited ? new Date(e.edited) : undefined
@@ -209,17 +209,17 @@ export const TherapeuticJournal: React.FC = () => {
         clearTimeout(autoSaveTimer.current);
       }
     };
-  }, [currentEntry, autoSaveEnabled, isWriting]);
+  }, [currentEntry, autoSaveEnabled, isWriting, saveDraft]);
 
   // Save draft
-  const saveDraft = () => {
-    const draft = {
+  const saveDraft = useCallback(() => {
+    const _draft = {
       ...currentEntry,
       timestamp: new Date(),
       lastSaved: new Date()
     };
-    secureStorage.setItem('journalDraft', JSON.stringify(draft));
-  };
+    secureStorage.setItem('journalDraft', JSON.stringify(_draft));
+  }, [currentEntry]);
 
   // Calculate word count and reading time
   const calculateStats = (content: string | Record<string, string>) => {
@@ -227,7 +227,7 @@ export const TherapeuticJournal: React.FC = () => {
     if (typeof content === 'string') {
       text = content;
     } else {
-      text = Object.values(content).join(' ');
+      text = Object.values(_content).join(' ');
     }
     
     const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
@@ -244,7 +244,7 @@ export const TherapeuticJournal: React.FC = () => {
     
     const stats = calculateStats(currentEntry.content);
     const newEntry: JournalEntry = {
-      id: Date.now().toString(),
+      id: Date._now().toString(),
       type: currentEntry.type || 'freeform',
       title: currentEntry.title || `${JOURNAL_TYPES[currentEntry.type || 'freeform'].name} - ${formatDate(new Date(), 'MMM d, yyyy')}`,
       content: currentEntry.content,
@@ -263,9 +263,9 @@ export const TherapeuticJournal: React.FC = () => {
       }
     }
     
-    const updatedEntries = [...entries, newEntry];
-    setEntries(updatedEntries);
-    secureStorage.setItem('journalEntries', JSON.stringify(updatedEntries));
+    const _updatedEntries = [...entries, newEntry];
+    setEntries(_updatedEntries);
+    secureStorage.setItem('journalEntries', JSON.stringify(_updatedEntries));
     
     // Clear draft
     secureStorage.removeItem('journalDraft');
@@ -314,8 +314,8 @@ export const TherapeuticJournal: React.FC = () => {
   // Export entries
   const exportEntries = (format: 'json' | 'txt' | 'pdf') => {
     if (format === 'json') {
-      const dataStr = JSON.stringify(entries, null, 2);
-      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
+      const _dataStr = JSON.stringify(entries, null, 2);
+      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
       const exportFileDefaultName = `journal-export-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
@@ -345,8 +345,8 @@ export const TherapeuticJournal: React.FC = () => {
         textContent += `\n${  '-'.repeat(50)  }\n\n`;
       });
       
-      const blob = new Blob([textContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
+      const _blob = new Blob([textContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(_blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `journal-export-${formatDate(new Date(), 'yyyy-MM-dd')}.txt`;
@@ -359,23 +359,23 @@ export const TherapeuticJournal: React.FC = () => {
     let matches = true;
     
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const _query = searchQuery.toLowerCase();
       const content = typeof entry.content === 'string' 
         ? entry.content.toLowerCase()
         : Object.values(entry.content).join(' ').toLowerCase();
       
       matches = matches && (
-        entry.title.toLowerCase().includes(query) ||
-        content.includes(query) ||
-        entry.tags.some(tag => tag.toLowerCase().includes(query))
+        entry.title.toLowerCase().includes(_query) ||
+        content.includes(_query) ||
+        entry.tags.some(tag => tag.toLowerCase().includes(_query))
       );
     }
     
-    if (filterMood) {
+    if (_filterMood) {
       matches = matches && entry.mood === filterMood;
     }
     
-    if (filterType) {
+    if (_filterType) {
       matches = matches && entry.type === filterType;
     }
     
@@ -384,9 +384,9 @@ export const TherapeuticJournal: React.FC = () => {
 
   // Get weekly stats
   const getWeeklyStats = () => {
-    const now = new Date();
-    const weekStart = startOfWeek(now);
-    const weekEnd = endOfWeek(now);
+    const _now = new Date();
+    const weekStart = startOfWeek(_now);
+    const weekEnd = endOfWeek(_now);
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
     
     return days.map(day => {
@@ -398,7 +398,7 @@ export const TherapeuticJournal: React.FC = () => {
         date: day,
         count: dayEntries.length,
         words: dayEntries.reduce((sum, e) => sum + e.wordCount, 0),
-        isToday: isToday(day)
+        isToday: isToday(_day)
       };
     });
   };
@@ -485,7 +485,7 @@ export const TherapeuticJournal: React.FC = () => {
                   Choose Journal Type
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {Object.entries(JOURNAL_TYPES).map(([key, type]) => {
+                  {Object.entries(_JOURNAL_TYPES).map(([key, type]) => {
                     const Icon = type.icon;
                     return (
                       <motion.button
@@ -700,7 +700,7 @@ export const TherapeuticJournal: React.FC = () => {
               {/* Title Input */}
               <input
                 type="text"
-                placeholder="Entry title (optional)"
+                placeholder="Entry title (_optional)"
                 value={currentEntry.title || ''}
                 onChange={(e) => setCurrentEntry(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full mb-4 px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -822,7 +822,7 @@ export const TherapeuticJournal: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Search and Filter */}
+          {/* Search and _Filter */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
               Search & Filter
@@ -845,7 +845,7 @@ export const TherapeuticJournal: React.FC = () => {
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
-                {Object.entries(JOURNAL_TYPES).map(([key, type]) => (
+                {Object.entries(_JOURNAL_TYPES).map(([key, type]) => (
                   <option key={key} value={key}>{type.name}</option>
                 ))}
               </select>

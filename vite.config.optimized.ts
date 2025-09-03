@@ -339,10 +339,6 @@ export default defineConfig({
         
         // Optimize chunk file names
         chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId ? 
-            chunkInfo.facadeModuleId.split('/').pop()?.replace('.tsx', '').replace('.ts', '') : 
-            'chunk';
-          
           // Critical chunks get shorter names
           if (chunkInfo.name?.includes('crisis')) {
             return 'c/[name]-[hash:8].js';

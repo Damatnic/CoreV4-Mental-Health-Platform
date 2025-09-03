@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users, Zap } from 'lucide-react';
+import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield } from 'lucide-react';
 import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { CrisisChat } from './CrisisChat';
+import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
 import { logger, LogCategory } from '../../services/logging/logger';
 
@@ -15,7 +15,7 @@ interface CrisisLevel {
   priority: number;
 }
 
-const CONSOLE_CRISIS_LEVELS: Record<string, CrisisLevel> = {
+const _CONSOLE_CRISIS_LEVELS: Record<string, CrisisLevel> = {
   low: {
     level: 'low',
     description: 'Feeling stressed or overwhelmed',
@@ -47,8 +47,8 @@ const CONSOLE_CRISIS_LEVELS: Record<string, CrisisLevel> = {
 };
 
 export function ConsoleCrisisSystem() {
-  const [currentCrisisLevel, setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
-  const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
+  const [currentCrisisLevel, _setCurrentCrisisLevel] = useState<CrisisLevel | null>(null);
+  const [_showEmergencyDialog, _setShowEmergencyDialog] = useState(false);
   const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
   const [activeTab, setActiveTab] = useState<'emergency' | 'resources' | 'safety' | 'chat'>('emergency');
   const [responseTime, setResponseTime] = useState(0);
@@ -57,10 +57,10 @@ export function ConsoleCrisisSystem() {
   // Enhanced pulse effect for critical situations
   useEffect(() => {
     if (currentCrisisLevel?.level === 'critical') {
-      const interval = setInterval(() => {
+      const _interval = setInterval(() => {
         setPulseIntensity(prev => prev === 1 ? 1.2 : 1);
       }, 800);
-      return () => clearInterval(interval);
+      return () => clearInterval(_interval);
     }
   }, [currentCrisisLevel]);
 
@@ -74,7 +74,7 @@ export function ConsoleCrisisSystem() {
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => setUserLocation(position),
+        (_position) => setUserLocation(_position),
         (error) => logger.error('Location access denied', new Error(error.message), { category: LogCategory.CRISIS }),
         { enableHighAccuracy: true, timeout: 5000 }
       );
@@ -94,7 +94,7 @@ export function ConsoleCrisisSystem() {
   }, [responseTime]);
 
   const handleCrisisText = useCallback((number: string, keyword: string) => {
-    const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(keyword)}` : ''}`;
+    const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(_keyword)}` : ''}`;
     window.location.href = smsUrl;
     
     logger.logCrisisIntervention('crisis_text_initiated', undefined, {
@@ -235,13 +235,13 @@ export function ConsoleCrisisSystem() {
                   id={`crisis-tab-${tab.id}`}
                   group="crisis-navigation"
                   priority={tab.urgent ? 90 : 70}
-                  onActivate={() => setActiveTab(tab.id as any)}
+                  onActivate={() => setActiveTab(tab.id as 'emergency' | 'resources' | 'safety' | 'chat')}
                 >
                   <motion.button
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.1 }}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id as 'emergency' | 'resources' | 'safety' | 'chat')}
                     className={`group flex items-center space-x-3 py-4 px-6 rounded-console-lg transition-all duration-300 relative overflow-hidden ${
                       activeTab === tab.id
                         ? `bg-gradient-to-r ${tab.urgent ? 'from-red-500/30 to-pink-500/30' : 'from-blue-500/20 to-purple-500/20'} text-white border ${tab.urgent ? 'border-red-400/50' : 'border-blue-400/30'} ${tab.urgent ? 'shadow-red-500/30' : 'shadow-console-glow'}`
@@ -323,7 +323,9 @@ export function ConsoleCrisisSystem() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <CrisisChat />
+                <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
+                  <CrisisChatLazy />
+                </Suspense>
               </motion.div>
             )}
           </AnimatePresence>

@@ -114,7 +114,7 @@ const defaultPreferences: UserPreferences = {
 };
 
 export function useUserPreferences(userId: string) {
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [preferences, setPreferences] = useState<UserPreferences>(_defaultPreferences);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -125,20 +125,20 @@ export function useUserPreferences(userId: string) {
         setLoading(true);
         
         // Try to load from localStorage first
-        const localKey = `userPreferences_${userId}`;
-        const savedPreferences = secureStorage.getItem(localKey);
+        const _localKey = `userPreferences_${userId}`;
+        const _savedPreferences = secureStorage.getItem(_localKey);
         
-        if (savedPreferences) {
-          const parsed = JSON.parse(savedPreferences);
+        if (_savedPreferences) {
+          const parsed = JSON.parse(_savedPreferences);
           setPreferences({ ...defaultPreferences, ...parsed });
         } else {
           // If not in localStorage, you could fetch from API here
           // const response = await fetch(`/api/users/${userId}/preferences`);
           // const data = await response.json();
-          // setPreferences(data);
+          // setPreferences(_data);
         }
-      } catch (err) {
-        console.error('Error loading preferences:', err);
+      } catch (_error) {
+        logger.error('Error loading preferences:', err);
         setError('Failed to load preferences');
       } finally {
         setLoading(false);
@@ -149,21 +149,21 @@ export function useUserPreferences(userId: string) {
   }, [userId]);
 
   // Save preferences to localStorage (and optionally to API)
-  const savePreferences = useCallback(async (newPreferences: UserPreferences) => {
+  const savePreferences = useCallback(async (_newPreferences: UserPreferences) => {
     try {
-      const localKey = `userPreferences_${userId}`;
-      secureStorage.setItem(localKey, JSON.stringify(newPreferences));
+      const _localKey = `userPreferences_${userId}`;
+      secureStorage.setItem(_localKey, JSON.stringify(_newPreferences));
       
       // Optionally save to API
       // await fetch(`/api/users/${userId}/preferences`, {
       //   method: 'PUT',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(newPreferences)
+      //   body: JSON.stringify(_newPreferences)
       // });
       
       return true;
-    } catch (err) {
-      console.error('Error saving preferences:', err);
+    } catch (_error) {
+      logger.error('Error saving preferences:', err);
       setError('Failed to save preferences');
       return false;
     }
@@ -174,9 +174,9 @@ export function useUserPreferences(userId: string) {
     key: K,
     value: UserPreferences[K]
   ) => {
-    const newPreferences = { ...preferences, [key]: value };
-    setPreferences(newPreferences);
-    await savePreferences(newPreferences);
+    const _newPreferences = { ...preferences, [key]: value };
+    setPreferences(_newPreferences);
+    await savePreferences(_newPreferences);
   }, [preferences, savePreferences]);
 
   // Update nested preference
@@ -188,27 +188,27 @@ export function useUserPreferences(userId: string) {
     key: NK,
     value: UserPreferences[K][NK]
   ) => {
-    const newPreferences = {
+    const _newPreferences = {
       ...preferences,
       [category]: {
         ...(preferences[category] as object),
         [key]: value
       }
     };
-    setPreferences(newPreferences);
-    await savePreferences(newPreferences);
+    setPreferences(_newPreferences);
+    await savePreferences(_newPreferences);
   }, [preferences, savePreferences]);
 
   // Reset to defaults
   const resetToDefaults = useCallback(async () => {
-    setPreferences(defaultPreferences);
-    await savePreferences(defaultPreferences);
+    setPreferences(_defaultPreferences);
+    await savePreferences(_defaultPreferences);
   }, [savePreferences]);
 
   // Export preferences
   const exportPreferences = useCallback(() => {
-    const dataStr = JSON.stringify(preferences, null, 2);
-    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
+    const _dataStr = JSON.stringify(preferences, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
     
     const exportFileDefaultName = `preferences_${userId}_${Date.now()}.json`;
     
@@ -221,22 +221,23 @@ export function useUserPreferences(userId: string) {
   // Import preferences
   const importPreferences = useCallback(async (file: File): Promise<boolean> => {
     try {
-      const text = await file.text();
-      const imported = JSON.parse(text);
+      const _text = await file._text();
+      const imported = JSON.parse(_text);
       
       // Validate imported preferences
       if (!imported.theme || !imported.notifications) {
         throw new Error('Invalid preferences file');
       }
       
-      const newPreferences = { ...defaultPreferences, ...imported };
-      setPreferences(newPreferences);
-      await savePreferences(newPreferences);
+      const _newPreferences = { ...defaultPreferences, ...imported };
+      setPreferences(_newPreferences);
+      await savePreferences(_newPreferences);
       
       return true;
-    } catch (err) {
-      console.error('Error importing preferences:', err);
+    } catch (_error) {
+      logger.error('Error importing preferences:', err);
       setError('Failed to import preferences');
+import { logger } from '../utils/logger';
       return false;
     }
   }, [savePreferences]);

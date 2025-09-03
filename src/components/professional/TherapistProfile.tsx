@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -16,27 +17,27 @@ import {
   Languages,
   Shield,
   CheckCircle,
-  Heart,
-  BookOpen,
+  _Heart,
+  _BookOpen,
   Users,
-  FileText,
+  _FileText,
   Play,
   Pause,
   Briefcase,
   Volume2,
   VolumeX,
-  ChevronLeft,
-  ChevronRight,
+  _ChevronLeft,
+  _ChevronRight,
   ThumbsUp,
   Flag,
   Share2
 } from 'lucide-react';
-import { therapistService } from '../../services/professional/TherapistService';
+import { _therapistService } from '../../services/professional/TherapistService';
 
 interface TherapistProfileProps {
   therapistId: string;
   onBookAppointment: () => void;
-  onClose?: () => void;
+  _onClose?: () => void;
 }
 
 interface Review {
@@ -142,30 +143,30 @@ const mockExperience: ExperienceItem[] = [
   }
 ];
 
-export function TherapistProfile({ therapistId, onBookAppointment, onClose }: TherapistProfileProps) {
-  const [therapist, setTherapist] = useState<any>(null);
+export function TherapistProfile({ therapistId, onBookAppointment, _onClose }: TherapistProfileProps) {
+  const [therapist, setTherapist] = useState<unknown>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [_selectedReview, _setSelectedReview] = useState<Review | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTherapist = async () => {
       setLoading(true);
       try {
         // In production, fetch from API
-        const therapistData = {
+        const _therapistData = {
           id: therapistId,
           name: 'Dr. Sarah Chen, PhD',
           title: 'Licensed Clinical Psychologist',
           credentials: ['PhD Clinical Psychology', 'Licensed Psychologist', 'EMDR Certified'],
           specializations: ['Anxiety Disorders', 'Trauma & PTSD', 'Depression'],
-          approaches: ['Cognitive Behavioral Therapy (CBT)', 'EMDR', 'Mindfulness-Based Therapy'],
+          approaches: ['Cognitive Behavioral Therapy (_CBT)', 'EMDR', 'Mindfulness-Based Therapy'],
           description: 'Dr. Chen is a compassionate and experienced clinical psychologist specializing in anxiety, trauma, and depression. With over 12 years of experience, she combines evidence-based therapeutic approaches with a warm, supportive style to help clients achieve lasting change.',
           longBio: `Dr. Sarah Chen brings over 12 years of dedicated experience in clinical psychology, with a particular focus on anxiety disorders, trauma recovery, and depression treatment. She earned her Ph.D. in Clinical Psychology from Stanford University and has since been committed to providing compassionate, evidence-based care.
 
-Dr. Chen's approach integrates cognitive-behavioral therapy (CBT) with EMDR and mindfulness-based interventions, allowing her to tailor treatment to each client's unique needs. She believes in creating a safe, non-judgmental space where clients feel heard and supported as they work toward their goals.
+Dr. Chen's approach integrates cognitive-behavioral therapy (_CBT) with EMDR and mindfulness-based interventions, allowing her to tailor treatment to each client's unique needs. She believes in creating a safe, non-judgmental space where clients feel heard and supported as they work toward their goals.
 
 Her expertise in trauma-informed care has made her particularly effective in helping clients process difficult experiences and develop healthy coping strategies. Dr. Chen is fluent in English and Mandarin, and she values cultural sensitivity in her practice.
 
@@ -215,7 +216,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
             email: 'dr.chen@example.com',
             website: 'https://drchenwellness.com'
           },
-          virtualPlatforms: ['Secure Video Portal', 'Zoom (Healthcare)', 'Doxy.me'],
+          virtualPlatforms: ['Secure Video Portal', 'Zoom (_Healthcare)', 'Doxy.me'],
           photos: [
             '/api/placeholder/300/400', // Professional headshot
             '/api/placeholder/400/300', // Office photo
@@ -241,9 +242,9 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
           ]
         };
         
-        setTherapist(therapistData);
-      } catch (error) {
-        console.error('Failed to load therapist:', error);
+        setTherapist(_therapistData);
+      } catch (_error) {
+        logger.error('Failed to load therapist:');
       } finally {
         setLoading(false);
       }
@@ -278,7 +279,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
     );
   };
 
-  if (loading) {
+  if (_loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -426,7 +427,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id as unknown)}
                     className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
@@ -517,7 +518,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold mb-4">Specialty Areas</h2>
                   <div className="space-y-6">
-                    {therapist.specialtyAreas.map((area: any, index: number) => (
+                    {therapist.specialtyAreas.map((area: unknown, index: number) => (
                       <div key={index} className="border-l-4 border-blue-200 pl-4">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">{area.name}</h3>

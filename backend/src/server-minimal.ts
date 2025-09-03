@@ -5,7 +5,7 @@
  * Focuses on critical routes: auth and crisis intervention
  */
 
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -15,9 +15,23 @@ import dotenv from 'dotenv';
 // Import simple working routes
 import authRoutes from './routes/auth-simple';
 import crisisRoutes from './routes/crisis-simple';
+import winston from 'winston';
 
 // Load environment variables
 dotenv.config();
+
+// Configure logger for this module
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'server-minimal' },
+  transports: [
+    new winston.transports.Console()
+  ]
+});
 
 class MinimalMentalHealthServer {
   private app: Application;
@@ -130,19 +144,19 @@ class MinimalMentalHealthServer {
     });
 
     // Global error handler
-    this.app.use((error: any, req: Request, res: Response, next: any) => {
-      console.error('Server Error:', {
-        error: error.message,
-        stack: error.stack,
+    this.app.use((error: Error, req: Request, res: Response, _next: NextFunction) => {
+      logger.error('Server Error:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
         url: req.url,
         method: req.method,
         timestamp: new Date().toISOString()
       });
 
-      res.status(error.status || 500).json({
+      res.status(error?.status || 500).json({
         error: process.env.NODE_ENV === 'production' 
           ? 'Internal server error' 
-          : error.message,
+          : error?.message || 'Unknown error',
         timestamp: new Date().toISOString()
       });
     });
@@ -151,21 +165,21 @@ class MinimalMentalHealthServer {
   public start(): void {
     try {
       this.app.listen(this.port, () => {
-        console.log(`🚀 CoreV4 Mental Health API Server`);
-        console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🔗 Server: http://localhost:${this.port}`);
-        console.log(`🏥 Health: http://localhost:${this.port}/api/health`);
-        console.log(`🔐 Auth: http://localhost:${this.port}/api/auth`);
-        console.log(`🚨 Crisis: http://localhost:${this.port}/api/crisis`);
+        logger.info(`🚀 CoreV4 Mental Health API Server`);
+        logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        logger.info(`🔗 Server: http://localhost:${this.port}`);
+        logger.info(`🏥 Health: http://localhost:${this.port}/api/health`);
+        logger.info(`🔐 Auth: http://localhost:${this.port}/api/auth`);
+        logger.info(`🚨 Crisis: http://localhost:${this.port}/api/crisis`);
         
         if (process.env.NODE_ENV === 'development') {
-          console.log(`📝 Logs: Debug mode enabled`);
+          logger.info(`📝 Logs: Debug mode enabled`);
         }
         
-        console.log('✅ Server ready for mental health platform deployment');
+        logger.info('✅ Server ready for mental health platform deployment');
       });
     } catch (error) {
-      console.error('❌ Failed to start server:', error);
+      logger.error('❌ Failed to start server:', error);
       process.exit(1);
     }
   }

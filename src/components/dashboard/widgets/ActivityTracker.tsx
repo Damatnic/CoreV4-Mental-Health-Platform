@@ -15,16 +15,16 @@ import {
   AlertCircle,
   ChevronRight,
   Plus,
-  Edit2,
-  X,
+  _Edit2,
+  _X,
   Star,
   Award
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, isToday, isPast, isFuture, differenceInMinutes, addDays } from 'date-fns';
+import { format, _isToday, isPast, _isFuture, _differenceInMinutes, addDays } from 'date-fns';
 
 interface ActivityTrackerProps {
-  onActivityClick?: (activity: any) => void;
+  onActivityClick?: (activity: unknown) => void;
   onAddActivity?: () => void;
   energyLevel?: 'low' | 'medium' | 'high';
   currentMood?: number;
@@ -38,7 +38,7 @@ export function ActivityTracker({
 }: ActivityTrackerProps) {
   const {
     activities,
-    dailySchedule,
+    _dailySchedule,
     completeActivity,
     rescheduleActivity,
     getActivityRecommendations,
@@ -56,7 +56,7 @@ export function ActivityTracker({
 
   // Generate daily schedule on mount and date change
   useEffect(() => {
-    generateDailySchedule(selectedDate);
+    generateDailySchedule(_selectedDate);
   }, [selectedDate, generateDailySchedule]);
 
   // Get today's activities
@@ -79,8 +79,8 @@ export function ActivityTracker({
   const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   // Get activity icon based on category
-  const getActivityIcon = (category: string) => {
-    switch (category) {
+  const getActivityIcon = (_category: string) => {
+    switch (_category) {
       case 'therapy': return Brain;
       case 'wellness': return Heart;
       case 'social': return Users;
@@ -91,8 +91,8 @@ export function ActivityTracker({
   };
 
   // Get energy indicator color
-  const getEnergyColor = (level: string) => {
-    switch (level) {
+  const getEnergyColor = (_level: string) => {
+    switch (_level) {
       case 'low': return 'text-blue-500 bg-blue-50';
       case 'medium': return 'text-yellow-500 bg-yellow-50';
       case 'high': return 'text-red-500 bg-red-50';
@@ -212,7 +212,7 @@ export function ActivityTracker({
             </motion.div>
           ) : (
             todayActivities.map((activity) => {
-              const Icon = getActivityIcon(activity.category);
+              const Icon = getActivityIcon(activity._category);
               const isPastDue = activity.scheduledTime && isPast(new Date(activity.scheduledTime)) && !activity.completed;
               const isEditing = editingActivity === activity.id;
               
@@ -350,7 +350,7 @@ export function ActivityTracker({
                                 {[-3, -2, -1, 0, 1, 2, 3].map((impact) => (
                                   <button
                                     key={impact}
-                                    onClick={() => setMoodImpact(impact)}
+                                    onClick={() => setMoodImpact(_impact)}
                                     className={`
                                       px-3 py-1 rounded-lg text-sm font-medium transition-colors
                                       ${moodImpact === impact 
@@ -371,7 +371,7 @@ export function ActivityTracker({
 
                             <div>
                               <label className="text-sm font-medium text-gray-700">
-                                Notes (optional)
+                                Notes (_optional)
                               </label>
                               <textarea
                                 value={completionNote}
@@ -437,7 +437,7 @@ export function ActivityTracker({
                 {rescheduleSuggestions.length > 0 && (
                   <div className="p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-xs text-yellow-800 mb-1">
-                      These activities don't match your current energy level:
+                      These activities don't match your current energy _level:
                     </p>
                     {rescheduleSuggestions.slice(0, 2).map((activity) => (
                       <div key={activity.id} className="flex items-center justify-between text-xs mt-1">
@@ -456,7 +456,7 @@ export function ActivityTracker({
                 {recommendations.length > 0 && (
                   <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-xs text-green-800 mb-1">
-                      Recommended activities for your energy level:
+                      Recommended activities for your energy _level:
                     </p>
                     {recommendations.slice(0, 3).map((activity) => (
                       <div key={activity.id} className="flex items-center justify-between text-xs mt-1">

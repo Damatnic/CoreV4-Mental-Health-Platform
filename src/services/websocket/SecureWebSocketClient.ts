@@ -9,10 +9,11 @@
 import { io, Socket } from 'socket.io-client';
 import { ApiService } from '../api/ApiService';
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 export interface WebSocketMessage {
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: Date;
   id?: string;
 }
@@ -27,7 +28,7 @@ export interface CrisisMessage {
 
 export interface WellnessUpdate {
   type: 'mood' | 'activity' | 'journal' | 'assessment';
-  data: any;
+  data: unknown;
   userId: string;
   timestamp: Date;
 }
@@ -45,7 +46,7 @@ export class SecureWebSocketClient {
   private onConnectionChange: ((connected: boolean) => void) | null = null;
   private onCrisisMessage: ((message: CrisisMessage) => void) | null = null;
   private onWellnessUpdate: ((update: WellnessUpdate) => void) | null = null;
-  private onError: ((error: any) => void) | null = null;
+  private onError: ((error: unknown) => void) | null = null;
 
   private constructor() {}
 
@@ -61,7 +62,7 @@ export class SecureWebSocketClient {
    */
   public async connect(): Promise<void> {
     if (this.socket && this.isConnected) {
-      console.info('🔗 WebSocket already connected');
+      logger.debug('WebSocket already connected', 'SecureWebSocketClient');
       return;
     }
 
@@ -70,11 +71,11 @@ export class SecureWebSocketClient {
       const token = secureStorage.getItem('access_token');
 
       if (!token) {
-        console.warn('⚠️ No access token found for WebSocket authentication');
+        logger.warn('⚠️ No access token found for WebSocket authentication');
         throw new Error('Authentication token required');
       }
 
-      console.info('🔗 Connecting to secure WebSocket server...', wsUrl);
+      logger.info('Connecting to secure WebSocket server', 'SecureWebSocketClient', { wsUrl });
 
       this.socket = io(wsUrl, {
         auth: {
@@ -95,7 +96,7 @@ export class SecureWebSocketClient {
         }
 
         this.socket.on('connect', () => {
-          console.info('✅ WebSocket connected successfully');
+          logger.info('WebSocket connected successfully', 'SecureWebSocketClient');
           this.isConnected = true;
           this.reconnectAttempts = 0;
           this.reconnectDelay = 1000;
@@ -103,8 +104,8 @@ export class SecureWebSocketClient {
           resolve();
         });
 
-        this.socket.on('connect_error', (error: any) => {
-          console.error('❌ WebSocket connection failed:', error);
+        this.socket.on('connect_error', (error: unknown) => {
+          logger.error('❌ WebSocket connection failed:', error);
           this.isConnected = false;
           this.onConnectionChange?.(false);
           this.onError?.(error);
@@ -112,12 +113,12 @@ export class SecureWebSocketClient {
         });
       });
 
-    } catch (error) {
-      console.error('❌ WebSocket connection error:', error);
+    } catch (_error) {
+      logger.error('❌ WebSocket connection error: ');
       this.isConnected = false;
       this.onConnectionChange?.(false);
       this.scheduleReconnect();
-      throw error;
+      throw undefined;
     }
   }
 
@@ -128,62 +129,62 @@ export class SecureWebSocketClient {
     if (!this.socket) return;
 
     // Connection events
-    this.socket.on('disconnect', (reason: any) => {
-      console.warn('🔌 WebSocket disconnected:', reason);
+    this.socket.on('disconnect', (reason: unknown) => {
+      logger.warn('🔌 WebSocket disconnected:', reason);
       this.isConnected = false;
       this.onConnectionChange?.(false);
       
       // Automatic reconnection for unexpected disconnections
       if (reason === 'io server disconnect') {
         // Server initiated disconnect - don't reconnect immediately
-        console.info('Server requested disconnect');
+        logger.info('Server requested disconnect', 'SecureWebSocketClient');
       } else {
         this.scheduleReconnect();
       }
     });
 
-    this.socket.on('error', (error: any) => {
-      console.error('❌ WebSocket error:', error);
+    this.socket.on('error', (error: unknown) => {
+      logger.error('❌ WebSocket error:', error);
       this.onError?.(error);
     });
 
     // Crisis intervention messages
     this.socket.on('crisis:message', (data: CrisisMessage) => {
-      console.info('🚨 Crisis message received:', data.urgency);
+      logger.crisis('Crisis message received', data.urgency as 'low' | 'medium' | 'high' | 'critical', 'SecureWebSocketClient', data);
       this.onCrisisMessage?.(data);
     });
 
-    this.socket.on('crisis:response', (data: any) => {
-      console.info('💬 Crisis response received');
+    this.socket.on('crisis:response', (_data: unknown) => {
+      logger.info('Crisis response received', 'SecureWebSocketClient');
       // Handle crisis response (e.g., professional support available)
     });
 
-    this.socket.on('crisis:escalation', (data: any) => {
-      console.warn('🚨 Crisis escalation:', data);
+    this.socket.on('crisis:escalation', (data: unknown) => {
+      logger.warn('🚨 Crisis escalation:', data);
       // Handle crisis escalation (emergency services, etc.)
     });
 
     // Wellness updates
     this.socket.on('wellness:update', (data: WellnessUpdate) => {
-      console.info('💚 Wellness update received:', data.type);
+      logger.info('Wellness update received', 'SecureWebSocketClient', { type: data.type });
       this.onWellnessUpdate?.(data);
     });
 
     // Community events
-    this.socket.on('community:message', (data: any) => {
-      console.info('👥 Community message received');
+    this.socket.on('community:message', (_data: unknown) => {
+      logger.info('Community message received', 'SecureWebSocketClient');
       // Handle community messages
     });
 
     // System messages
-    this.socket.on('system:notification', (data: any) => {
-      console.info('🔔 System notification:', data);
+    this.socket.on('system:notification', (data: unknown) => {
+      logger.info('System notification', 'SecureWebSocketClient', data);
       // Handle system notifications
     });
 
     // Authentication errors
-    this.socket.on('auth:error', (error: any) => {
-      console.error('🔐 Authentication error:', error);
+    this.socket.on('auth:error', (error: unknown) => {
+      logger.error('🔐 Authentication error:', error);
       this.onError?.(error);
       
       // Token might be expired, try to refresh
@@ -196,17 +197,17 @@ export class SecureWebSocketClient {
    */
   private async handleAuthError(): Promise<void> {
     try {
-      const apiService = ApiService.getInstance();
+      const _apiService = ApiService.getInstance();
       // Try to refresh token
-      // await apiService.refreshToken();
+      // await _apiService.refreshToken();
       
       // Reconnect with new token
       this.disconnect();
       await new Promise(resolve => setTimeout(resolve, 2000));
       await this.connect();
-    } catch (error) {
-      console.error('❌ Failed to handle auth error:', error);
-      this.onError?.(error);
+    } catch (_error) {
+      logger.error('❌ Failed to handle auth error: ');
+      this.onError?.(_undefined);
     }
   }
 
@@ -236,7 +237,7 @@ export class SecureWebSocketClient {
    */
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('🚫 Max reconnection attempts reached');
+      logger.error('🚫 Max reconnection attempts reached');
       this.onError?.(new Error('Max reconnection attempts reached'));
       return;
     }
@@ -244,13 +245,13 @@ export class SecureWebSocketClient {
     this.reconnectAttempts++;
     const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), 30000);
     
-    console.info(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
+    logger.info(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`, 'SecureWebSocketClient');
     
     setTimeout(async () => {
       try {
         await this.connect();
-      } catch (error) {
-        console.error('❌ Reconnection failed:', error);
+      } catch (_error) {
+        logger.error('❌ Reconnection failed:');
       }
     }, delay);
   }
@@ -260,7 +261,7 @@ export class SecureWebSocketClient {
    */
   public disconnect(): void {
     if (this.socket) {
-      console.info('🔌 Disconnecting WebSocket...');
+      logger.info('Disconnecting WebSocket', 'SecureWebSocketClient');
       this.stopHeartbeat();
       this.socket.disconnect();
       this.socket = null;
@@ -274,7 +275,7 @@ export class SecureWebSocketClient {
    */
   public sendCrisisMessage(message: Omit<CrisisMessage, 'timestamp'>): void {
     if (!this.socket || !this.isConnected) {
-      console.warn('⚠️ Cannot send crisis message - WebSocket not connected');
+      logger.warn('⚠️ Cannot send crisis message - WebSocket not connected');
       return;
     }
 
@@ -283,7 +284,7 @@ export class SecureWebSocketClient {
       timestamp: new Date()
     };
 
-    console.info('🚨 Sending crisis message:', crisisMessage.urgency);
+    logger.crisis('Sending crisis message', crisisMessage.urgency as 'low' | 'medium' | 'high' | 'critical', 'SecureWebSocketClient', crisisMessage);
     this.socket.emit('crisis:message', crisisMessage);
   }
 
@@ -292,11 +293,11 @@ export class SecureWebSocketClient {
    */
   public joinCrisisRoom(roomId: string): void {
     if (!this.socket || !this.isConnected) {
-      console.warn('⚠️ Cannot join crisis room - WebSocket not connected');
+      logger.warn('⚠️ Cannot join crisis room - WebSocket not connected');
       return;
     }
 
-    console.info('🚨 Joining crisis room:', roomId);
+    logger.info('Joining crisis room', 'SecureWebSocketClient', { roomId });
     this.socket.emit('crisis:join', roomId);
   }
 
@@ -306,7 +307,7 @@ export class SecureWebSocketClient {
   public leaveCrisisRoom(roomId: string): void {
     if (!this.socket || !this.isConnected) return;
 
-    console.info('🚨 Leaving crisis room:', roomId);
+    logger.info('Leaving crisis room', 'SecureWebSocketClient', { roomId });
     this.socket.emit('crisis:leave', roomId);
   }
 
@@ -315,11 +316,11 @@ export class SecureWebSocketClient {
    */
   public subscribeToWellnessUpdates(): void {
     if (!this.socket || !this.isConnected) {
-      console.warn('⚠️ Cannot subscribe to wellness updates - WebSocket not connected');
+      logger.warn('⚠️ Cannot subscribe to wellness updates - WebSocket not connected');
       return;
     }
 
-    console.info('💚 Subscribing to wellness updates');
+    logger.info('Subscribing to wellness updates', 'SecureWebSocketClient');
     this.socket.emit('wellness:subscribe');
   }
 
@@ -328,7 +329,7 @@ export class SecureWebSocketClient {
    */
   public sendWellnessUpdate(update: Omit<WellnessUpdate, 'timestamp'>): void {
     if (!this.socket || !this.isConnected) {
-      console.warn('⚠️ Cannot send wellness update - WebSocket not connected');
+      logger.warn('⚠️ Cannot send wellness update - WebSocket not connected');
       return;
     }
 
@@ -337,7 +338,7 @@ export class SecureWebSocketClient {
       timestamp: new Date()
     };
 
-    console.info('💚 Sending wellness update:', wellnessUpdate.type);
+    logger.info('Sending wellness update', 'SecureWebSocketClient', { type: wellnessUpdate.type });
     this.socket.emit('wellness:update', wellnessUpdate);
   }
 
@@ -346,11 +347,11 @@ export class SecureWebSocketClient {
    */
   public joinCommunityGroup(groupId: string): void {
     if (!this.socket || !this.isConnected) {
-      console.warn('⚠️ Cannot join community group - WebSocket not connected');
+      logger.warn('⚠️ Cannot join community group - WebSocket not connected');
       return;
     }
 
-    console.info('👥 Joining community group:', groupId);
+    logger.info('Joining community group', 'SecureWebSocketClient', { groupId });
     this.socket.emit('community:join', groupId);
   }
 
@@ -369,7 +370,7 @@ export class SecureWebSocketClient {
     this.onWellnessUpdate = callback;
   }
 
-  public onErrorReceived(callback: (error: any) => void): void {
+  public onErrorReceived(callback: (error: unknown) => void): void {
     this.onError = callback;
   }
 
@@ -389,4 +390,4 @@ export class SecureWebSocketClient {
 }
 
 // Export singleton instance
-export const secureWebSocket = SecureWebSocketClient.getInstance();
+export const _secureWebSocket = SecureWebSocketClient.getInstance();

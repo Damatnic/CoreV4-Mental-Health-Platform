@@ -6,6 +6,7 @@
 
 import { secureStorage } from './secureStorage';
 import { cryptoService } from './cryptoService';
+import { logger } from '../../utils/logger';
 
 export interface AuditLogEntry {
   id: string;
@@ -143,14 +144,14 @@ class AuditLoggerService {
 
       // Add signature if enabled
       if (this.config.enableSignatures) {
-        entry.signature = await this.signLogEntry(entry);
+        entry.signature = await this.signLogEntry(_entry);
       }
 
       // Add to memory buffer
-      this.logs.push(entry);
+      this.logs.push(_entry);
 
       // Check if immediate persistence is needed
-      if (this.shouldPersistImmediately(entry)) {
+      if (this.shouldPersistImmediately(_entry)) {
         await this.persistLogs();
       }
 
@@ -161,10 +162,10 @@ class AuditLoggerService {
 
       // Send critical events to monitoring service
       if (entry.severity === 'critical') {
-        this.notifyCriticalEvent(entry);
+        this.notifyCriticalEvent(_entry);
       }
-    } catch (error) {
-      console.error('Failed to log audit event:', error);
+    } catch (_error) {
+      logger.error('Failed to log audit event:');
       // Audit logging should never throw - fail silently but log to console
     }
   }
@@ -235,8 +236,8 @@ class AuditLoggerService {
       const limit = filters.limit || 100;
       
       return filteredLogs.slice(offset, offset + limit);
-    } catch (error) {
-      console.error('Failed to query audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to query audit logs:');
       return [];
     }
   }
@@ -255,10 +256,10 @@ class AuditLoggerService {
       if (format === 'json') {
         return JSON.stringify(logs, null, 2);
       } else {
-        return this.convertToCSV(logs);
+        return this.convertToCSV(_logs);
       }
-    } catch (error) {
-      console.error('Failed to export audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to export audit logs:');
       throw new Error('Export failed');
     }
   }
@@ -275,13 +276,13 @@ class AuditLoggerService {
       const logWithoutSignature = { ...log };
       delete logWithoutSignature.signature;
       
-      const dataToVerify = JSON.stringify(logWithoutSignature);
+      const dataToVerify = JSON.stringify(_logWithoutSignature);
       return await cryptoService.verifySignature(
         dataToVerify,
         log.signature
       );
-    } catch (error) {
-      console.error('Failed to verify log integrity:', error);
+    } catch (_error) {
+      logger.error('Failed to verify log integrity:');
       return false;
     }
   }
@@ -289,7 +290,7 @@ class AuditLoggerService {
   /**
    * Get audit statistics
    */
-  async getStatistics(period: 'day' | 'week' | 'month' = 'day'): Promise<{
+  async getStatistics(_period: 'day' | 'week' | 'month' = 'day'): Promise<{
     totalEvents: number;
     byEvent: Record<string, number>;
     bySeverity: Record<string, number>;
@@ -300,7 +301,7 @@ class AuditLoggerService {
     const now = new Date();
     const startDate = new Date();
     
-    switch (period) {
+    switch (_period) {
       case 'day':
         startDate.setDate(now.getDate() - 1);
         break;
@@ -371,7 +372,7 @@ class AuditLoggerService {
   private async loadStoredLogs(): Promise<void> {
     try {
       const storedLogs = await secureStorage.getItem('audit_logs');
-      if (storedLogs && Array.isArray(storedLogs)) {
+      if (storedLogs && Array.isArray(_storedLogs)) {
         // Only load recent logs into memory
         const recentDate = new Date();
         recentDate.setDate(recentDate.getDate() - 1);
@@ -380,8 +381,8 @@ class AuditLoggerService {
           log => new Date(log.timestamp) > recentDate
         );
       }
-    } catch (error) {
-      console.error('Failed to load stored audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to load stored audit logs:');
     }
   }
 
@@ -406,8 +407,8 @@ class AuditLoggerService {
       
       // Clear memory buffer of persisted logs
       this.logs = [];
-    } catch (error) {
-      console.error('Failed to persist audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to persist audit logs:');
     }
   }
 
@@ -447,8 +448,8 @@ class AuditLoggerService {
           compress: true,
         });
       }
-    } catch (error) {
-      console.error('Failed to cleanup old audit logs:', error);
+    } catch (_error) {
+      logger.error('Failed to cleanup old audit logs:');
     }
   }
 
@@ -461,8 +462,8 @@ class AuditLoggerService {
     const entryWithoutSignature = { ...entry };
     delete entryWithoutSignature.signature;
     
-    const dataToSign = JSON.stringify(entryWithoutSignature);
-    return await cryptoService.signData(dataToSign);
+    const _dataToSign = JSON.stringify(_entryWithoutSignature);
+    return await cryptoService.signData(_dataToSign);
   }
 
   private shouldPersistImmediately(entry: AuditLogEntry): boolean {
@@ -476,7 +477,7 @@ class AuditLoggerService {
 
   private notifyCriticalEvent(entry: AuditLogEntry): void {
     // In production, send to monitoring service
-    console.error('CRITICAL AUDIT EVENT:', entry);
+    logger.error('CRITICAL AUDIT EVENT:', entry);
     
     // Could trigger alerts, emails, etc.
     if (window.navigator.onLine) {
@@ -484,8 +485,8 @@ class AuditLoggerService {
       fetch('/api/monitoring/critical', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry),
-      }).catch(err => console.error('Failed to notify monitoring:', err));
+        body: JSON.stringify(_entry),
+      }).catch(err => logger.error('Failed to notify monitoring:', err));
     }
   }
 

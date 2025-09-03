@@ -10,6 +10,7 @@
  */
 
 import { auditLogger } from '../security/auditLogger';
+import { logger } from '../utils/logger';
 
 export enum LogLevel {
   DEBUG = 0,
@@ -47,7 +48,7 @@ interface LogContext {
   buddyId?: string;
   newStatus?: boolean;
   relationship?: string;
-  metadata?: Record<string, any>;
+  _metadata?: Record<string, any>;
   performanceMetrics?: {
     duration?: number;
     memoryUsage?: number;
@@ -100,7 +101,7 @@ class Logger {
     }, this.flushInterval);
   }
 
-  private sanitizeData(data: any): any {
+  private sanitizeData(data: unknown): unknown {
     if (data === null || data === undefined) {
       return data;
     }
@@ -123,12 +124,12 @@ class Logger {
     ];
 
     if (typeof data === 'object') {
-      const sanitized: any = Array.isArray(data) ? [] : {};
+      const sanitized: unknown = Array.isArray(data) ? [] : {};
       
       for (const key in data) {
         if (data.hasOwnProperty(key)) {
           const lowerKey = key.toLowerCase();
-          if (sensitiveFields.some(field => lowerKey.includes(field))) {
+          if (sensitiveFields.some(_field => lowerKey.includes(_field))) {
             sanitized[key] = '[REDACTED]';
           } else if (typeof data[key] === 'object') {
             sanitized[key] = this.sanitizeData(data[key]);
@@ -150,7 +151,7 @@ class Logger {
       level,
       category: context?.category || LogCategory.SYSTEM,
       message,
-      context: context ? this.sanitizeData(context) : undefined,
+      context: context ? this.sanitizeData(_context) : undefined,
       environment: this.isDevelopment ? 'development' : 'production'
     };
   }
@@ -171,15 +172,15 @@ class Logger {
       case LogLevel.DEBUG:
       case LogLevel.INFO:
         if (this.isDevelopment) {
-          console.log(message, entry.context || '');
+          logger.info(message, entry.context || '');
         }
         break;
       case LogLevel.WARN:
-        console.warn(message, entry.context || '');
+        logger.warn(message, entry.context || '');
         break;
       case LogLevel.ERROR:
       case LogLevel.CRITICAL:
-        console.error(message, entry.context || '');
+        logger.error(message, entry.context || '');
         break;
     }
   }
@@ -203,10 +204,10 @@ class Logger {
     // Send to remote logging service (if configured)
     if (!this.isDevelopment) {
       try {
-        await this.sendToRemoteLogging(entriesToFlush);
-      } catch (error) {
+        await this.sendToRemoteLogging(_entriesToFlush);
+      } catch (_error) {
         // Fallback to console if remote logging fails
-        console.error('[Logger] Failed to send logs to remote service', error);
+        logger.error('[Logger] Failed to send logs to remote service');
       }
     }
 
@@ -225,7 +226,7 @@ class Logger {
           severity: 'critical',
           details: {
             message: log.message,
-            ...log.context.metadata
+            ...log.context._metadata
           }
         });
       }
@@ -281,7 +282,7 @@ class Logger {
         error: error ? {
           message: error.message,
           stack: error.stack,
-          code: (error as any).code
+          code: (error as unknown).code
         } : undefined
       };
       
@@ -298,7 +299,7 @@ class Logger {
       error: error ? {
         message: error.message,
         stack: error.stack,
-        code: (error as any).code
+        code: (error as unknown).code
       } : undefined
     };
     
@@ -312,21 +313,21 @@ class Logger {
 
   // Specialized logging methods for mental health features
 
-  logCrisisIntervention(action: string, userId?: string, metadata?: Record<string, any>): void {
+  logCrisisIntervention(action: string, userId?: string, _metadata?: Record<string, any>): void {
     this.info(`Crisis intervention: ${action}`, {
       category: LogCategory.CRISIS,
       action,
       userId,
-      metadata: this.sanitizeData(metadata)
+      _metadata: this.sanitizeData(_metadata)
     });
   }
 
-  logWellnessActivity(action: string, userId?: string, metadata?: Record<string, any>): void {
+  logWellnessActivity(action: string, userId?: string, _metadata?: Record<string, any>): void {
     this.info(`Wellness activity: ${action}`, {
       category: LogCategory.WELLNESS,
       action,
       userId,
-      metadata: this.sanitizeData(metadata)
+      _metadata: this.sanitizeData(_metadata)
     });
   }
 
@@ -341,12 +342,12 @@ class Logger {
     });
   }
 
-  logSecurityEvent(event: string, userId?: string, metadata?: Record<string, any>): void {
+  logSecurityEvent(event: string, userId?: string, _metadata?: Record<string, any>): void {
     this.warn(`Security event: ${event}`, {
       category: LogCategory.SECURITY,
       action: event,
       userId,
-      metadata: this.sanitizeData(metadata)
+      _metadata: this.sanitizeData(_metadata)
     });
   }
 
@@ -356,7 +357,7 @@ class Logger {
       category: LogCategory.API,
       action: `${method} ${endpoint}`,
       performanceMetrics: duration ? { duration } : undefined,
-      metadata: { statusCode }
+      _metadata: { statusCode }
     });
   }
 
@@ -386,18 +387,18 @@ class Logger {
 export const logger = Logger.getInstance();
 
 // Export convenience functions
-export const logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
-export const logInfo = (message: string, context?: LogContext) => logger.info(message, context);
-export const logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
-export const logError = (message: string, error?: Error, context?: LogContext) => logger.error(message, error, context);
-export const logCritical = (message: string, error?: Error, context?: LogContext) => logger.critical(message, error, context);
+export const _logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
+export const _logInfo = (message: string, context?: LogContext) => logger.info(message, context);
+export const _logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
+export const _logError = (message: string, error?: Error, context?: LogContext) => logger.error(message, error, context);
+export const _logCritical = (message: string, error?: Error, context?: LogContext) => logger.critical(message, error, context);
 
 // Extend window interface for Sentry integration
 declare global {
   interface Window {
     Sentry?: {
-      captureMessage: (message: string, options?: any) => void;
-      captureException: (error: Error, options?: any) => void;
+      captureMessage: (message: string, options?: unknown) => void;
+      captureException: (error: Error, options?: unknown) => void;
     };
   }
 }

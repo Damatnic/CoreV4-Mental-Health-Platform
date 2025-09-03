@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, _AnimatePresence } from 'framer-motion';
 import { 
-  Target, Calendar, Clock, CheckCircle, AlertCircle,
-  Plus, Minus, Edit2, Save, Trash2, Users, Brain,
-  TrendingUp, TrendingDown, BarChart3, FileText,
-  Star, Award, Settings, Filter, Search, Download,
-  Upload, RefreshCw, Eye, EyeOff, Flag, MessageSquare,
-  Lightbulb, Activity, Heart, Shield, Zap, Globe
+  Target, _Calendar, _Clock, CheckCircle, AlertCircle,
+  Plus, _Minus, Edit2, Save, _Trash2, Users, Brain,
+  TrendingUp, _TrendingDown, BarChart3, FileText,
+  Star, _Award, _Settings, _Filter, _Search, Download,
+  _Upload, _RefreshCw, _Eye, _EyeOff, _Flag, _MessageSquare,
+  Lightbulb, Activity, _Heart, Shield, _Zap, _Globe
 } from 'lucide-react';
 
 interface TreatmentPlan {
@@ -20,8 +20,8 @@ interface TreatmentPlan {
   createdDate: Date;
   lastUpdated: Date;
   reviewDate: Date;
-  status: 'active' | 'paused' | 'completed' | 'discontinued';
-  priority: 'high' | 'medium' | 'low';
+  _status: 'active' | 'paused' | 'completed' | 'discontinued';
+  _priority: 'high' | 'medium' | 'low';
   treatmentModalities: TreatmentModality[];
   shortTermGoals: TreatmentGoal[];
   longTermGoals: TreatmentGoal[];
@@ -61,8 +61,8 @@ interface TreatmentGoal {
   category: 'symptom_reduction' | 'functional_improvement' | 'skill_development' | 'relationship' | 'behavioral' | 'cognitive' | 'other';
   description: string;
   targetDate: Date;
-  priority: 'high' | 'medium' | 'low';
-  status: 'not_started' | 'in_progress' | 'achieved' | 'modified' | 'discontinued';
+  _priority: 'high' | 'medium' | 'low';
+  _status: 'not_started' | 'in_progress' | 'achieved' | 'modified' | 'discontinued';
   progress: number; // 0-100
   objectives: string[];
   measurableOutcomes: string[];
@@ -93,8 +93,8 @@ interface Objective {
   goalId: string;
   description: string;
   targetDate: Date;
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue';
-  priority: 'high' | 'medium' | 'low';
+  _status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+  _priority: 'high' | 'medium' | 'low';
   measurable: boolean;
   measurementCriteria?: string;
   progress: number; // 0-100
@@ -118,7 +118,7 @@ interface Barrier {
   category: 'financial' | 'transportation' | 'scheduling' | 'motivation' | 'family' | 'medical' | 'substance_use' | 'other';
   description: string;
   impact: 'high' | 'medium' | 'low';
-  status: 'active' | 'resolved' | 'managed';
+  _status: 'active' | 'resolved' | 'managed';
   interventions?: string[];
   notes?: string;
 }
@@ -148,7 +148,7 @@ interface TreatmentPlanManagerProps {
   treatmentPlan?: TreatmentPlan;
   onSavePlan?: (plan: TreatmentPlan) => void;
   onUpdateGoal?: (goalId: string, updates: Partial<TreatmentGoal>) => void;
-  onAddIntervention?: (intervention: Intervention) => void;
+  _onAddIntervention?: (intervention: Intervention) => void;
   onArchivePlan?: (planId: string) => void;
   readOnly?: boolean;
   isProvider?: boolean;
@@ -158,19 +158,19 @@ export function TreatmentPlanManager({
   treatmentPlan,
   onSavePlan,
   onUpdateGoal,
-  onAddIntervention,
+  _onAddIntervention,
   onArchivePlan,
   readOnly = false,
   isProvider = false
 }: TreatmentPlanManagerProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
   const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
-  const [editingGoal, setEditingGoal] = useState<string | null>(null);
-  const [showGoalForm, setShowGoalForm] = useState(false);
-  const [showInterventionForm, setShowInterventionForm] = useState(false);
+  const [_editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [_showGoalForm, setShowGoalForm] = useState(false);
+  const [_showInterventionForm, setShowInterventionForm] = useState(false);
   const [filterPriority, setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showPrivateNotes, setShowPrivateNotes] = useState(isProvider);
+  const [_searchTerm, _setSearchTerm] = useState('');
+  const [_showPrivateNotes, _setShowPrivateNotes] = useState(_isProvider);
 
   // Create new treatment plan if none provided
   useEffect(() => {
@@ -190,7 +190,7 @@ export function TreatmentPlanManager({
     lastUpdated: new Date(),
     reviewDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
     status: 'active',
-    priority: 'medium',
+    _priority: 'medium',
     treatmentModalities: [],
     shortTermGoals: [],
     longTermGoals: [],
@@ -212,15 +212,15 @@ export function TreatmentPlanManager({
   };
 
   // Get goals by status
-  const getGoalsByStatus = (status: TreatmentGoal['status']) => {
+  const getGoalsByStatus = (_status: TreatmentGoal['status']) => {
     if (!currentPlan) return [];
     const allGoals = [...currentPlan.shortTermGoals, ...currentPlan.longTermGoals];
-    return allGoals.filter(goal => goal.status === status);
+    return allGoals.filter(goal => goal._status === _status);
   };
 
   // Get priority color
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const getPriorityColor = (_priority: string) => {
+    switch (_priority) {
       case 'high': return 'text-red-600 bg-red-100';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-green-600 bg-green-100';
@@ -229,8 +229,8 @@ export function TreatmentPlanManager({
   };
 
   // Get status color
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (_status: string) => {
+    switch (_status) {
       case 'achieved':
       case 'completed': return 'text-green-600 bg-green-100';
       case 'in_progress': return 'text-blue-600 bg-blue-100';
@@ -253,7 +253,7 @@ export function TreatmentPlanManager({
           ? { 
               ...goal, 
               progress,
-              status: progress === 100 ? 'achieved' as const : 
+              _status: progress === 100 ? 'achieved' as const : 
                      progress > 0 ? 'in_progress' as const : 'not_started' as const,
               lastReviewed: new Date()
             }
@@ -316,12 +316,12 @@ export function TreatmentPlanManager({
           <div className="text-center">
             <div className="mb-2">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                currentPlan.status === 'active' ? 'bg-green-500 text-white' :
-                currentPlan.status === 'paused' ? 'bg-yellow-500 text-white' :
-                currentPlan.status === 'completed' ? 'bg-blue-500 text-white' :
+                currentPlan._status === 'active' ? 'bg-green-500 text-white' :
+                currentPlan._status === 'paused' ? 'bg-yellow-500 text-white' :
+                currentPlan._status === 'completed' ? 'bg-blue-500 text-white' :
                 'bg-red-500 text-white'
               }`}>
-                {currentPlan.status}
+                {currentPlan._status}
               </span>
             </div>
             <div className="text-right">
@@ -365,7 +365,7 @@ export function TreatmentPlanManager({
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as any)}
+              onClick={() => setActiveTab(id as unknown)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-all flex items-center space-x-2 ${
                 activeTab === id
                   ? 'text-primary-600 border-primary-600'
@@ -464,7 +464,7 @@ export function TreatmentPlanManager({
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Current Barriers</h3>
                 <div className="space-y-2">
-                  {currentPlan.barriers?.filter(b => b.status === 'active').slice(0, 3).map((barrier) => (
+                  {currentPlan.barriers?.filter(b => b._status === 'active').slice(0, 3).map((barrier) => (
                     <div key={barrier.id} className="p-2 bg-red-50 rounded-lg">
                       <div className="flex justify-between items-start">
                         <span className="text-sm text-red-800">{barrier.description}</span>
@@ -478,7 +478,7 @@ export function TreatmentPlanManager({
                       </div>
                     </div>
                   ))}
-                  {!currentPlan.barriers?.filter(b => b.status === 'active').length && (
+                  {!currentPlan.barriers?.filter(b => b._status === 'active').length && (
                     <p className="text-gray-500 text-sm">No active barriers identified</p>
                   )}
                 </div>
@@ -557,7 +557,7 @@ export function TreatmentPlanManager({
                 <h3 className="text-lg font-semibold text-gray-900">Treatment Goals</h3>
                 <select
                   value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value as any)}
+                  onChange={(e) => setFilterPriority(e.target.value as unknown)}
                   className="text-sm border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="all">All Priorities</option>
@@ -582,7 +582,7 @@ export function TreatmentPlanManager({
               <h4 className="text-md font-medium text-gray-800">Short-term Goals</h4>
               <div className="space-y-3">
                 {currentPlan.shortTermGoals
-                  .filter(goal => filterPriority === 'all' || goal.priority === filterPriority)
+                  .filter(goal => filterPriority === 'all' || goal._priority === filterPriority)
                   .map((goal) => (
                     <motion.div
                       key={goal.id}
@@ -594,11 +594,11 @@ export function TreatmentPlanManager({
                         <div className="flex-1">
                           <h5 className="font-medium text-gray-900 mb-1">{goal.description}</h5>
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(goal.priority)}`}>
-                              {goal.priority}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(goal._priority)}`}>
+                              {goal._priority}
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(goal.status)}`}>
-                              {goal.status.replace('_', ' ')}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(goal._status)}`}>
+                              {goal._status.replace('_', ' ')}
                             </span>
                             <span className="text-xs text-gray-500">
                               Due: {new Date(goal.targetDate).toLocaleDateString()}
@@ -699,7 +699,7 @@ export function TreatmentPlanManager({
               <h4 className="text-md font-medium text-gray-800">Long-term Goals</h4>
               <div className="space-y-3">
                 {currentPlan.longTermGoals
-                  .filter(goal => filterPriority === 'all' || goal.priority === filterPriority)
+                  .filter(goal => filterPriority === 'all' || goal._priority === filterPriority)
                   .map((goal) => (
                     <motion.div
                       key={goal.id}
@@ -711,11 +711,11 @@ export function TreatmentPlanManager({
                         <div className="flex-1">
                           <h5 className="font-medium text-gray-900 mb-1">{goal.description}</h5>
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(goal.priority)}`}>
-                              {goal.priority}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(goal._priority)}`}>
+                              {goal._priority}
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(goal.status)}`}>
-                              {goal.status.replace('_', ' ')}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(goal._status)}`}>
+                              {goal._status.replace('_', ' ')}
                             </span>
                             <span className="text-xs text-gray-500">
                               Target: {new Date(goal.targetDate).toLocaleDateString()}
@@ -1001,7 +1001,7 @@ export function TreatmentPlanManager({
             <div className="space-y-4">
               <h4 className="text-md font-medium text-red-800">Active Barriers</h4>
               <div className="space-y-3">
-                {currentPlan.barriers?.filter(barrier => barrier.status === 'active').map((barrier) => (
+                {currentPlan.barriers?.filter(barrier => barrier._status === 'active').map((barrier) => (
                   <motion.div
                     key={barrier.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -1054,7 +1054,7 @@ export function TreatmentPlanManager({
             <div className="space-y-4">
               <h4 className="text-md font-medium text-green-800">Resolved/Managed Barriers</h4>
               <div className="space-y-3">
-                {currentPlan.barriers?.filter(barrier => barrier.status !== 'active').map((barrier) => (
+                {currentPlan.barriers?.filter(barrier => barrier._status !== 'active').map((barrier) => (
                   <motion.div
                     key={barrier.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -1069,7 +1069,7 @@ export function TreatmentPlanManager({
                             {barrier.category.replace('_', ' ')}
                           </span>
                           <span className="px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">
-                            {barrier.status}
+                            {barrier._status}
                           </span>
                         </div>
                       </div>

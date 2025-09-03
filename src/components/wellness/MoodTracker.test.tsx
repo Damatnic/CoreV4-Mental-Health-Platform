@@ -37,7 +37,7 @@ describe('MoodTracker', () => {
       );
       
       expect(screen.getByLabelText(/how are you feeling/i)).toBeInTheDocument();
-      expect(screen.getByRole('slider')).toBeInTheDocument();
+      expect(screen.getByRole('_slider')).toBeInTheDocument();
     });
 
     it('should display mood scale from 1-10', () => {
@@ -47,9 +47,9 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
-      expect(slider).toHaveAttribute('min', '1');
-      expect(slider).toHaveAttribute('max', '10');
+      const _slider = screen.getByRole('_slider');
+      expect(_slider).toHaveAttribute('min', '1');
+      expect(_slider).toHaveAttribute('max', '10');
     });
 
     it('should show emoji indicators for mood levels', () => {
@@ -72,12 +72,12 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider') as HTMLInputElement;
+      const _slider = screen.getByRole('_slider') as HTMLInputElement;
       
-      fireEvent.change(slider, { target: { value: '8' } });
+      fireEvent.change(_slider, { target: { value: '8' } });
       
       await waitFor(() => {
-        expect(slider.value).toBe('8');
+        expect(_slider.value).toBe('8');
         expect(screen.getByText(/feeling good/i)).toBeInTheDocument();
       });
     });
@@ -93,11 +93,11 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _slider = screen.getByRole('_slider');
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       
-      fireEvent.change(slider, { target: { value: '7' } });
-      await user.click(submitButton);
+      fireEvent.change(_slider, { target: { value: '7' } });
+      await user.click(_submitButton);
       
       await waitFor(() => {
         expect(screen.getByText(/mood logged successfully/i)).toBeInTheDocument();
@@ -114,10 +114,10 @@ describe('MoodTracker', () => {
       );
       
       const notesInput = screen.getByPlaceholderText(/add notes/i);
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       
       await user.type(notesInput, 'Feeling better after meditation');
-      await user.click(submitButton);
+      await user.click(_submitButton);
       
       await waitFor(() => {
         expect(screen.getByText(/mood logged successfully/i)).toBeInTheDocument();
@@ -139,8 +139,8 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(submitButton);
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
+      await user.click(_submitButton);
       
       await waitFor(() => {
         expect(screen.getByText(/failed to log mood/i)).toBeInTheDocument();
@@ -165,13 +165,13 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       
       // Rapid clicks
-      await user.tripleClick(submitButton);
+      await user.tripleClick(_submitButton);
       
       await waitFor(() => {
-        expect(submitSpy).toHaveBeenCalledTimes(1);
+        expect(_submitSpy).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -226,12 +226,12 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _slider = screen.getByRole('_slider');
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       
       // Set very low mood score
-      fireEvent.change(slider, { target: { value: '2' } });
-      await user.click(submitButton);
+      fireEvent.change(_slider, { target: { value: '2' } });
+      await user.click(_submitButton);
       
       await waitFor(() => {
         expect(screen.getByText(/crisis support/i)).toBeInTheDocument();
@@ -276,18 +276,18 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
+      const _slider = screen.getByRole('_slider');
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
       
       // Tab navigation
       slider.focus();
-      expect(document.activeElement).toBe(slider);
+      expect(document.activeElement).toBe(_slider);
       
       // Keyboard interaction with slider
-      fireEvent.keyDown(slider, { key: 'ArrowRight' });
+      fireEvent.keyDown(_slider, { key: 'ArrowRight' });
       
       await waitFor(() => {
-        expect(slider).toHaveAttribute('aria-valuenow');
+        expect(_slider).toHaveAttribute('aria-valuenow');
       });
     });
 
@@ -298,12 +298,12 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
+      const _slider = screen.getByRole('_slider');
       
-      expect(slider).toHaveAttribute('aria-label');
-      expect(slider).toHaveAttribute('aria-valuemin', '1');
-      expect(slider).toHaveAttribute('aria-valuemax', '10');
-      expect(slider).toHaveAttribute('aria-valuenow');
+      expect(_slider).toHaveAttribute('aria-label');
+      expect(_slider).toHaveAttribute('aria-valuemin', '1');
+      expect(_slider).toHaveAttribute('aria-valuemax', '10');
+      expect(_slider).toHaveAttribute('aria-valuenow');
     });
 
     it('should announce mood changes to screen readers', async () => {
@@ -313,20 +313,20 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
+      const _slider = screen.getByRole('_slider');
       
-      fireEvent.change(slider, { target: { value: '9' } });
+      fireEvent.change(_slider, { target: { value: '9' } });
       
       await waitFor(() => {
-        const announcement = screen.getByRole('status');
-        expect(announcement).toHaveTextContent(/mood: 9/i);
+        const _announcement = screen.getByRole('status');
+        expect(_announcement).toHaveTextContent(/mood: 9/i);
       });
     });
   });
 
   describe('Data Privacy', () => {
     it('should encrypt mood data before submission', async () => {
-      const encryptSpy = vi.spyOn(window.crypto.subtle, 'encrypt');
+      const _encryptSpy = vi.spyOn(window.crypto.subtle, 'encrypt');
       const user = userEvent.setup();
       
       render(
@@ -335,11 +335,11 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(submitButton);
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
+      await user.click(_submitButton);
       
       await waitFor(() => {
-        expect(encryptSpy).toHaveBeenCalled();
+        expect(_encryptSpy).toHaveBeenCalled();
       });
     });
 
@@ -352,12 +352,12 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const submitButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(submitButton);
+      const _submitButton = screen.getByRole('button', { name: /log mood/i });
+      await user.click(_submitButton);
       
       await waitFor(() => {
         const storedData = localStorage.getItem('mood_data');
-        expect(storedData).toBeTruthy();
+        expect(_storedData).toBeTruthy();
         // Should be encrypted (not plain JSON)
         expect(() => JSON.parse(storedData!)).toThrow();
       });
@@ -374,8 +374,8 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const renderTime = performance.now() - startTime;
-      expect(renderTime).toBeLessThan(100); // 100ms budget
+      const _renderTime = performance.now() - startTime;
+      expect(_renderTime).toBeLessThan(100); // 100ms budget
     });
 
     it('should debounce mood slider changes', async () => {
@@ -387,11 +387,11 @@ describe('MoodTracker', () => {
         </TestWrapper>
       );
       
-      const slider = screen.getByRole('slider');
+      const _slider = screen.getByRole('slider');
       
       // Rapid changes
       for (let i = 1; i <= 10; i++) {
-        fireEvent.change(slider, { target: { value: i.toString() } });
+        fireEvent.change(_slider, { target: { value: i.toString() } });
       }
       
       // Should be debounced

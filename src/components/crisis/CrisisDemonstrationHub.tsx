@@ -1,11 +1,12 @@
+import { logger } from '@/utils/logger';
 // Crisis Infrastructure Demonstration Hub - Showcases all crisis system capabilities
 // CRITICAL: This demonstrates life-safety systems for stakeholder review
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Shield, Phone, MessageSquare, MapPin, Brain, TestTube, Wifi, WifiOff,
-  AlertTriangle, Heart, Clock, CheckCircle, XCircle, Play, Pause, 
-  BarChart3, Users, Navigation, Activity, Zap, Target
+  Shield, Phone, MessageSquare, _MapPin, Brain, TestTube, WifiOff,
+  AlertTriangle, Heart, _Clock, _CheckCircle, _XCircle,
+  BarChart3, Activity
 } from 'lucide-react';
 import { EnhancedCrisisChat } from './EnhancedCrisisChat';
 import { EmergencyServicesInterface } from './EmergencyServicesInterface';
@@ -31,9 +32,22 @@ interface DemoStats {
   activeResources: number;
 }
 
+interface TestReport {
+  totalTests: number;
+  passedTests: number;
+  failedTests: number;
+  totalDuration: number;
+  scenarios: Array<{
+    name: string;
+    passed: boolean;
+    duration: number;
+    error?: string;
+  }>;
+}
+
 export function CrisisDemonstrationHub() {
   const [activeDemo, setActiveDemo] = useState<string>('overview');
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>({
+  const [_systemStatus, setSystemStatus] = useState<SystemStatus>({
     crisisChat: 'offline',
     emergencyServices: 'inactive',
     offlineResources: 'unavailable',
@@ -41,7 +55,7 @@ export function CrisisDemonstrationHub() {
     assessmentAlgorithm: 'operational'
   });
   const [isRunningTests, setIsRunningTests] = useState(false);
-  const [testResults, setTestResults] = useState<any>(null);
+  const [testResults, setTestResults] = useState<TestReport | null>(null);
   const [demoStats, setDemoStats] = useState<DemoStats>({
     totalTests: 0,
     passedTests: 0,
@@ -79,8 +93,8 @@ export function CrisisDemonstrationHub() {
       }));
       
       toast.success('Crisis demonstration systems initialized');
-    } catch (error) {
-      console.error('Demo initialization failed:', error);
+    } catch (_error) {
+      logger.error('Demo initialization failed:');
       toast.error('Some demo systems failed to initialize');
     }
   };
@@ -93,7 +107,7 @@ export function CrisisDemonstrationHub() {
 
   // Load demonstration statistics
   const loadDemoStats = () => {
-    const stats = mockWebSocketAdapter.getServerStats();
+    const _stats = mockWebSocketAdapter.getServerStats();
     const offlineStats = offlineCrisisResources.getConnectionStatus();
     
     setDemoStats({
@@ -111,7 +125,7 @@ export function CrisisDemonstrationHub() {
     toast.loading('Running comprehensive crisis system tests...');
     
     try {
-      const results = await crisisScenarioTester.runAllScenarios();
+      const _results = await crisisScenarioTester.runAllScenarios();
       const report = crisisScenarioTester.generateReport();
       
       setTestResults(report);
@@ -128,10 +142,10 @@ export function CrisisDemonstrationHub() {
       } else {
         toast.error(`${report.failedTests} tests failed - Review required`);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.dismiss();
       toast.error('Test execution failed');
-      console.error('Test failed:', error);
+      logger.error('Test failed:');
     } finally {
       setIsRunningTests(false);
     }
@@ -139,7 +153,7 @@ export function CrisisDemonstrationHub() {
 
   // Simulate crisis scenario
   const simulateScenario = (scenario: CrisisTestScenario) => {
-    setSimulatedScenario(scenario);
+    setSimulatedScenario(_scenario);
     setActiveDemo('crisis-simulation');
     
     // Show scenario details
@@ -187,7 +201,7 @@ export function CrisisDemonstrationHub() {
       </h3>
       
       <div className="space-y-3">
-        {Object.entries(systemStatus).map(([system, status]) => (
+        {Object.entries(_systemStatus).map(([system, status]) => (
           <div key={system} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center space-x-3">
               <div className={`h-3 w-3 rounded-full ${getStatusColor(status, system)}`}></div>
@@ -314,7 +328,7 @@ export function CrisisDemonstrationHub() {
             <p className="text-sm text-gray-600 mb-3">{scenario.description}</p>
             <div className="flex space-x-2">
               <button
-                onClick={() => simulateScenario(scenario)}
+                onClick={() => simulateScenario(_scenario)}
                 className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
               >
                 Simulate
@@ -331,7 +345,7 @@ export function CrisisDemonstrationHub() {
 
   // Render active demonstration content
   const renderActiveDemo = () => {
-    switch (activeDemo) {
+    switch (_activeDemo) {
       case 'overview':
         return (
           <div className="space-y-6">

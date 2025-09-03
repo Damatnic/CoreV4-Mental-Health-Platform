@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Users, Stethoscope, AlertTriangle, Clock, Shield } from 'lucide-react';
+import { Heart, Users, Stethoscope, AlertTriangle, _Clock, _Shield } from 'lucide-react';
 import { ConsoleWelcomeBar } from './ConsoleWelcomeBar';
 import { ConsoleGrid } from './ConsoleGrid';
 import { ConsoleTile } from './ConsoleTile';
@@ -11,7 +11,7 @@ import { useMobileFeatures } from '../../../hooks/useMobileFeatures';
 
 export function ConsoleDashboard() {
   const { navigationMode, isPerformanceMode } = useConsoleNavigation();
-  const { deviceInfo, isMobileDevice, isSmallScreen } = useMobileFeatures();
+  const { _deviceInfo, isMobileDevice, isSmallScreen } = useMobileFeatures();
 
   // Apply navigation mode class to body for styling
   useEffect(() => {
@@ -248,7 +248,7 @@ export function ConsoleDashboard() {
                 <div className="text-4xl mb-3">
                   🌟
                 </div>
-                <div className="text-lg font-semibold text-white mb-2">You're Not Alone</div>
+                <div className="text-lg font-semibold text-white mb-2">You&apos;re Not Alone</div>
                 <div className="text-gray-300 text-sm">
                   Thousands of people are here to support you on your journey
                 </div>

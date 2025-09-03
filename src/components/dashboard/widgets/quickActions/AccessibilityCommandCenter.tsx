@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, _useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Eye, EyeOff, Volume2, VolumeX, Type, Palette, Monitor,
-  Moon, Sun, Zap, ZapOff, Globe, Keyboard, Mouse,
-  Smartphone, Headphones, Settings, Check, X,
-  ChevronRight, ChevronDown, RefreshCw, Download,
-  Upload, HelpCircle, Info, AlertCircle, Brain, Mic,
+  Eye, _EyeOff, Volume2, _VolumeX, Type, Palette, _Monitor,
+  Moon, _Sun, _Zap, ZapOff, Globe, Keyboard, Mouse,
+  Smartphone, Headphones, _Settings, _Check, _X,
+  _ChevronRight, _ChevronDown, RefreshCw, _Download,
+  _Upload, HelpCircle, _Info, AlertCircle, Brain, Mic,
   MessageSquare, Edit3, Clock, Layout, Book
 } from 'lucide-react';
 import { useAccessibilityStore, type AccessibilitySettings } from '../../../../stores/accessibilityStore';
 
 interface AccessibilityCommandCenterProps {
-  onSettingChange?: (setting: string, value: any) => void;
-  showCompactView?: boolean;
+  onSettingChange?: (setting: string, value: unknown) => void;
+  _showCompactView?: boolean;
 }
 
 export function AccessibilityCommandCenter({
   onSettingChange,
-  showCompactView = false
+  _showCompactView = false
 }: AccessibilityCommandCenterProps) {
-  const { settings, updateSetting, presets, applyPreset, resetToDefaults } = useAccessibilityStore();
+  const { settings, updateSetting, _presets, applyPreset, resetToDefaults } = useAccessibilityStore();
   
   const [activeSection, setActiveSection] = useState<string>('visual');
   const [showPresetMenu, setShowPresetMenu] = useState(false);
@@ -288,7 +288,7 @@ export function AccessibilityCommandCenter({
 
   // Get settings for active section
   const getActiveSettings = () => {
-    switch (activeSection) {
+    switch (_activeSection) {
       case 'visual': return visualSettings;
       case 'audio': return audioSettings;
       case 'interaction': return interactionSettings;
@@ -298,19 +298,19 @@ export function AccessibilityCommandCenter({
   };
 
   // Handle setting change
-  const handleSettingChange = useCallback((settingId: string, value: any) => {
+  const handleSettingChange = useCallback((settingId: string, value: unknown) => {
     updateSetting(settingId as keyof AccessibilitySettings, value);
     onSettingChange?.(settingId, value);
     
     // Announce change for screen readers
     if (settings.screenReader) {
-      const utterance = new SpeechSynthesisUtterance(`${settingId} changed to ${value}`);
-      window.speechSynthesis.speak(utterance);
+      const _utterance = new SpeechSynthesisUtterance(`${settingId} changed to ${value}`);
+      window.speechSynthesis.speak(_utterance);
     }
   }, [updateSetting, onSettingChange, settings.screenReader]);
 
   // Render setting control based on type
-  const renderSettingControl = (setting: any) => {
+  const renderSettingControl = (setting: unknown) => {
     switch (setting.type) {
       case 'toggle':
         return (
@@ -425,7 +425,7 @@ export function AccessibilityCommandCenter({
     }
   ];
 
-  if (showCompactView) {
+  if (_showCompactView) {
     // Compact view for quick access
     return (
       <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -568,7 +568,7 @@ export function AccessibilityCommandCenter({
         })}
       </div>
 
-      {/* Settings content */}
+      {/* _Settings content */}
       <div className="p-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -611,7 +611,7 @@ export function AccessibilityCommandCenter({
           onClick={() => setTestMode(!testMode)}
           className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
-          {testMode ? 'Exit Test Mode' : 'Test Accessibility Settings'}
+          {testMode ? 'Exit Test Mode' : 'Test Accessibility _Settings'}
         </button>
         
         {testMode && (

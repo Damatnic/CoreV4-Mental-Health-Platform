@@ -8,6 +8,7 @@ import { User, ApiResponse } from '@/types';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../utils/logger';
 
 interface AuthTokens {
   accessToken: string;
@@ -163,7 +164,7 @@ class AuthenticationService {
 
       if (credentials.anonymousMode) {
         // Handle anonymous login
-        sessionData = await this.createAnonymousSession();
+        _sessionData = await this.createAnonymousSession();
       } else {
         // Hash password for comparison
         const hashedPassword = await cryptoService.hashPassword(credentials.password);
@@ -180,7 +181,7 @@ class AuthenticationService {
       }
 
       // Store session securely
-      await this.storeSession(sessionData, credentials.rememberMe);
+      await this.storeSession(_sessionData, credentials.rememberMe);
       
       // Set up token refresh
       this.scheduleTokenRefresh();
@@ -188,7 +189,7 @@ class AuthenticationService {
       // Log successful login
       await auditLogger.log({
         event: 'USER_LOGIN',
-        userId: sessionData.user.id,
+        userId: _sessionData.user.id,
         details: {
           anonymous: credentials.anonymousMode,
           mfaUsed: !!credentials.mfaCode,
@@ -198,7 +199,7 @@ class AuthenticationService {
 
       return {
         success: true,
-        data: sessionData,
+        data: _sessionData,
       };
     } catch (error) {
       await auditLogger.log({
@@ -243,8 +244,8 @@ class AuthenticationService {
         clearTimeout(this.activityTimer);
         this.activityTimer = null;
       }
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (_error) {
+      logger.error('Logout error: ');
       // Force clear session even if API call fails
       await this.clearSession();
     }
@@ -274,8 +275,8 @@ class AuthenticationService {
       this.scheduleTokenRefresh();
 
       return newTokens;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
+    } catch (_error) {
+      logger.error('Token refresh failed:');
       // If refresh fails, user needs to re-authenticate
       await this.logout();
       return null;
@@ -333,7 +334,7 @@ class AuthenticationService {
       await auditLogger.log({
         event: 'PROFILE_UPDATED',
         userId: this.currentSession.user.id,
-        details: { updatedFields: Object.keys(updates) },
+        details: { updatedFields: Object.keys(_updates) },
         severity: 'info',
       });
 
@@ -430,10 +431,10 @@ class AuthenticationService {
    */
   private async loadStoredSession(): Promise<void> {
     try {
-      const encryptedSession = await secureStorage.getItem('session');
-      if (encryptedSession) {
-        const sessionData = await cryptoService.decrypt(encryptedSession);
-        const session = JSON.parse(sessionData) as SessionData;
+      const _encryptedSession = await secureStorage.getItem('session');
+      if (_encryptedSession) {
+        const _sessionData = await cryptoService.decrypt(_encryptedSession);
+        const session = JSON.parse(_sessionData) as SessionData;
         
         // Check if session is still valid
         if (new Date() < new Date(session.expiresAt)) {
@@ -443,8 +444,8 @@ class AuthenticationService {
           await this.clearSession();
         }
       }
-    } catch (error) {
-      console.error('Failed to load stored session:', error);
+    } catch (_error) {
+      logger.error('Failed to load stored session:');
       await this.clearSession();
     }
   }
@@ -453,10 +454,10 @@ class AuthenticationService {
     this.currentSession = session;
     
     // Encrypt session data
-    const encryptedSession = await cryptoService.encrypt(JSON.stringify(session));
+    const _encryptedSession = await cryptoService.encrypt(JSON.stringify(_session));
     
     // Store in secure storage
-    secureStorage.setItem('session', encryptedSession);
+    secureStorage.setItem('session', _encryptedSession);
   }
 
   private async clearSession(): Promise<void> {
@@ -583,31 +584,31 @@ class AuthenticationService {
     if (password.length < 8) feedback.push('Password should be at least 8 characters');
 
     // Complexity checks
-    if (/[a-z]/.test(password)) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^a-zA-Z0-9]/.test(password)) score++;
+    if (/[a-z]/.test(_password)) score++;
+    if (/[A-Z]/.test(_password)) score++;
+    if (/[0-9]/.test(_password)) score++;
+    if (/[^a-zA-Z0-9]/.test(_password)) score++;
 
     // Common patterns check
     const commonPatterns = ['password', '12345', 'qwerty', 'admin', 'letmein'];
-    if (commonPatterns.some(pattern => password.toLowerCase().includes(pattern))) {
+    if (commonPatterns.some(_pattern => password.toLowerCase().includes(_pattern))) {
       score = Math.max(0, score - 2);
       feedback.push('Password contains common patterns');
     }
 
     // Provide feedback
-    if (!/[a-z]/.test(password)) feedback.push('Add lowercase letters');
-    if (!/[A-Z]/.test(password)) feedback.push('Add uppercase letters');
-    if (!/[0-9]/.test(password)) feedback.push('Add numbers');
-    if (!/[^a-zA-Z0-9]/.test(password)) feedback.push('Add special characters');
+    if (!/[a-z]/.test(_password)) feedback.push('Add lowercase letters');
+    if (!/[A-Z]/.test(_password)) feedback.push('Add uppercase letters');
+    if (!/[0-9]/.test(_password)) feedback.push('Add numbers');
+    if (!/[^a-zA-Z0-9]/.test(_password)) feedback.push('Add special characters');
 
     return { score: Math.min(5, score), feedback };
   }
 
   private async checkRateLimit(identifier: string): Promise<void> {
     // Implement rate limiting logic
-    const key = `rate_limit_${identifier}`;
-    const attempts = await secureStorage.getItem(key);
+    const _key = `rate_limit_${identifier}`;
+    const attempts = await secureStorage.getItem(_key);
     
     if (attempts) {
       const data = JSON.parse(attempts);
@@ -645,9 +646,9 @@ class AuthenticationService {
     return '127.0.0.1';
   }
 
-  private async mockApiCall(endpoint: string, data: any): Promise<any> {
+  private async mockApiCall(endpoint: string, data: unknown): Promise<unknown> {
     // Simulate API call - in production, this would be a real API call
-    console.log(`API Call to ${endpoint}:`, data);
+    logger.info(`API Call to ${endpoint}:`, data);
     
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));

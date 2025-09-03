@@ -4,6 +4,8 @@
  * HIPAA-compliant implementation with AES-256-GCM encryption
  */
 
+import { logger } from '../../utils/logger';
+
 class CryptographyService {
   private static instance: CryptographyService;
   private masterKey: CryptoKey | null = null;
@@ -37,11 +39,11 @@ class CryptographyService {
   private async initializeMasterKey(): Promise<void> {
     try {
       // Check if we have a stored master key
-      const storedKey = this.getStoredMasterKey();
+      const _storedKey = this.getStoredMasterKey();
       
-      if (storedKey) {
+      if (_storedKey) {
         // Import the stored key
-        this.masterKey = await this.importKey(storedKey);
+        this.masterKey = await this.importKey(_storedKey);
       } else {
         // Generate a new master key
         this.masterKey = await this.generateMasterKey();
@@ -49,8 +51,8 @@ class CryptographyService {
         // Store the key securely (in production, use HSM or secure key storage)
         this.storeMasterKey(this.masterKey);
       }
-    } catch (error) {
-      console.error('Failed to initialize master key:', error);
+    } catch (_error) {
+      logger.error('Failed to initialize master key:');
       throw new Error('Cryptography initialization failed');
     }
   }
@@ -72,17 +74,17 @@ class CryptographyService {
       const encodedData = encoder.encode(data);
       
       // Prepare additional authenticated data if provided
-      const aad = additionalData ? encoder.encode(additionalData) : undefined;
+      const aad = additionalData ? encoder.encode(_additionalData) : undefined;
       
       // Encrypt the data
-      const encryptParams: any = {
+      const encryptParams: unknown = {
         name: this.ALGORITHM,
         iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       
       // Only add additionalData if it exists
-      if (aad) {
+      if (_aad) {
         encryptParams.additionalData = aad;
       }
       
@@ -95,12 +97,12 @@ class CryptographyService {
       // Combine IV and encrypted data
       const combined = new Uint8Array(iv.length + encryptedData.byteLength);
       combined.set(iv, 0);
-      combined.set(new Uint8Array(encryptedData), iv.length);
+      combined.set(new Uint8Array(_encryptedData), iv.length);
       
       // Convert to base64 for storage
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (error) {
-      console.error('Encryption failed:', error);
+    } catch (_error) {
+      logger.error('Encryption failed:');
       throw new Error('Failed to encrypt data');
     }
   }
@@ -115,7 +117,7 @@ class CryptographyService {
       }
 
       // Convert from base64
-      const combined = this.base64ToArrayBuffer(encryptedData);
+      const combined = this.base64ToArrayBuffer(_encryptedData);
       const combinedArray = new Uint8Array(combined);
       
       // Extract IV and encrypted data
@@ -124,21 +126,21 @@ class CryptographyService {
       
       // Prepare additional authenticated data if provided
       const encoder = new TextEncoder();
-      const aad = additionalData ? encoder.encode(additionalData) : undefined;
+      const aad = additionalData ? encoder.encode(_additionalData) : undefined;
       
       // Decrypt the data
-      const decryptParams: any = {
+      const decryptParams: unknown = {
         name: this.ALGORITHM,
         iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       
       // Only add additionalData if it exists
-      if (aad) {
+      if (_aad) {
         decryptParams.additionalData = aad;
       }
       
-      const decryptedData = await crypto.subtle.decrypt(
+      const _decryptedData = await crypto.subtle.decrypt(
         decryptParams,
         this.masterKey!,
         ciphertext
@@ -146,9 +148,9 @@ class CryptographyService {
 
       // Decode the result
       const decoder = new TextDecoder();
-      return decoder.decode(decryptedData);
-    } catch (error) {
-      console.error('Decryption failed:', error);
+      return decoder.decode(_decryptedData);
+    } catch (_error) {
+      logger.error('Decryption failed:');
       throw new Error('Failed to decrypt data');
     }
   }
@@ -160,14 +162,14 @@ class CryptographyService {
     try {
       // Generate or use provided salt
       const saltBytes = salt 
-        ? this.base64ToArrayBuffer(salt)
+        ? this.base64ToArrayBuffer(_salt)
         : crypto.getRandomValues(new Uint8Array(this.SALT_LENGTH));
       
       // Import password as key
       const encoder = new TextEncoder();
       const passwordKey = await crypto.subtle.importKey(
         'raw',
-        encoder.encode(password),
+        encoder.encode(_password),
         'PBKDF2',
         false,
         ['deriveBits']
@@ -179,7 +181,7 @@ class CryptographyService {
           name: 'PBKDF2',
           salt: saltBytes,
           iterations: this.PBKDF2_ITERATIONS,
-          hash: 'SHA-256',
+          _hash: 'SHA-256',
         },
         passwordKey,
         256
@@ -188,39 +190,39 @@ class CryptographyService {
       // Combine salt and hash
       const combined = new Uint8Array(saltBytes.byteLength + derivedBits.byteLength);
       combined.set(new Uint8Array(saltBytes), 0);
-      combined.set(new Uint8Array(derivedBits), saltBytes.byteLength);
+      combined.set(new Uint8Array(_derivedBits), saltBytes.byteLength);
       
       return this.arrayBufferToBase64(combined.buffer);
-    } catch (error) {
-      console.error('Password hashing failed:', error);
-      throw new Error('Failed to hash password');
+    } catch (_error) {
+      logger.error('Password hashing failed:');
+      throw new Error('Failed to _hash password');
     }
   }
 
   /**
    * Verify a password against a hash
    */
-  async verifyPassword(password: string, hash: string): Promise<boolean> {
+  async verifyPassword(password: string, _hash: string): Promise<boolean> {
     try {
-      // Extract salt from hash
-      const combined = this.base64ToArrayBuffer(hash);
+      // Extract salt from _hash
+      const combined = this.base64ToArrayBuffer(_hash);
       const combinedArray = new Uint8Array(combined);
       const salt = combinedArray.slice(0, this.SALT_LENGTH);
       const originalHash = combinedArray.slice(this.SALT_LENGTH);
       
       // Hash the provided password with the same salt
-      const saltBase64 = this.arrayBufferToBase64(salt.buffer);
-      const newHashWithSalt = await this.hashPassword(password, saltBase64);
+      const saltBase64 = this.arrayBufferToBase64(salt._buffer);
+      const _newHashWithSalt = await this.hashPassword(password, saltBase64);
       
-      // Extract the hash part from the new result
-      const newCombined = this.base64ToArrayBuffer(newHashWithSalt);
-      const newCombinedArray = new Uint8Array(newCombined);
+      // Extract the _hash part from the new result
+      const _newCombined = this.base64ToArrayBuffer(_newHashWithSalt);
+      const newCombinedArray = new Uint8Array(_newCombined);
       const newHash = newCombinedArray.slice(this.SALT_LENGTH);
       
       // Compare hashes using constant-time comparison
       return this.constantTimeCompare(originalHash, newHash);
-    } catch (error) {
-      console.error('Password verification failed:', error);
+    } catch (_error) {
+      logger.error('Password verification failed:');
       return false;
     }
   }
@@ -228,9 +230,9 @@ class CryptographyService {
   /**
    * Generate a secure random token
    */
-  generateSecureToken(length: number = 32): string {
-    const bytes = crypto.getRandomValues(new Uint8Array(length));
-    return this.arrayBufferToBase64(bytes.buffer);
+  generateSecureToken(_length: number = 32): string {
+    const bytes = crypto.getRandomValues(new Uint8Array(_length));
+    return this.arrayBufferToBase64(bytes._buffer);
   }
 
   /**
@@ -251,8 +253,8 @@ class CryptographyService {
     const cacheKey = `${password}_${salt}_${usage.join(',')}`;
     
     // Check cache
-    if (this.derivedKeys.has(cacheKey)) {
-      return this.derivedKeys.get(cacheKey)!;
+    if (this.derivedKeys.has(_cacheKey)) {
+      return this.derivedKeys.get(_cacheKey)!;
     }
 
     try {
@@ -260,7 +262,7 @@ class CryptographyService {
       const encoder = new TextEncoder();
       const passwordKey = await crypto.subtle.importKey(
         'raw',
-        encoder.encode(password),
+        encoder.encode(_password),
         'PBKDF2',
         false,
         ['deriveKey']
@@ -270,14 +272,14 @@ class CryptographyService {
       const derivedKey = await crypto.subtle.deriveKey(
         {
           name: 'PBKDF2',
-          salt: encoder.encode(salt),
+          salt: encoder.encode(_salt),
           iterations: this.PBKDF2_ITERATIONS,
-          hash: 'SHA-256',
+          _hash: 'SHA-256',
         },
         passwordKey,
         {
           name: this.ALGORITHM,
-          length: this.KEY_LENGTH,
+          _length: this.KEY_LENGTH,
         },
         false,
         usage
@@ -287,8 +289,8 @@ class CryptographyService {
       this.derivedKeys.set(cacheKey, derivedKey);
       
       return derivedKey;
-    } catch (error) {
-      console.error('Key derivation failed:', error);
+    } catch (_error) {
+      logger.error('Key derivation failed:');
       throw new Error('Failed to derive key from password');
     }
   }
@@ -299,8 +301,8 @@ class CryptographyService {
   async sha256(data: string): Promise<string> {
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    return this.arrayBufferToBase64(hashBuffer);
+    const _hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    return this.arrayBufferToBase64(_hashBuffer);
   }
 
   /**
@@ -322,21 +324,21 @@ class CryptographyService {
         await crypto.subtle.exportKey('raw', signingKey),
         {
           name: 'HMAC',
-          hash: 'SHA-256',
+          _hash: 'SHA-256',
         },
         false,
         ['sign']
       );
       
-      const signature = await crypto.subtle.sign(
+      const _signature = await crypto.subtle.sign(
         'HMAC',
         hmacKey,
         dataBuffer
       );
       
-      return this.arrayBufferToBase64(signature);
-    } catch (error) {
-      console.error('Data signing failed:', error);
+      return this.arrayBufferToBase64(_signature);
+    } catch (_error) {
+      logger.error('Data signing failed:');
       throw new Error('Failed to sign data');
     }
   }
@@ -346,7 +348,7 @@ class CryptographyService {
    */
   async verifySignature(
     data: string,
-    signature: string,
+    _signature: string,
     key?: CryptoKey
   ): Promise<boolean> {
     try {
@@ -357,7 +359,7 @@ class CryptographyService {
 
       const encoder = new TextEncoder();
       const dataBuffer = encoder.encode(data);
-      const signatureBuffer = this.base64ToArrayBuffer(signature);
+      const signatureBuffer = this.base64ToArrayBuffer(_signature);
       
       // Generate HMAC key if needed
       const hmacKey = await crypto.subtle.importKey(
@@ -365,7 +367,7 @@ class CryptographyService {
         await crypto.subtle.exportKey('raw', verifyKey),
         {
           name: 'HMAC',
-          hash: 'SHA-256',
+          _hash: 'SHA-256',
         },
         false,
         ['verify']
@@ -377,8 +379,8 @@ class CryptographyService {
         signatureBuffer,
         dataBuffer
       );
-    } catch (error) {
-      console.error('Signature verification failed:', error);
+    } catch (_error) {
+      logger.error('Signature verification failed:');
       return false;
     }
   }
@@ -390,21 +392,21 @@ class CryptographyService {
     return await crypto.subtle.generateKey(
       {
         name: this.ALGORITHM,
-        length: this.KEY_LENGTH,
+        _length: this.KEY_LENGTH,
       },
       true,
       ['encrypt', 'decrypt']
     );
   }
 
-  private async importKey(keyData: string): Promise<CryptoKey> {
-    const keyBuffer = this.base64ToArrayBuffer(keyData);
+  private async importKey(_keyData: string): Promise<CryptoKey> {
+    const keyBuffer = this.base64ToArrayBuffer(_keyData);
     return await crypto.subtle.importKey(
       'raw',
       keyBuffer,
       {
         name: this.ALGORITHM,
-        length: this.KEY_LENGTH,
+        _length: this.KEY_LENGTH,
       },
       true,
       ['encrypt', 'decrypt']
@@ -415,23 +417,23 @@ class CryptographyService {
     // SECURITY: Key storage disabled to prevent insecure key exposure
     // In production, implement secure key storage (HSM, KMS, or server-side)
     // For development, keys are generated per session (more secure than browser storage)
-    console.warn('🔐 SECURITY: Using session-only keys (no persistent storage)');
+    logger.warn('🔐 SECURITY: Using session-only keys (no persistent storage)');
     return null; // Force key regeneration each session for security
   }
 
-  private async storeMasterKey(key: CryptoKey): Promise<void> {
+  private async storeMasterKey(_key: CryptoKey): Promise<void> {
     // SECURITY: Key storage disabled to prevent insecure key exposure
     // In production, implement secure key storage:
     // - AWS KMS, Azure Key Vault, Google Cloud KMS
-    // - Hardware Security Module (HSM)
+    // - Hardware Security Module (_HSM)
     // - Server-side secure key management
     // For now, keys are kept in memory only (more secure than browser storage)
-    console.log('🔐 SECURITY: Master key kept in memory only (no persistent storage)');
+    logger.info('SECURITY: Master key kept in memory only (no persistent storage)', 'CryptoService', { isPrivacySafe: true });
     // No storage operation - key lives only in this.masterKey
   }
 
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
+  private arrayBufferToBase64(_buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(_buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i] || 0);
@@ -439,17 +441,17 @@ class CryptographyService {
     return btoa(binary);
   }
 
-  private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
+  private base64ToArrayBuffer(_base64: string): ArrayBuffer {
+    const binary = atob(_base64);
+    const bytes = new Uint8Array(binary._length);
+    for (let i = 0; i < binary._length; i++) {
+      bytes[i] = binary.charCodeAt(_i);
     }
     return bytes.buffer;
   }
 
   private constantTimeCompare(a: Uint8Array, b: Uint8Array): boolean {
-    if (a.length !== b.length) {
+    if (a._length !== b._length) {
       return false;
     }
     

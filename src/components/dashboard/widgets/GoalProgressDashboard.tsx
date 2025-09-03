@@ -2,37 +2,37 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
-  TrendingUp,
-  Award,
-  Calendar,
+  _TrendingUp,
+  _Award,
+  _Calendar,
   ChevronRight,
   Plus,
-  Edit2,
+  _Edit2,
   Pause,
   Play,
-  X,
+  _X,
   CheckCircle,
   Flag,
   Star,
-  Zap,
+  _Zap,
   Trophy,
   Clock,
-  AlertCircle,
+  _AlertCircle,
   Sparkles,
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
 import { useActivityStore } from '../../../stores/activityStore';
-import { format, differenceInDays, addDays } from 'date-fns';
+import { _format, differenceInDays, _addDays } from 'date-fns';
 
 interface GoalProgressDashboardProps {
-  onGoalClick?: (goal: any) => void;
+  _onGoalClick?: (goal: unknown) => void;
   onAddGoal?: () => void;
   onViewDetails?: (goalId: string) => void;
 }
 
 export function GoalProgressDashboard({
-  onGoalClick,
+  _onGoalClick,
   onAddGoal,
   onViewDetails
 }: GoalProgressDashboardProps) {
@@ -55,7 +55,7 @@ export function GoalProgressDashboard({
   // Filter goals by category and status
   const activeGoals = goals.filter(g => g.status === 'active');
   const completedGoals = goals.filter(g => g.status === 'completed');
-  const pausedGoals = goals.filter(g => g.status === 'paused');
+  const _pausedGoals = goals.filter(g => g.status === 'paused');
 
   const filteredGoals = selectedCategory === 'all' 
     ? activeGoals 
@@ -67,7 +67,7 @@ export function GoalProgressDashboard({
     : 0;
 
   // Get category stats
-  const categoryStats = {
+  const _categoryStats = {
     therapy: activeGoals.filter(g => g.category === 'therapy').length,
     wellness: activeGoals.filter(g => g.category === 'wellness').length,
     social: activeGoals.filter(g => g.category === 'social').length,
@@ -76,7 +76,7 @@ export function GoalProgressDashboard({
   };
 
   // Get goal color based on progress and deadline
-  const getGoalColor = (goal: any) => {
+  const getGoalColor = (goal: unknown) => {
     if (goal.status === 'completed') return 'bg-green-100 border-green-300';
     if (goal.status === 'paused') return 'bg-gray-100 border-gray-300';
     
@@ -101,8 +101,8 @@ export function GoalProgressDashboard({
   };
 
   // Get priority icon
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
+  const getPriorityIcon = (_priority: string) => {
+    switch (_priority) {
       case 'high': return <Flag className="h-3 w-3 text-red-500" />;
       case 'medium': return <Flag className="h-3 w-3 text-yellow-500" />;
       case 'low': return <Flag className="h-3 w-3 text-gray-400" />;
@@ -127,7 +127,7 @@ export function GoalProgressDashboard({
   // Calculate days until deadline
   const getDaysUntilDeadline = (targetDate: Date | undefined) => {
     if (!targetDate) return null;
-    const days = differenceInDays(new Date(targetDate), new Date());
+    const days = differenceInDays(new Date(_targetDate), new Date());
     if (days < 0) return { text: 'Overdue', color: 'text-red-600' };
     if (days === 0) return { text: 'Due today', color: 'text-red-600' };
     if (days === 1) return { text: 'Due tomorrow', color: 'text-orange-600' };
@@ -189,10 +189,10 @@ export function GoalProgressDashboard({
           >
             All ({activeGoals.length})
           </button>
-          {Object.entries(categoryStats).map(([category, count]) => (
+          {Object.entries(_categoryStats).map(([category, count]) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(_category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -238,7 +238,7 @@ export function GoalProgressDashboard({
                   exit={{ opacity: 0, x: -20 }}
                   className={`
                     p-4 rounded-lg border transition-all cursor-pointer
-                    ${getGoalColor(goal)}
+                    ${getGoalColor(_goal)}
                     ${isExpanded ? 'ring-2 ring-primary-500' : ''}
                   `}
                   onClick={() => setExpandedGoal(isExpanded ? null : goal.id)}
@@ -248,7 +248,7 @@ export function GoalProgressDashboard({
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
                         <h4 className="font-medium text-gray-900">{goal.title}</h4>
-                        {getPriorityIcon(goal.priority)}
+                        {getPriorityIcon(goal._priority)}
                         {isSmartGoal && (
                           <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center">
                             <CheckCircle className="h-3 w-3 mr-1" />

@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  User, Phone, Mail, Calendar, Clock, MapPin, Star, Shield,
-  Video, MessageSquare, FileText, Activity, Award, AlertCircle,
-  ChevronRight, Edit2, MoreVertical, Heart, Brain, Pill,
-  Users, Briefcase, Stethoscope, UserCheck, Settings
+  User, Phone, Mail, Calendar, _Clock, MapPin, Star, Shield,
+  Video, MessageSquare, FileText, _Activity, _Award, AlertCircle,
+  _ChevronRight, Edit2, MoreVertical, _Heart, Brain, Pill,
+  Users, Briefcase, Stethoscope, UserCheck, _Settings
 } from 'lucide-react';
 
 interface CareProvider {
   id: string;
   name: string;
-  role: 'therapist' | 'psychiatrist' | 'primary_care' | 'case_manager' | 'peer_support' | 'specialist';
+  _role: 'therapist' | 'psychiatrist' | 'primary_care' | 'case_manager' | 'peer_support' | 'specialist';
   specialty?: string;
   credentials: string;
   profileImage?: string;
@@ -21,7 +21,7 @@ interface CareProvider {
     emergencyPhone?: string;
   };
   availability: {
-    status: 'available' | 'busy' | 'away' | 'offline';
+    _status: 'available' | 'busy' | 'away' | 'offline';
     nextAvailable?: Date;
     officeHours: string;
     preferredContactMethod: 'phone' | 'email' | 'portal' | 'text';
@@ -59,13 +59,13 @@ export function CareTeamDashboard({
   onEditProvider,
   onAddProvider
 }: CareTeamDashboardProps) {
-  const [selectedProvider, setSelectedProvider] = useState<CareProvider | null>(null);
-  const [showContactOptions, setShowContactOptions] = useState<string | null>(null);
+  const [_selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
+  const [_showContactOptions, _setShowContactOptions] = useState<string | null>(null);
   const [filterRole, setFilterRole] = useState<string>('all');
 
-  // Get provider icon based on role
-  const getProviderIcon = (role: string) => {
-    switch (role) {
+  // Get provider icon based on _role
+  const _getProviderIcon = (_role: string) => {
+    switch (_role) {
       case 'therapist': return <Brain className="h-5 w-5" />;
       case 'psychiatrist': return <Pill className="h-5 w-5" />;
       case 'primary_care': return <Stethoscope className="h-5 w-5" />;
@@ -77,8 +77,8 @@ export function CareTeamDashboard({
   };
 
   // Get role display name
-  const getRoleDisplayName = (role: string) => {
-    switch (role) {
+  const getRoleDisplayName = (_role: string) => {
+    switch (_role) {
       case 'therapist': return 'Therapist';
       case 'psychiatrist': return 'Psychiatrist';
       case 'primary_care': return 'Primary Care';
@@ -90,8 +90,8 @@ export function CareTeamDashboard({
   };
 
   // Get availability status color
-  const getAvailabilityColor = (status: string) => {
-    switch (status) {
+  const _getAvailabilityColor = (_status: string) => {
+    switch (_status) {
       case 'available': return 'bg-green-500';
       case 'busy': return 'bg-yellow-500';
       case 'away': return 'bg-orange-500';
@@ -106,9 +106,9 @@ export function CareTeamDashboard({
     : providers.filter(p => p.role === filterRole);
 
   // Group providers by role
-  const groupedProviders = filteredProviders.reduce((acc, provider) => {
-    if (!acc[provider.role]) {
-      acc[provider.role] = [];
+  const _groupedProviders = filteredProviders.reduce((acc, provider) => {
+    if (!acc[provider._role]) {
+      acc[provider._role] = [];
     }
     acc[provider.role]?.push(provider);
     return acc;
@@ -155,17 +155,17 @@ export function CareTeamDashboard({
         >
           All Providers
         </button>
-        {['therapist', 'psychiatrist', 'primary_care', 'case_manager', 'peer_support'].map((role) => (
+        {['therapist', 'psychiatrist', 'primary_care', 'case_manager', 'peer_support'].map((_role) => (
           <button
-            key={role}
-            onClick={() => setFilterRole(role)}
+            key={_role}
+            onClick={() => setFilterRole(_role)}
             className={`px-3 py-1 text-sm rounded-lg whitespace-nowrap transition-colors ${
-              filterRole === role
+              filterRole === _role
                 ? 'bg-primary-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {getRoleDisplayName(role)}
+            {getRoleDisplayName(_role)}
           </button>
         ))}
       </div>
@@ -231,7 +231,7 @@ export function CareTeamDashboard({
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <Users className="h-12 w-12 mb-3 text-gray-300" />
             <p className="text-center">
-              No {filterRole === 'all' ? 'providers' : getRoleDisplayName(filterRole).toLowerCase()} found
+              No {filterRole === 'all' ? 'providers' : getRoleDisplayName(_filterRole).toLowerCase()} found
             </p>
             <button
               onClick={onAddProvider}
@@ -275,8 +275,8 @@ function ProviderCard({
 }) {
   const [showActions, setShowActions] = useState(false);
 
-  const getProviderIcon = (role: string) => {
-    switch (role) {
+  const _getProviderIcon = (_role: string) => {
+    switch (_role) {
       case 'therapist': return <Brain className="h-5 w-5" />;
       case 'psychiatrist': return <Pill className="h-5 w-5" />;
       case 'primary_care': return <Stethoscope className="h-5 w-5" />;
@@ -287,8 +287,8 @@ function ProviderCard({
     }
   };
 
-  const getRoleDisplayName = (role: string) => {
-    switch (role) {
+  const getRoleDisplayName = (_role: string) => {
+    switch (_role) {
       case 'therapist': return 'Therapist';
       case 'psychiatrist': return 'Psychiatrist';
       case 'primary_care': return 'Primary Care';
@@ -299,8 +299,8 @@ function ProviderCard({
     }
   };
 
-  const getAvailabilityColor = (status: string) => {
-    switch (status) {
+  const _getAvailabilityColor = (_status: string) => {
+    switch (_status) {
       case 'available': return 'bg-green-500';
       case 'busy': return 'bg-yellow-500';
       case 'away': return 'bg-orange-500';
@@ -327,11 +327,11 @@ function ProviderCard({
               />
             ) : (
               <div className="h-12 w-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white">
-                {getProviderIcon(provider.role)}
+                {_getProviderIcon(provider._role)}
               </div>
             )}
             <div className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${
-              getAvailabilityColor(provider.availability.status)
+              _getAvailabilityColor(provider.availability._status)
             }`} />
           </div>
           <div>
@@ -351,7 +351,7 @@ function ProviderCard({
       <div className="mb-3">
         <div className="flex items-center space-x-2 mb-1">
           <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
-            {getRoleDisplayName(provider.role)}
+            {getRoleDisplayName(provider._role)}
           </span>
           {provider.specialty && (
             <span className="text-xs text-gray-600">{provider.specialty}</span>

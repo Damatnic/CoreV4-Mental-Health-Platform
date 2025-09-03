@@ -4,6 +4,8 @@
  * Prevents insecure deployments
  */
 
+import { logger } from '../utils/logger';
+
 interface SecurityValidationResult {
   isSecure: boolean;
   criticalIssues: string[];
@@ -34,7 +36,7 @@ export class SecurityValidationService {
     ];
 
     exposedSecrets.forEach(secret => {
-      // @ts-ignore - checking for dangerous environment variables
+      // @ts-expect-error - checking for dangerous environment variables
       if (import.meta.env[secret]) {
         // In production, only fail for truly critical secrets
         if (import.meta.env.PROD && ['VITE_JWT_SECRET', 'VITE_DATABASE_URL', 'VITE_STRIPE_SECRET_KEY'].includes(secret)) {
@@ -56,7 +58,7 @@ export class SecurityValidationService {
 
       const wsUrl = import.meta.env.VITE_WS_URL;
       if (wsUrl && !wsUrl.startsWith('wss://')) {
-        result.warnings.push('⚠️ WARNING: WebSocket URL should use WSS (secure) in production');
+        result.warnings.push('⚠️ WARNING: WebSocket URL should use WSS (_secure) in production');
       }
 
       if (apiUrl?.includes('localhost')) {
@@ -85,14 +87,14 @@ export class SecurityValidationService {
     ];
 
     criticalVars.forEach(varName => {
-      // @ts-ignore - checking for critical environment variables
+      // @ts-expect-error - checking for critical environment variables
       if (!import.meta.env[varName]) {
         result.warnings.push(`⚠️ WARNING: Missing critical environment variable: ${varName}`);
       }
     });
 
     recommendedVars.forEach(varName => {
-      // @ts-ignore - checking for recommended environment variables
+      // @ts-expect-error - checking for recommended environment variables
       if (!import.meta.env[varName]) {
         result.recommendations.push(`💡 RECOMMENDATION: Set environment variable: ${varName}`);
       }
@@ -109,31 +111,31 @@ export class SecurityValidationService {
     
     // Only log security issues in development or when critical errors exist
     if (import.meta.env.DEV || !validation.isSecure) {
-      console.log('🔐 SECURITY VALIDATION REPORT');
-      console.log('============================');
+      logger.info('SECURITY VALIDATION REPORT', 'SecurityValidation');
+      logger.info('============================', 'SecurityValidation');
       
       if (validation.isSecure) {
-        console.log('✅ CLIENT SECURITY: PASSED');
+        logger.info('CLIENT SECURITY: PASSED', 'SecurityValidation');
       } else {
-        console.error('❌ CLIENT SECURITY: FAILED');
-        console.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
-        validation.criticalIssues.forEach(issue => console.error(issue));
+        logger.error('❌ CLIENT SECURITY: FAILED');
+        logger.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
+        validation.criticalIssues.forEach(_issue => logger.error(_issue));
       }
 
       if (validation.warnings.length > 0) {
-        console.warn('⚠️  SECURITY WARNINGS:');
-        validation.warnings.forEach(warning => console.warn(warning));
+        logger.warn('⚠️  SECURITY WARNINGS:');
+        validation.warnings.forEach(_warning => logger.warn(_warning));
       }
 
       if (validation.recommendations.length > 0 && import.meta.env.DEV) {
-        console.log('💡 SECURITY RECOMMENDATIONS:');
-        validation.recommendations.forEach(rec => console.log(rec));
+        logger.info('SECURITY RECOMMENDATIONS:', 'SecurityValidation');
+        validation.recommendations.forEach(rec => logger.info(rec, 'SecurityValidation'));
       }
     }
 
     // In production, fail hard on security issues
     if (!validation.isSecure && import.meta.env.PROD) {
-      console.error('🚫 PRODUCTION DEPLOYMENT BLOCKED DUE TO SECURITY ISSUES');
+      logger.error('🚫 PRODUCTION DEPLOYMENT BLOCKED DUE TO SECURITY ISSUES');
       throw new Error('Security validation failed - deployment blocked');
     }
 
@@ -144,8 +146,8 @@ export class SecurityValidationService {
 // Auto-validate on module load
 try {
   SecurityValidationService.validateAndLog();
-} catch (error) {
-  console.error('Security validation failed:', error);
+} catch (_error) {
+  logger.error('Security validation failed:');
   if (import.meta.env.PROD) {
     // Prevent insecure production deployments
     document.body.innerHTML = `

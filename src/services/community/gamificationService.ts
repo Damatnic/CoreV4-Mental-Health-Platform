@@ -101,7 +101,7 @@ export type Milestone = z.infer<typeof MilestoneSchema>;
 export type Challenge = z.infer<typeof ChallengeSchema>;
 
 // Achievement definitions
-const ACHIEVEMENTS = {
+const _ACHIEVEMENTS = {
   // Community Achievements
   FIRST_POST: {
     id: 'first-post',
@@ -245,8 +245,8 @@ class GamificationService {
     
     // Show notifications for achievements
     if (response.data.newAchievements?.length > 0) {
-      response.data.newAchievements.forEach((achievement: Achievement) => {
-        this.showAchievementNotification(achievement);
+      response.data.newAchievements.forEach((_achievement: Achievement) => {
+        this.showAchievementNotification(_achievement);
       });
     }
     
@@ -265,7 +265,7 @@ class GamificationService {
 
   async getAchievements(userId?: string): Promise<Achievement[]> {
     const response = await this.apiClient.get(`/gamification/achievements/${userId || 'me'}`);
-    return response.data.map((a: any) => AchievementSchema.parse(a));
+    return response.data.map((a: unknown) => AchievementSchema.parse(a));
   }
 
   async getAchievementProgress(achievementId: string): Promise<Achievement> {
@@ -277,7 +277,7 @@ class GamificationService {
     await this.apiClient.post(`/gamification/achievements/${achievementId}/claim`);
   }
 
-  private showAchievementNotification(achievement: Achievement) {
+  private showAchievementNotification(_achievement: Achievement) {
     const tierEmojis = {
       bronze: '🥉',
       silver: '🥈',
@@ -288,7 +288,7 @@ class GamificationService {
     const emoji = achievement.icon || tierEmojis[achievement.tier] || '🏆';
     
     toast.success(
-      `${emoji} Achievement Unlocked!\n${achievement.name}\n${achievement.description}\n+${achievement.points} points`,
+      `${emoji} Achievement Unlocked!\n${_achievement.name}\n${_achievement.description}\n+${_achievement.points} points`,
       {
         duration: 5000,
         style: {
@@ -311,7 +311,7 @@ class GamificationService {
     const response = await this.apiClient.get('/gamification/leaderboard', {
       params: { type, period, limit },
     });
-    return response.data.map((entry: any) => LeaderboardEntrySchema.parse(entry));
+    return response.data.map((_entry: unknown) => LeaderboardEntrySchema.parse(_entry));
   }
 
   async getUserRank(userId?: string): Promise<{
@@ -327,7 +327,7 @@ class GamificationService {
 
   async getMilestones(userId?: string): Promise<Milestone[]> {
     const response = await this.apiClient.get(`/gamification/milestones/${userId || 'me'}`);
-    return response.data.map((m: any) => MilestoneSchema.parse(m));
+    return response.data.map((m: unknown) => MilestoneSchema.parse(m));
   }
 
   async celebrateMilestone(milestoneId: string, message?: string): Promise<void> {
@@ -347,12 +347,12 @@ class GamificationService {
 
   async getActiveChallenges(): Promise<Challenge[]> {
     const response = await this.apiClient.get('/gamification/challenges/active');
-    return response.data.map((c: any) => ChallengeSchema.parse(c));
+    return response.data.map((c: unknown) => ChallengeSchema.parse(c));
   }
 
   async getMyChallenges(): Promise<Challenge[]> {
     const response = await this.apiClient.get('/gamification/challenges/my');
-    return response.data.map((c: any) => ChallengeSchema.parse(c));
+    return response.data.map((c: unknown) => ChallengeSchema.parse(c));
   }
 
   async joinChallenge(challengeId: string): Promise<void> {
@@ -491,4 +491,4 @@ class GamificationService {
 }
 
 // Export singleton instance
-export const gamificationService = new GamificationService();
+export const _gamificationService = new GamificationService();

@@ -10,12 +10,12 @@ import {
   SafetyPlan,
   CommunityPost,
   SupportGroup,
-  Message,
-  Comment
+  _Message,
+  _Comment
 } from './types';
 
 // Helper function to generate random dates
-const randomDate = (start: Date, end: Date): Date => {
+const _randomDate = (start: Date, end: Date): Date => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
@@ -382,7 +382,7 @@ export const mockSafetyPlan: SafetyPlan = {
     'Feeling overwhelmed and unable to cope',
     'Isolating myself from others',
     'Negative self-talk increasing',
-    'Sleep disturbances for multiple days',
+    'Sleep disturbances for multiple _days',
     'Loss of interest in activities'
   ],
   copingStrategies: [
@@ -657,7 +657,7 @@ export class MockDataService {
   }
   
   // Mood tracking methods
-  async getMoodEntries(userId: string, days: number = 30): Promise<MoodEntry[]> {
+  async getMoodEntries(userId: string, _days: number = 30): Promise<MoodEntry[]> {
     await this.delay();
     return mockMoodEntries.filter(entry => entry.userId === userId);
   }
@@ -668,12 +668,12 @@ export class MockDataService {
       ...entry,
       id: `mood-${Date.now()}`
     };
-    mockMoodEntries.push(newEntry);
+    mockMoodEntries.push(_newEntry);
     return newEntry;
   }
   
   // Therapist methods
-  async getTherapists(filters?: any): Promise<Therapist[]> {
+  async getTherapists(filters?: unknown): Promise<Therapist[]> {
     await this.delay(500);
     let therapists = [...mockTherapists];
     
@@ -709,7 +709,7 @@ export class MockDataService {
       ...appointment,
       id: `appt-${Date.now()}`
     };
-    mockAppointments.push(newAppointment);
+    mockAppointments.push(_newAppointment);
     return newAppointment;
   }
   
@@ -775,7 +775,7 @@ export class MockDataService {
       moderated: false,
       pinned: false
     };
-    mockCommunityPosts.unshift(newPost);
+    mockCommunityPosts.unshift(_newPost);
     return newPost;
   }
   
@@ -795,4 +795,4 @@ export class MockDataService {
 }
 
 // Export singleton instance
-export const mockDataService = MockDataService.getInstance();
+export const _mockDataService = MockDataService.getInstance();

@@ -1,6 +1,6 @@
 // Crisis Intervention Workflow Integration Tests
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, _within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { http, HttpResponse } from 'msw';
 // Import components for integration testing
 import CrisisButton from '../../components/crisis/CrisisButton';
 import MoodTracker from '../../components/wellness/MoodTracker';
+import { logger } from '../../utils/logger';
 
 // Test wrapper with all necessary providers
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -42,7 +43,7 @@ describe('Crisis Intervention Workflow', () => {
   afterEach(() => {
     const duration = performance.now() - performanceStart;
     if (duration > 200) {
-      console.warn(`Test exceeded 200ms threshold: ${duration.toFixed(2)}ms`);
+      logger.warn(`Test exceeded 200ms threshold: ${duration.toFixed(2)}ms`);
     }
   });
 
@@ -61,8 +62,8 @@ describe('Crisis Intervention Workflow', () => {
       const moodSlider = screen.getByRole('slider');
       fireEvent.change(moodSlider, { target: { value: '2' } });
       
-      const logButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(logButton);
+      const _logButton = screen.getByRole('button', { name: /log mood/i });
+      await user.click(_logButton);
       
       // Step 2: Crisis support should be triggered automatically
       await waitFor(() => {
@@ -71,8 +72,8 @@ describe('Crisis Intervention Workflow', () => {
       });
       
       // Step 3: User clicks crisis button
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       // Step 4: Crisis resources should be displayed immediately
       await waitFor(() => {
@@ -105,8 +106,8 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       // Should show offline resources
       await waitFor(() => {
@@ -122,8 +123,8 @@ describe('Crisis Intervention Workflow', () => {
       
       server.use(
         http.post('/api/crisis/escalate', async ({ request }) => {
-          const body = await request.json() as any;
-          escalationSpy(body);
+          const _body = await request.json() as unknown;
+          escalationSpy(_body);
           return HttpResponse.json({
             escalated: true,
             level: 'urgent',
@@ -140,11 +141,11 @@ describe('Crisis Intervention Workflow', () => {
       
       // Multiple low mood entries in succession
       const moodSlider = screen.getByRole('slider');
-      const logButton = screen.getByRole('button', { name: /log mood/i });
+      const _logButton = screen.getByRole('button', { name: /log mood/i });
       
       // First entry
       fireEvent.change(moodSlider, { target: { value: '2' } });
-      await user.click(logButton);
+      await user.click(_logButton);
       
       await waitFor(() => {
         expect(screen.getByText(/mood logged successfully/i)).toBeInTheDocument();
@@ -155,11 +156,11 @@ describe('Crisis Intervention Workflow', () => {
       
       // Second very low entry
       fireEvent.change(moodSlider, { target: { value: '1' } });
-      await user.click(logButton);
+      await user.click(_logButton);
       
       // Should trigger escalation
       await waitFor(() => {
-        expect(escalationSpy).toHaveBeenCalled();
+        expect(_escalationSpy).toHaveBeenCalled();
       });
     });
 
@@ -183,16 +184,16 @@ describe('Crisis Intervention Workflow', () => {
       );
       
       // Trigger crisis intervention
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
         expect(screen.getByText(/crisis resources/i)).toBeInTheDocument();
       });
       
       // Close crisis modal
-      const closeButton = screen.getByRole('button', { name: /close/i });
-      await user.click(closeButton);
+      const _closeButton = screen.getByRole('button', { name: /close/i });
+      await user.click(_closeButton);
       
       // Should schedule follow-up
       await waitFor(() => {
@@ -226,8 +227,8 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
         expect(screen.getByText(/professional support notified/i)).toBeInTheDocument();
@@ -238,9 +239,9 @@ describe('Crisis Intervention Workflow', () => {
       await waitFor(() => {
         expect(screen.getByText(/Dr. Sarah Johnson/i)).toBeInTheDocument();
       });
-      const connectionTime = performance.now() - connectionStart;
+      const _connectionTime = performance.now() - connectionStart;
       
-      expect(connectionTime).toBeLessThan(100); // Sub-100ms connection
+      expect(_connectionTime).toBeLessThan(100); // Sub-100ms connection
     });
 
     it('should queue user for next available professional if none available', async () => {
@@ -266,8 +267,8 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
         expect(screen.getByText(/estimated wait: 5 minutes/i)).toBeInTheDocument();
@@ -278,7 +279,7 @@ describe('Crisis Intervention Workflow', () => {
 
   describe('Data Privacy During Crisis', () => {
     it('should encrypt all crisis-related communications', async () => {
-      const encryptSpy = vi.spyOn(window.crypto.subtle, 'encrypt');
+      const _encryptSpy = vi.spyOn(window.crypto.subtle, 'encrypt');
       const user = userEvent.setup();
       
       render(
@@ -287,11 +288,11 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
-        expect(encryptSpy).toHaveBeenCalled();
+        expect(_encryptSpy).toHaveBeenCalled();
       });
     });
 
@@ -300,8 +301,8 @@ describe('Crisis Intervention Workflow', () => {
       
       server.use(
         http.post('/api/analytics/event', async ({ request }) => {
-          const body = await request.json() as any;
-          analyticsSpy(body);
+          const _body = await request.json() as unknown;
+          analyticsSpy(_body);
           return HttpResponse.json({ tracked: true });
         })
       );
@@ -321,13 +322,13 @@ describe('Crisis Intervention Workflow', () => {
       const notesInput = screen.getByPlaceholderText(/add notes/i);
       await user.type(notesInput, 'Feeling suicidal');
       
-      const logButton = screen.getByRole('button', { name: /log mood/i });
-      await user.click(logButton);
+      const _logButton = screen.getByRole('button', { name: /log mood/i });
+      await user.click(_logButton);
       
       await waitFor(() => {
-        expect(analyticsSpy).toHaveBeenCalled();
+        expect(_analyticsSpy).toHaveBeenCalled();
         // Should not contain sensitive text
-        expect(analyticsSpy).not.toHaveBeenCalledWith(
+        expect(_analyticsSpy).not.toHaveBeenCalledWith(
           expect.objectContaining({
             notes: expect.stringContaining('suicidal')
           })
@@ -344,16 +345,16 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       // Check for HIPAA compliance indicators
       await waitFor(() => {
-        const secureIndicator = sessionStorage.getItem('hipaa_compliant');
-        expect(secureIndicator).toBe('true');
+        const _secureIndicator = sessionStorage.getItem('hipaa_compliant');
+        expect(_secureIndicator).toBe('true');
         
-        const auditLog = sessionStorage.getItem('audit_log');
-        expect(auditLog).toBeTruthy();
+        const _auditLog = sessionStorage.getItem('audit_log');
+        expect(_auditLog).toBeTruthy();
       });
     });
   });
@@ -368,8 +369,8 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
         // Phone support
@@ -379,9 +380,9 @@ describe('Crisis Intervention Workflow', () => {
         expect(screen.getByText(/text home to 741741/i)).toBeInTheDocument();
         
         // Online chat (if available)
-        const onlineSupport = screen.queryByText(/online support/i);
-        if (onlineSupport) {
-          expect(onlineSupport).toBeInTheDocument();
+        const _onlineSupport = screen.queryByText(/online support/i);
+        if (_onlineSupport) {
+          expect(_onlineSupport).toBeInTheDocument();
         }
       });
     });
@@ -398,13 +399,13 @@ describe('Crisis Intervention Workflow', () => {
         </TestWrapper>
       );
       
-      const crisisButton = screen.getByRole('button', { name: /crisis help/i });
-      await user.click(crisisButton);
+      const _crisisButton = screen.getByRole('button', { name: /crisis help/i });
+      await user.click(_crisisButton);
       
       await waitFor(() => {
         // Text options should be prominently displayed
-        const textSection = screen.getByText(/crisis text line/i).parentElement;
-        expect(textSection).toHaveClass('bg-blue-50'); // Highlighted
+        const _textSection = screen.getByText(/crisis text line/i).parentElement;
+        expect(_textSection).toHaveClass('bg-blue-50'); // Highlighted
       });
     });
   });
@@ -433,7 +434,7 @@ describe('Crisis Intervention Workflow', () => {
       
       await waitFor(() => {
         const recoveryData = sessionStorage.getItem('recovery_tracking');
-        expect(recoveryData).toBeTruthy();
+        expect(_recoveryData).toBeTruthy();
         
         const parsed = JSON.parse(recoveryData!);
         expect(parsed.moodImprovement).toBeGreaterThan(0);

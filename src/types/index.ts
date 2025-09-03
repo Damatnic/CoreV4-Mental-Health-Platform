@@ -279,7 +279,7 @@ export interface ApiResponse<T> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface ResponseMetadata {
@@ -307,6 +307,6 @@ export interface SelectOption {
 
 export interface ValidationRule {
   type: 'required' | 'email' | 'min' | 'max' | 'pattern';
-  value?: any;
+  value?: unknown;
   message: string;
 }

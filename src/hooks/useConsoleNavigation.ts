@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import _React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConsoleSound } from '../services/console/ConsoleSoundSystem';
 import { performanceMonitor } from '../utils/performance/performanceMonitor';
+import { logger } from '../utils/logger';
 
 interface ConsoleFocusable {
   id: string;
@@ -32,7 +33,7 @@ export function useConsoleNavigation() {
   
   // Detect device performance capabilities
   const isLowEndDevice = useMemo(() => {
-    const memory = (navigator as any).deviceMemory;
+    const memory = (navigator as unknown).deviceMemory;
     const cores = navigator.hardwareConcurrency;
     return (memory && memory <= 4) || (cores && cores <= 2);
   }, []);
@@ -52,7 +53,7 @@ export function useConsoleNavigation() {
     let frameCount = 0;
     let lastTime = performance.now();
     
-    const measureFrameRate = () => {
+    const _measureFrameRate = () => {
       const now = performance.now();
       frameCount++;
       
@@ -76,11 +77,11 @@ export function useConsoleNavigation() {
         });
       }
       
-      requestAnimationFrame(measureFrameRate);
+      requestAnimationFrame(_measureFrameRate);
     };
     
-    const animationId = requestAnimationFrame(measureFrameRate);
-    return () => cancelAnimationFrame(animationId);
+    const _animationId = requestAnimationFrame(_measureFrameRate);
+    return () => cancelAnimationFrame(_animationId);
   }, [isLowEndDevice, state.navigationMode]);
 
   // Register a focusable element with performance optimizations
@@ -119,7 +120,7 @@ export function useConsoleNavigation() {
   // Unregister a focusable element with cleanup
   const unregisterFocusable = useCallback((id: string) => {
     // Clean up cached bounds
-    boundsCacheRef.current.delete(id);
+    boundsCacheRef.current.delete(_id);
     
     setState(prev => ({
       ...prev,
@@ -129,7 +130,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Get focusables in current group with memoization
-  const getCurrentGroupFocusables = useCallback(() => {
+  const _getCurrentGroupFocusables = useCallback(() => {
     return state.focusables.filter(f => f.group === state.currentGroup);
   }, [state.focusables, state.currentGroup]);
   
@@ -163,7 +164,7 @@ export function useConsoleNavigation() {
           // Add console focus styling
           focusable.element?.classList.add('console-focused');
           
-          // Remove focus styling from other elements (throttled)
+          // Remove focus styling from other elements (_throttled)
           const now = Date.now();
           if (now - lastCleanupRef.current > 16) { // ~60fps throttling
             state.focusables.forEach(f => {
@@ -191,9 +192,9 @@ export function useConsoleNavigation() {
             isPerformanceMode: state.isPerformanceMode
           });
         }
-      } catch (error) {
-        console.warn('Error setting focus on element:', error);
-        performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, error: String(error) });
+      } catch (_error) {
+        logger.warn('Error setting focus on element:');
+        performanceMonitor.recordMetric('focus_error', 1, { focusableId: id, undefined: String(_undefined) });
       }
     }
   }, [state.focusables, state.isPerformanceMode, onFocus]);
@@ -253,29 +254,29 @@ export function useConsoleNavigation() {
       const deltaY = center.y - currentCenter.y;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      let isValidDirection = false;
+      let _isValidDirection = false;
       let alignment = 0;
       
-      switch (direction) {
+      switch (_direction) {
         case 'up':
-          isValidDirection = deltaY < -10; // Must be significantly above
-          alignment = 1 - Math.abs(deltaX) / window.innerWidth; // Prefer aligned horizontally
+          _isValidDirection = deltaY < -10; // Must be significantly above
+          alignment = 1 - Math.abs(_deltaX) / window.innerWidth; // Prefer aligned horizontally
           break;
         case 'down':
-          isValidDirection = deltaY > 10; // Must be significantly below
-          alignment = 1 - Math.abs(deltaX) / window.innerWidth;
+          _isValidDirection = deltaY > 10; // Must be significantly below
+          alignment = 1 - Math.abs(_deltaX) / window.innerWidth;
           break;
         case 'left':
-          isValidDirection = deltaX < -10; // Must be significantly to the left
-          alignment = 1 - Math.abs(deltaY) / window.innerHeight; // Prefer aligned vertically
+          _isValidDirection = deltaX < -10; // Must be significantly to the left
+          alignment = 1 - Math.abs(_deltaY) / window.innerHeight; // Prefer aligned vertically
           break;
         case 'right':
-          isValidDirection = deltaX > 10; // Must be significantly to the right
-          alignment = 1 - Math.abs(deltaY) / window.innerHeight;
+          _isValidDirection = deltaX > 10; // Must be significantly to the right
+          alignment = 1 - Math.abs(_deltaY) / window.innerHeight;
           break;
       }
       
-      if (isValidDirection) {
+      if (_isValidDirection) {
         // Score combines distance and alignment
         const score = distance - (alignment * 100); // Alignment bonus
         
@@ -335,8 +336,8 @@ export function useConsoleNavigation() {
           
           focusable.element.click();
           onSelect();
-        } catch (error) {
-          console.warn('Error activating element:', error);
+        } catch (_error) {
+    logger.warn('Error activating element:');
         }
       }
     }
@@ -400,18 +401,18 @@ export function useConsoleNavigation() {
           const groups = ['main-nav', 'dashboard-tiles', 'sidebar'];
           const currentIndex = groups.indexOf(state.currentGroup);
           const prevIndex = currentIndex > 0 ? currentIndex - 1 : groups.length - 1;
-          const prevGroup = groups[prevIndex];
-          if (prevGroup) {
-            switchGroup(prevGroup);
+          const _prevGroup = groups[prevIndex];
+          if (_prevGroup) {
+            switchGroup(_prevGroup);
           }
         } else {
           // Switch to next group
           const groups = ['main-nav', 'dashboard-tiles', 'sidebar'];
           const currentIndex = groups.indexOf(state.currentGroup);
           const nextIndex = (currentIndex + 1) % groups.length;
-          const nextGroup = groups[nextIndex];
-          if (nextGroup) {
-            switchGroup(nextGroup);
+          const _nextGroup = groups[nextIndex];
+          if (_nextGroup) {
+            switchGroup(_nextGroup);
           }
         }
         break;
@@ -470,8 +471,8 @@ export function useConsoleNavigation() {
       if (f.element && f.element.classList) {
         try {
           f.element.classList.remove('console-focused');
-        } catch (error) {
-          console.warn('Error removing focus styling:', error);
+        } catch (_error) {
+    logger.warn('Error removing focus styling:');
         }
       }
     });
@@ -483,7 +484,7 @@ export function useConsoleNavigation() {
     document.addEventListener('mousemove', handleMouseMove);
 
     // Set initial focus on dashboard tiles
-    const timer = setTimeout(() => {
+    const _timer = setTimeout(() => {
       const dashboardTiles = state.focusables.filter(f => f.group === 'dashboard-tiles');
       if (dashboardTiles.length > 0) {
         const firstTile = dashboardTiles[0];
@@ -496,7 +497,7 @@ export function useConsoleNavigation() {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousemove', handleMouseMove);
-      clearTimeout(timer);
+      clearTimeout(_timer);
     };
   }, [handleKeyDown, handleMouseMove, state.focusables, setFocus]);
 
@@ -505,7 +506,7 @@ export function useConsoleNavigation() {
     let gamepadIndex: number | null = null;
     let lastButtonStates: boolean[] = [];
     let lastAxisStates: number[] = [];
-    let gamepadConnected = false;
+    let _gamepadConnected = false;
 
     const checkGamepad = () => {
       // Skip if no gamepad API or performance mode is active
@@ -514,8 +515,8 @@ export function useConsoleNavigation() {
       try {
         const gamepads = navigator.getGamepads();
         if (!gamepads || gamepads.length === 0) {
-          if (gamepadConnected) {
-            gamepadConnected = false;
+          if (_gamepadConnected) {
+            _gamepadConnected = false;
             performanceMonitor.recordMetric('gamepad_disconnected', Date.now());
           }
           return;
@@ -525,7 +526,7 @@ export function useConsoleNavigation() {
 
         if (gamepad && gamepadIndex === null) {
           gamepadIndex = 0;
-          gamepadConnected = true;
+          _gamepadConnected = true;
           setState(prev => ({ ...prev, navigationMode: 'gamepad', lastInteraction: Date.now() }));
           performanceMonitor.recordMetric('gamepad_connected', Date.now(), {
             id: gamepad.id,
@@ -542,16 +543,16 @@ export function useConsoleNavigation() {
           
           // Ensure axis values are defined before processing
           if (rawVertical !== undefined && rawHorizontal !== undefined) {
-            const verticalAxis = Math.abs(rawVertical) > deadzone ? rawVertical : 0;
-            const horizontalAxis = Math.abs(rawHorizontal) > deadzone ? rawHorizontal : 0;
+            const verticalAxis = Math.abs(_rawVertical) > deadzone ? rawVertical : 0;
+            const horizontalAxis = Math.abs(_rawHorizontal) > deadzone ? rawHorizontal : 0;
             
             // Only process if axis state changed significantly
-            const axisChanged = (
+            const _axisChanged = (
               Math.abs((lastAxisStates[1] || 0) - verticalAxis) > 0.2 ||
               Math.abs((lastAxisStates[0] || 0) - horizontalAxis) > 0.2
             );
             
-            if (axisChanged) {
+            if (_axisChanged) {
               if (verticalAxis < -0.5) navigate2D('up');
               if (verticalAxis > 0.5) navigate2D('down');
               if (horizontalAxis < -0.5) navigate2D('left');
@@ -585,20 +586,20 @@ export function useConsoleNavigation() {
           // Update button states efficiently
           lastButtonStates = gamepad.buttons.map(b => b?.pressed || false);
         }
-      } catch (error) {
+      } catch (_error) {
         // Log gamepad errors for monitoring but don't break functionality
         performanceMonitor.recordMetric('gamepad_error', 1, {
-          error: String(error)
+          error: String(_error)
         });
       }
     };
 
     // Adaptive polling rate based on performance
     const pollingRate = state.frameRate < 30 ? 200 : 100; // Slower polling for low-end devices
-    const gamepadInterval = setInterval(checkGamepad, pollingRate);
+    const _gamepadInterval = setInterval(checkGamepad, pollingRate);
     
     return () => {
-      clearInterval(gamepadInterval);
+      clearInterval(_gamepadInterval);
       if (interactionTimeoutRef.current) {
         clearTimeout(interactionTimeoutRef.current);
       }
@@ -607,7 +608,7 @@ export function useConsoleNavigation() {
   
   // Cleanup old focusable elements periodically
   useEffect(() => {
-    const cleanupInterval = setInterval(() => {
+    const _cleanupInterval = setInterval(() => {
       const now = Date.now();
       const staleThreshold = 30000; // 30 seconds
       
@@ -625,7 +626,7 @@ export function useConsoleNavigation() {
       }));
     }, 60000); // Run every minute
     
-    return () => clearInterval(cleanupInterval);
+    return () => clearInterval(_cleanupInterval);
   }, []);
 
   // Performance metrics for the hook

@@ -194,7 +194,7 @@ export const wellnessTheme = {
       to: { opacity: 1 },
     },
     slideIn: {
-      from: { transform: 'translateY(20px)', opacity: 0 },
+      from: { transform: 'translateY(_20px)', opacity: 0 },
       to: { transform: 'translateY(0)', opacity: 1 },
     },
     scaleIn: {
@@ -213,17 +213,17 @@ export const wellnessTheme = {
 };
 
 // Helper function to get gradient class
-export const getGradientClass = (type: keyof typeof wellnessTheme.gradients) => {
+export const _getGradientClass = (type: keyof typeof wellnessTheme.gradients) => {
   return `bg-gradient-to-r ${wellnessTheme.gradients[type]}`;
 };
 
 // Helper function to get tool gradient
-export const getToolGradient = (tool: keyof typeof wellnessTheme.gradients.tools) => {
+export const _getToolGradient = (tool: keyof typeof wellnessTheme.gradients.tools) => {
   return `bg-gradient-to-r ${wellnessTheme.gradients.tools[tool]}`;
 };
 
 // Helper function to apply component styles
-export const getComponentStyles = (
+export const _getComponentStyles = (
   component: keyof typeof wellnessTheme.components,
   variant?: string,
   size?: string
@@ -232,11 +232,11 @@ export const getComponentStyles = (
   let styles = comp.base || '';
   
   if (variant && 'variants' in comp) {
-    styles += ` ${  (comp.variants as any)[variant]}`;
+    styles += ` ${  (comp.variants as unknown)[variant]}`;
   }
   
   if (size && 'sizes' in comp) {
-    styles += ` ${  (comp.sizes as any)[size]}`;
+    styles += ` ${  (comp.sizes as unknown)[size]}`;
   }
   
   return styles;

@@ -1,21 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertCircle, Heart, Users, Activity, MapPin, Save, Download, Share2, CheckCircle } from 'lucide-react';
+import { Shield, AlertCircle, Heart, Users, Activity, MapPin, _Save, Download, Share2, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
+import { logger } from '@/utils/logger';
+
+interface SupportPerson {
+  name: string;
+  phone: string;
+  available: string;
+}
+
+interface ProfessionalContact {
+  name: string;
+  role: string;
+  phone: string;
+}
 
 interface SafetyPlanData {
   warningSignals: string[];
   copingStrategies: string[];
   distractionTechniques: string[];
-  supportPeople: { name: string; phone: string; available: string }[];
+  supportPeople: SupportPerson[];
   safePlaces: string[];
-  professionalContacts: { name: string; role: string; phone: string }[];
+  professionalContacts: ProfessionalContact[];
   reasonsToLive: string[];
   safeEnvironmentSteps: string[];
   lastUpdated: string;
 }
 
-const DEFAULT_SAFETY_PLAN: SafetyPlanData = {
+type SafetyPlanSection = keyof SafetyPlanData;
+type _SafetyPlanValue = SafetyPlanData[SafetyPlanSection];
+
+const _DEFAULT_SAFETY_PLAN: SafetyPlanData = {
   warningSignals: [],
   copingStrategies: [],
   distractionTechniques: [],
@@ -28,7 +44,7 @@ const DEFAULT_SAFETY_PLAN: SafetyPlanData = {
 };
 
 export function SafetyPlan() {
-  const [safetyPlan, setSafetyPlan] = useState<SafetyPlanData>(DEFAULT_SAFETY_PLAN);
+  const [safetyPlan, setSafetyPlan] = useState<SafetyPlanData>(_DEFAULT_SAFETY_PLAN);
   const [activeSection, setActiveSection] = useState<string>('warningSignals');
   const [isEditing, setIsEditing] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -36,26 +52,26 @@ export function SafetyPlan() {
 
   // Load safety plan from localStorage
   useEffect(() => {
-    const savedPlan = secureStorage.getItem('safetyPlan');
-    if (savedPlan) {
-      setSafetyPlan(JSON.parse(savedPlan));
+    const _savedPlan = secureStorage.getItem('safetyPlan');
+    if (_savedPlan) {
+      setSafetyPlan(JSON.parse(_savedPlan));
     }
   }, []);
 
   // Auto-save functionality
   useEffect(() => {
-    const saveTimer = setTimeout(() => {
-      if (isEditing) {
+    const _saveTimer = setTimeout(() => {
+      if (_isEditing) {
         setAutoSaveStatus('saving');
-        secureStorage.setItem('safetyPlan', JSON.stringify(safetyPlan));
+        secureStorage.setItem('safetyPlan', JSON.stringify(_safetyPlan));
         setTimeout(() => setAutoSaveStatus('saved'), 1000);
       }
     }, 2000);
 
-    return () => clearTimeout(saveTimer);
+    return () => clearTimeout(_saveTimer);
   }, [safetyPlan, isEditing]);
 
-  const handleUpdateSection = (section: keyof SafetyPlanData, value: any) => {
+  const handleUpdateSection = <T extends SafetyPlanSection>(section: T, value: SafetyPlanData[T]) => {
     setSafetyPlan({
       ...safetyPlan,
       [section]: value,
@@ -64,8 +80,8 @@ export function SafetyPlan() {
   };
 
   const exportSafetyPlan = () => {
-    const dataStr = JSON.stringify(safetyPlan, null, 2);
-    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
+    const _dataStr = JSON.stringify(safetyPlan, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
     const exportFileDefaultName = `safety-plan-${new Date().toISOString().split('T')[0]}.json`;
     
     const linkElement = document.createElement('a');
@@ -82,13 +98,13 @@ export function SafetyPlan() {
           text: 'I created a safety plan for crisis situations',
           url: window.location.href
         });
-      } catch (err) {
-        console.error('Error sharing:', err);
+      } catch (_error) {
+        logger.error('Error sharing');
       }
     } else {
       // Fallback: Copy to clipboard
-      const planText = generatePlainTextPlan();
-      navigator.clipboard.writeText(planText);
+      const _planText = generatePlainTextPlan();
+      navigator.clipboard.writeText(_planText);
       toast.success('Safety plan copied to clipboard!');
     }
   };
@@ -259,7 +275,7 @@ export function SafetyPlan() {
               : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
         >
-          {isEditing ? 'Save Changes' : 'Edit Plan'}
+          {isEditing ? '_Save Changes' : 'Edit Plan'}
         </button>
         <button
           onClick={() => setShowTemplates(!showTemplates)}
@@ -336,9 +352,9 @@ export function SafetyPlan() {
           {activeSection === 'warningSignals' && (
             <SectionEditor
               title="Warning Signals"
-              description="Early signs that I'm beginning to feel unwell"
+              description="Early signs that I&apos;m beginning to feel unwell"
               items={safetyPlan.warningSignals}
-              onUpdate={(items: any) => handleUpdateSection('warningSignals', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('warningSignals', items)}
               isEditing={isEditing}
               placeholder="e.g., Feeling isolated, trouble sleeping..."
             />
@@ -349,7 +365,7 @@ export function SafetyPlan() {
               title="Coping Strategies"
               description="Things I can do on my own to feel better"
               items={safetyPlan.copingStrategies}
-              onUpdate={(items: any) => handleUpdateSection('copingStrategies', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('copingStrategies', items)}
               isEditing={isEditing}
               placeholder="e.g., Deep breathing, take a walk..."
             />
@@ -360,7 +376,7 @@ export function SafetyPlan() {
               title="Distraction Techniques"
               description="Activities to take my mind off problems"
               items={safetyPlan.distractionTechniques}
-              onUpdate={(items: any) => handleUpdateSection('distractionTechniques', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('distractionTechniques', items)}
               isEditing={isEditing}
               placeholder="e.g., Watch a movie, call a friend..."
             />
@@ -369,7 +385,7 @@ export function SafetyPlan() {
           {activeSection === 'supportPeople' && (
             <SupportPeopleEditor
               people={safetyPlan.supportPeople}
-              onUpdate={(people: any) => handleUpdateSection('supportPeople', people)}
+              onUpdate={(people: SupportPerson[]) => handleUpdateSection('supportPeople', people)}
               isEditing={isEditing}
             />
           )}
@@ -379,7 +395,7 @@ export function SafetyPlan() {
               title="Safe Places"
               description="Places where I feel calm and secure"
               items={safetyPlan.safePlaces}
-              onUpdate={(items: any) => handleUpdateSection('safePlaces', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('safePlaces', items)}
               isEditing={isEditing}
               placeholder="e.g., Library, park, friend's house..."
             />
@@ -388,7 +404,7 @@ export function SafetyPlan() {
           {activeSection === 'professionalContacts' && (
             <ProfessionalContactsEditor
               contacts={safetyPlan.professionalContacts}
-              onUpdate={(contacts: any) => handleUpdateSection('professionalContacts', contacts)}
+              onUpdate={(contacts: ProfessionalContact[]) => handleUpdateSection('professionalContacts', contacts)}
               isEditing={isEditing}
             />
           )}
@@ -398,7 +414,7 @@ export function SafetyPlan() {
               title="Reasons to Live"
               description="Things that are important to me and worth living for"
               items={safetyPlan.reasonsToLive}
-              onUpdate={(items: any) => handleUpdateSection('reasonsToLive', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('reasonsToLive', items)}
               isEditing={isEditing}
               placeholder="e.g., Family, goals, beliefs..."
             />
@@ -409,7 +425,7 @@ export function SafetyPlan() {
               title="Making Environment Safe"
               description="Steps to remove or reduce access to harmful means"
               items={safetyPlan.safeEnvironmentSteps}
-              onUpdate={(items: any) => handleUpdateSection('safeEnvironmentSteps', items)}
+              onUpdate={(items: string[]) => handleUpdateSection('safeEnvironmentSteps', items)}
               isEditing={isEditing}
               placeholder="e.g., Give medications to trusted person..."
             />
@@ -446,7 +462,16 @@ export function SafetyPlan() {
 }
 
 // Section Editor Component
-function SectionEditor({ title, description, items, onUpdate, isEditing, placeholder }: any) {
+interface SectionEditorProps {
+  title: string;
+  description: string;
+  items: string[];
+  onUpdate: (items: string[]) => void;
+  isEditing: boolean;
+  placeholder: string;
+}
+
+function SectionEditor({ title, description, items, onUpdate, isEditing, placeholder }: SectionEditorProps) {
   const [newItem, setNewItem] = useState('');
 
   const handleAdd = () => {
@@ -457,7 +482,7 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
   };
 
   const handleRemove = (index: number) => {
-    onUpdate(items.filter((_: any, i: number) => i !== index));
+    onUpdate(items.filter((_, i) => i !== index));
   };
 
   return (
@@ -471,7 +496,7 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
             <span className="text-gray-800">{item}</span>
             {isEditing && (
               <button
-                onClick={() => handleRemove(index)}
+                onClick={() => handleRemove(_index)}
                 className="text-red-600 hover:text-red-700"
               >
                 Remove
@@ -504,7 +529,13 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
 }
 
 // Support People Editor Component
-function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
+interface SupportPeopleEditorProps {
+  people: SupportPerson[];
+  onUpdate: (people: SupportPerson[]) => void;
+  isEditing: boolean;
+}
+
+function SupportPeopleEditor({ people, onUpdate, isEditing }: SupportPeopleEditorProps) {
   const [newPerson, setNewPerson] = useState({ name: '', phone: '', available: '' });
 
   const handleAdd = () => {
@@ -515,7 +546,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
   };
 
   const handleRemove = (index: number) => {
-    onUpdate(people.filter((_: any, i: number) => i !== index));
+    onUpdate(people.filter((_, i) => i !== index));
   };
 
   return (
@@ -524,7 +555,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
       <p className="text-gray-600 mb-4">People I can reach out to when I need help</p>
       
       <div className="space-y-3 mb-4">
-        {people.map((person: any, index: number) => (
+        {people.map((person, index) => (
           <div key={index} className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -536,7 +567,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
               </div>
               {isEditing && (
                 <button
-                  onClick={() => handleRemove(index)}
+                  onClick={() => handleRemove(_index)}
                   className="text-red-600 hover:text-red-700"
                 >
                   Remove
@@ -567,7 +598,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
             type="text"
             value={newPerson.available}
             onChange={(e) => setNewPerson({ ...newPerson, available: e.target.value })}
-            placeholder="When available (optional)"
+            placeholder="When available (_optional)"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <button
@@ -583,7 +614,13 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: any) {
 }
 
 // Professional Contacts Editor Component
-function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: any) {
+interface ProfessionalContactsEditorProps {
+  contacts: ProfessionalContact[];
+  onUpdate: (contacts: ProfessionalContact[]) => void;
+  isEditing: boolean;
+}
+
+function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: ProfessionalContactsEditorProps) {
   const [newContact, setNewContact] = useState({ name: '', role: '', phone: '' });
 
   const handleAdd = () => {
@@ -594,7 +631,7 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: any) {
   };
 
   const handleRemove = (index: number) => {
-    onUpdate(contacts.filter((_: any, i: number) => i !== index));
+    onUpdate(contacts.filter((_, i) => i !== index));
   };
 
   return (
@@ -603,7 +640,7 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: any) {
       <p className="text-gray-600 mb-4">Healthcare providers and crisis professionals</p>
       
       <div className="space-y-3 mb-4">
-        {contacts.map((contact: any, index: number) => (
+        {contacts.map((contact, index) => (
           <div key={index} className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -613,7 +650,7 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: any) {
               </div>
               {isEditing && (
                 <button
-                  onClick={() => handleRemove(index)}
+                  onClick={() => handleRemove(_index)}
                   className="text-red-600 hover:text-red-700"
                 >
                   Remove

@@ -2,16 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Phone, MessageSquare, MapPin, Shield, Heart, Users,
-  AlertCircle, Activity, Brain, Headphones, Navigation,
-  Clock, CheckCircle, XCircle, ChevronRight, Volume2,
-  Zap, Send, Copy, Share2, ExternalLink, Wifi, WifiOff, X
+  AlertCircle, Activity, Brain, _Headphones, _Navigation,
+  _Clock, CheckCircle, _XCircle, ChevronRight, _Volume2,
+  _Zap, _Send, _Copy, Share2, ExternalLink, _Wifi, WifiOff, X
 } from 'lucide-react';
 import { useCrisisAssessment } from '../../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../../hooks/useGeolocation';
 
 interface CrisisQuickActionsHubProps {
-  userId: string;
-  onActionTaken?: (action: string, details?: any) => void;
+  _userId: string;
+  onActionTaken?: (action: string, details?: unknown) => void;
   emergencyContacts?: EmergencyContact[];
   safetyPlan?: SafetyPlan;
 }
@@ -43,13 +43,13 @@ interface ProfessionalContact {
 }
 
 export function CrisisQuickActionsHub({
-  userId,
+  _userId,
   onActionTaken,
   emergencyContacts = [],
   safetyPlan
 }: CrisisQuickActionsHubProps) {
-  const { assessmentData, isAssessing, updateAssessment } = useCrisisAssessment();
-  const { location, error: locationError, loading } = useGeolocation();
+  const { assessmentData, _isAssessing, _updateAssessment } = useCrisisAssessment();
+  const { location, error: _locationError, loading } = useGeolocation();
   
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [showSafetyPlan, setShowSafetyPlan] = useState(false);
@@ -143,10 +143,10 @@ export function CrisisQuickActionsHub({
   const shareEmergencyLocation = useCallback(async () => {
     if (location) {
       const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-      const message = `Emergency: I need help. My location: ${googleMapsUrl}`;
+      const _message = `Emergency: I need help. My location: ${googleMapsUrl}`;
       
       // Copy to clipboard
-      navigator.clipboard.writeText(message);
+      navigator.clipboard.writeText(_message);
       setCopiedToClipboard('location');
       
       onActionTaken?.('location_shared', {
@@ -552,11 +552,11 @@ function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void
       exhale: { duration: 8, next: 'inhale' as const }
     };
 
-    const timer = setInterval(() => {
+    const _timer = setInterval(() => {
       setCount(prev => {
         if (prev >= phases[phase].duration - 1) {
           const nextPhase = phases[phase].next;
-          setPhase(nextPhase);
+          setPhase(_nextPhase);
           
           if (nextPhase === 'inhale') {
             setCycles(c => c + 1);
@@ -572,7 +572,7 @@ function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => clearInterval(_timer);
   }, [phase, cycles, onComplete, onClose]);
 
   return (

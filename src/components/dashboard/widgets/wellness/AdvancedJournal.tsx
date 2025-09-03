@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, _useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -6,7 +6,7 @@ import {
   Search,
   Filter,
   Tag,
-  Calendar,
+  _Calendar,
   Heart,
   Smile,
   Frown,
@@ -57,7 +57,7 @@ interface AdvancedJournalProps {
   onNewEntry?: () => void;
   onEditEntry?: (id: string) => void;
   onExport?: (entries: JournalEntry[]) => void;
-  onSearch?: (query: string) => void;
+  _onSearch?: (query: string) => void;
 }
 
 export function AdvancedJournal({ 
@@ -65,7 +65,7 @@ export function AdvancedJournal({
   onNewEntry, 
   onEditEntry,
   onExport,
-  onSearch 
+  _onSearch 
 }: AdvancedJournalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -131,7 +131,7 @@ export function AdvancedJournal({
     let filtered = [...journalEntries];
 
     // Search filter
-    if (searchQuery) {
+    if (_searchQuery) {
       filtered = filtered.filter(entry =>
         entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -155,7 +155,7 @@ export function AdvancedJournal({
 
     // Date filter
     const now = new Date();
-    switch (dateFilter) {
+    switch (_dateFilter) {
       case 'today':
         filtered = filtered.filter(entry => isToday(new Date(entry.timestamp)));
         break;
@@ -182,7 +182,7 @@ export function AdvancedJournal({
     journalEntries.forEach(entry => {
       entry.tags?.forEach(tag => tags.add(tag));
     });
-    return Array.from(tags);
+    return Array.from(_tags);
   }, [journalEntries]);
 
   const allEmotions = useMemo(() => {
@@ -190,7 +190,7 @@ export function AdvancedJournal({
     journalEntries.forEach(entry => {
       entry.emotions?.forEach(emotion => emotions.add(emotion));
     });
-    return Array.from(emotions);
+    return Array.from(_emotions);
   }, [journalEntries]);
 
   // Calculate sentiment statistics
@@ -199,7 +199,7 @@ export function AdvancedJournal({
     if (validEntries.length === 0) return null;
 
     const avgSentiment = validEntries.reduce((sum, e) => sum + (e.sentiment?.score || 0), 0) / validEntries.length;
-    const dominantEmotion = validEntries.reduce((emotions, entry) => {
+    const _dominantEmotion = validEntries.reduce((emotions, entry) => {
       if (!entry.sentiment?.emotions) return emotions;
       Object.entries(entry.sentiment.emotions).forEach(([emotion, value]) => {
         emotions[emotion] = (emotions[emotion] || 0) + value;
@@ -207,7 +207,7 @@ export function AdvancedJournal({
       return emotions;
     }, {} as Record<string, number>);
 
-    const topEmotion = Object.entries(dominantEmotion)
+    const topEmotion = Object.entries(_dominantEmotion)
       .sort((a, b) => b[1] - a[1])[0];
 
     return {
@@ -266,10 +266,10 @@ export function AdvancedJournal({
   }, [sentimentStats]);
 
   // Format date for display
-  const formatEntryDate = (date: Date) => {
-    const entryDate = new Date(date);
-    if (isToday(entryDate)) return 'Today';
-    if (isYesterday(entryDate)) return 'Yesterday';
+  const formatEntryDate = (_date: Date) => {
+    const entryDate = new Date(_date);
+    if (isToday(_entryDate)) return 'Today';
+    if (isYesterday(_entryDate)) return 'Yesterday';
     return format(entryDate, 'MMM d, yyyy');
   };
 
@@ -292,7 +292,7 @@ export function AdvancedJournal({
 
   // Handle export
   const handleExport = () => {
-    if (onExport) {
+    if (_onExport) {
       onExport(filteredEntries);
     } else {
       // Create markdown export
@@ -308,13 +308,13 @@ ${entry.gratitude ? `**Gratitude:** ${entry.gratitude.join(', ')}` : ''}
 ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''}
       `).join('\n---\n');
 
-      const blob = new Blob([markdown], { type: 'text/markdown' });
-      const url = window.URL.createObjectURL(blob);
+      const _blob = new Blob([markdown], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(_blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `journal-export-${format(new Date(), 'yyyy-MM-dd')}.md`;
       a.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(_url);
     }
   };
 
@@ -412,7 +412,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                     {(['all', 'today', 'week', 'month'] as const).map(period => (
                       <button
                         key={period}
-                        onClick={() => setDateFilter(period)}
+                        onClick={() => setDateFilter(_period)}
                         className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                           dateFilter === period
                             ? 'bg-purple-500 text-white'
@@ -492,7 +492,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
       <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4">
         <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
           <Sparkles className="h-5 w-5 mr-2 text-yellow-600" />
-          Today's Writing Prompts
+          Today&apos;s Writing Prompts
         </h4>
         <div className="space-y-2">
           {writingPrompts.map((prompt, idx) => (

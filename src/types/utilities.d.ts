@@ -19,7 +19,7 @@ declare module 'socket.io-client' {
     timeout?: number;
     autoConnect?: boolean;
     query?: Record<string, string>;
-    parser?: any;
+    parser?: unknown;
   }
 
   export interface SocketOptions extends ManagerOptions {
@@ -30,12 +30,12 @@ declare module 'socket.io-client' {
     id: string;
     connected: boolean;
     disconnected: boolean;
-    io: any;
+    io: unknown;
     auth: Record<string, any>;
     
     connect(): Socket;
     disconnect(): Socket;
-    emit(event: string, ...args: any[]): Socket;
+    emit(event: string, ...args: unknown[]): Socket;
     on(event: string, fn: Function): Socket;
     once(event: string, fn: Function): Socket;
     off(event?: string, fn?: Function): Socket;
@@ -43,8 +43,8 @@ declare module 'socket.io-client' {
     removeAllListeners(event?: string): Socket;
     
     // Mental health app specific events
-    onAny(fn: (event: string, ...args: any[]) => void): Socket;
-    offAny(fn?: (event: string, ...args: any[]) => void): Socket;
+    onAny(fn: (event: string, ...args: unknown[]) => void): Socket;
+    offAny(fn?: (event: string, ...args: unknown[]) => void): Socket;
     timeout(timeout: number): Socket;
     compress(compress: boolean): Socket;
     volatile: Socket;
@@ -63,7 +63,7 @@ declare module 'comlink' {
   }
 
   export interface Endpoint {
-    postMessage(message: any, transfer?: Transferable[]): void;
+    postMessage(message: unknown, transfer?: Transferable[]): void;
     addEventListener(
       type: string,
       listener: EventListenerOrEventListenerObject,
@@ -93,7 +93,7 @@ declare module 'comlink' {
   
   export function proxy<T>(obj: T): T;
   
-  export function releaseProxy(obj: any): void;
+  export function releaseProxy(obj: unknown): void;
   
   export function windowEndpoint(
     w: PostMessageWithOrigin,
@@ -110,7 +110,7 @@ declare module 'comlink' {
   };
 
   interface PostMessageWithOrigin {
-    postMessage(message: any, targetOrigin?: string, transfer?: Transferable[]): void;
+    postMessage(message: unknown, targetOrigin?: string, transfer?: Transferable[]): void;
   }
 }
 
@@ -125,7 +125,7 @@ declare module 'idb' {
     get<Name extends string>(
       storeName: Name,
       query: IDBValidKey | IDBKeyRange
-    ): Promise<any>;
+    ): Promise<unknown>;
     
     getAll<Name extends string>(
       storeName: Name,
@@ -135,13 +135,13 @@ declare module 'idb' {
     
     add<Name extends string>(
       storeName: Name,
-      value: any,
+      value: unknown,
       key?: IDBValidKey
     ): Promise<IDBValidKey>;
     
     put<Name extends string>(
       storeName: Name,
-      value: any,
+      value: unknown,
       key?: IDBValidKey
     ): Promise<IDBValidKey>;
     
@@ -166,10 +166,10 @@ declare module 'idb' {
   }
 
   export interface IDBPObjectStore<DBTypes = unknown> extends IDBObjectStore {
-    get(query: IDBValidKey | IDBKeyRange): Promise<any>;
+    get(query: IDBValidKey | IDBKeyRange): Promise<unknown>;
     getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<any[]>;
-    add(value: any, key?: IDBValidKey): Promise<IDBValidKey>;
-    put(value: any, key?: IDBValidKey): Promise<IDBValidKey>;
+    add(value: unknown, key?: IDBValidKey): Promise<IDBValidKey>;
+    put(value: unknown, key?: IDBValidKey): Promise<IDBValidKey>;
     delete(query: IDBValidKey | IDBKeyRange): Promise<void>;
     clear(): Promise<void>;
     count(query?: IDBValidKey | IDBKeyRange): Promise<number>;
@@ -268,7 +268,7 @@ declare module 'react-use' {
   
   export function useEffectOnce(effect: EffectCallback): void;
   
-  export function useEvent<T extends (...args: any[]) => any>(handler: T): T;
+  export function useEvent<T extends (...args: unknown[]) => any>(handler: T): T;
   
   export function useMountedState(): () => boolean;
   
@@ -280,20 +280,20 @@ declare module 'react-use' {
 // Crypto-JS type extensions
 declare module 'crypto-js' {
   export interface CipherParams {
-    ciphertext: any;
-    key?: any;
-    iv?: any;
+    ciphertext: unknown;
+    key?: unknown;
+    iv?: unknown;
     algorithm?: string;
-    mode?: any;
-    padding?: any;
+    mode?: unknown;
+    padding?: unknown;
     blockSize?: number;
-    formatter?: any;
+    formatter?: unknown;
   }
   
   export interface WordArray {
     words: number[];
     sigBytes: number;
-    toString(encoder?: any): string;
+    toString(encoder?: unknown): string;
     concat(wordArray: WordArray): WordArray;
     clamp(): void;
     clone(): WordArray;
@@ -301,12 +301,12 @@ declare module 'crypto-js' {
   }
   
   export namespace AES {
-    function encrypt(message: string | WordArray, key: string | WordArray, cfg?: any): CipherParams;
-    function decrypt(cipherParams: CipherParams | string, key: string | WordArray, cfg?: any): WordArray;
+    function encrypt(message: string | WordArray, key: string | WordArray, cfg?: unknown): CipherParams;
+    function decrypt(cipherParams: CipherParams | string, key: string | WordArray, cfg?: unknown): WordArray;
   }
   
   export namespace SHA256 {
-    function hash(message: string | WordArray, cfg?: any): WordArray;
+    function hash(message: string | WordArray, cfg?: unknown): WordArray;
   }
   
   export namespace enc {
@@ -326,7 +326,7 @@ declare module 'crypto-js' {
     }
   }
   
-  export function lib(cfg?: any): any;
+  export function lib(cfg?: unknown): unknown;
 }
 
 // Web Vitals

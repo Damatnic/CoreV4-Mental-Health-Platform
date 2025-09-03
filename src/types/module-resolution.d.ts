@@ -20,7 +20,7 @@ declare module '../../components/wellness/Meditation' {
 declare module '../../components/wellness/Journal' {
   // Create a placeholder type if Journal component doesn't exist
   import { ComponentType } from 'react';
-  const Journal: ComponentType<any>;
+  const Journal: ComponentType<unknown>;
   export default Journal;
 }
 
@@ -32,7 +32,7 @@ declare module '../../components/community/CommunityFeed' {
 declare module '../../components/community/Forums' {
   // Create a placeholder type if Forums component doesn't exist
   import { ComponentType } from 'react';
-  const Forums: ComponentType<any>;
+  const Forums: ComponentType<unknown>;
   export default Forums;
 }
 
@@ -40,14 +40,14 @@ declare module '../../components/community/Forums' {
 declare module '../../components/professional/TherapistFinder' {
   // Create a placeholder type if TherapistFinder component doesn't exist
   import { ComponentType } from 'react';
-  const TherapistFinder: ComponentType<any>;
+  const TherapistFinder: ComponentType<unknown>;
   export default TherapistFinder;
 }
 
 declare module '../../components/professional/AppointmentScheduling' {
   // Create a placeholder type if AppointmentScheduling component doesn't exist
   import { ComponentType } from 'react';
-  const AppointmentScheduling: ComponentType<any>;
+  const AppointmentScheduling: ComponentType<unknown>;
   export default AppointmentScheduling;
 }
 
@@ -55,14 +55,14 @@ declare module '../../components/professional/AppointmentScheduling' {
 declare module '../../components/settings/Settings' {
   // Create a placeholder type if Settings component doesn't exist
   import { ComponentType } from 'react';
-  const Settings: ComponentType<any>;
+  const Settings: ComponentType<unknown>;
   export default Settings;
 }
 
 declare module '../../components/profile/Profile' {
   // Create a placeholder type if Profile component doesn't exist
   import { ComponentType } from 'react';
-  const Profile: ComponentType<any>;
+  const Profile: ComponentType<unknown>;
   export default Profile;
 }
 
@@ -90,6 +90,6 @@ declare module '../../pages/Professional' {
 declare module '../../pages/Settings' {
   // Create a placeholder type if Settings page doesn't exist
   import { ComponentType } from 'react';
-  const SettingsPage: ComponentType<any>;
+  const SettingsPage: ComponentType<unknown>;
   export default SettingsPage;
 }

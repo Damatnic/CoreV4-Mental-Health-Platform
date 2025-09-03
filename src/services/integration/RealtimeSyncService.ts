@@ -7,6 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import { EventEmitter } from 'events';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
+import { logger } from '../../utils/logger';
 
 // Real-time event types
 export enum RealtimeEvent {
@@ -48,11 +49,11 @@ export enum RealtimeEvent {
 
 // Message types
 interface RealtimeMessage {
-  id: string;
-  type: string;
-  payload: any;
+  _id: string;
+  _type: string;
+  _payload: unknown;
   timestamp: Date;
-  userId?: string;
+  _userId?: string;
   metadata?: Record<string, any>;
 }
 
@@ -60,8 +61,8 @@ interface RealtimeMessage {
 interface SubscriptionConfig {
   channel: string;
   events: string[];
-  handler: (data: any) => void;
-  filter?: (data: any) => boolean;
+  handler: (data: unknown) => void;
+  filter?: (data: unknown) => boolean;
 }
 
 // Connection configuration
@@ -70,16 +71,16 @@ interface ConnectionConfig {
   reconnection: boolean;
   reconnectionAttempts: number;
   reconnectionDelay: number;
-  timeout: number;
-  auth?: {
+  _timeout: number;
+  _auth?: {
     token: string;
-    userId: string;
+    _userId: string;
   };
 }
 
 // Presence information
 interface UserPresence {
-  userId: string;
+  _userId: string;
   status: 'online' | 'away' | 'busy' | 'offline';
   lastSeen: Date;
   location?: string;
@@ -92,7 +93,7 @@ class RealtimeSyncService extends EventEmitter {
   private config: ConnectionConfig;
   private subscriptions: Map<string, SubscriptionConfig> = new Map();
   private messageQueue: RealtimeMessage[] = [];
-  private presence: Map<string, UserPresence> = new Map();
+  private _presence: Map<string, UserPresence> = new Map();
   private reconnectAttempts = 0;
   private isConnected = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
@@ -105,7 +106,7 @@ class RealtimeSyncService extends EventEmitter {
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
-      timeout: 20000
+      _timeout: 20000
     };
     
     this.setupDefaultSubscriptions();
@@ -121,30 +122,30 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Connect to WebSocket server
    */
-  public async connect(auth?: { token: string; userId: string }): Promise<void> {
+  public async connect(_auth?: { token: string; _userId: string }): Promise<void> {
     if (this.isConnected) return;
     
     return new Promise((resolve, reject) => {
       try {
-        this.config.auth = auth;
+        this.config._auth = _auth;
         
         this.socket = io(this.config.url, {
           reconnection: this.config.reconnection,
           reconnectionAttempts: this.config.reconnectionAttempts,
           reconnectionDelay: this.config.reconnectionDelay,
-          timeout: this.config.timeout,
-          auth: auth || {}
+          _timeout: this.config._timeout,
+          _auth: _auth || {}
         });
         
         this.setupSocketListeners();
         
         // Set connection timeout
-        const timeout = setTimeout(() => {
-          reject(new Error('Connection timeout'));
+        const _timeout = setTimeout(() => {
+          reject(new Error('Connection _timeout'));
         }, this.config.timeout);
         
         this.socket.once('connect', () => {
-          clearTimeout(timeout);
+          clearTimeout(_timeout);
           this.isConnected = true;
           this.reconnectAttempts = 0;
           this.emit(RealtimeEvent.CONNECTED);
@@ -153,14 +154,14 @@ class RealtimeSyncService extends EventEmitter {
           resolve();
         });
         
-        this.socket.once('connect_error', (error: any) => {
-          clearTimeout(timeout);
+        this.socket.once('connect_error', (error: unknown) => {
+          clearTimeout(_timeout);
           this.emit(RealtimeEvent.ERROR, error);
-          reject(error);
+          reject(_error);
         });
         
-      } catch (error) {
-        reject(error);
+      } catch (_error) {
+        reject(_error);
       }
     });
   }
@@ -173,35 +174,35 @@ class RealtimeSyncService extends EventEmitter {
     this.subscribe({
       channel: 'crisis',
       events: ['alert', 'support_connected', 'message', 'status_update'],
-      handler: (data) => this.handleCrisisUpdate(data)
+      handler: (_data) => this.handleCrisisUpdate(data)
     });
     
     // Community channel subscription
     this.subscribe({
       channel: 'community',
       events: ['post_created', 'comment_added', 'user_joined', 'user_left', 'typing'],
-      handler: (data) => this.handleCommunityUpdate(data)
+      handler: (_data) => this.handleCommunityUpdate(data)
     });
     
     // Professional care channel subscription
     this.subscribe({
       channel: 'professional',
       events: ['therapist_available', 'appointment_reminder', 'prescription_update', 'care_team_message'],
-      handler: (data) => this.handleProfessionalUpdate(data)
+      handler: (_data) => this.handleProfessionalUpdate(data)
     });
     
     // Wellness channel subscription
     this.subscribe({
       channel: 'wellness',
       events: ['mood_check_reminder', 'goal_milestone', 'insight'],
-      handler: (data) => this.handleWellnessUpdate(data)
+      handler: (_data) => this.handleWellnessUpdate(data)
     });
     
     // Notifications channel subscription
     this.subscribe({
       channel: 'notifications',
       events: ['received', 'read', 'cleared'],
-      handler: (data) => this.handleNotificationUpdate(data)
+      handler: (_data) => this.handleNotificationUpdate(data)
     });
   }
   
@@ -236,15 +237,15 @@ class RealtimeSyncService extends EventEmitter {
     });
     
     // Presence updates
-    this.socket.on('presence:update', (presence: UserPresence) => {
-      this.updatePresence(presence);
+    this.socket.on('presence:update', (_presence: UserPresence) => {
+      this.updatePresence(_presence);
     });
     
     // Subscribe to configured channels
-    this.subscriptions.forEach((config, key) => {
+    this.subscriptions.forEach((_config, _key) => {
       config.events.forEach(event => {
-        const eventName = `${config.channel}:${event}`;
-        this.socket!.on(eventName, (data: any) => {
+        const _eventName = `${config.channel}:${event}`;
+        this.socket!.on(_eventName, (data: unknown) => {
           if (!config.filter || config.filter(data)) {
             config.handler(data);
           }
@@ -257,8 +258,8 @@ class RealtimeSyncService extends EventEmitter {
    * Handle incoming messages
    */
   private handleMessage(message: RealtimeMessage) {
-    // Process message based on type
-    switch (message.type) {
+    // Process message based on _type
+    switch (message._type) {
       case 'crisis':
         this.handleCrisisMessage(message);
         break;
@@ -275,7 +276,7 @@ class RealtimeSyncService extends EventEmitter {
         this.handleNotificationMessage(message);
         break;
       default:
-        console.warn('Unknown message type:', message.type);
+        logger.warn('Unknown message _type:', message._type);
     }
     
     // Emit generic message event
@@ -285,26 +286,26 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle crisis updates
    */
-  private handleCrisisUpdate(data: any) {
-    const { type, payload } = data;
+  private handleCrisisUpdate(data: unknown) {
+    const { _type, _payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'alert':
-        this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, payload);
+        this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, _payload);
         // Update wellness store with crisis event
-        useWellnessStore.getState().recordCrisisEvent(payload);
+        useWellnessStore.getState().recordCrisisEvent(_payload);
         break;
         
       case 'support_connected':
-        this.emit(RealtimeEvent.CRISIS_SUPPORT_CONNECTED, payload);
+        this.emit(RealtimeEvent.CRISIS_SUPPORT_CONNECTED, _payload);
         break;
         
       case 'message':
-        this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, payload);
+        this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, _payload);
         break;
         
       case 'status_update':
-        this.emit(RealtimeEvent.CRISIS_STATUS_UPDATED, payload);
+        this.emit(RealtimeEvent.CRISIS_STATUS_UPDATED, _payload);
         break;
     }
   }
@@ -312,38 +313,38 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle community updates
    */
-  private handleCommunityUpdate(data: any) {
-    const { type, payload } = data;
+  private handleCommunityUpdate(data: unknown) {
+    const { _type, _payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'post_created':
-        this.emit(RealtimeEvent.COMMUNITY_POST_CREATED, payload);
+        this.emit(RealtimeEvent.COMMUNITY_POST_CREATED, _payload);
         break;
         
       case 'comment_added':
-        this.emit(RealtimeEvent.COMMUNITY_COMMENT_ADDED, payload);
+        this.emit(RealtimeEvent.COMMUNITY_COMMENT_ADDED, _payload);
         break;
         
       case 'user_joined':
-        this.emit(RealtimeEvent.COMMUNITY_USER_JOINED, payload);
+        this.emit(RealtimeEvent.COMMUNITY_USER_JOINED, _payload);
         this.updatePresence({
-          userId: payload.userId,
+          _userId: _payload._userId,
           status: 'online',
           lastSeen: new Date()
         });
         break;
         
       case 'user_left':
-        this.emit(RealtimeEvent.COMMUNITY_USER_LEFT, payload);
+        this.emit(RealtimeEvent.COMMUNITY_USER_LEFT, _payload);
         this.updatePresence({
-          userId: payload.userId,
+          _userId: _payload._userId,
           status: 'offline',
           lastSeen: new Date()
         });
         break;
         
       case 'typing':
-        this.emit(RealtimeEvent.COMMUNITY_TYPING, payload);
+        this.emit(RealtimeEvent.COMMUNITY_TYPING, _payload);
         break;
     }
   }
@@ -351,32 +352,32 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle professional care updates
    */
-  private handleProfessionalUpdate(data: any) {
-    const { type, payload } = data;
+  private handleProfessionalUpdate(data: unknown) {
+    const { _type, _payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'therapist_available':
-        this.emit(RealtimeEvent.THERAPIST_AVAILABLE, payload);
+        this.emit(RealtimeEvent.THERAPIST_AVAILABLE, _payload);
         break;
         
       case 'appointment_reminder':
-        this.emit(RealtimeEvent.APPOINTMENT_REMINDER, payload);
+        this.emit(RealtimeEvent.APPOINTMENT_REMINDER, _payload);
         // Update activity store with appointment reminder
         useActivityStore.getState().addActivity({
-          title: payload.title,
-          type: 'appointment',
+          title: _payload.title,
+          _type: 'appointment',
           category: 'professional',
-          scheduledTime: new Date(payload.time),
+          scheduledTime: new Date(_payload.time),
           completed: false
         });
         break;
         
       case 'prescription_update':
-        this.emit(RealtimeEvent.PRESCRIPTION_UPDATE, payload);
+        this.emit(RealtimeEvent.PRESCRIPTION_UPDATE, _payload);
         break;
         
       case 'care_team_message':
-        this.emit(RealtimeEvent.CARE_TEAM_MESSAGE, payload);
+        this.emit(RealtimeEvent.CARE_TEAM_MESSAGE, _payload);
         break;
     }
   }
@@ -384,25 +385,25 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle wellness updates
    */
-  private handleWellnessUpdate(data: any) {
-    const { type, payload } = data;
+  private handleWellnessUpdate(data: unknown) {
+    const { _type, _payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'mood_check_reminder':
-        this.emit(RealtimeEvent.MOOD_CHECK_REMINDER, payload);
+        this.emit(RealtimeEvent.MOOD_CHECK_REMINDER, _payload);
         break;
         
       case 'goal_milestone':
-        this.emit(RealtimeEvent.GOAL_MILESTONE_REACHED, payload);
+        this.emit(RealtimeEvent.GOAL_MILESTONE_REACHED, _payload);
         // Update activity store with milestone
         useActivityStore.getState().updateGoalProgress(
-          payload.goalId,
-          payload.progress
+          _payload.goalId,
+          _payload.progress
         );
         break;
         
       case 'insight':
-        this.emit(RealtimeEvent.WELLNESS_INSIGHT, payload);
+        this.emit(RealtimeEvent.WELLNESS_INSIGHT, _payload);
         // Regenerate insights in wellness store
         useWellnessStore.getState().generateInsights();
         break;
@@ -412,20 +413,20 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle notification updates
    */
-  private handleNotificationUpdate(data: any) {
-    const { type, payload } = data;
+  private handleNotificationUpdate(data: unknown) {
+    const { _type, _payload } = data;
     
-    switch (type) {
+    switch (_type) {
       case 'received':
-        this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, payload);
+        this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, _payload);
         break;
         
       case 'read':
-        this.emit(RealtimeEvent.NOTIFICATION_READ, payload);
+        this.emit(RealtimeEvent.NOTIFICATION_READ, _payload);
         break;
         
       case 'cleared':
-        this.emit(RealtimeEvent.NOTIFICATION_CLEARED, payload);
+        this.emit(RealtimeEvent.NOTIFICATION_CLEARED, _payload);
         break;
     }
   }
@@ -434,7 +435,7 @@ class RealtimeSyncService extends EventEmitter {
    * Handle crisis messages
    */
   private handleCrisisMessage(message: RealtimeMessage) {
-    this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, message.payload);
+    this.emit(RealtimeEvent.CRISIS_MESSAGE_RECEIVED, message._payload);
   }
   
   /**
@@ -442,36 +443,36 @@ class RealtimeSyncService extends EventEmitter {
    */
   private handleCommunityMessage(message: RealtimeMessage) {
     // Process community messages
-    this.emit('community:message', message.payload);
+    this.emit('community:message', message._payload);
   }
   
   /**
    * Handle professional messages
    */
   private handleProfessionalMessage(message: RealtimeMessage) {
-    this.emit('professional:message', message.payload);
+    this.emit('professional:message', message._payload);
   }
   
   /**
    * Handle wellness messages
    */
   private handleWellnessMessage(message: RealtimeMessage) {
-    this.emit('wellness:message', message.payload);
+    this.emit('wellness:message', message._payload);
   }
   
   /**
    * Handle notification messages
    */
   private handleNotificationMessage(message: RealtimeMessage) {
-    this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, message.payload);
+    this.emit(RealtimeEvent.NOTIFICATION_RECEIVED, message._payload);
   }
   
   /**
    * Update user presence
    */
-  private updatePresence(presence: UserPresence) {
-    this.presence.set(presence.userId, presence);
-    this.emit('presence:updated', presence);
+  private updatePresence(_presence: UserPresence) {
+    this._presence.set(_presence._userId, _presence);
+    this.emit('_presence:updated', _presence);
   }
   
   /**
@@ -484,8 +485,8 @@ class RealtimeSyncService extends EventEmitter {
     // If already connected, setup listener immediately
     if (this.socket && this.isConnected) {
       config.events.forEach(event => {
-        const eventName = `${config.channel}:${event}`;
-        this.socket!.on(eventName, (data: any) => {
+        const _eventName = `${config.channel}:${event}`;
+        this.socket!.on(_eventName, (data: unknown) => {
           if (!config.filter || config.filter(data)) {
             config.handler(data);
           }
@@ -509,8 +510,8 @@ class RealtimeSyncService extends EventEmitter {
     // Remove listeners if connected
     if (this.socket) {
       config.events.forEach(event => {
-        const eventName = `${config.channel}:${event}`;
-        this.socket!.off(eventName);
+        const _eventName = `${config.channel}:${event}`;
+        this.socket!.off(_eventName);
       });
       
       // Leave channel if no other subscriptions
@@ -528,13 +529,13 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Send a message
    */
-  public send(channel: string, event: string, data: any): void {
+  public send(channel: string, event: string, data: unknown): void {
     const message: RealtimeMessage = {
-      id: `msg-${Date.now()}-${Math.random()}`,
-      type: channel,
-      payload: data,
+      _id: `msg-${Date.now()}-${Math.random()}`,
+      _type: channel,
+      _payload: data,
       timestamp: new Date(),
-      userId: this.config.auth?.userId,
+      _userId: this.config.auth?.userId,
       metadata: { event }
     };
     
@@ -555,8 +556,8 @@ class RealtimeSyncService extends EventEmitter {
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift();
       if (message) {
-        const { type, metadata, payload } = message;
-        this.socket.emit(`${type}:${metadata?.event}`, message);
+        const { _type, metadata, _payload } = message;
+        this.socket.emit(`${_type}:${metadata?.event}`, message);
       }
     }
   }
@@ -587,15 +588,15 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Get user presence
    */
-  public getPresence(userId: string): UserPresence | undefined {
-    return this.presence.get(userId);
+  public getPresence(_userId: string): UserPresence | undefined {
+    return this._presence.get(_userId);
   }
   
   /**
    * Get all online users
    */
   public getOnlineUsers(): UserPresence[] {
-    return Array.from(this.presence.values())
+    return Array.from(this._presence.values())
       .filter(p => p.status === 'online');
   }
   
@@ -603,34 +604,34 @@ class RealtimeSyncService extends EventEmitter {
    * Update own presence
    */
   public updateOwnPresence(status: UserPresence['status'], activity?: string) {
-    if (!this.socket || !this.isConnected || !this.config.auth?.userId) return;
+    if (!this.socket || !this.isConnected || !this.config._auth?._userId) return;
     
-    const presence: UserPresence = {
-      userId: this.config.auth.userId,
+    const _presence: UserPresence = {
+      _userId: this.config._auth._userId,
       status,
       lastSeen: new Date(),
       activity
     };
     
-    this.socket.emit('presence:update', presence);
-    this.updatePresence(presence);
+    this.socket.emit('presence:update', _presence);
+    this.updatePresence(_presence);
   }
   
   /**
    * Join a room
    */
-  public joinRoom(roomId: string) {
+  public joinRoom(_roomId: string) {
     if (this.socket && this.isConnected) {
-      this.socket.emit('join', roomId);
+      this.socket.emit('join', _roomId);
     }
   }
   
   /**
    * Leave a room
    */
-  public leaveRoom(roomId: string) {
+  public leaveRoom(_roomId: string) {
     if (this.socket && this.isConnected) {
-      this.socket.emit('leave', roomId);
+      this.socket.emit('leave', _roomId);
     }
   }
   
@@ -673,26 +674,26 @@ class RealtimeSyncService extends EventEmitter {
 }
 
 // Export singleton instance
-export const realtimeSyncService = RealtimeSyncService.getInstance();
+export const _realtimeSyncService = RealtimeSyncService.getInstance();
 
 // Export React hook
 export function useRealtimeSync() {
   const service = RealtimeSyncService.getInstance();
   
   return {
-    connect: (auth?: { token: string; userId: string }) => service.connect(auth),
+    connect: (_auth?: { token: string; _userId: string }) => service.connect(_auth),
     disconnect: () => service.disconnect(),
     subscribe: (config: SubscriptionConfig) => service.subscribe(config),
-    unsubscribe: (id: string) => service.unsubscribe(id),
-    send: (channel: string, event: string, data: any) => service.send(channel, event, data),
-    getPresence: (userId: string) => service.getPresence(userId),
+    unsubscribe: (_id: string) => service.unsubscribe(_id),
+    send: (channel: string, event: string, data: unknown) => service.send(channel, event, data),
+    getPresence: (_userId: string) => service.getPresence(_userId),
     getOnlineUsers: () => service.getOnlineUsers(),
     updatePresence: (status: UserPresence['status'], activity?: string) => 
       service.updateOwnPresence(status, activity),
-    joinRoom: (roomId: string) => service.joinRoom(roomId),
-    leaveRoom: (roomId: string) => service.leaveRoom(roomId),
+    joinRoom: (_roomId: string) => service.joinRoom(_roomId),
+    leaveRoom: (_roomId: string) => service.leaveRoom(_roomId),
     getConnectionState: () => service.getConnectionState(),
-    on: (event: string, callback: (...args: any[]) => void) => {
+    on: (event: string, callback: (...args: unknown[]) => void) => {
       service.on(event, callback);
       return () => service.off(event, callback);
     }

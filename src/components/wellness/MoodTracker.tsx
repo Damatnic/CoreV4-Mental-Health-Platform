@@ -15,6 +15,7 @@ import {
   Legend,
   ChartOptions
 } from 'chart.js';
+import { logger } from '@/utils/logger';
 import { useDebounce } from 'react-use';
 import CrisisButton from '../crisis/CrisisButton';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
@@ -62,51 +63,51 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
   const [showCrisisSupport, setShowCrisisSupport] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [debouncedMood, setDebouncedMood] = useState(mood);
+  const [_debouncedMood, setDebouncedMood] = useState(_mood);
 
   // Debounce mood changes for performance
   useDebounce(
     () => {
-      setDebouncedMood(mood);
-      if (onMoodChange) {
-        onMoodChange(mood);
+      setDebouncedMood(_mood);
+      if (_onMoodChange) {
+        onMoodChange(_mood);
       }
     },
     300
   );
 
   // Fetch mood history
-  const { data: history, isLoading: historyLoading } = useQuery({
+  const { _data: history, isLoading: historyLoading } = useQuery({
     queryKey: ['moodHistory'],
     queryFn: async () => {
       const response = await axios.get('/api/wellness/history');
-      return response.data;
+      return response._data;
     },
     enabled: showHistory
   });
 
   // Submit mood mutation
   const submitMood = useMutation({
-    mutationFn: async (data: { mood: number; score: number; notes: string }) => {
-      // Encrypt sensitive data before sending
-      const encryptedData = await encryptMoodData(data);
+    mutationFn: async (_data: { mood: number; score: number; notes: string }) => {
+      // Encrypt sensitive _data before sending
+      const encryptedData = await encryptMoodData(_data);
       
       const response = await axios.post('/api/wellness/mood', {
-        mood: MOOD_LABELS[data.mood - 1],
-        score: data.mood,
-        notes: data.notes,
-        encrypted: encryptedData,
+        mood: MOOD_LABELS[_data.mood - 1],
+        score: _data.mood,
+        notes: _data.notes,
+        _encrypted: encryptedData,
         timestamp: Date.now()
       });
       
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       setSuccessMessage('Mood logged successfully!');
       setErrorMessage('');
       
-      // Store encrypted data locally for offline access
-      storeMoodLocally(data);
+      // Store _encrypted _data locally for offline access
+      storeMoodLocally(_data);
       
       // Check for crisis indicators
       if (mood <= 2) {
@@ -124,10 +125,10 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
   });
 
   // Encrypt mood data for privacy
-  const encryptMoodData = async (data: any) => {
+  const encryptMoodData = async (_data: unknown) => {
     try {
       const encoder = new TextEncoder();
-      const dataBuffer = encoder.encode(JSON.stringify(data));
+      const dataBuffer = encoder.encode(JSON.stringify(_data));
       
       // Generate a random key for this session
       const key = await window.crypto.subtle.generateKey(
@@ -137,34 +138,34 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       );
       
       const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      const encrypted = await window.crypto.subtle.encrypt(
+      const _encrypted = await window.crypto.subtle.encrypt(
         { name: 'AES-GCM', iv },
         key,
         dataBuffer
       );
       
-      return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-    } catch (error) {
-      console.error('Encryption failed:', error);
+      return btoa(String.fromCharCode(...new Uint8Array(_encrypted)));
+    } catch (_error) {
+      logger.error('Encryption failed:');
       return null;
     }
   };
 
-  // Store mood data locally (encrypted)
-  const storeMoodLocally = (data: any) => {
+  // Store mood data locally (_encrypted)
+  const storeMoodLocally = (_data: unknown) => {
     try {
       const existingData = secureStorage.getItem('mood_data');
-      const moodHistory = existingData ? JSON.parse(atob(existingData)) : [];
-      moodHistory.push(data);
+      const moodHistory = existingData ? JSON.parse(atob(_existingData)) : [];
+      moodHistory.push(_data);
       
       // Keep only last 30 entries
       if (moodHistory.length > 30) {
         moodHistory.shift();
       }
       
-      secureStorage.setItem('mood_data', btoa(JSON.stringify(moodHistory)));
-    } catch (error) {
-      console.error('Failed to store mood locally:', error);
+      secureStorage.setItem('mood_data', btoa(JSON.stringify(_moodHistory)));
+    } catch (_error) {
+      logger.error('Failed to store mood locally:');
     }
   };
 
@@ -210,7 +211,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       ),
       datasets: [{
         label: 'Mood Score',
-        data: history.moodHistory.map((m: MoodEntry) => m.score),
+        _data: history.moodHistory.map((m: MoodEntry) => m.score),
         borderColor: 'rgb(147, 51, 234)',
         backgroundColor: 'rgba(147, 51, 234, 0.1)',
         tension: 0.3
@@ -264,7 +265,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
           <span>😊</span>
         </div>
         
-        {/* Mood Slider */}
+        {/* Mood _Slider */}
         <input
           id="mood-slider"
           type="range"
@@ -296,7 +297,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         {/* Notes Input */}
         <div className="mt-4">
           <textarea
-            placeholder="Add notes about how you're feeling (optional)"
+            placeholder="Add notes about how you're feeling (_optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg resize-none"
@@ -400,8 +401,8 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
           
           {/* Mood Chart */}
           {chartData && (
-            <div data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
-              <Line data={chartData} options={chartOptions} />
+            <div _data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
+              <Line _data={chartData} options={chartOptions} />
             </div>
           )}
           

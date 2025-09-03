@@ -5,7 +5,7 @@
  * Features: Authentication, Crisis Intervention, Wellness Tracking, Community Support
  */
 
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -32,7 +32,7 @@ import { securityHeaders } from './middleware/security';
 // Import services
 import { DatabaseService } from './services/DatabaseService';
 import { CrisisService } from './services/CrisisService';
-import { EncryptionService } from './services/EncryptionService';
+// import { EncryptionService } from './services/EncryptionService'; // Not currently used
 
 // Load environment variables
 dotenv.config();
@@ -61,7 +61,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 class CoreV4Server {
   private app: Application;
-  private server: any;
+  private server: unknown;
   private io: Server;
   private port: number;
   private databaseService: DatabaseService;
@@ -281,7 +281,7 @@ class CoreV4Server {
       process.exit(1);
     });
 
-    process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+    process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
       logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
       process.exit(1);
     });

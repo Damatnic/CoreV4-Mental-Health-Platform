@@ -6,30 +6,30 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info';
 export interface Toast {
   id: string;
   message: string;
-  type: ToastType;
+  _type: ToastType;
   duration?: number;
 }
 
 interface ToastContextType {
   toasts: Toast[];
-  addToast: (message: string, type?: ToastType, duration?: number) => void;
+  addToast: (message: string, _type?: ToastType, duration?: number) => void;
   removeToast: (id: string) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+const ToastContext = createContext<ToastContextType | undefined>(_undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback((message: string, type: ToastType = 'info', duration = 5000) => {
+  const addToast = useCallback((message: string, _type: ToastType = 'info', duration = 5000) => {
     const id = Math.random().toString(36).substring(7);
-    const toast: Toast = { id, message, type, duration };
+    const toast: Toast = { id, message, _type, duration };
     
     setToasts((prev) => [...prev, toast]);
 
     if (duration > 0) {
       setTimeout(() => {
-        removeToast(id);
+        removeToast(_id);
       }, duration);
     }
   }, []);
@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 export function useToast() {
-  const context = useContext(ToastContext);
+  const context = useContext(_ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }
@@ -55,8 +55,8 @@ export function useToast() {
 }
 
 function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast: (id: string) => void }) {
-  const getIcon = (type: ToastType) => {
-    switch (type) {
+  const getIcon = (_type: ToastType) => {
+    switch (_type) {
       case 'success':
         return '✅';
       case 'error':
@@ -69,8 +69,8 @@ function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast:
     }
   };
 
-  const getColorClasses = (type: ToastType) => {
-    switch (type) {
+  const getColorClasses = (_type: ToastType) => {
+    switch (_type) {
       case 'success':
         return 'bg-green-50 border-green-200 text-green-800';
       case 'error':
@@ -95,11 +95,11 @@ function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast:
             transition={{ duration: 0.2 }}
             className={`
               flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg
-              min-w-[300px] max-w-[500px] ${getColorClasses(toast.type)}
+              min-w-[300px] max-w-[500px] ${getColorClasses(toast._type)}
             `}
           >
-            <span className="text-xl" role="img" aria-label={toast.type}>
-              {getIcon(toast.type)}
+            <span className="text-xl" role="img" aria-label={toast._type}>
+              {getIcon(toast._type)}
             </span>
             <p className="flex-1 text-sm font-medium">{toast.message}</p>
             <button
