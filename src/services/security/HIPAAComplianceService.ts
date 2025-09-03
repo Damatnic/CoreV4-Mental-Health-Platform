@@ -3,7 +3,7 @@
 
 import CryptoJS from 'crypto-js';
 import { _secureStorage } from './SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // HIPAA compliance requirements
 export enum ComplianceRequirement {

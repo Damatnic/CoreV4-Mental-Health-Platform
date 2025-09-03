@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 /**
  * Ultra-Optimized Crisis Intervention Component
  * Guaranteed <200ms response time for immediate mental health support

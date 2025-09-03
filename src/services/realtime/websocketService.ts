@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Types for real-time events
 export interface UserPresence {

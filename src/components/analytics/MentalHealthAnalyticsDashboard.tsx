@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 import {
   TrendingUp, TrendingDown, Activity, Heart, Brain,
   Target, BarChart3,

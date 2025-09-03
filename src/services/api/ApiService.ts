@@ -4,7 +4,7 @@
 
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 import { 
   ApiResponse, 
   _ApiError, 

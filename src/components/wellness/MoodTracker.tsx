@@ -15,7 +15,7 @@ import {
   Legend,
   ChartOptions
 } from 'chart.js';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import { useDebounce } from 'react-use';
 import CrisisButton from '../crisis/CrisisButton';
 import { secureStorage } from '../../services/security/SecureLocalStorage';

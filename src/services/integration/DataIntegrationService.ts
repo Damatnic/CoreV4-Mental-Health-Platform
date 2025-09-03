@@ -11,7 +11,7 @@ import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
 import { _User } from '../api/types';
 import { EventEmitter } from 'events';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Integration event types
 export enum IntegrationEvent {

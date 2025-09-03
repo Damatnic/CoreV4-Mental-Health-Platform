@@ -4,7 +4,7 @@
  * HIPAA-compliant implementation with AES-256-GCM encryption
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 class CryptographyService {
   private static instance: CryptographyService;

@@ -14,7 +14,7 @@ import {
   RotateCcw,
   Zap
 } from 'lucide-react';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 import {
   advancedAccessibilityService,
   AccessibilityProfile,

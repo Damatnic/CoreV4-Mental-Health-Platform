@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 /**
  * Performance Monitoring Dashboard
  * Displays real-time performance metrics for crisis response and general app performance

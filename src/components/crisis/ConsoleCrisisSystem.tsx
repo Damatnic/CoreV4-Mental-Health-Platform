@@ -5,7 +5,7 @@ import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimiz
 import { CrisisResources } from './CrisisResources';
 import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
-import { logger, LogCategory } from '../../services/logging/logger';
+import { logger, LogCategory } from '../../utils/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';

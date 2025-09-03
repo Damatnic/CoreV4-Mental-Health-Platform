@@ -7,7 +7,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccessibilityStore } from '../../stores/accessibilityStore';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface VoiceCommand {
   phrase: string;

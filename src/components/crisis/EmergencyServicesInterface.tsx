@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -13,7 +13,7 @@ import {
   CheckCircle,
   Loader
 } from 'lucide-react';
-import { geolocationEmergencyService, EmergencyServiceProvider } from '../../services/emergency/GeolocationEmergencyService';
+import { ____geolocationEmergencyService, EmergencyServiceProvider } from '../../services/emergency/GeolocationEmergencyService';
 import { CrisisProfile } from '../../types/ai-insights';
 import { LocationCoordinates, GeolocationPermission } from '../../types/emergency';
 
@@ -48,15 +48,15 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       setIsLoadingServices(true);
       
       // Get current permission status
-      const permission = geolocationEmergencyService.getPermissionStatus();
+      const permission = __geolocationEmergencyService.getPermissionStatus();
       setPermissionStatus(permission);
       
       // Get current _location if available
-      const location = geolocationEmergencyService.getCurrentLocation();
+      const location = __geolocationEmergencyService.getCurrentLocation();
       setCurrentLocation(location);
       
       // Load nearby services
-      const services = await geolocationEmergencyService.findNearbyEmergencyServices();
+      const services = await __geolocationEmergencyService.findNearbyEmergencyServices();
       setNearbyServices(services);
       
     } catch (error) {
@@ -69,15 +69,15 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
   const requestLocationPermission = async () => {
     setIsRequestingLocation(true);
     try {
-      const permission = await geolocationEmergencyService.requestLocationPermission();
+      const permission = await __geolocationEmergencyService.requestLocationPermission();
       setPermissionStatus(permission);
       
       if (permission.granted) {
-        const location = geolocationEmergencyService.getCurrentLocation();
+        const location = __geolocationEmergencyService.getCurrentLocation();
         setCurrentLocation(location);
         
         // Refresh nearby services with new location
-        const services = await geolocationEmergencyService.findNearbyEmergencyServices();
+        const services = await __geolocationEmergencyService.findNearbyEmergencyServices();
         setNearbyServices(services);
       }
     } catch (error) {
@@ -92,7 +92,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
     try {
       setEmergencyTriggered(service.id);
       
-      const response = await geolocationEmergencyService.triggerEmergencyResponse(
+      const response = await __geolocationEmergencyService.triggerEmergencyResponse(
         crisisProfile,
         service
       );

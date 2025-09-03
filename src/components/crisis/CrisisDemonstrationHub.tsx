@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 // Crisis Infrastructure Demonstration Hub - Showcases all crisis system capabilities
 // CRITICAL: This demonstrates life-safety systems for stakeholder review
 

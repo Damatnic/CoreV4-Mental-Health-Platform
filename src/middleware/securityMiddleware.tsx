@@ -5,11 +5,11 @@
 
 import React, { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { securityHeaders } from '../services/security/securityHeaders';
-import { rateLimiter } from '../services/security/rateLimiter';
-import { sessionManager } from '../services/security/sessionManager';
-import { authService } from '../services/auth/authService';
-import { securityMonitor } from '../services/security/securityMonitor';
-import { fieldEncryption } from '../services/security/fieldEncryption';
+import { _rateLimiter } from '../services/security/rateLimiter';
+import { _sessionManager } from '../services/security/sessionManager';
+import { _authService } from '../services/auth/authService';
+import { _securityMonitor } from '../services/security/securityMonitor';
+import { _fieldEncryption } from '../services/security/fieldEncryption';
 import { auditLogger } from '../services/security/auditLogger';
 import { logger } from '../utils/logger';
 
@@ -26,10 +26,10 @@ interface SecurityContextType {
   reportSecurityEvent: (event: unknown) => Promise<void>;
 }
 
-const SecurityContext = createContext<SecurityContextType | undefined>(_undefined);
+const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
 
 export const useSecurityContext = () => {
-  const context = useContext(_SecurityContext);
+  const context = useContext(SecurityContext);
   if (!context) {
     throw new Error('useSecurityContext must be used within SecurityProvider');
   }
@@ -41,12 +41,12 @@ interface SecurityProviderProps {
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [isSecure, _setIsSecure] = useState(true);
-  const [sessionValid, _setSessionValid] = useState(false);
-  const [securityLevel, _setSecurityLevel] = useState<'basic' | 'elevated' | 'maximum'>('basic');
-  const [threatLevel, _setThreatLevel] = useState<'low' | 'medium' | 'high' | 'critical'>('low');
-  const [requiresCaptcha, _setRequiresCaptcha] = useState(false);
-  const [requiresMFA, _setRequiresMFA] = useState(false);
+  const [isSecure, setIsSecure] = useState(true);
+  const [sessionValid, setSessionValid] = useState(false);
+  const [securityLevel, setSecurityLevel] = useState<'basic' | 'elevated' | 'maximum'>('basic');
+  const [threatLevel, setThreatLevel] = useState<'low' | 'medium' | 'high' | 'critical'>('low');
+  const [requiresCaptcha, setRequiresCaptcha] = useState(false);
+  const [requiresMFA, setRequiresMFA] = useState(false);
 
   useEffect(() => {
     initializeSecurity();
@@ -57,8 +57,8 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
-        const isAuthenticated = authService.isAuthenticated();
-        const session = authService.getCurrentSession();
+        const isAuthenticated = _authService.isAuthenticated();
+        const session = _authService.getCurrentSession();
         
         // For development/demo mode, allow basic access without full session
         if (isAuthenticated && session) {
@@ -90,13 +90,13 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       securityHeaders.applyCSPToDocument();
       
       // Set up security monitoring
-      const __unsubscribe = securityMonitor.subscribe(_handleSecurityEvent);
+      const unsubscribe = _securityMonitor.subscribe(handleSecurityEvent);
       
       // Validate current session if exists
-      const _sessionId = getSessionId();
-      if (_sessionId) {
+      const sessionId = getSessionId();
+      if (sessionId) {
         try {
-          const validation = await sessionManager.validateSession(_sessionId, {
+          const validation = await _sessionManager.validateSession(sessionId, {
             ipAddress: await getClientIP(),
             userAgent: navigator.userAgent,
             fingerprint: await generateFingerprint(),
@@ -117,7 +117,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       }
       
       // Check security metrics
-      const metrics = securityMonitor.getMetrics();
+      const metrics = _securityMonitor.getMetrics();
       updateThreatLevel(metrics.threatScore);
       
       // Set up CSP violation listener
@@ -136,8 +136,8 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     // Cleanup tasks
   };
 
-  const _handleSecurityEvent = async (event: unknown) => {
-    // Update threat _level based on events
+  const handleSecurityEvent = async (event: unknown) => {
+    // Update threat level based on events
     if (event.severity === 'critical') {
       setThreatLevel('critical');
       setIsSecure(false);
@@ -173,7 +173,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const validateRequest = async (endpoint: string): Promise<boolean> => {
     try {
       const ip = await getClientIP();
-      const result = await rateLimiter.checkRateLimit({
+      const result = await _rateLimiter.checkRateLimit({
         endpoint,
         ip,
         userId: getCurrentUserId(),
@@ -206,7 +206,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 
   const encryptField = async (fieldName: string, value: unknown): Promise<unknown> => {
     try {
-      return await fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
+      return await _fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
     } catch (error) {
       logger.error(`Failed to encrypt field ${fieldName}:`, error);
       throw error;
@@ -215,7 +215,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 
   const decryptField = async (fieldName: string, encryptedValue: unknown): Promise<unknown> => {
     try {
-      return await fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
+      return await _fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
     } catch (error) {
       logger.error(`Failed to decrypt field ${fieldName}:`, error);
       throw error;
@@ -224,7 +224,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 
   const reportSecurityEvent = async (event: unknown): Promise<void> => {
     try {
-      await securityMonitor.reportEvent(event);
+      await _securityMonitor.reportEvent(event);
     } catch (error) {
       logger.error('Failed to report security event:');
     }
@@ -251,7 +251,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 };
 
 // Security HOC for protected routes
-export const _withSecurity = <P extends object>(
+export const withSecurity = <P extends object>(
   Component: React.ComponentType<P>,
   requiredLevel: 'basic' | 'elevated' | 'maximum' = 'basic'
 ) => {
@@ -311,7 +311,7 @@ const SessionExpired: React.FC = () => (
 );
 
 const CaptchaChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
-  const [loading, _setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const handleVerify = async () => {
     setLoading(true);
@@ -345,8 +345,8 @@ const CaptchaChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) =>
 };
 
 const MFAChallenge: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
-  const [code, _setCode] = useState('');
-  const [loading, _setLoading] = useState(false);
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const handleVerify = async () => {
     if (code.length !== 6) return;
@@ -409,9 +409,9 @@ const ElevateSecurityLevel: React.FC<{ required: string }> = ({ required }) => (
 const getSessionId = (): string | null => {
   // Try to get session from authService first
   try {
-    const session = authService.getCurrentSession();
-    if (session?._sessionId) {
-      return session._sessionId;
+    const session = _authService.getCurrentSession();
+    if (session?.sessionId) {
+      return session.sessionId;
     }
   } catch (error) {
     logger.debug('Could not get session from authService:', error);
@@ -424,7 +424,7 @@ const getSessionId = (): string | null => {
 const getCurrentUserId = (): string | undefined => {
   // Try to get user from authService first
   try {
-    const user = authService.getCurrentUser();
+    const user = _authService.getCurrentUser();
     if (user?.id) {
       return user.id;
     }
@@ -442,7 +442,7 @@ const getClientIP = async (): Promise<string> => {
 };
 
 const generateFingerprint = async (): Promise<string> => {
-  const _data = [
+  const data = [
     navigator.userAgent,
     navigator.language,
     screen.width,
@@ -451,7 +451,7 @@ const generateFingerprint = async (): Promise<string> => {
     new Date().getTimezoneOffset(),
   ].join(':');
   
-  return btoa(_data);
+  return btoa(data);
 };
 
 const getRequestHeaders = (): Record<string, string> => {
@@ -461,8 +461,8 @@ const getRequestHeaders = (): Record<string, string> => {
   };
 };
 
-const getSecurityLevelValue = (_level: string): number => {
-  switch (_level) {
+const getSecurityLevelValue = (level: string): number => {
+  switch (level) {
     case 'maximum': return 3;
     case 'elevated': return 2;
     case 'basic': return 1;
@@ -472,7 +472,7 @@ const getSecurityLevelValue = (_level: string): number => {
 
 const setupCSPViolationListener = () => {
   document.addEventListener('securitypolicyviolation', async (e) => {
-    await securityMonitor.reportEvent({
+    await _securityMonitor.reportEvent({
       type: 'policy_violation',
       severity: 'medium',
       source: 'csp',
@@ -488,9 +488,9 @@ const setupCSPViolationListener = () => {
 
 const startHeartbeat = () => {
   setInterval(async () => {
-    const _sessionId = getSessionId();
-    if (_sessionId) {
-      await sessionManager.validateSession(_sessionId);
+    const sessionId = getSessionId();
+    if (sessionId) {
+      await _sessionManager.validateSession(sessionId);
     }
   }, 5 * 60 * 1000); // Every 5 minutes
 };

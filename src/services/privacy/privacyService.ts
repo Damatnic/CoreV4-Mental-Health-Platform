@@ -7,7 +7,7 @@
 import { secureStorage } from '../security/secureStorage';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 export interface ConsentRecord {
   id: string;

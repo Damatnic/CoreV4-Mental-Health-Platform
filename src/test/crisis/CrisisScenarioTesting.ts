@@ -5,7 +5,7 @@ import { MockCrisisServer, _MockCrisisSession } from '../../services/crisis/Mock
 import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
 import { assessCrisisSeverity, _CRISIS_ASSESSMENT_QUESTIONS } from '../../services/crisis/emergencyServices';
 import { offlineCrisisResources } from '../../services/crisis/OfflineCrisisResources';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Test scenario types
 export interface CrisisTestScenario {

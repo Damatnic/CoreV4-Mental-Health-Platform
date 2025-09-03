@@ -8,7 +8,7 @@ import { User, ApiResponse } from '@/types';
 import { auditLogger } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface AuthTokens {
   accessToken: string;

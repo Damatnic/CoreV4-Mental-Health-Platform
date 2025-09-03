@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Calendar, Clock, MapPin, Video, Users, Plus } from 'lucide-react';
 import { format, isToday, isTomorrow, isThisWeek, addDays } from 'date-fns';
 import { toast } from 'react-hot-toast';
-import { communityService, Event, CreateEventDto } from '../../services/community/communityService';
+import { __communityService, Event, CreateEventDto } from '../../services/community/_communityService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface EventCardProps {
@@ -187,7 +187,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
   const [tagInput, _setTagInput] = useState('');
 
   const mutation = useMutation({
-    mutationFn: (data: CreateEventDto) => communityService.createEvent(data),
+    mutationFn: (data: CreateEventDto) => _communityService.createEvent(data),
     onSuccess: () => {
       toast.success('Event created successfully!');
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -506,7 +506,7 @@ export function CommunityEvents() {
   // Fetch events
   const { data, isLoading, error } = useQuery({
     queryKey: ['events', selectedType, dateFilter],
-    queryFn: () => communityService.getEvents({
+    queryFn: () => _communityService.getEvents({
       type: selectedType === 'all' ? undefined : selectedType,
       startDate: dateRange.start,
       endDate: dateRange.end,
@@ -516,7 +516,7 @@ export function CommunityEvents() {
 
   // Register for event mutation
   const __registerMutation   = useMutation({
-    mutationFn: (_eventId: string) => communityService.registerForEvent(_eventId),
+    mutationFn: (_eventId: string) => _communityService.registerForEvent(_eventId),
     onSuccess: () => {
       toast.success('Successfully registered for event!');
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -528,7 +528,7 @@ export function CommunityEvents() {
 
   // Unregister from event mutation
   const __unregisterMutation   = useMutation({
-    mutationFn: (_eventId: string) => communityService.unregisterFromEvent(_eventId),
+    mutationFn: (_eventId: string) => _communityService.unregisterFromEvent(_eventId),
     onSuccess: () => {
       toast.success('Registration cancelled');
       queryClient.invalidateQueries({ queryKey: ['events'] });

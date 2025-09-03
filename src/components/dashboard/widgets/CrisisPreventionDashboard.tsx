@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { _Line, _Bar, _Radar, _Area } from 'recharts';
 import { useAuth } from '../../../hooks/useAuth';
-import { logger, LogCategory } from '../../../services/logging/logger';
+import { logger, LogCategory } from '../../../utils/logger';
 
 interface TriggerPattern {
   id: string;

@@ -6,7 +6,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, Phone, MessageCircle, Home, RefreshCw } from 'lucide-react';
-import { logger } from '../services/logging/logger';
+import { logger } from '../utils/logger';
 
 interface ErrorBoundaryState {
   hasError: boolean;

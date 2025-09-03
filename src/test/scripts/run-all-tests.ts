@@ -9,7 +9,7 @@ import { exec, _execSync } from 'child_process';
 import { promises as fs } from 'fs';
 import _path from 'path';
 import chalk from 'chalk';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Test suite configurations
 const TEST_SUITES = {

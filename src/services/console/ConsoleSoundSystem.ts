@@ -3,7 +3,7 @@
  * Provides gaming console-style audio feedback and haptic vibrations
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 /**
  * Complete sound configuration with all required properties

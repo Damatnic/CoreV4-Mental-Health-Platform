@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, statSync } from 'fs';
 import { join } from 'path';
 import { glob } from 'glob';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 describe('Bundle Optimization Tests', () => {
   const bundleStats: Record<string, number> = {};

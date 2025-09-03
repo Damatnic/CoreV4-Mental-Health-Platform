@@ -3,7 +3,7 @@
 
 import { _apiService } from '../api/ApiService';
 import { wsService } from '../websocket/WebSocketService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Health check status types
 export enum HealthStatus {

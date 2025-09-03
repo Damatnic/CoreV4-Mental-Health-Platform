@@ -9,7 +9,7 @@
 import { io, Socket } from 'socket.io-client';
 import { ApiService } from '../api/ApiService';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 export interface WebSocketMessage {
   type: string;

@@ -2,7 +2,7 @@
 // CRITICAL: This is for DEMO PURPOSES ONLY - Production requires certified counselors
 
 import { RealtimeMessage } from '../realtime/websocketService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Crisis Counselor Personas with Different Specializations
 export interface MockCounselor {

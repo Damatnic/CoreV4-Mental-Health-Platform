@@ -2,7 +2,7 @@
 // CRITICAL: These resources must be available 24/7 regardless of connectivity
 
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Offline Crisis Resource Types
 export interface OfflineCrisisResource {

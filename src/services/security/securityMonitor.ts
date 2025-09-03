@@ -5,10 +5,10 @@
  */
 
 import { auditLogger } from './auditLogger';
-import { rateLimiter } from './rateLimiter';
-import { hipaaService } from '../compliance/hipaaService';
+import { _rateLimiter } from './rateLimiter';
+import { _hipaaService } from '../compliance/hipaaService';
 import { cryptoService } from './cryptoService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface SecurityEvent {
   id: string;
@@ -201,11 +201,11 @@ class SecurityMonitorService {
     let totalRisk = 0;
 
     for (const [metric, value] of Object.entries(metrics)) {
-      const baseline = this.baselineMetrics.get(_metric);
+      const baseline = this.baselineMetrics.get(metric);
       if (!baseline) continue;
 
       const deviation = Math.abs(value - baseline) / baseline;
-      const threshold = this.anomalyThresholds.get(_metric) || 0.5;
+      const threshold = this.anomalyThresholds.get(metric) || 0.5;
 
       if (deviation > threshold) {
         const severity = deviation > threshold * 2 ? 'high' : 
@@ -312,7 +312,7 @@ class SecurityMonitorService {
         // Execute action based on type
         switch (action.type) {
           case 'blockip':
-            await rateLimiter.blockIP(action.target, 'Security incident', action.duration);
+            await _rateLimiter.blockIP(action.target, 'Security incident', action.duration);
             break;
             
           case 'disable_account':
@@ -521,7 +521,7 @@ class SecurityMonitorService {
           (existingEvent.ipAddress && existingEvent.ipAddress === event.ipAddress) ||
           (existingEvent.target && existingEvent.target === event.target)
         ) {
-          correlated.push(_existingEvent);
+          correlated.push(existingEvent);
         }
       }
     }
@@ -587,7 +587,7 @@ class SecurityMonitorService {
       if (event.target) systems.add(event.target);
       if (event.source) systems.add(event.source);
     });
-    return Array.from(_systems);
+    return Array.from(systems);
   }
 
   private identifyAffectedUsers(events: SecurityEvent[]): string[] {
@@ -595,7 +595,7 @@ class SecurityMonitorService {
     events.forEach(event => {
       if (event.userId) users.add(event.userId);
     });
-    return Array.from(_users);
+    return Array.from(users);
   }
 
   private getPlaybook(severity: string, eventType: SecurityEventType): PlaybookAction[] {
@@ -625,14 +625,14 @@ class SecurityMonitorService {
     switch (event.type) {
       case 'brute_force_attack':
         if (event.ipAddress) {
-          await rateLimiter.requireCaptcha(event.ipAddress);
+          await _rateLimiter.requireCaptcha(event.ipAddress);
         }
         break;
         
       case 'sqlinjection':
       case 'xss_attack':
         if (event.ipAddress) {
-          await rateLimiter.blockIP(event.ipAddress, 'Attack detected', 3600000);
+          await _rateLimiter.blockIP(event.ipAddress, 'Attack detected', 3600000);
         }
         break;
         
@@ -661,7 +661,7 @@ class SecurityMonitorService {
   }
 
   private async initiateBreachNotification(incident: IncidentResponse): Promise<void> {
-    await hipaaService.reportBreach({
+    await _hipaaService.reportBreach({
       discoveredBy: 'security_monitor',
       affectedUsers: incident.affectedUsers,
       dataCompromised: ['potential_phi_exposure'],

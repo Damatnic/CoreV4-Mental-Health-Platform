@@ -7,7 +7,7 @@
 import { cryptoService } from './cryptoService';
 import { auditLogger } from './auditLogger';
 import { secureStorage } from './secureStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface EncryptionKeyMetadata {
   _keyId: string;

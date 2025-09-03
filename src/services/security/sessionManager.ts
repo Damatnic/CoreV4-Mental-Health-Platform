@@ -9,7 +9,7 @@ import { secureStorage } from './secureStorage';
 import { auditLogger } from './auditLogger';
 import { _rateLimiter } from './rateLimiter';
 import { _fieldEncryption } from './fieldEncryption';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface Session {
   sessionId: string;

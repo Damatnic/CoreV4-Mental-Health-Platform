@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, AlertCircle, Heart, Users, Activity, MapPin, _Save, Download, Share2, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 interface SupportPerson {
   name: string;

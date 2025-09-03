@@ -5,7 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { EnhancedLayout } from './components/ui/EnhancedLayout';
-import { RouteComponents } from './utils/bundleOptimization/lazyLoading';
+import { __RouteComponents } from './utils/bundleOptimization/lazyLoading';
 // Crisis page is now loaded via lazy loading for better performance
 import { AnonymousAuthProvider } from './contexts/AnonymousAuthContext';
 import { SecurityProvider, withSecurity } from './middleware/securityMiddleware';
@@ -247,7 +247,7 @@ function App() {
                     path="/" 
                     element={
                       <RouteWrapper 
-                        component={RouteComponents.Dashboard} 
+                        component={_RouteComponents.Dashboard} 
                         priority={UpdatePriority.HIGH}
                         fallback={<LoadingFallbacks.FullPage />}
                       />
@@ -257,7 +257,7 @@ function App() {
                     path="/crisis" 
                     element={
                       <RouteWrapper 
-                        component={RouteComponents.Crisis} 
+                        component={_RouteComponents.Crisis} 
                         priority={UpdatePriority.CRISIS}
                         fallback={<LoadingFallbacks.FullPage />}
                       />

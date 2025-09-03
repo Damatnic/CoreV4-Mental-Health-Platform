@@ -4,7 +4,7 @@ import { RealtimeMessage } from '../../services/realtime/websocketService';
 import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';

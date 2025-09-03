@@ -4,13 +4,13 @@
  */
 
 import { securityHeaders } from '../security/securityHeaders';
-import { rateLimiter } from '../security/rateLimiter';
-import { sessionManager } from '../security/sessionManager';
-import { fieldEncryption } from '../security/fieldEncryption';
+import { _rateLimiter } from '../security/rateLimiter';
+import { _sessionManager } from '../security/sessionManager';
+import { _fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
-import { securityMonitor } from '../security/securityMonitor';
-import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { _securityMonitor } from '../security/securityMonitor';
+import { _secureStorage } from '../security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
 
 interface SecureRequestConfig {
   url: string;
@@ -72,14 +72,14 @@ class SecureAPIService {
           throw new Error('Authentication required');
         }
         
-        const validation = await sessionManager.validateSession(_sessionId);
+        const validation = await _sessionManager.validateSession(sessionId);
         if (!validation.isValid) {
           throw new Error('Invalid session');
         }
       }
       
       // Check rate limits
-      const rateLimitCheck = await rateLimiter.checkRateLimit({
+      const rateLimitCheck = await _rateLimiter.checkRateLimit({
         endpoint: config.url,
         ip: await this.getClientIP(),
         userId: this.getCurrentUserId(),
@@ -102,18 +102,18 @@ class SecureAPIService {
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeout = config.timeout || 30000;
-      const _timeoutId = setTimeout(() => controller.abort(), timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
       
       // Make the request
       const response = await this.executeRequest({
         url: `${this.baseURL}${config.url}`,
         method: config.method || 'GET',
         headers,
-        body: requestData ? JSON.stringify(_requestData) : undefined,
+        body: requestData ? JSON.stringify(requestData) : undefined;
         signal: controller.signal,
       });
       
-      clearTimeout(_timeoutId);
+      clearTimeout(timeoutId);
       
       // Validate response
       await this.validateResponse(response, requestId);
@@ -203,21 +203,21 @@ class SecureAPIService {
   async uploadSecure(
     url: string,
     file: File,
-    _encrypt: boolean = true
+    encrypt: boolean = true
   ): Promise<unknown> {
     try {
       let data: Blob | ArrayBuffer = file;
       
-      if (_encrypt) {
+      if (encrypt) {
         // Read file content
-        const _arrayBuffer = await file._arrayBuffer();
-        const uint8Array = new Uint8Array(_arrayBuffer);
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
         
         // Convert to base64 for encryption
         const base64 = btoa(String.fromCharCode(...uint8Array));
         
         // Encrypt file content
-        const encrypted = await fieldEncryption.encryptField('file_content', base64);
+        const encrypted = await _fieldEncryption.encryptField('file_content', base64);
         
         // Create encrypted blob
         data = new Blob([JSON.stringify(encrypted)], { type: 'application/octet-stream' });
@@ -225,7 +225,7 @@ class SecureAPIService {
       
       const formData = new FormData();
       formData.append('file', new File([data], file.name, { type: file.type }));
-      formData.append('encrypted', String(_encrypt));
+      formData.append('encrypted', String(encrypt));
       formData.append('original_name', file.name);
       formData.append('original_type', file.type);
       
@@ -263,12 +263,12 @@ class SecureAPIService {
       let data = await response.blob();
       
       if (decrypt && response.headers.get('X-Encrypted') === 'true') {
-        // Read blob as _text
-        const _text = await data._text();
-        const encrypted = JSON.parse(_text);
+        // Read blob as text
+        const text = await data.text();
+        const encrypted = JSON.parse(text);
         
         // Decrypt content
-        const decrypted = await fieldEncryption.decryptField('file_content', encrypted);
+        const decrypted = await _fieldEncryption.decryptField('file_content', encrypted);
         
         // Convert base64 back to blob
         const binaryString = atob(decrypted);
@@ -300,7 +300,7 @@ class SecureAPIService {
     headers.set('Accept', 'application/json');
     
     // Add security headers
-    securityHeaders.applyToFetch(_headers);
+    securityHeaders.applyToFetch(headers);
     
     // Add CSRF token
     if (this.csrfToken) {
@@ -309,8 +309,8 @@ class SecureAPIService {
     
     // Add session token
     const sessionId = this.getSessionId();
-    if (_sessionId) {
-      const session = await sessionManager.validateSession(_sessionId);
+    if (sessionId) {
+      const session = await _sessionManager.validateSession(sessionId);
       if (session.isValid) {
         headers.set('Authorization', `Bearer ${sessionId}`);
       }
@@ -343,8 +343,8 @@ class SecureAPIService {
     
     // Check if request is already in progress (prevent duplicate requests)
     const requestKey = `${method}:${url}:${body || ''}`;
-    if (this.requestQueue.has(_requestKey)) {
-      return await this.requestQueue.get(_requestKey);
+    if (this.requestQueue.has(requestKey)) {
+      return await this.requestQueue.get(requestKey) as Response;
     }
     
     // Create request promise
@@ -365,7 +365,7 @@ class SecureAPIService {
       return response;
     } finally {
       // Remove from queue
-      this.requestQueue.delete(_requestKey);
+      this.requestQueue.delete(requestKey);
     }
   }
 
@@ -381,7 +381,7 @@ class SecureAPIService {
           
         case 403:
           // Forbidden - check permissions
-          await this.handleForbidden(_requestId);
+          await this.handleForbidden(requestId);
           throw new Error('Access denied');
           
         case 429: {
@@ -411,10 +411,10 @@ class SecureAPIService {
     }
     
     // Verify response signature if present
-    const _signature = response.headers.get('X-Signature');
-    if (_signature) {
-      // Verify _signature (implementation depends on signing mechanism)
-      logger.info('Response _signature verified');
+    const signature = response.headers.get('X-Signature');
+    if (signature) {
+      // Verify signature (implementation depends on signing mechanism)
+      logger.info('Response signature verified');
     }
   }
 
@@ -432,7 +432,7 @@ class SecureAPIService {
       
       return data;
     } else if (contentType?.includes('text/')) {
-      return await response._text();
+      return await response.text();
     } else {
       return await response.blob();
     }
@@ -443,7 +443,7 @@ class SecureAPIService {
     
     for (const field of fields) {
       if (field in encrypted) {
-        encrypted[field] = await fieldEncryption.encryptField(field, encrypted[field]);
+        encrypted[field] = await _fieldEncryption.encryptField(field, encrypted[field]);
       }
     }
     
@@ -461,7 +461,7 @@ class SecureAPIService {
       for (const [key, value] of Object.entries(data)) {
         if (typeof value === 'object' && value !== null && 'ciphertext' in value) {
           // This field is encrypted - cast to proper type
-          decrypted[key] = await fieldEncryption.decryptField(key, value as unknown);
+          decrypted[key] = await _fieldEncryption.decryptField(key, value as unknown);
         } else {
           decrypted[key] = value;
         }
@@ -491,7 +491,7 @@ class SecureAPIService {
     });
     
     // Report to security monitor
-    await securityMonitor.reportEvent({
+    await _securityMonitor.reportEvent({
       type: 'api_abuse',
       severity: 'low',
       source: 'api_client',
@@ -524,8 +524,8 @@ class SecureAPIService {
   private async handleUnauthorized(): Promise<void> {
     // Clear session
     const sessionId = this.getSessionId();
-    if (_sessionId) {
-      await sessionManager.terminateSession(sessionId, 'Unauthorized');
+    if (sessionId) {
+      await _sessionManager.terminateSession(sessionId, 'Unauthorized');
     }
     
     // Redirect to login
@@ -534,7 +534,7 @@ class SecureAPIService {
 
   private async handleForbidden(requestId: string): Promise<void> {
     // Report security event
-    await securityMonitor.reportEvent({
+    await _securityMonitor.reportEvent({
       type: 'unauthorized_access',
       severity: 'medium',
       source: 'api_client',
@@ -546,7 +546,7 @@ class SecureAPIService {
 
   private async handleServerError(response: Response, requestId: string): Promise<void> {
     // Report server error
-    await securityMonitor.reportEvent({
+    await _securityMonitor.reportEvent({
       type: 'suspicious_activity',
       severity: 'low',
       source: 'api_client',
@@ -585,7 +585,7 @@ class SecureAPIService {
       if (url.startsWith(this.baseURL)) {
         // Apply security headers
         const headers = new Headers(init?.headers);
-        securityHeaders.applyToFetch(_headers);
+        securityHeaders.applyToFetch(headers);
         
         return originalFetch(input, {
           ...init,

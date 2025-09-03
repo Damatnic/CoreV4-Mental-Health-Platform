@@ -1,9 +1,9 @@
 // Professional Support System Integration Service
 // Manages therapist onboarding, verification, appointments, and video sessions
 
-import { apiService } from '../api/ApiService';
-import { wsService } from '../websocket/WebSocketService';
-import { logger } from '../utils/logger';
+import { __apiService } from '../api/ApiService';
+import { __wsService } from '../websocket/WebSocketService';
+import { logger } from '../../utils/logger';
 import {
   Therapist,
   Appointment,
@@ -202,21 +202,21 @@ export class TherapistService {
   // Setup WebSocket event handlers
   private setupWebSocketHandlers(): void {
     // Listen for therapist availability updates
-    wsService.on('therapist:available', (data: unknown) => {
+    _wsService.on('therapist:available', (data: unknown) => {
       this.handleTherapistAvailability(data);
     });
 
     // Listen for appointment updates
-    wsService.on('appointment:update', (data: unknown) => {
+    _wsService.on('appointment:update', (data: unknown) => {
       this.handleAppointmentUpdate(data);
     });
 
     // Listen for video session events
-    wsService.on('video:session:start', (data: unknown) => {
+    _wsService.on('video:session:start', (data: unknown) => {
       this.handleVideoSessionStart(data);
     });
 
-    wsService.on('video:session:end', (data: unknown) => {
+    _wsService.on('video:session:end', (data: unknown) => {
       this.handleVideoSessionEnd(data);
     });
   }
@@ -259,7 +259,7 @@ export class TherapistService {
 
   private async createTherapistAccount(data: TherapistOnboarding): Promise<Therapist> {
     // Create user account with therapist role
-    const userResponse = await apiService.register({
+    const userResponse = await _apiService.register({
       email: data.personalInfo.email,
       password: '', // Temporary, will be set by therapist
       username: `dr_${data.personalInfo.lastName.toLowerCase()}`,
@@ -302,24 +302,24 @@ export class TherapistService {
 
       // Upload license
       if (documents.license instanceof File) {
-        uploads.push(apiService.uploadFile(documents.license, 'document'));
+        uploads.push(_apiService.uploadFile(documents.license, 'document'));
       }
 
       // Upload insurance
       if (documents.insurance instanceof File) {
-        uploads.push(apiService.uploadFile(documents.insurance, 'document'));
+        uploads.push(_apiService.uploadFile(documents.insurance, 'document'));
       }
 
       // Upload resume if provided
       if (documents.resume instanceof File) {
-        uploads.push(apiService.uploadFile(documents.resume, 'document'));
+        uploads.push(_apiService.uploadFile(documents.resume, 'document'));
       }
 
       // Upload certifications
       if (documents.certifications) {
         for (const cert of documents.certifications) {
           if (cert instanceof File) {
-            uploads.push(apiService.uploadFile(cert, 'document'));
+            uploads.push(_apiService.uploadFile(cert, 'document'));
           }
         }
       }
@@ -385,7 +385,7 @@ export class TherapistService {
 
   private notifyVerificationComplete(_therapistId: string): void {
     // Send notification via WebSocket
-    wsService.emit('therapist:verification:complete', {
+    _wsService.emit('therapist:verification:complete', {
       _therapistId,
       _status: this.verificationCache.get(_therapistId)
     });
@@ -413,7 +413,7 @@ export class TherapistService {
       const paymentInfo = await this.processPayment(request);
       
       // Step 3: Create appointment
-      const appointment = await apiService.bookAppointment({
+      const appointment = await _apiService.bookAppointment({
         patientId: request.patientId,
         _therapistId: request._therapistId,
         scheduledTime: this.combineDateAndTime(request.date, request.time),
@@ -452,7 +452,7 @@ export class TherapistService {
     duration: number
   ): Promise<boolean> {
     // Get therapist's schedule
-    const therapist = await apiService.getTherapist(_therapistId);
+    const therapist = await _apiService.getTherapist(_therapistId);
     
     // Check if time slot is within regular hours
     const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -461,7 +461,7 @@ export class TherapistService {
     if (!regularHours) return false;
     
     // Check for conflicts with existing appointments
-    const appointments = await apiService.getAppointments(_therapistId, 'scheduled');
+    const appointments = await _apiService.getAppointments(_therapistId, 'scheduled');
     
     const requestedStart = this.combineDateAndTime(date, time);
     const requestedEnd = new Date(requestedStart.getTime() + duration * 60000);
@@ -490,7 +490,7 @@ export class TherapistService {
   }
 
   private async processPayment(request: BookingRequest): Promise<PaymentInfo> {
-    const therapist = await apiService.getTherapist(request._therapistId);
+    const therapist = await _apiService.getTherapist(request._therapistId);
     
     let _amount = therapist.sessionRate;
     const method = request.paymentMethod;
@@ -557,7 +557,7 @@ export class TherapistService {
 
   private async sendAppointmentConfirmation(appointment: Appointment): Promise<void> {
     // Send confirmation via WebSocket
-    wsService.emit('appointment:confirmed', appointment);
+    _wsService.emit('appointment:confirmed', appointment);
     
     // In production, also send email/SMS confirmation
     logger.info('Appointment confirmed:', appointment);
@@ -569,7 +569,7 @@ export class TherapistService {
     cancelledBy: 'patient' | 'therapist'
   ): Promise<void> {
     try {
-      const appointment = await apiService.cancelAppointment(appointmentId, reason);
+      const appointment = await _apiService.cancelAppointment(appointmentId, reason);
       
       // Process refund if needed
       if (appointment.payment?._status === 'paid') {
@@ -577,7 +577,7 @@ export class TherapistService {
       }
       
       // Notify both parties
-      wsService.emit('appointment:cancelled', {
+      _wsService.emit('appointment:cancelled', {
         appointment,
         reason,
         cancelledBy
@@ -640,7 +640,7 @@ export class TherapistService {
       }
       
       // Notify participants
-      wsService.emit('video:session:ready', {
+      _wsService.emit('video:session:ready', {
         sessionId: this.activeVideoSession.sessionId,
         roomId,
         tokens
@@ -720,7 +720,7 @@ export class TherapistService {
       this.activeVideoSession.status = 'ended';
       
       // Notify participants
-      wsService.emit('video:session:ended', {
+      _wsService.emit('video:session:ended', {
         sessionId,
         duration: this.activeVideoSession.endTime.getTime() - 
                   this.activeVideoSession.startTime!.getTime()
@@ -774,8 +774,8 @@ export class TherapistService {
     ratings: number;
     upcomingSessions: Appointment[];
   }> {
-    const therapist = await apiService.getTherapist(_therapistId);
-    const appointments = await apiService.getAppointments(_therapistId);
+    const therapist = await _apiService.getTherapist(_therapistId);
+    const appointments = await _apiService.getAppointments(_therapistId);
     
     // Calculate metrics
     const revenue = appointments

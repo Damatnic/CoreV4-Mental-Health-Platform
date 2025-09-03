@@ -1,7 +1,7 @@
 // Comprehensive Test Report Generator for CoreV4
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface TestResult {
   suite: string;

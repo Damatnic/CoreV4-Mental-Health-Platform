@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 /**
  * Safety Plan Generator Component
  * Creates personalized crisis safety plans with evidence-based interventions

@@ -7,7 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import { EventEmitter } from 'events';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Real-time event types
 export enum RealtimeEvent {

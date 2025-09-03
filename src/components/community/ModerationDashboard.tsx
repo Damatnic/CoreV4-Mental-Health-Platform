@@ -3,8 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Shield, AlertTriangle, Flag, CheckCircle, XCircle, Clock, TrendingUp, Users, MessageSquare, Activity, Ban, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
-import { communityService } from '../../services/community/communityService';
-import { websocketService } from '../../services/realtime/websocketService';
+import { __communityService } from '../../services/community/_communityService';
+import { __websocketService } from '../../services/realtime/_websocketService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface ModerationItem {
@@ -243,25 +243,25 @@ export function ModerationDashboard() {
       });
     };
 
-    websocketService.on('moderation:alert', handleModerationAlert);
-    websocketService.on('crisis:detected', handleCrisisAlert);
+    _websocketService.on('moderation:alert', handleModerationAlert);
+    _websocketService.on('crisis:detected', handleCrisisAlert);
 
     return () => {
-      websocketService.off('moderation:alert', handleModerationAlert);
-      websocketService.off('crisis:detected', handleCrisisAlert);
+      _websocketService.off('moderation:alert', handleModerationAlert);
+      _websocketService.off('crisis:detected', handleCrisisAlert);
     };
   }, [queryClient]);
 
   // Handle moderation actions
   const handleAction = async (itemId: string, action: string, notes?: string) => {
     try {
-      await communityService.moderateContent(itemId, action as unknown, notes);
+      await _communityService.moderateContent(itemId, action as unknown, notes);
       toast.success(`Action "${action}" completed successfully`);
       queryClient.invalidateQueries({ queryKey: ['moderation-queue'] });
       
       // If crisis escalation, send immediate alert
       if (action === 'escalate-crisis') {
-        websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
+        _websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
       }
     } catch (error) {
       // Error is caught but not needed for logging

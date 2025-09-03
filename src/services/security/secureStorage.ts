@@ -6,7 +6,7 @@
 
 import { cryptoService } from './cryptoService';
 import { secureStorage as _localSecureStorage } from './SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface StorageOptions {
   persistent?: boolean;

@@ -7,14 +7,14 @@
 import { auditLogger, AuditLogEntry } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
-import { privacyService } from '../privacy/privacyService';
-import { logger } from '../utils/logger';
+import { _privacyService } from '../privacy/privacyService';
+import { logger } from '../../utils/logger';
 
 export interface PHIAccessControl {
-  _userId: string;
+  userId: string;
   resourceId: string;
-  _resourceType: PHIResourceType;
-  _accessLevel: AccessLevel;
+  resourceType: PHIResourceType;
+  accessLevel: AccessLevel;
   purpose: string;
   grantedBy?: string;
   grantedAt: Date;
@@ -110,30 +110,30 @@ class HIPAAComplianceService {
    * Request access to PHI with validation
    */
   async requestPHIAccess(params: {
-    _userId: string;
+    userId: string;
     resourceId: string;
-    _resourceType: PHIResourceType;
-    _accessLevel: AccessLevel;
+    resourceType: PHIResourceType;
+    accessLevel: AccessLevel;
     purpose: string;
     duration?: number; // in minutes
   }): Promise<PHIAccessControl | null> {
     try {
       // Verify user authorization
       const isAuthorized = await this.verifyAuthorization(
-        params._userId,
-        params._resourceType,
-        params._accessLevel
+        params.userId,
+        params.resourceType,
+        params.accessLevel
       );
 
       if (!isAuthorized) {
         await auditLogger.log({
           event: 'PERMISSION_DENIED',
-          _userId: params._userId,
+          userId: params.userId,
           resourceId: params.resourceId,
-          _resourceType: params._resourceType,
+          resourceType: params.resourceType,
           details: {
             reason: 'Unauthorized PHI access attempt',
-            _accessLevel: params._accessLevel,
+            accessLevel: params.accessLevel,
           },
           severity: 'warning',
         });
@@ -150,10 +150,10 @@ class HIPAAComplianceService {
       if (!assessment.assessment.necessary.includes(params.resourceType)) {
         await auditLogger.log({
           event: 'COMPLIANCE_VIOLATION',
-          _userId: params._userId,
+          userId: params.userId,
           details: {
             violation: 'minimum_necessary_standard',
-            requested: params._resourceType,
+            requested: params.resourceType,
             alternatives: assessment.assessment.alternatives,
           },
           severity: 'warning',
@@ -162,7 +162,7 @@ class HIPAAComplianceService {
       }
 
       // Check patient consent
-      const hasConsent = await privacyService.hasConsent(
+      const hasConsent = await _privacyService.hasConsent(
         params.userId,
         'health_data',
         ['health_records']
@@ -171,7 +171,7 @@ class HIPAAComplianceService {
       if (!hasConsent && params.accessLevel !== 'read') {
         await auditLogger.log({
           event: 'PERMISSION_DENIED',
-          _userId: params._userId,
+          userId: params.userId,
           details: {
             reason: 'No patient consent for PHI modification',
           },
@@ -182,10 +182,10 @@ class HIPAAComplianceService {
 
       // Grant access
       const accessControl: PHIAccessControl = {
-        _userId: params._userId,
+        userId: params.userId,
         resourceId: params.resourceId,
-        _resourceType: params._resourceType,
-        _accessLevel: params._accessLevel,
+        resourceType: params.resourceType,
+        accessLevel: params.accessLevel,
         purpose: params.purpose,
         grantedAt: new Date(),
         expiresAt: params.duration
@@ -194,15 +194,15 @@ class HIPAAComplianceService {
       };
 
       // Store access control
-      await this.storePHIAccess(_accessControl);
+      await this.storePHIAccess(accessControl);
 
       // Log PHI access
       await auditLogger.log({
         event: 'PHI_ACCESS',
-        _userId: params._userId,
+        userId: params.userId,
         resourceId: params.resourceId,
-        _resourceType: params._resourceType,
-        action: params._accessLevel,
+        resourceType: params.resourceType,
+        action: params.accessLevel,
         details: {
           purpose: params.purpose,
           duration: params.duration,
@@ -214,10 +214,10 @@ class HIPAAComplianceService {
     } catch (error) {
       await auditLogger.log({
         event: 'SYSTEM_ERROR',
-        _userId: params._userId,
+        userId: params.userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
-          _context: 'PHI access request',
+          context: 'PHI access request',
         },
         severity: 'error',
       });
@@ -245,12 +245,12 @@ class HIPAAComplianceService {
       };
 
       // Store disclosure record
-      await this.storeDisclosure(_disclosure);
+      await this.storeDisclosure(disclosure);
 
       // Log disclosure
       await auditLogger.log({
         event: 'PHI_MODIFICATION',
-        _userId: params.patientId,
+        userId: params.patientId,
         details: {
           action: 'disclosure',
           recipient: params.recipientId,
@@ -272,10 +272,10 @@ class HIPAAComplianceService {
    * Validate PHI handling for compliance
    */
   async validatePHIHandling(params: {
-    _userId: string;
+    userId: string;
     action: string;
-    _data: unknown;
-    _context: string;
+    data: unknown;
+    context: string;
   }): Promise<{
     compliant: boolean;
     violations: string[];
@@ -286,7 +286,7 @@ class HIPAAComplianceService {
 
     try {
       // Check encryption
-      if (this.ENCRYPTION_REQUIRED && !this.isDataEncrypted(params._data)) {
+      if (this.ENCRYPTION_REQUIRED && !this.isDataEncrypted(params.data)) {
         violations.push('PHI must be encrypted at rest and in transit');
       }
 
@@ -317,7 +317,7 @@ class HIPAAComplianceService {
       }
 
       // Check consent
-      const hasConsent = await privacyService.hasConsent(
+      const hasConsent = await _privacyService.hasConsent(
         params.userId,
         'health_data'
       );
@@ -367,7 +367,7 @@ class HIPAAComplianceService {
       // Log critical security event
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId: params.discoveredBy,
+        userId: params.discoveredBy,
         details: {
           type: 'breach_detected',
           affectedCount: params.affectedUsers.length,
@@ -397,7 +397,7 @@ class HIPAAComplianceService {
     try {
       // Query audit logs for PHI access
       const logs = await auditLogger.query({
-        _userId: patientId,
+        userId: patientId,
         event: 'PHI_ACCESS',
         startDate,
         endDate,
@@ -523,13 +523,13 @@ class HIPAAComplianceService {
    * Private helper methods
    */
   private async verifyAuthorization(
-    _userId: string,
-    _resourceType: PHIResourceType,
-    _accessLevel: AccessLevel
+    userId: string,
+    resourceType: PHIResourceType,
+    accessLevel: AccessLevel
   ): Promise<boolean> {
     // Check user role and permissions
     // In production, integrate with RBAC system
-    const userRole = await this.getUserRole(_userId);
+    const userRole = await this.getUserRole(userId);
     
     const permissions = {
       provider: ['read', 'write', 'modify'],
@@ -538,18 +538,18 @@ class HIPAAComplianceService {
       emergency: ['read', 'write'],
     };
 
-    return (permissions[userRole as keyof typeof permissions] || []).includes(_accessLevel);
+    return (permissions[userRole as keyof typeof permissions] || []).includes(accessLevel);
   }
 
   private async assessMinimumNecessary(
     resourceId: string,
-    _resourceType: PHIResourceType,
+    resourceType: PHIResourceType,
     purpose: string
   ): Promise<MinimumNecessaryAssessment> {
     // Apply minimum necessary standard
     const assessment: MinimumNecessaryAssessment = {
       requestId: cryptoService.generateSecureUUID(),
-      dataRequested: [_resourceType],
+      dataRequested: [resourceType],
       purpose,
       assessment: {
         necessary: [],
@@ -567,14 +567,14 @@ class HIPAAComplianceService {
       emergency: ['crisis_plan', 'medication_list', 'emergency_contacts'],
     };
 
-    const purposeCategory = this.categorizePurpose(_purpose);
+    const purposeCategory = this.categorizePurpose(purpose);
     const categoryData = necessaryData[purposeCategory as keyof typeof necessaryData];
     if (categoryData) {
       assessment.assessment.necessary = categoryData.filter(
-        _d => _d === _resourceType
+        d => d === resourceType
       );
-      assessment.assessment.unnecessary = [_resourceType].filter(
-        _d => !assessment.assessment.necessary.includes(_d)
+      assessment.assessment.unnecessary = [resourceType].filter(
+        d => !assessment.assessment.necessary.includes(d)
       );
     }
 
@@ -594,8 +594,8 @@ class HIPAAComplianceService {
   }
 
   private async storePHIAccess(access: PHIAccessControl): Promise<void> {
-    const _key = `phi_access_${access._userId}`;
-    const existing = await secureStorage.getItem(_key) || [];
+    const key = `phi_access_${access.userId}`;
+    const existing = await secureStorage.getItem(key) || [];
     existing.push(access);
     
     // Keep only recent access records
@@ -605,30 +605,30 @@ class HIPAAComplianceService {
       new Date(a.grantedAt) > cutoff
     );
     
-    await secureStorage.setItem(_key, recent, { encrypted: true });
+    await secureStorage.setItem(key, recent, { encrypted: true });
     
     // Update cache
     this.phiAccessCache.set(access.userId, recent);
   }
 
-  private async checkPHIAccess(_userId: string, _context: string): Promise<boolean> {
+  private async checkPHIAccess(userId: string, context: string): Promise<boolean> {
     // Check if user has valid PHI access
-    const _key = `phi_access_${_userId}`;
-    const accesses = this.phiAccessCache.get(_userId) || 
-                     await secureStorage.getItem(_key) || [];
+    const key = `phi_access_${userId}`;
+    const accesses = this.phiAccessCache.get(userId) || 
+                     await secureStorage.getItem(key) || [];
     
     const now = new Date();
     return accesses.some((a: PHIAccessControl) => 
       (!a.expiresAt || new Date(a.expiresAt) > now) &&
-      a.purpose.includes(_context)
+      a.purpose.includes(context)
     );
   }
 
   private async storeDisclosure(disclosure: PHIDisclosure): Promise<void> {
-    const _key = `phi_disclosures_${disclosure.patientId}`;
-    const existing = await secureStorage.getItem(_key) || [];
-    existing.push(_disclosure);
-    await secureStorage.setItem(_key, existing, { encrypted: true });
+    const key = `phi_disclosures_${disclosure.patientId}`;
+    const existing = await secureStorage.getItem(key) || [];
+    existing.push(disclosure);
+    await secureStorage.setItem(key, existing, { encrypted: true });
   }
 
   private async getDisclosures(
@@ -636,21 +636,21 @@ class HIPAAComplianceService {
     startDate?: Date,
     endDate?: Date
   ): Promise<PHIDisclosure[]> {
-    const _key = `phi_disclosures_${patientId}`;
-    const all = await secureStorage.getItem(_key) || [];
+    const key = `phi_disclosures_${patientId}`;
+    const all = await secureStorage.getItem(key) || [];
     
-    return all.filter((_d: PHIDisclosure) => {
-      const disclosedAt = new Date(_d.disclosedAt);
+    return all.filter((d: PHIDisclosure) => {
+      const disclosedAt = new Date(d.disclosedAt);
       return (!startDate || disclosedAt >= startDate) &&
              (!endDate || disclosedAt <= endDate);
     });
   }
 
   private async storeBreachNotification(breach: BreachNotification): Promise<void> {
-    const _key = 'hipaa_breaches';
-    const existing = await secureStorage.getItem(_key) || [];
+    const key = 'hipaa_breaches';
+    const existing = await secureStorage.getItem(key) || [];
     existing.push(breach);
-    await secureStorage.setItem(_key, existing, { encrypted: true });
+    await secureStorage.setItem(key, existing, { encrypted: true });
   }
 
   private async initiateBreachResponse(breach: BreachNotification): Promise<void> {
@@ -671,15 +671,15 @@ class HIPAAComplianceService {
   }
 
   private async getBreachHistory(): Promise<BreachNotification[]> {
-    const _key = 'hipaa_breaches';
-    return await secureStorage.getItem(_key) || [];
+    const key = 'hipaa_breaches';
+    return await secureStorage.getItem(key) || [];
   }
 
-  private isDataEncrypted(_data: unknown): boolean {
-    // Check if _data appears to be encrypted
-    if (typeof _data === 'string') {
-      // Simple check for base64 encoded encrypted _data
-      return /^[A-Za-z0-9+/]+=*$/.test(_data) && _data.length > 100;
+  private isDataEncrypted(data: unknown): boolean {
+    // Check if data appears to be encrypted
+    if (typeof data === 'string') {
+      // Simple check for base64 encoded encrypted data
+      return /^[A-Za-z0-9+/]+=*$/.test(data) && data.length > 100;
     }
     return false;
   }
@@ -689,8 +689,8 @@ class HIPAAComplianceService {
     return true; // Audit logger is always enabled in our implementation
   }
 
-  private async checkRetentionCompliance(_data: unknown): Promise<boolean> {
-    // Check if _data retention meets HIPAA requirements (7 years)
+  private async checkRetentionCompliance(data: unknown): Promise<boolean> {
+    // Check if data retention meets HIPAA requirements (7 years)
     return true; // Simplified for development
   }
 
@@ -709,7 +709,7 @@ class HIPAAComplianceService {
     return { comprehensive: true };
   }
 
-  private async getUserRole(_userId: string): Promise<string> {
+  private async getUserRole(userId: string): Promise<string> {
     // Get user role from auth system
     // Simplified for development
     return 'provider';

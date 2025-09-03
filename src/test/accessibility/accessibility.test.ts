@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { AxePuppeteer } from '@axe-core/puppeteer';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 describe('Accessibility Testing Suite - WCAG AAA Compliance', () => {
   let browser: Browser;

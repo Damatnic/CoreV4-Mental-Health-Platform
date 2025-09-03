@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/index.css';
-import { EmergencyErrorBoundary, setupGlobalErrorHandling } from './components/ErrorBoundary';
+import { EmergencyErrorBoundary, __setupGlobalErrorHandling } from './components/ErrorBoundary';
 import { setupRuntimeGuards } from './utils/runtimeGuards';
 import { logger } from './utils/logger';
 // CRITICAL SECURITY: Validate environment configuration before app startup
@@ -16,7 +16,7 @@ declare global {
 }
 
 // Initialize global error handling and runtime guards immediately
-setupGlobalErrorHandling();
+_setupGlobalErrorHandling();
 setupRuntimeGuards();
 
 // Performance monitoring (quiet in production)

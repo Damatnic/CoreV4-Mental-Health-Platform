@@ -7,7 +7,7 @@
 
 // @ts-expect-error - CryptoJS types compatibility
 import CryptoJS from 'crypto-js';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Sensitive data types that must be encrypted
 const SENSITIVE_DATA_KEYS = [

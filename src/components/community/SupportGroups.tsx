@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users, Lock, Globe, UserPlus, Settings, _Calendar, MessageSquare, TrendingUp, Shield, Heart } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { communityService, SupportGroup, CreateGroupDto } from '../../services/community/communityService';
+import { __communityService, SupportGroup, CreateGroupDto } from '../../services/community/_communityService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface GroupCardProps {
@@ -157,7 +157,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [guidelineInput, setGuidelineInput] = useState('');
 
   const mutation = useMutation({
-    mutationFn: (data: CreateGroupDto) => communityService.createGroup(data),
+    mutationFn: (data: CreateGroupDto) => _communityService.createGroup(data),
     onSuccess: () => {
       toast.success('Support group created successfully!');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
@@ -442,7 +442,7 @@ export function SupportGroups() {
   // Fetch groups
   const { data, isLoading, error } = useQuery({
     queryKey: ['groups', selectedCategory, searchQuery],
-    queryFn: () => communityService.getGroups({
+    queryFn: () => _communityService.getGroups({
       category: selectedCategory === 'all' ? undefined : selectedCategory,
       search: searchQuery || undefined,
       limit: 12,
@@ -451,7 +451,7 @@ export function SupportGroups() {
 
   // Join group mutation
   const joinMutation = useMutation({
-    mutationFn: (groupId: string) => communityService.joinGroup(groupId),
+    mutationFn: (groupId: string) => _communityService.joinGroup(groupId),
     onSuccess: () => {
       toast.success('Successfully joined the group!');
       queryClient.invalidateQueries({ queryKey: ['groups'] });
@@ -463,7 +463,7 @@ export function SupportGroups() {
 
   // Leave group mutation
   const leaveMutation = useMutation({
-    mutationFn: (groupId: string) => communityService.leaveGroup(groupId),
+    mutationFn: (groupId: string) => _communityService.leaveGroup(groupId),
     onSuccess: () => {
       toast.success('You have left the group');
       queryClient.invalidateQueries({ queryKey: ['groups'] });

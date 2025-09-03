@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, X, AlertCircle, CheckCircle } from 'lucide-react';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 
 interface VoiceCommandInterfaceProps {
   isActive: boolean;

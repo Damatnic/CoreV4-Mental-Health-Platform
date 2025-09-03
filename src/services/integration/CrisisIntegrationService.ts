@@ -10,7 +10,7 @@ import { useWellnessStore } from '../../stores/wellnessStore';
 import { useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
 import { dataIntegrationService } from './DataIntegrationService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Crisis severity levels
 export enum CrisisSeverity {

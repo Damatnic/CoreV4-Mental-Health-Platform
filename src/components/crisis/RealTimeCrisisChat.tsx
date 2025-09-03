@@ -13,7 +13,7 @@ import {
   AlertCircle, UserCheck,
   MessageSquare, Volume2, VolumeX
 } from 'lucide-react';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface ChatMessage {
   id: string;

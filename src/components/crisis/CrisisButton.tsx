@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { AlertCircle, Phone, MessageCircle, MapPin, Heart, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAnalytics } from '../../hooks/useAnalytics';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 interface CrisisResource {
   name: string;

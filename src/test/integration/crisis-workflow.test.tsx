@@ -10,7 +10,7 @@ import { http, HttpResponse } from 'msw';
 // Import components for integration testing
 import CrisisButton from '../../components/crisis/CrisisButton';
 import MoodTracker from '../../components/wellness/MoodTracker';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Test wrapper with all necessary providers
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {

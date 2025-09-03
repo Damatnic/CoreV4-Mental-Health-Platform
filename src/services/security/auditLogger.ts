@@ -6,7 +6,7 @@
 
 import { secureStorage } from './secureStorage';
 import { cryptoService } from './cryptoService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 export interface AuditLogEntry {
   id: string;

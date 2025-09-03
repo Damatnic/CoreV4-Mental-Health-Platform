@@ -11,7 +11,7 @@ import {
 import { NavigationProvider, useNavigation } from '../navigation/NavigationContext';
 import { GlobalSearch } from '../navigation/GlobalSearch';
 import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
-import { FloatingCrisisButton, MobileCrisisButton } from '../navigation/FloatingCrisisButton';
+import { FloatingCrisisButton } from '../navigation/FloatingCrisisButton';
 import { _MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../hooks/useAuth';
@@ -705,7 +705,6 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       
       {/* Floating Crisis Button - Mobile Enhanced */}
       <FloatingCrisisButton />
-      <MobileCrisisButton />
       
       {/* Console Mobile Safe Area Styles */}
       <style>{`

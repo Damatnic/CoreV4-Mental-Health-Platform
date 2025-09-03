@@ -6,7 +6,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Connection state interface
 interface ConnectionState {

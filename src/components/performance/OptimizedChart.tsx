@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 /**
  * High-Performance Chart Component
  * Optimized for mental health data visualization with web workers

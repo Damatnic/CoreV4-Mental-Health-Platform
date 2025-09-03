@@ -4,7 +4,7 @@
 import { RealtimeMessage } from '../realtime/websocketService';
 import { mockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
 import { toast } from 'react-hot-toast';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 // Mock WebSocket Adapter that mimics the real WebSocketService interface
 export class MockWebSocketAdapter {

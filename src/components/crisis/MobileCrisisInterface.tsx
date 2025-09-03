@@ -11,7 +11,7 @@ import {
   Battery,
   BatteryLow
 } from 'lucide-react';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useBatteryStatus } from '../../hooks/useBatteryStatus';

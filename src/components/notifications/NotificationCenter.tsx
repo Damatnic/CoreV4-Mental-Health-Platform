@@ -25,7 +25,7 @@ import {
   NotificationRule,
   SmartNotification
 } from '../../services/notifications/ComprehensiveNotificationService';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface NotificationCenterProps {
   className?: string;

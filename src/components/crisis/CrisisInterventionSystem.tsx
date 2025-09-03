@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
-import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { __EmergencyContactsLazy, __SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
-import { logger, LogCategory } from '../../services/logging/logger';
+import { __CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { logger, LogLevel } from '../../utils/logger';
 
 interface CrisisLevel {
   level: 'low' | 'medium' | 'high' | 'critical';
@@ -62,7 +62,7 @@ export function CrisisInterventionSystem() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (_position) => setUserLocation(_position),
-        (error) => logger.error('Location access denied', new Error(error.message), { category: LogCategory.CRISIS }),
+        (error) => logger.error('Location access denied', new Error(error.message), { category: LogLevel.CRISIS }),
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
@@ -224,12 +224,12 @@ export function CrisisInterventionSystem() {
             )}
             {activeTab === 'safety' && (
               <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
-                <SafetyPlanLazy />
+                <_SafetyPlanLazy />
               </Suspense>
             )}
             {activeTab === 'chat' && (
               <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
-                <CrisisChatLazy />
+                <_CrisisChatLazy />
               </Suspense>
             )}
           </div>
@@ -237,7 +237,7 @@ export function CrisisInterventionSystem() {
 
         {/* Emergency Contacts Widget */}
         <Suspense fallback={<div className="animate-pulse bg-gray-200 h-24 rounded"></div>}>
-          <EmergencyContactsLazy />
+          <_EmergencyContactsLazy />
         </Suspense>
 
         {/* Quick Access Tools */}

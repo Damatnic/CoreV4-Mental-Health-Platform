@@ -3,8 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle, Share2, Flag, Edit2, Trash2, AlertTriangle, Award, Users, TrendingUp } from 'lucide-react';
 import { _format, formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
-import { communityService, Post, CreatePostDto } from '../../services/community/communityService';
-import { websocketService } from '../../services/realtime/websocketService';
+import { __communityService, Post, CreatePostDto } from '../../services/community/_communityService';
+import { __websocketService } from '../../services/realtime/_websocketService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface PostCardProps {
@@ -22,7 +22,7 @@ function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
   const [_likeCount, _setLikeCount] = useState(post.likes);
 
   const likeMutation = useMutation({
-    mutationFn: () => isLiked ? communityService.unlikePost(post.id) : communityService.likePost(post.id),
+    mutationFn: () => isLiked ? _communityService.unlikePost(post.id) : _communityService.likePost(post.id),
     onSuccess: () => {
       setIsLiked(!isLiked);
       setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
@@ -34,7 +34,7 @@ function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
   });
 
   const shareMutation = useMutation({
-    mutationFn: () => communityService.sharePost(post.id),
+    mutationFn: () => _communityService.sharePost(post.id),
     onSuccess: () => {
       toast.success('Post shared successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -217,8 +217,8 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
   const mutation = useMutation({
     mutationFn: (data: CreatePostDto) => 
       editPost 
-        ? communityService.updatePost(editPost.id, data)
-        : communityService.createPost(data),
+        ? _communityService.updatePost(editPost.id, data)
+        : _communityService.createPost(data),
     onSuccess: () => {
       toast.success(editPost ? 'Post updated successfully' : 'Post created successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -466,12 +466,12 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   // Fetch posts
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', groupId, selectedFilter],
-    queryFn: () => communityService.getPosts({ groupId, limit: 20 }),
+    queryFn: () => _communityService.getPosts({ groupId, limit: 20 }),
   });
 
   // Delete post mutation
   const __deleteMutation   = useMutation({
-    mutationFn: (_postId: string) => communityService.deletePost(_postId),
+    mutationFn: (_postId: string) => _communityService.deletePost(_postId),
     onSuccess: () => {
       toast.success('Post deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -484,7 +484,7 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
   // Report post mutation
   const __reportMutation   = useMutation({
     mutationFn: ({ _postId, reason }: { _postId: string; reason: string }) => 
-      communityService.reportPost(_postId, reason),
+      _communityService.reportPost(_postId, reason),
     onSuccess: () => {
       toast.success('Post reported. Our moderation team will review it.');
     },
@@ -508,14 +508,14 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     };
 
-    websocketService.on('post:new', handleNewPost);
-    websocketService.on('post:update', handlePostUpdate);
-    websocketService.on('post:delete', handlePostDelete);
+    _websocketService.on('post:new', handleNewPost);
+    _websocketService.on('post:update', handlePostUpdate);
+    _websocketService.on('post:delete', handlePostDelete);
 
     return () => {
-      websocketService.off('post:new', handleNewPost);
-      websocketService.off('post:update', handlePostUpdate);
-      websocketService.off('post:delete', handlePostDelete);
+      _websocketService.off('post:new', handleNewPost);
+      _websocketService.off('post:update', handlePostUpdate);
+      _websocketService.off('post:delete', handlePostDelete);
     };
   }, [queryClient]);
 

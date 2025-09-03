@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapPin, Phone, Globe, Clock, Search, Navigation, ExternalLink } from 'lucide-react';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 interface Resource {
   id: string;
