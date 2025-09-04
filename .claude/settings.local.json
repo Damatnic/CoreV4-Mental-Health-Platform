@@ -84,7 +84,10 @@
       "Read(H:\\/**)",
       "WebFetch(domain:github.com)",
       "Read(H:\\/**)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(gh repo create:*)"
     ],
     "deny": [],
     "ask": []
