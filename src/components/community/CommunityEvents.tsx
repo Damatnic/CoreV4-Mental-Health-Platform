@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Calendar, Clock, MapPin, Video, Users, Plus } from 'lucide-react';
 import { format, isToday, isTomorrow, isThisWeek, addDays } from 'date-fns';
 import { toast } from 'react-hot-toast';
-import { __communityService, Event, CreateEventDto } from '../../services/community/_communityService';
+import { _communityService, Event, CreateEventDto } from '../../services/community/communityService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface EventCardProps {
@@ -123,7 +123,7 @@ function EventCard({ event, onRegister, onUnregister }: EventCardProps) {
         {/* Tags */}
         {event.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {event.tags.map((tag) => (
+            {event.tags.map((tag: string) => (
               <span key={tag} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
                 #{tag}
               </span>
@@ -170,7 +170,7 @@ interface CreateEventModalProps {
 
 function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
   const queryClient = useQueryClient();
-  const [formData, _setFormData] = useState<CreateEventDto>({
+  const [formData, setFormData] = useState<CreateEventDto>({
     title: '',
     description: '',
     type: 'workshop' as Event['type'],
@@ -184,7 +184,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
     groupId,
     tags: [],
   });
-  const [tagInput, _setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState('');
 
   const mutation = useMutation({
     mutationFn: (data: CreateEventDto) => _communityService.createEvent(data),
@@ -212,7 +212,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
 
   const addTag = () => {
     if (tagInput && !formData.tags.includes(tagInput)) {
-      setFormData(prev => ({
+      setFormData((prev: CreateEventDto) => ({
         ...prev,
         tags: [...prev.tags, tagInput.toLowerCase().replace(/\s+/g, '-')],
       }));
@@ -221,9 +221,9 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
   };
 
   const removeTag = (tag: string) => {
-    setFormData(prev => ({
+    setFormData((prev: CreateEventDto) => ({
       ...prev,
-      tags: prev.tags.filter(t => t !== tag),
+      tags: prev.tags.filter((t: string) => t !== tag),
     }));
   };
 
@@ -245,7 +245,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 id="event-title"
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, title: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., Weekly Mindfulness Meditation"
                 required
@@ -262,7 +262,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
               <textarea
                 id="event-description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, description: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describe what attendees can expect..."
                 rows={4}
@@ -280,7 +280,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
               <select
                 id="event-type"
                 value={formData.type}
-                onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as Event['type'] }))}
+                onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, type: e.target.value as Event['type'] }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
                 aria-required="true"
@@ -304,7 +304,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                   id="event-start-time"
                   type="datetime-local"
                   value={format(formData.startTime, "yyyy-MM-dd'T'HH:mm")}
-                  onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
+                  onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, startTime: new Date(e.target.value) }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                   aria-required="true"
@@ -318,7 +318,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                   id="event-end-time"
                   type="datetime-local"
                   value={format(formData.endTime, "yyyy-MM-dd'T'HH:mm")}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endTime: new Date(e.target.value) }))}
+                  onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, endTime: new Date(e.target.value) }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                   aria-required="true"
@@ -339,7 +339,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                       name="location-type"
                       id="location-online"
                       checked={formData.isOnline}
-                      onChange={() => setFormData(prev => ({ ...prev, isOnline: true }))}
+                      onChange={() => setFormData((prev: CreateEventDto) => ({ ...prev, isOnline: true }))}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="ml-2 text-sm text-gray-700">Online</span>
@@ -350,7 +350,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                       name="location-type"
                       id="location-in-person"
                       checked={!formData.isOnline}
-                      onChange={() => setFormData(prev => ({ ...prev, isOnline: false }))}
+                      onChange={() => setFormData((prev: CreateEventDto) => ({ ...prev, isOnline: false }))}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="ml-2 text-sm text-gray-700">In-Person</span>
@@ -369,7 +369,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                   id="meeting-link"
                   type="url"
                   value={formData.meetingLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, meetingLink: e.target.value }))}
+                  onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, meetingLink: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="https://zoom.us/j/..."
                   aria-describedby="meeting-link-hint"
@@ -384,7 +384,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                   id="event-location"
                   type="text"
                   value={formData.location}
-                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={(e) => setFormData((prev: CreateEventDto) => ({ ...prev, location: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Community Center, 123 Main St"
                   aria-describedby="location-hint"
@@ -401,9 +401,9 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 id="max-attendees"
                 type="number"
                 value={formData.maxAttendees || ''}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  maxAttendees: e.target.value ? parseInt(e.target.value) : undefined 
+                onChange={(e) => setFormData((prev: CreateEventDto) => ({
+                  ...prev,
+                  maxAttendees: e.target.value ? parseInt(e.target.value) : undefined
                 }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Leave empty for unlimited"
@@ -437,7 +437,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.tags.map((tag) => (
+                {formData.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm flex items-center space-x-1"
@@ -482,9 +482,9 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
 export function CommunityEvents() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [___showCreateModal, _setShowCreateModal] = useState(false);
-  const [selectedType, _setSelectedType] = useState<string>('all');
-  const [dateFilter, _setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
   // Calculate date range based on filter
   const getDateRange = () => {
@@ -515,8 +515,8 @@ export function CommunityEvents() {
   });
 
   // Register for event mutation
-  const __registerMutation   = useMutation({
-    mutationFn: (_eventId: string) => _communityService.registerForEvent(_eventId),
+  const registerMutation = useMutation({
+    mutationFn: (eventId: string) => _communityService.registerForEvent(eventId),
     onSuccess: () => {
       toast.success('Successfully registered for event!');
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -527,8 +527,8 @@ export function CommunityEvents() {
   });
 
   // Unregister from event mutation
-  const __unregisterMutation   = useMutation({
-    mutationFn: (_eventId: string) => _communityService.unregisterFromEvent(_eventId),
+  const unregisterMutation = useMutation({
+    mutationFn: (eventId: string) => _communityService.unregisterFromEvent(eventId),
     onSuccess: () => {
       toast.success('Registration cancelled');
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -622,7 +622,7 @@ export function CommunityEvents() {
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data?.events && data.events.length > 0 ? (
-          data.events.map((event) => (
+          data.events.map((event: Event) => (
             <EventCard
               key={event.id}
               event={event}

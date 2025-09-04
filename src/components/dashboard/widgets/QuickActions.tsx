@@ -1,9 +1,20 @@
 import { motion } from 'framer-motion';
-import { 
-  Brain, Heart, Edit3, Phone, Calendar, MessageSquare, 
-  Activity, Pill, Book, Users, Sparkles, Music
+import {
+  Activity,
+  Book,
+  Brain,
+  Calendar,
+  Edit3,
+  Heart,
+  MessageSquare,
+  Music,
+  Phone,
+  Pill,
+  Sparkles,
+  Users
 } from 'lucide-react';
 import { QuickAction } from '../../../types/dashboard';
+import { IconMap } from '../../../types/ui';
 
 interface QuickActionsProps {
   actions?: QuickAction[];
@@ -78,7 +89,7 @@ export function QuickActions({ actions, onActionClick }: QuickActionsProps) {
 
   // Get icon component based on icon string
   const getIconComponent = (iconName: string) => {
-    const icons: Record<string, any> = {
+    const icons: IconMap = {
       mood: Brain,
       meditation: Heart,
       journal: Edit3,

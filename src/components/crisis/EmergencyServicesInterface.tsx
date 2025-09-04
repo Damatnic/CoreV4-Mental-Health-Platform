@@ -13,7 +13,7 @@ import {
   CheckCircle,
   Loader
 } from 'lucide-react';
-import { ____geolocationEmergencyService, EmergencyServiceProvider } from '../../services/emergency/GeolocationEmergencyService';
+import { __geolocationEmergencyService, EmergencyServiceProvider } from '../../services/emergency/GeolocationEmergencyService';
 import { CrisisProfile } from '../../types/ai-insights';
 import { LocationCoordinates, GeolocationPermission } from '../../types/emergency';
 
@@ -185,7 +185,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       </div>
 
       {/* Location Status */}
-      {permissionStatus.granted && currentLocation && (
+      {permissionStatus.granted && __currentLocation && (
         <div className="bg-green-50 border-b border-green-200 p-4">
           <div className="flex items-center space-x-2 text-green-700">
             <CheckCircle className="w-5 h-5" />
@@ -197,9 +197,9 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
       )}
 
       {/* Emergency Services List */}
-      <div className="divide-y divide-gray-200">{nearbyServices.map((service, index) => {
+      <div className="divide-y divide-gray-200">{__nearbyServices.map((service: any, index: number) => {
           const ServiceIcon = getServiceIcon(service._type);
-          const isTriggered = emergencyTriggered === service.id;
+          const isTriggered = __emergencyTriggered === service.id;
           
           return (
             <motion.div
@@ -265,7 +265,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
                 {/* Action Button */}
                 <div className="flex flex-col space-y-2 ml-4">
                   <button
-                    onClick={() => triggerEmergencyResponse(_service)}
+                    onClick={() => triggerEmergencyResponse(service)}
                     disabled={isTriggered}
                     className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                       service._type === 'crisis_center'

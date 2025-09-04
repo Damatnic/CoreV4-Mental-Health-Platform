@@ -219,7 +219,7 @@ export const __useAccessibilityStore = create<AccessibilityStore>()(
         }));
         
         // Apply all settings
-        Object.entries(_newSettings).forEach(([key, value]) => {
+        Object.entries(newSettings).forEach(([key, value]) => {
           applyAccessibilitySetting(key as keyof AccessibilitySettings, value);
         });
       },
@@ -242,7 +242,7 @@ export const __useAccessibilityStore = create<AccessibilityStore>()(
         set({ settings: defaultSettings });
         
         // Apply default settings
-        Object.entries(_defaultSettings).forEach(([key, value]) => {
+        Object.entries(defaultSettings).forEach(([key, value]) => {
           applyAccessibilitySetting(key as keyof AccessibilitySettings, value);
         });
       },
@@ -308,7 +308,7 @@ export const __useAccessibilityStore = create<AccessibilityStore>()(
           const utterance = new SpeechSynthesisUtterance(message);
           utterance.rate = get().settings.voiceSpeed;
           utterance.pitch = get().settings.voicePitch;
-          window.speechSynthesis.speak(_utterance);
+          window.speechSynthesis.speak(utterance);
         }
       },
 
@@ -343,9 +343,9 @@ export const __useAccessibilityStore = create<AccessibilityStore>()(
 function applyAccessibilitySetting(key: keyof AccessibilitySettings, value: unknown) {
   const root = document.documentElement;
   
-  switch (_key) {
+  switch (key) {
     case 'highContrast':
-      root.classList.toggle('high-contrast', value);
+      root.classList.toggle('high-contrast', value as boolean);
       break;
       
     case 'darkMode':
@@ -353,7 +353,7 @@ function applyAccessibilitySetting(key: keyof AccessibilitySettings, value: unkn
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
       } else {
-        root.setAttribute('data-theme', value);
+        root.setAttribute('data-theme', value as string);
       }
       break;
       
@@ -366,43 +366,43 @@ function applyAccessibilitySetting(key: keyof AccessibilitySettings, value: unkn
       break;
       
     case 'reducedMotion':
-      root.classList.toggle('reduced-motion', value);
+      root.classList.toggle('reduced-motion', value as boolean);
       break;
       
     case 'focusIndicator':
-      root.setAttribute('data-focus-indicator', value);
+      root.setAttribute('data-focus-indicator', value as string);
       break;
       
     case 'colorBlindMode':
-      root.setAttribute('data-colorblind-mode', value);
-      applyColorBlindFilter(value);
+      root.setAttribute('data-colorblind-mode', value as string);
+      applyColorBlindFilter(value as string);
       break;
       
     case 'simplifiedUI':
-      root.classList.toggle('simplified-ui', value);
+      root.classList.toggle('simplified-ui', value as boolean);
       break;
       
     case 'readingMode':
-      root.classList.toggle('reading-mode', value);
+      root.classList.toggle('reading-mode', value as boolean);
       break;
       
     case 'touchTargetSize':
-      root.setAttribute('data-touch-target-size', value);
+      root.setAttribute('data-touch-target-size', value as string);
       break;
       
     case 'cursorSize':
-      root.setAttribute('data-cursor-size', value);
+      root.setAttribute('data-cursor-size', value as string);
       break;
       
     case 'fontFamily':
       if (value) {
-        root.style.setProperty('--font-family', value);
+        root.style.setProperty('--font-family', value as string);
       }
       break;
       
     case 'backgroundColor':
       if (value) {
-        root.style.setProperty('--background-color', value);
+        root.style.setProperty('--background-color', value as string);
       }
       break;
   }

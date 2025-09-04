@@ -6,8 +6,8 @@
 // Import for internal use
 import {
   performanceMonitor,
-  _memoryMonitor,
-  _frameRateMonitor,
+  __memoryMonitor,
+  __frameRateMonitor,
 } from './performanceMonitor';
 
 import {
@@ -17,15 +17,15 @@ import {
 import {
   resourceManager,
   imageLoader,
-  memoryLeakDetector,
+  MemoryLeakDetector,
 } from './memoryManagement';
 import { logger } from '../logger';
 
 // Performance monitoring
 export {
   performanceMonitor,
-  _memoryMonitor,
-  _frameRateMonitor,
+  __memoryMonitor,
+  __frameRateMonitor,
   PERFORMANCE_THRESHOLDS,
 } from './performanceMonitor';
 
@@ -56,7 +56,6 @@ export {
   ImageLoader,
   debounceWithCleanup,
   throttleWithCleanup,
-  memoryLeakDetector,
   MemoryLeakDetector,
   WeakCache,
 } from './memoryManagement';
@@ -90,9 +89,10 @@ export function initializePerformanceOptimizations() {
     
     // Start memory leak detection
     setInterval(() => {
-      memoryLeakDetector.takeSnapshot();
-      if (memoryLeakDetector.detectLeak()) {
-        logger.error('Memory leak detected!', memoryLeakDetector.getReport());
+      const memoryDetector = new MemoryLeakDetector();
+      memoryDetector.takeSnapshot();
+      if (memoryDetector.detectLeak()) {
+        logger.error('Memory leak detected!', JSON.stringify(memoryDetector.getReport()));
       }
     }, 60000); // Check every minute
   }
@@ -162,7 +162,7 @@ function setupPerformanceBudget() {
         let cssSize = 0;
         let imageSize = 0;
         
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           if (entry.entryType === 'resource') {
             const resource = entry as PerformanceResourceTiming;
             const size = resource.transferSize || 0;
@@ -244,7 +244,8 @@ export function getPerformanceReport() {
   const metrics = performanceMonitor.getMetrics();
   const resources = resourceManager.getStats();
   const images = imageLoader.getStats();
-  const memory = memoryLeakDetector.getReport();
+  const memoryDetector = new MemoryLeakDetector();
+  const memory = memoryDetector.getReport();
   const fps = 60; // Default FPS assumption, could be enhanced with actual monitoring
   
   return {

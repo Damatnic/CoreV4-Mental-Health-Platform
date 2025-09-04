@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '../utils/logger';
 
 // Types and interfaces for activity tracking
 export interface Activity {
@@ -258,23 +259,24 @@ export const __useActivityStore = create<ActivityStore>()(
         const newActivity: Activity = {
           ...activity,
           id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          completed: false,
         };
-        set((_state) => ({
+        set((state) => ({
           activities: [...state.activities, newActivity],
         }));
       },
       
       updateActivity: (id, updates) => {
-        set((_state) => ({
-          activities: state.activities.map((activity) =>
+        set((state) => ({
+          activities: state.activities.map((activity: Activity) =>
             activity.id === id ? { ...activity, ...updates } : activity
           ),
         }));
       },
       
       deleteActivity: (id) => {
-        set((_state) => ({
-          activities: state.activities.filter((activity) => activity.id !== id),
+        set((state) => ({
+          activities: state.activities.filter((activity: Activity) => activity.id !== id),
         }));
       },
       
@@ -310,8 +312,8 @@ export const __useActivityStore = create<ActivityStore>()(
       },
       
       rescheduleActivity: (id, newTime) => {
-        set((_state) => ({
-          activities: state.activities.map((activity) =>
+        set((state) => ({
+          activities: state.activities.map((activity: Activity) =>
             activity.id === id ? { ...activity, scheduledTime: newTime } : activity
           ),
         }));
@@ -323,23 +325,31 @@ export const __useActivityStore = create<ActivityStore>()(
           ...goal,
           id: `goal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           progress: 0,
+          currentValue: 0,
+          status: 'active',
+          milestones: [],
+          measurable: true,
+          specific: true,
+          achievable: true,
+          relevant: true,
+          timeBound: true,
         };
-        set((_state) => ({
+        set((state) => ({
           goals: [...state.goals, newGoal],
         }));
       },
       
       updateGoal: (id, updates) => {
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === id ? { ...goal, ...updates } : goal
           ),
         }));
       },
       
       updateGoalProgress: (id, newValue) => {
-        set((_state) => ({
-          goals: state.goals.map((goal) => {
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) => {
             if (goal.id === id) {
               const progress = Math.min((newValue / goal.targetValue) * 100, 100);
               return {
@@ -359,8 +369,8 @@ export const __useActivityStore = create<ActivityStore>()(
       
       completeGoal: (id) => {
         const now = new Date();
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === id
               ? {
                   ...goal,
@@ -377,16 +387,16 @@ export const __useActivityStore = create<ActivityStore>()(
       },
       
       pauseGoal: (id) => {
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === id ? { ...goal, status: 'paused' } : goal
           ),
         }));
       },
       
       abandonGoal: (id, reason) => {
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === id
               ? {
                   ...goal,
@@ -403,9 +413,10 @@ export const __useActivityStore = create<ActivityStore>()(
           ...milestone,
           id: `milestone-${Date.now()}`,
           goalId,
+          completed: false,
         };
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === goalId
               ? { ...goal, milestones: [...goal.milestones, newMilestone] }
               : goal
@@ -415,12 +426,12 @@ export const __useActivityStore = create<ActivityStore>()(
       
       completeMilestone: (goalId, milestoneId) => {
         const now = new Date();
-        set((_state) => ({
-          goals: state.goals.map((goal) =>
+        set((state) => ({
+          goals: state.goals.map((goal: Goal) =>
             goal.id === goalId
               ? {
                   ...goal,
-                  milestones: goal.milestones.map((m) =>
+                  milestones: goal.milestones.map((m: Milestone) =>
                     m.id === milestoneId
                       ? { ...m, completed: true, completedDate: now }
                       : m
@@ -441,15 +452,19 @@ export const __useActivityStore = create<ActivityStore>()(
           currentStreak: 0,
           longestStreak: 0,
           totalCompletions: 0,
+          isActive: true,
+          startDate: new Date(),
+          flexibleTracking: false,
+          recoveryDays: 1,
         };
-        set((_state) => ({
+        set((state) => ({
           habits: [...state.habits, newHabit],
         }));
       },
       
       updateHabit: (id, updates) => {
-        set((_state) => ({
-          habits: state.habits.map((habit) =>
+        set((state) => ({
+          habits: state.habits.map((habit: Habit) =>
             habit.id === id ? { ...habit, ...updates } : habit
           ),
         }));
@@ -457,8 +472,8 @@ export const __useActivityStore = create<ActivityStore>()(
       
       completeHabit: (id) => {
         const now = new Date();
-        set((_state) => ({
-          habits: state.habits.map((habit) => {
+        set((state) => ({
+          habits: state.habits.map((habit: Habit) => {
             if (habit.id === id) {
               const lastDate = habit.lastCompleted ? new Date(habit.lastCompleted) : null;
               const daysSince = lastDate
@@ -485,24 +500,24 @@ export const __useActivityStore = create<ActivityStore>()(
       },
       
       resetHabitStreak: (id) => {
-        set((_state) => ({
-          habits: state.habits.map((habit) =>
+        set((state) => ({
+          habits: state.habits.map((habit: Habit) =>
             habit.id === id ? { ...habit, currentStreak: 0 } : habit
           ),
         }));
       },
       
       pauseHabit: (id) => {
-        set((_state) => ({
-          habits: state.habits.map((habit) =>
+        set((state) => ({
+          habits: state.habits.map((habit: Habit) =>
             habit.id === id ? { ...habit, isActive: false } : habit
           ),
         }));
       },
       
       stackHabits: (habitIds) => {
-        set((_state) => ({
-          habits: state.habits.map((habit) =>
+        set((state) => ({
+          habits: state.habits.map((habit: Habit) =>
             habitIds.includes(habit.id)
               ? { ...habit, stackedWith: habitIds.filter(id => id !== habit.id) }
               : habit
@@ -516,14 +531,14 @@ export const __useActivityStore = create<ActivityStore>()(
           ...session,
           id: `therapy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         };
-        set((_state) => ({
+        set((state) => ({
           therapyProgress: [...state.therapyProgress, newSession],
         }));
       },
       
       updateTherapyProgress: (id, updates) => {
-        set((_state) => ({
-          therapyProgress: state.therapyProgress.map((session) =>
+        set((state) => ({
+          therapyProgress: state.therapyProgress.map((session: TherapyProgress) =>
             session.id === id ? { ...session, ...updates } : session
           ),
         }));
@@ -531,12 +546,12 @@ export const __useActivityStore = create<ActivityStore>()(
       
       completeHomework: (sessionId, homeworkId, _notes) => {
         const now = new Date();
-        set((_state) => ({
-          therapyProgress: state.therapyProgress.map((session) =>
+        set((state) => ({
+          therapyProgress: state.therapyProgress.map((session: TherapyProgress) =>
             session.id === sessionId
               ? {
                   ...session,
-                  homework: session.homework.map((hw) =>
+                  homework: session.homework.map((hw: any) =>
                     hw.id === homeworkId
                       ? { ...hw, completed: true, completedDate: now }
                       : hw
@@ -553,11 +568,11 @@ export const __useActivityStore = create<ActivityStore>()(
         // This would add to the most recent therapy session or create a practice log
         set((state) => {
           const recentSession = state.therapyProgress
-            .sort((a, b) => b.sessionDate.getTime() - a.sessionDate.getTime())[0];
+            .sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime())[0];
           
-          if (_recentSession) {
+          if (recentSession) {
             return {
-              therapyProgress: state.therapyProgress.map((session) =>
+              therapyProgress: state.therapyProgress.map((session: TherapyProgress) =>
                 session.id === recentSession.id
                   ? {
                       ...session,
@@ -635,8 +650,8 @@ export const __useActivityStore = create<ActivityStore>()(
       
       unlockAchievement: (id) => {
         const now = new Date();
-        set((_state) => ({
-          achievements: state.achievements.map((achievement) =>
+        set((state) => ({
+          achievements: state.achievements.map((achievement: Achievement) =>
             achievement.id === id && !achievement.unlockedDate
               ? { ...achievement, unlockedDate: now }
               : achievement
@@ -645,8 +660,8 @@ export const __useActivityStore = create<ActivityStore>()(
       },
       
       shareAchievement: (id) => {
-        set((_state) => ({
-          achievements: state.achievements.map((achievement) =>
+        set((state) => ({
+          achievements: state.achievements.map((achievement: Achievement) =>
             achievement.id === id ? { ...achievement, shared: true } : achievement
           ),
         }));
@@ -703,9 +718,9 @@ export const __useActivityStore = create<ActivityStore>()(
         const recommendations: Activity[] = [];
         
         // Filter activities based on energy level and expected _mood impact
-        state.activities.forEach(activity => {
+        state.activities.forEach((activity: Activity) => {
           if (!activity.completed && activity.energyLevel === energyLevel) {
-            recommendations.push(_activity);
+            recommendations.push(activity);
           }
         });
         
@@ -765,11 +780,11 @@ export const __useActivityStore = create<ActivityStore>()(
         const suggestions: Activity[] = [];
         
         // Find activities that don't match current energy level
-        state.activities.forEach(activity => {
+        state.activities.forEach((activity: Activity) => {
           if (!activity.completed && activity.scheduledTime) {
             const isToday = new Date(activity.scheduledTime).toDateString() === today.toDateString();
             if (isToday && activity.energyLevel !== energyLevel && activity.flexibility !== 'fixed') {
-              suggestions.push(_activity);
+              suggestions.push(activity);
             }
           }
         });
@@ -778,16 +793,15 @@ export const __useActivityStore = create<ActivityStore>()(
       },
       
       adaptScheduleForBadDay: () => {
-        const state = get();
         const today = new Date();
         
         // Mark optional activities as postponed
-        set((_state) => ({
-          activities: state.activities.map(activity => {
+        set((state) => ({
+          activities: state.activities.map((activity: Activity) => {
             if (activity.scheduledTime) {
               const isToday = new Date(activity.scheduledTime).toDateString() === today.toDateString();
               if (isToday && activity.flexibility === 'optional' && !activity.completed) {
-                const tomorrow = new Date(_today);
+                const tomorrow = new Date(today);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 return { ...activity, scheduledTime: tomorrow };
               }
@@ -868,8 +882,7 @@ export const __useActivityStore = create<ActivityStore>()(
             analytics: parsed.analytics || [],
           });
         } catch (error) {
-          logger.error('Failed to import data:');
-import { logger } from '../utils/logger';
+          logger.error('Failed to import data:', String(error));
         }
       },
       
@@ -889,7 +902,7 @@ import { logger } from '../utils/logger';
     }),
     {
       name: 'activity-store',
-      partialize: (_state) => ({
+      partialize: (state) => ({
         activities: state.activities,
         goals: state.goals,
         habits: state.habits,

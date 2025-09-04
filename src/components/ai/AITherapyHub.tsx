@@ -9,8 +9,8 @@ interface AITherapyHubProps {
 }
 
 const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
-  const [selectedTherapist, _setSelectedTherapist] = useState<Therapist | null>(null);
-  const [___currentView, _setCurrentView] = useState<'selector' | 'chat'>('selector');
+  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
+  const [currentView, setCurrentView] = useState<'selector' | 'chat'>('selector');
 
   const handleTherapistSelect = (_therapist: Therapist) => {
     setSelectedTherapist(_therapist);
@@ -61,7 +61,7 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
           >
             {selectedTherapist && (
               <TherapistChat
-                _therapist={selectedTherapist}
+                therapist={selectedTherapist}
                 onBack={handleBackToSelector}
                 fullScreen={true}
               />

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Lock, Globe, UserPlus, Settings, _Calendar, MessageSquare, TrendingUp, Shield, Heart } from 'lucide-react';
+import { Users, Lock, Globe, UserPlus, Settings, Calendar, MessageSquare, TrendingUp, Shield, Heart } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { __communityService, SupportGroup, CreateGroupDto } from '../../services/community/_communityService';
+import { _communityService, SupportGroup, CreateGroupDto } from '../../services/community/communityService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface GroupCardProps {
@@ -143,7 +143,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [formData, setFormData] = useState<CreateGroupDto>({
     name: '',
     description: '',
-    category: 'other' as unknown,
+    category: 'other' as any,
     isPrivate: false,
     requiresApproval: false,
     guidelines: [],
@@ -186,7 +186,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const removeGuideline = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      guidelines: prev.guidelines?.filter((_, i) => i !== index),
+      guidelines: prev.guidelines?.filter((_: any, i: number) => i !== index),
     }));
   };
 
@@ -241,7 +241,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
               <select
                 id="group-category-select"
                 value={formData.category}
-                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as unknown }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
@@ -393,7 +393,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 </button>
               </div>
               <ul className="space-y-1">
-                {formData.guidelines?.map((guideline, index) => (
+                {formData.guidelines?.map((guideline: any, index: number) => (
                   <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                     <span className="text-sm text-gray-700">{guideline}</span>
                     <button
@@ -557,7 +557,7 @@ export function SupportGroups() {
       {/* Groups Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data?.groups && data.groups.length > 0 ? (
-          data.groups.map((group) => (
+          data.groups.map((group: any) => (
             <GroupCard
               key={group.id}
               group={group}

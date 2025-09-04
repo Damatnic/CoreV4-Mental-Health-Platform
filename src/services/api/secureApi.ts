@@ -9,7 +9,7 @@ import { _sessionManager } from '../security/sessionManager';
 import { _fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
 import { _securityMonitor } from '../security/securityMonitor';
-import { _secureStorage } from '../security/SecureLocalStorage';
+import { secureStorage as _secureStorage } from '../security/SecureLocalStorage';
 import { logger } from '../../utils/logger';
 
 interface SecureRequestConfig {
@@ -109,7 +109,7 @@ class SecureAPIService {
         url: `${this.baseURL}${config.url}`,
         method: config.method || 'GET',
         headers,
-        body: requestData ? JSON.stringify(requestData) : undefined;
+        body: requestData ? JSON.stringify(requestData) : undefined,
         signal: controller.signal,
       });
       
@@ -125,7 +125,7 @@ class SecureAPIService {
       await this.logRequest(config, response.status, requestId);
       
       return {
-        data: responseData,
+        data: responseData as T,
         encrypted: response.headers.get('X-Encrypted') === 'true',
         _signature: response.headers.get('X-Signature') || undefined,
         timestamp: new Date(),
@@ -240,7 +240,7 @@ class SecureAPIService {
       }
       
       return await response.json();
-    } catch (error) {
+    } catch (_error) {
       logger.error('Secure upload failed:');
       throw undefined;
     }
@@ -271,7 +271,7 @@ class SecureAPIService {
         const decrypted = await _fieldEncryption.decryptField('file_content', encrypted);
         
         // Convert base64 back to blob
-        const binaryString = atob(decrypted);
+        const binaryString = atob(decrypted as string);
         const uint8Array = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           uint8Array[i] = binaryString.charCodeAt(i);
@@ -283,7 +283,7 @@ class SecureAPIService {
       }
       
       return data;
-    } catch (error) {
+    } catch (_error) {
       logger.error('Secure download failed:');
       throw undefined;
     }
@@ -439,7 +439,7 @@ class SecureAPIService {
   }
 
   private async encryptRequestData(data: unknown, fields: string[]): Promise<unknown> {
-    const encrypted = { ...data };
+    const encrypted: Record<string, any> = { ...(data as object) };
     
     for (const field of fields) {
       if (field in encrypted) {
@@ -456,12 +456,12 @@ class SecureAPIService {
     }
     
     if (typeof data === 'object' && data !== null) {
-      const decrypted: unknown = {};
+      const decrypted: Record<string, any> = {};
       
       for (const [key, value] of Object.entries(data)) {
         if (typeof value === 'object' && value !== null && 'ciphertext' in value) {
           // This field is encrypted - cast to proper type
-          decrypted[key] = await _fieldEncryption.decryptField(key, value as unknown);
+          decrypted[key] = await _fieldEncryption.decryptField(key, value as any);
         } else {
           decrypted[key] = value;
         }
@@ -485,7 +485,7 @@ class SecureAPIService {
         requestId,
         url: config.url,
         method: config.method,
-        error: error.message,
+        error: (error as Error).message,
       },
       severity: 'error',
     });
@@ -497,7 +497,7 @@ class SecureAPIService {
       source: 'api_client',
       details: {
         requestId,
-        error: error.message,
+        error: (error as Error).message,
       },
     });
   }
@@ -569,7 +569,7 @@ class SecureAPIService {
         const data = await response.json();
         this.csrfToken = data.token;
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Failed to get CSRF token:');
     }
   }
@@ -602,11 +602,11 @@ class SecureAPIService {
   }
 
   private getSessionId(): string | null {
-    return secureStorage.getItem('sessionId');
+    return _secureStorage.getItem('sessionId');
   }
 
   private getCurrentUserId(): string | undefined {
-    return secureStorage.getItem('userId') || undefined;
+    return _secureStorage.getItem('userId') || undefined;
   }
 
   private async getClientIP(): Promise<string> {

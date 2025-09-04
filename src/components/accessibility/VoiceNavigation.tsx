@@ -19,19 +19,19 @@ interface VoiceCommand {
 export const VoiceNavigation: React.FC = () => {
   const navigate = useNavigate();
   const { settings } = __useAccessibilityStore();
-  const [isListening, _setIsListening] = useState(false);
-  const [recognition, _setRecognition] = useState<unknown>(null);
-  const [confidence, _setConfidence] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState<any>(null);
+  const [confidence, setConfidence] = useState(0);
   
   // Voice commands with crisis-focused priority
   // Announce actions using speech synthesis
   const announceAction = useCallback((message: string) => {
     if ('speechSynthesis' in window && settings.voiceFeedback) {
-      const utterance = new (window as unknown).SpeechSynthesisUtterance(message);
+      const utterance = new (window as any).SpeechSynthesisUtterance(message);
       utterance.rate = 0.8;
       utterance.pitch = 1;
       utterance.volume = 0.7;
-      (window as unknown).speechSynthesis.speak(utterance);
+      (window as any).speechSynthesis.speak(utterance);
     }
   }, [settings.voiceFeedback]);
 
@@ -127,7 +127,7 @@ export const VoiceNavigation: React.FC = () => {
       return;
     }
 
-    const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognitionInstance = new SpeechRecognition();
     
     recognitionInstance.continuous = true;
@@ -135,7 +135,7 @@ export const VoiceNavigation: React.FC = () => {
     recognitionInstance.lang = 'en-US';
     recognitionInstance.maxAlternatives = 3;
 
-    recognitionInstance.onresult = (event: unknown) => {
+    recognitionInstance.onresult = (event: any) => {
       const lastResult = event.results[event.results.length - 1];
       if (lastResult.isFinal) {
         const transcript = lastResult[0].transcript.toLowerCase().trim();
@@ -183,7 +183,7 @@ export const VoiceNavigation: React.FC = () => {
       }
     };
 
-    recognitionInstance.onerror = (event: unknown) => {
+    recognitionInstance.onerror = (event: any) => {
       logger.warn('Voice recognition error:', event.error);
       if (event.error === 'no-speech' || event.error === 'audio-capture') {
         // These are expected errors, Don&apos;t show to user
@@ -200,7 +200,7 @@ export const VoiceNavigation: React.FC = () => {
   }, [settings.voiceNavigation, navigate, commands, announceAction]);
 
   // Start/stop voice recognition
-  const __toggleVoiceRecognition   = useCallback(() => {
+  const toggleVoiceRecognition = useCallback(() => {
     if (!recognition) return;
 
     if (isListening) {

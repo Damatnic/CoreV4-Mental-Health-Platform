@@ -31,7 +31,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, _subDays } from 'date-fns';
-import { _useWellnessStore } from '../../stores/wellnessStore';
+import { useWellnessStore } from '../../stores/wellnessStore';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
 // Wellness metrics categories
@@ -141,19 +141,19 @@ interface WellnessGoal {
 
 export const WellnessDashboard: React.FC = () => {
   // Use Zustand store for state management
-  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = _useWellnessStore();
+  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = useWellnessStore();
 
-  const [wellnessData, _setWellnessData] = useState<WellnessData[]>([]);
-  const [todayData, _setTodayData] = useState<WellnessData>({
+  const [wellnessData, setWellnessData] = useState<WellnessData[]>([]);
+  const [todayData, setTodayData] = useState<WellnessData>({
     date: new Date(),
     habits: []
   });
-  const [selectedCategory, _setSelectedCategory] = useState<keyof typeof WELLNESS_CATEGORIES | 'all'>('all');
-  const [habitStreaks, _setHabitStreaks] = useState<HabitStreak[]>([]);
-  const [___showAddGoal, _setShowAddGoal] = useState(false);
-  const [newGoal, _setNewGoal] = useState<Partial<WellnessGoal & { description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }>>({});
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof WELLNESS_CATEGORIES | 'all'>('all');
+  const [habitStreaks, setHabitStreaks] = useState<HabitStreak[]>([]);
+  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [newGoal, setNewGoal] = useState<Partial<WellnessGoal & { description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }>>({});
   const [_selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [showExportOptions, _setShowExportOptions] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
 
   // Load saved data and calculate scores on mount
   useEffect(() => {
@@ -333,7 +333,7 @@ export const WellnessDashboard: React.FC = () => {
     // Habits score (30%)
     const completedHabits = (todayData.habits?.length || 0) / DAILY_HABITS.length;
     score += completedHabits * 30;
-    factors++;
+    _factors++;
     
     // Mood score from recent entries (30%)
     const recentMoodEntries = moodEntries.filter(entry => {
@@ -385,7 +385,7 @@ export const WellnessDashboard: React.FC = () => {
       
       return {
         date: day,
-        isToday: isToday(_day),
+        isToday: isToday(day),
         habits: dayData?.habits?.length || 0,
         exercise: dayData?.exercise?.reduce((sum, e) => sum + e.duration, 0) || 0,
         water: dayData?.water || 0,
@@ -574,7 +574,7 @@ export const WellnessDashboard: React.FC = () => {
         >
           All Categories
         </button>
-        {Object.entries(_WELLNESS_CATEGORIES).map(([key, category]) => {
+        {Object.entries(WELLNESS_CATEGORIES).map(([key, category]) => {
           const Icon = category.icon;
           return (
             <button
@@ -690,7 +690,7 @@ export const WellnessDashboard: React.FC = () => {
                   })}
                   className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-                  {Object.entries(_SLEEP_QUALITY).map(([key, quality]) => (
+                  {Object.entries(SLEEP_QUALITY).map(([key, quality]) => (
                     <option key={key} value={key}>{quality.name}</option>
                   ))}
                 </select>
@@ -954,7 +954,7 @@ export const WellnessDashboard: React.FC = () => {
                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
                   >
                     <option value="">Select category</option>
-                    {Object.entries(_WELLNESS_CATEGORIES).map(([key, cat]) => (
+                    {Object.entries(WELLNESS_CATEGORIES).map(([key, cat]) => (
                       <option key={key} value={key}>{cat.name}</option>
                     ))}
                   </select>

@@ -1,20 +1,47 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Brain, Heart, Phone, Calendar, MessageSquare, Activity,
-  Pill, Book, Users, Sparkles, Music, Shield, AlertCircle,
-  Mic, Keyboard, Eye, Settings, _ChevronRight, Search,
-  Zap, Clock, MapPin, Volume2, Edit3, Home, HelpCircle,
-  Smartphone, Headphones, Wind, Coffee, Moon, Sun
+  Activity,
+  AlertCircle,
+  Book,
+  Brain,
+  Calendar,
+  Clock,
+  Coffee,
+  Edit3,
+  Eye,
+  Headphones,
+  Heart,
+  HelpCircle,
+  Home,
+  Keyboard,
+  MapPin,
+  MessageSquare,
+  Mic,
+  Moon,
+  Music,
+  Phone,
+  Pill,
+  Search,
+  Settings,
+  Shield,
+  Smartphone,
+  Sparkles,
+  Sun,
+  Users,
+  Volume2,
+  Wind,
+  Zap
 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuickActionsContext } from '../../../../hooks/useQuickActionsContext';
-import { __useAccessibilityStore } from '../../../../stores/accessibilityStore';
 import { useUserPreferences } from '../../../../hooks/useUserPreferences';
+import { __useAccessibilityStore } from '../../../../stores/accessibilityStore';
 import { QuickAction } from '../../../../types/dashboard';
-import { VoiceCommandInterface } from './VoiceCommandInterface';
+import { IconMap } from '../../../../types/ui';
+import { ActionRecommendationEngine } from './ActionRecommendationEngine';
 import { GestureHandler } from './GestureHandler';
 import { KeyboardNavigator } from './KeyboardNavigator';
-import { ActionRecommendationEngine } from './ActionRecommendationEngine';
+import { VoiceCommandInterface } from './VoiceCommandInterface';
 
 interface SmartQuickActionsWidgetProps {
   userId: string;
@@ -35,9 +62,9 @@ export function SmartQuickActionsWidget({
   crisisMode = false,
   onActionExecute
 }: SmartQuickActionsWidgetProps) {
-  const { actions, executeAction, _addCustomAction, getFrequentActions } = useQuickActionsContext();
+  const { actions, executeAction, getFrequentActions } = useQuickActionsContext();
   const { settings: accessibilitySettings } = __useAccessibilityStore();
-  const { _preferences, _updatePreference } = useUserPreferences(_userId);
+  const { preferences: _preferences, updatePreference: _updatePreference } = useUserPreferences(userId);
   
   const [searchQuery, _setSearchQuery] = useState('');
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');
@@ -59,13 +86,13 @@ export function SmartQuickActionsWidget({
 
   // Get recommended actions based on context
   useEffect(() => {
-    const _recommendations = recommendationEngine.getRecommendations(actions);
-    setContextualActions(_recommendations);
+    const recommendations = recommendationEngine.getRecommendations(actions);
+    _setContextualActions(recommendations);
   }, [actions, recommendationEngine]);
 
   // Enhanced action categories with crisis priority
   const categories = useMemo(() => {
-    if (_crisisMode) {
+    if (crisisMode) {
       return [
         { id: 'crisis', label: 'Emergency', icon: AlertCircle, color: 'red' },
         { id: 'grounding', label: 'Grounding', icon: Shield, color: 'purple' },
@@ -107,7 +134,7 @@ export function SmartQuickActionsWidget({
 
   // Handle action execution with tracking
   const handleActionClick = useCallback((action: QuickAction) => {
-    setActionHistory(prev => [...prev, action.id].slice(-20)); // Keep last 20 actions
+    _setActionHistory(prev => [...prev, action.id].slice(-20)); // Keep last 20 actions
     executeAction(action);
     onActionExecute?.(action);
     
@@ -119,7 +146,7 @@ export function SmartQuickActionsWidget({
   }, [executeAction, onActionExecute, accessibilitySettings.screenReaderMode]);
 
   // Voice command handler
-  const __handleVoiceCommand   = useCallback((command: string) => {
+  const handleVoiceCommand = useCallback((command: string) => {
     const _matchedAction = actions.find(a => 
       a.label.toLowerCase().includes(command.toLowerCase()) ||
       a.voiceAlias?.some(alias => alias.toLowerCase() === command.toLowerCase())
@@ -131,7 +158,7 @@ export function SmartQuickActionsWidget({
   }, [actions, handleActionClick]);
 
   // Keyboard navigation handler
-  const __handleKeyboardNavigation   = useCallback((key: string) => {
+  const handleKeyboardNavigation = useCallback((key: string) => {
     // Handle keyboard shortcuts for actions
     const actionWithShortcut = actions.find(a => a.keyboard === key);
     if (actionWithShortcut) {
@@ -141,7 +168,7 @@ export function SmartQuickActionsWidget({
 
   // Get icon component
   const getIcon = (iconName: string) => {
-    const iconMap: Record<string, any> = {
+    const iconMap: IconMap = {
       brain: Brain, heart: Heart, phone: Phone, calendar: Calendar,
       message: MessageSquare, activity: Activity, pill: Pill, book: Book,
       users: Users, sparkles: Sparkles, music: Music, shield: Shield,
@@ -191,7 +218,7 @@ export function SmartQuickActionsWidget({
           <div className="flex items-center space-x-2">
             {/* Voice Command Toggle */}
             <button
-              onClick={() => setVoiceCommandActive(!voiceCommandActive)}
+              onClick={() => _setVoiceCommandActive(!voiceCommandActive)}
               className={`p-2 rounded-lg transition-colors ${
                 voiceCommandActive 
                   ? 'bg-blue-500 text-white' 
@@ -205,7 +232,7 @@ export function SmartQuickActionsWidget({
             
             {/* Keyboard Navigation Help */}
             <button
-              onClick={() => setShowCustomizationPanel(!showCustomizationPanel)}
+              onClick={() => _setShowCustomizationPanel(!showCustomizationPanel)}
               className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
               aria-label="Keyboard shortcuts"
               title="Keyboard Shortcuts (Alt+K)"
@@ -215,7 +242,7 @@ export function SmartQuickActionsWidget({
             
             {/* Settings */}
             <button
-              onClick={() => setShowCustomizationPanel(!showCustomizationPanel)}
+              onClick={() => _setShowCustomizationPanel(!showCustomizationPanel)}
               className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
               aria-label="Customize actions"
             >
@@ -230,7 +257,7 @@ export function SmartQuickActionsWidget({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => _setSearchQuery(e.target.value)}
               placeholder="Search actions..."
               className="w-full px-3 py-2 pl-9 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Search quick actions"
@@ -249,7 +276,7 @@ export function SmartQuickActionsWidget({
               return (
                 <button
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => _setSelectedCategory(category.id)}
                   className={`
                     flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm font-medium
                     transition-all whitespace-nowrap
@@ -399,8 +426,8 @@ export function SmartQuickActionsWidget({
             <p className="text-gray-500">No actions found</p>
             <button
               onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
+                _setSearchQuery('');
+                _setSelectedCategory('all');
               }}
               className="mt-2 text-sm text-blue-600 hover:text-blue-700"
             >
@@ -441,7 +468,7 @@ export function SmartQuickActionsWidget({
         <VoiceCommandInterface
           isActive={voiceCommandActive}
           onCommand={handleVoiceCommand}
-          onClose={() => setVoiceCommandActive(false)}
+          onClose={() => _setVoiceCommandActive(false)}
         />
       )}
 

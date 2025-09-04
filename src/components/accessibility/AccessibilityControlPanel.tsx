@@ -28,13 +28,13 @@ interface AccessibilityControlPanelProps {
 export const AccessibilityControlPanel: React.FC<AccessibilityControlPanelProps> = ({
   className = ''
 }) => {
-  const [profile, _setProfile] = useState<AccessibilityProfile | null>(null);
-  const [isVoiceActive, _setIsVoiceActive] = useState(false);
-  const [isEyeTrackingActive, _setIsEyeTrackingActive] = useState(false);
-  const [availableCommands, _setAvailableCommands] = useState<VoiceNavigationAction[]>([]);
-  const [_isLoading, _setIsLoading] = useState(true);
-  const [testingSpeech, _setTestingSpeech] = useState(false);
-  const [calibratingEyeTracking, _setCalibratingEyeTracking] = useState(false);
+  const [profile, setProfile] = useState<AccessibilityProfile | null>(null);
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [isEyeTrackingActive, setIsEyeTrackingActive] = useState(false);
+  const [availableCommands, setAvailableCommands] = useState<VoiceNavigationAction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [testingSpeech, setTestingSpeech] = useState(false);
+  const [calibratingEyeTracking, setCalibratingEyeTracking] = useState(false);
 
   useEffect(() => {
     initializeAccessibility();

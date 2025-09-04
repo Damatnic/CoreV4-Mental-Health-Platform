@@ -1,10 +1,10 @@
 import { logger } from '../logger';
 /**
- * Progressive Web App (_PWA) Management System
+ * Progressive Web App (PWA) Management System
  * Coordinates all PWA features including offline support, push notifications, and app installation
  */
 
-import { pushNotifications } from '../../services/pushNotifications';
+import { __pushNotifications } from '../../services/pushNotifications';
 import { initCrisisDB, precacheCrisisResources } from '../../service-worker/crisis-offline';
 import { performanceMonitor } from '../performance/performanceMonitor';
 import { ComponentPreloader, initializeBundleOptimization } from '../bundleOptimization/lazyLoading';
@@ -69,7 +69,7 @@ export class PWAManager {
       logger.info(`PWA initialized successfully in ${initTime?.toFixed(2)}ms`);
       
     } catch (error) {
-      logger.error('Failed to initialize PWA:', error);
+      logger.error('Failed to initialize PWA:', String(error));
       performanceMonitor.recordMetric('pwainiterror', 1, { error: String(error) });
       throw error;
     }
@@ -80,7 +80,7 @@ export class PWAManager {
    */
   private async detectCapabilities(): Promise<PWACapabilities> {
     const userAgent = navigator.userAgent.toLowerCase();
-    const connection = (navigator as unknown).connection || {};
+    const connection = (navigator as any).connection || {};
     
     // Device type detection
     let deviceType: 'mobile' | 'tablet' | 'desktop' = 'desktop';
@@ -91,20 +91,20 @@ export class PWAManager {
     }
 
     // Low-end device detection
-    const deviceMemory = (navigator as unknown).deviceMemory || 4;
+    const deviceMemory = (navigator as any).deviceMemory || 4;
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
     const isLowEndDevice = deviceMemory <= 2 || hardwareConcurrency <= 2;
 
     const capabilities: PWACapabilities = {
       isInstallable: false, // Will be updated when beforeinstallprompt fires
       isInstalled: window.matchMedia('(display-mode: standalone)').matches || 
-                   (window.navigator as unknown).standalone === true,
+                   (window.navigator as any).standalone === true,
       supportsNotifications: 'Notification' in window && 'serviceWorker' in navigator,
       supportsOffline: 'serviceWorker' in navigator && 'caches' in window,
       supportsPushMessages: 'PushManager' in window,
       supportsBackgroundSync: 'serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype,
       deviceType,
-      connectionType: connection.effectiveType || 'unknown',
+      connectionType: (connection as any).effectiveType || 'unknown',
       isLowEndDevice,
     };
 
@@ -150,7 +150,7 @@ export class PWAManager {
       performanceMonitor.recordMetric('service_worker_registered', 1);
 
     } catch (error) {
-      logger.error('Service Worker registration failed:', error);
+      logger.error('Service Worker registration failed:', String(error));
       performanceMonitor.recordMetric('service_workererror', 1, { error: String(error) });
     }
   }
@@ -165,11 +165,11 @@ export class PWAManager {
     }
 
     try {
-      const initialized = await pushNotifications.init();
+      const initialized = await __pushNotifications.init();
       if (initialized) {
         logger.info('Push notifications initialized');
         
-        // Schedule wellness reminders based on device _type
+        // Schedule wellness reminders based on device type
         if (this.capabilities.deviceType === 'mobile') {
           await this.scheduleMobileNotifications();
         }
@@ -177,7 +177,7 @@ export class PWAManager {
         performanceMonitor.recordMetric('push_notificationsinitialized', 1);
       }
     } catch (error) {
-      logger.error('Push notifications initialization failed:', error);
+      logger.error('Push notifications initialization failed:', String(error));
       performanceMonitor.recordMetric('push_notificationserror', 1, { error: String(error) });
     }
   }
@@ -206,7 +206,7 @@ export class PWAManager {
       performanceMonitor.recordMetric('offline_supportinitialized', 1);
       
     } catch (error) {
-      logger.error('Offline support initialization failed:', error);
+      logger.error('Offline support initialization failed:', String(error));
       performanceMonitor.recordMetric('offline_supporterror', 1, { error: String(error) });
     }
   }
@@ -240,8 +240,8 @@ export class PWAManager {
       this.installPrompt = null;
       
       // Show welcome notification
-      if (pushNotifications.isEnabled()) {
-        pushNotifications.showWelcomeNotification();
+      if (__pushNotifications.isEnabled()) {
+        __pushNotifications.showWelcomeNotification();
       }
       
       window.dispatchEvent(new CustomEvent('pwa:installed'));
@@ -269,7 +269,7 @@ export class PWAManager {
       performanceMonitor.recordMetric('performance_optimizationsinitialized', 1);
       
     } catch (error) {
-      logger.error('Performance optimizations failed:', error);
+      logger.error('Performance optimizations failed:', String(error));
       performanceMonitor.recordMetric('performance_optimizationserror', 1, { error: String(error) });
     }
   }
@@ -309,7 +309,7 @@ export class PWAManager {
     }
     
     // Update push notification permissions
-    if (pushNotifications.getPermissionStatus() === 'granted') {
+    if (__pushNotifications.getPermissionStatus() === 'granted') {
       // Schedule any pending notifications
       this.schedulePendingNotifications();
     }
@@ -356,9 +356,9 @@ export class PWAManager {
    * Handle service worker messages
    */
   private handleServiceWorkerMessage(event: MessageEvent): void {
-    const { _type, data } = event.data;
+    const { type, data } = event.data;
     
-    switch (_type) {
+    switch (type) {
       case 'SYNC_COMPLETE':
         window.dispatchEvent(new CustomEvent('pwa:sync-complete', { detail: data }));
         break;
@@ -378,7 +378,7 @@ export class PWAManager {
    */
   private handleNotificationClick(data: unknown): void {
     // Forward to push notification service
-    pushNotifications.handleNotificationClick(data.action, data.data);
+    __pushNotifications.handleNotificationClick((data as any).action, (data as any).data);
   }
 
   /**
@@ -401,7 +401,7 @@ export class PWAManager {
       return choice.outcome === 'accepted';
       
     } catch (error) {
-      logger.error('Install failed:', error);
+      logger.error('Install failed:', String(error));
       performanceMonitor.recordMetric('installerror', 1, { error: String(error) });
       return false;
     }
@@ -424,9 +424,9 @@ export class PWAManager {
    */
   private async scheduleMobileNotifications(): Promise<void> {
     // Morning wellness check-in
-    await pushNotifications.scheduleWellnessReminder({
+    await __pushNotifications.scheduleWellnessReminder({
       id: 'morning-checkin',
-      _type: 'check-in',
+      type: 'check-in',
       title: 'Morning Wellness Check',
       body: 'How are you feeling this morning?',
       time: '09:00',
@@ -435,9 +435,9 @@ export class PWAManager {
     });
 
     // Evening reflection
-    await pushNotifications.scheduleWellnessReminder({
+    await __pushNotifications.scheduleWellnessReminder({
       id: 'evening-reflection',
-      _type: 'check-in',
+      type: 'check-in',
       title: 'Evening Reflection',
       body: 'Take a moment to reflect on your day',
       time: '20:00',
@@ -446,9 +446,9 @@ export class PWAManager {
     });
 
     // Midday breathing break
-    await pushNotifications.scheduleWellnessReminder({
+    await __pushNotifications.scheduleWellnessReminder({
       id: 'midday-breathing',
-      _type: 'mindfulness',
+      type: 'mindfulness',
       title: 'Mindfulness Break',
       body: 'Take 2 minutes for a breathing exercise',
       time: '14:00',
@@ -473,7 +473,7 @@ export class PWAManager {
       // Trigger background sync via service worker
       const registration = await navigator.serviceWorker.ready;
       if ('sync' in registration) {
-        await (registration as unknown).sync.register('sync-data');
+        await (registration as any).sync.register('sync-data');
       }
     } catch (error) {
       logger.error('Background sync failed:');
@@ -524,8 +524,8 @@ export class PWAManager {
       caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames
-            .filter(_cacheName => _cacheName.includes('temp'))
-            .map(_cacheName => caches.delete(_cacheName))
+            .filter(cacheName => cacheName.includes('temp'))
+            .map(cacheName => caches.delete(cacheName))
         );
       });
     }

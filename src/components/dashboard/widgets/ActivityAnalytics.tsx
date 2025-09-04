@@ -4,9 +4,9 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  _Calendar,
+  Calendar,
   BarChart3,
-  _PieChart,
+  PieChart,
   Clock,
   Zap,
   Heart,
@@ -18,37 +18,37 @@ import {
   Cloud,
   Award,
   AlertCircle,
-  _Filter,
+  Filter,
   Download,
   ChevronLeft,
   ChevronRight,
-  _Info
+  Info
 } from 'lucide-react';
 import { __useActivityStore } from '../../../stores/activityStore';
-import { format, startOfWeek, _endOfWeek, eachDayOfInterval, subDays, addDays, isToday } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, subDays, addDays, isToday } from 'date-fns';
 
 interface ActivityAnalyticsProps {
-  _onExportData?: () => void;
-  _onViewDetails?: (activityId: string) => void;
+  onExportData?: () => void;
+  onViewDetails?: (activityId: string) => void;
 }
 
 export function ActivityAnalytics({
-  _onExportData,
-  _onViewDetails
+  onExportData,
+  onViewDetails
 }: ActivityAnalyticsProps) {
-  const { activityHistory, _activities, _goals, _habits, correlateActivitiesWithMood, _analyzeActivityEffectiveness, exportProgressReport } = __useActivityStore();
+  const { activityHistory, activities, goals, habits, correlateActivitiesWithMood, analyzeActivityEffectiveness, exportProgressReport } = __useActivityStore();
 
-  const [selectedPeriod, _setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
-  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
-  const [currentDate, _setCurrentDate] = useState(new Date());
-  const [_showInsights, _setShowInsights] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [showInsights, setShowInsights] = useState(true);
 
   // Get date range based on selected period
   const getDateRange = () => {
     const end = currentDate;
     let start;
     
-    switch (_selectedPeriod) {
+    switch (selectedPeriod) {
       case 'week':
         start = startOfWeek(currentDate);
         break;
@@ -69,7 +69,7 @@ export function ActivityAnalytics({
   const filteredActivities = useMemo(() => {
     const { start, end } = getDateRange();
     
-    return activityHistory.filter(activity => {
+    return activityHistory.filter((activity: any) => {
       const activityDate = activity.completedAt ? new Date(activity.completedAt) : null;
       if (!activityDate) return false;
       
@@ -81,26 +81,26 @@ export function ActivityAnalytics({
   }, [activityHistory, selectedPeriod, selectedCategory, currentDate, getDateRange]);
 
   // Calculate statistics
-  const ____stats   = useMemo(() => {
-    const completed = filteredActivities.filter(a => a.completed).length;
+  const stats = useMemo(() => {
+    const completed = filteredActivities.filter((a: any) => a.completed).length;
     const total = filteredActivities.length;
     const completionRate = total > 0 ? (completed / total) * 100 : 0;
     
     const moodImpacts = filteredActivities
-      .filter(a => a.actualMoodImpact !== undefined)
-      .map(a => a.actualMoodImpact!);
+      .filter((a: any) => a.actualMoodImpact !== undefined)
+      .map((a: any) => a.actualMoodImpact!);
     
     const avgMoodImpact = moodImpacts.length > 0
-      ? moodImpacts.reduce((sum, impact) => sum + impact, 0) / moodImpacts.length
+      ? moodImpacts.reduce((sum: number, impact: number) => sum + impact, 0) / moodImpacts.length
       : 0;
     
     const totalTime = filteredActivities
-      .filter(a => a.duration)
-      .reduce((sum, a) => sum + (a.duration || 0), 0);
+      .filter((a: any) => a.duration)
+      .reduce((sum: number, a: any) => sum + (a.duration || 0), 0);
     
     // Category breakdown
     const categoryBreakdown = new Map<string, number>();
-    filteredActivities.forEach(activity => {
+    filteredActivities.forEach((activity: any) => {
       const count = categoryBreakdown.get(activity.category) || 0;
       categoryBreakdown.set(activity.category, count + 1);
     });
@@ -113,7 +113,7 @@ export function ActivityAnalytics({
       night: 0 // 0-6
     };
     
-    filteredActivities.forEach(activity => {
+    filteredActivities.forEach((activity: any) => {
       if (activity.scheduledTime) {
         const hour = new Date(activity.scheduledTime).getHours();
         if (hour >= 6 && hour < 12) timeOfDayBreakdown.morning++;
@@ -125,9 +125,9 @@ export function ActivityAnalytics({
     
     // Energy level analysis
     const energyBreakdown = {
-      low: filteredActivities.filter(a => a.energyLevel === 'low').length,
-      medium: filteredActivities.filter(a => a.energyLevel === 'medium').length,
-      high: filteredActivities.filter(a => a.energyLevel === 'high').length,
+      low: filteredActivities.filter((a: any) => a.energyLevel === 'low').length,
+      medium: filteredActivities.filter((a: any) => a.energyLevel === 'medium').length,
+      high: filteredActivities.filter((a: any) => a.energyLevel === 'high').length,
     };
     
     return {
@@ -153,26 +153,26 @@ export function ActivityAnalytics({
     const days = eachDayOfInterval({ start, end });
     
     return days.map(day => {
-      const dayActivities = filteredActivities.filter(activity => {
+      const dayActivities = filteredActivities.filter((activity: any) => {
         if (!activity.completedAt) return false;
         const activityDate = new Date(activity.completedAt);
         return activityDate.toDateString() === day.toDateString();
       });
       
-      const completed = dayActivities.filter(a => a.completed).length;
+      const completed = dayActivities.filter((a: any) => a.completed).length;
       const moodImpacts = dayActivities
-        .filter(a => a.actualMoodImpact !== undefined)
-        .map(a => a.actualMoodImpact!);
+        .filter((a: any) => a.actualMoodImpact !== undefined)
+        .map((a: any) => a.actualMoodImpact!);
       
       const avgMood = moodImpacts.length > 0
-        ? moodImpacts.reduce((sum, impact) => sum + impact, 0) / moodImpacts.length
+        ? moodImpacts.reduce((sum: number, impact: number) => sum + impact, 0) / moodImpacts.length
         : 0;
       
       return {
         date: day,
         completed,
         avgMood,
-        isToday: isToday(_day)
+        isToday: isToday(day)
       };
     });
   }, [filteredActivities, selectedPeriod, currentDate, getDateRange]);
@@ -193,7 +193,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'warning',
         title: 'Low Completion Rate',
-        message: 'Consider reducing _activities or adjusting your schedule',
+        message: 'Consider reducing activities or adjusting your schedule',
         icon: AlertCircle
       });
     }
@@ -203,14 +203,14 @@ export function ActivityAnalytics({
       insights.push({
         type: 'success',
         title: 'Positive Mood Impact',
-        message: 'Your _activities are significantly improving your mood',
+        message: 'Your activities are significantly improving your mood',
         icon: Heart
       });
     } else if (stats.avgMoodImpact < -1) {
       insights.push({
         type: 'warning',
         title: 'Negative Mood Trend',
-        message: 'Some _activities may be affecting your mood negatively',
+        message: 'Some activities may be affecting your mood negatively',
         icon: TrendingDown
       });
     }
@@ -233,7 +233,7 @@ export function ActivityAnalytics({
       insights.push({
         type: 'info',
         title: 'Low Energy Pattern',
-        message: 'Most _activities are low energy - consider adding energizing _activities',
+        message: 'Most activities are low energy - consider adding energizing activities',
         icon: Zap
       });
     }
@@ -250,13 +250,13 @@ export function ActivityAnalytics({
   // Export data
   const handleExport = () => {
     const report = exportProgressReport();
-    const _blob = new Blob([report], { type: 'application/json' });
-    const url = URL.createObjectURL(_blob);
+    const blob = new Blob([report], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `activity-report-${format(new Date(), 'yyyy-MM-dd')}.json`;
     a.click();
-    URL.revokeObjectURL(_url);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -291,7 +291,7 @@ export function ActivityAnalytics({
             {(['week', 'month', 'year'] as const).map((period) => (
               <button
                 key={period}
-                onClick={() => setSelectedPeriod(_period)}
+                onClick={() => setSelectedPeriod(period)}
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedPeriod === period
                     ? 'bg-primary-100 text-primary-700'
@@ -351,7 +351,7 @@ export function ActivityAnalytics({
           </div>
         </div>
 
-        {/* Category _Filter */}
+        {/* Category Filter */}
         <div className="flex space-x-2 overflow-x-auto pb-2">
           <button
             onClick={() => setSelectedCategory('all')}
@@ -366,7 +366,7 @@ export function ActivityAnalytics({
           {Array.from(stats.categoryBreakdown.entries()).map(([category, count]) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(_category)}
+              onClick={() => setSelectedCategory(category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -426,9 +426,9 @@ export function ActivityAnalytics({
           <h4 className="font-medium text-gray-900 mb-3">Category Distribution</h4>
           <div className="space-y-2">
             {Array.from(stats.categoryBreakdown.entries()).map(([category, count]) => {
-              const _percentage = (count / stats.total) * 100;
+              const percentage = (count / stats.total) * 100;
               const getCategoryIcon = () => {
-                switch (_category) {
+                switch (category) {
                   case 'therapy': return Brain;
                   case 'wellness': return Heart;
                   case 'social': return Users;
@@ -455,13 +455,13 @@ export function ActivityAnalytics({
                           'bg-gray-500'
                         }`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${_percentage}%` }}
+                        animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5 }}
                       />
                     </div>
                   </div>
                   <span className="text-sm text-gray-700 font-medium">
-                    {count} ({Math.round(_percentage)}%)
+                    {count} ({Math.round(percentage)}%)
                   </span>
                 </div>
               );
@@ -475,7 +475,7 @@ export function ActivityAnalytics({
           <div className="grid grid-cols-4 gap-2">
             {Object.entries(stats.timeOfDayBreakdown).map(([time, count]) => {
               const getTimeIcon = () => {
-                switch (_time) {
+                switch (time) {
                   case 'morning': return Sun;
                   case 'afternoon': return Sun;
                   case 'evening': return Cloud;
@@ -484,7 +484,7 @@ export function ActivityAnalytics({
                 }
               };
               const Icon = getTimeIcon();
-              const _percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+              const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
               
               return (
                 <div key={time} className="text-center p-2 bg-gray-50 rounded-lg">
@@ -493,7 +493,7 @@ export function ActivityAnalytics({
                     {time.charAt(0).toUpperCase() + time.slice(1)}
                   </div>
                   <div className="text-lg font-bold text-gray-900">{count}</div>
-                  <div className="text-xs text-gray-500">{Math.round(_percentage)}%</div>
+                  <div className="text-xs text-gray-500">{Math.round(percentage)}%</div>
                 </div>
               );
             })}
@@ -505,9 +505,9 @@ export function ActivityAnalytics({
           <h4 className="font-medium text-gray-900 mb-3">Energy Level Distribution</h4>
           <div className="space-y-2">
             {Object.entries(stats.energyBreakdown).map(([level, count]) => {
-              const _percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+              const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
               const getColor = () => {
-                switch (_level) {
+                switch (level) {
                   case 'low': return 'bg-blue-500';
                   case 'medium': return 'bg-yellow-500';
                   case 'high': return 'bg-red-500';
@@ -530,13 +530,13 @@ export function ActivityAnalytics({
                       <motion.div
                         className={`h-4 rounded-full ${getColor()}`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${_percentage}%` }}
+                        animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5 }}
                       />
                     </div>
                   </div>
                   <span className="text-sm text-gray-700 font-medium">
-                    {count} ({Math.round(_percentage)}%)
+                    {count} ({Math.round(percentage)}%)
                   </span>
                 </div>
               );
@@ -549,7 +549,7 @@ export function ActivityAnalytics({
           <div className="bg-white p-4 rounded-lg border border-gray-200">
             <h4 className="font-medium text-gray-900 mb-3">Activities with Strongest Mood Impact</h4>
             <div className="space-y-2">
-              {moodCorrelations.map((correlation, index) => (
+              {moodCorrelations.map((correlation: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                   <span className="text-sm text-gray-700">{correlation.activity}</span>
                   <div className="flex items-center space-x-2">

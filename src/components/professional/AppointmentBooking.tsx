@@ -1,24 +1,19 @@
-import { logger } from '../../utils/logger';
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Calendar,
-  _Clock,
-  CreditCard,
-  User,
-  _Phone,
-  _Mail,
-  Shield,
-  CheckCircle,
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
-  AlertTriangle,
-  _FileText,
-  Video,
+  Calendar,
+  CheckCircle,
+  CreditCard,
   MapPin,
-  _Users
+  Shield,
+  User,
+  Video
 } from 'lucide-react';
-import { _therapistService } from '../../services/professional/TherapistService';
+import { useEffect, useState } from 'react';
+import { TherapistService } from '../../services/professional/TherapistService';
+import { logger } from '../../utils/logger';
 
 interface AppointmentBookingProps {
   therapistId: string;
@@ -27,9 +22,16 @@ interface AppointmentBookingProps {
 }
 
 interface TimeSlot {
-  _time: string;
+  time: string;
   available: boolean;
   type: 'morning' | 'afternoon' | 'evening';
+}
+
+interface TherapistInfo {
+  id: string;
+  name: string;
+  sessionRate: number;
+  insuranceAccepted: string[];
 }
 
 interface BookingStep {
@@ -53,11 +55,11 @@ const generateTimeSlots = (_date: Date): TimeSlot[] => {
   
   for (let hour = startHour; hour < endHour; hour++) {
     for (let minute = 0; minute < 60; minute += 50) {
-      const _time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       const type = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
       const available = Math.random() > 0.3; // 70% availability rate
       
-      slots.push({ _time, available, type });
+      slots.push({ time, available, type });
     }
   }
   
@@ -78,16 +80,16 @@ const getNextSevenDays = () => {
 };
 
 export function AppointmentBooking({ therapistId, onClose, onSuccess }: AppointmentBookingProps) {
-  const [currentStep, _setCurrentStep] = useState(1);
-  const [selectedDate, _setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, _setSelectedTime] = useState<string>('');
-  const [_availableDays, _setAvailableDays] = useState<Date[]>([]);
-  const [_timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
-  const [loading, _setLoading] = useState(false);
-  const [therapist, _setTherapist] = useState<unknown>(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [availableDays, setAvailableDays] = useState<Date[]>([]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [therapist, setTherapist] = useState<TherapistInfo | null>(null);
   
   // Form data
-  const [formData, _setFormData] = useState({
+  const [formData, setFormData] = useState({
     sessionType: 'initial',
     format: 'video',
     reason: '',
@@ -136,8 +138,8 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
     setSelectedTime('');
   };
 
-  const handleTimeSelect = (_time: string) => {
-    setSelectedTime(_time);
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time);
   };
 
   const nextStep = () => {
@@ -158,7 +160,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       setFormData(prev => ({
         ...prev,
         [parent as keyof typeof formData]: {
-          ...(prev[parent as keyof typeof prev] as Record<string, any> || {}),
+          ...(prev[parent as keyof typeof prev] as Record<string, unknown> || {}),
           [child as string]: value
         }
       }));
@@ -171,34 +173,35 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
     setLoading(true);
     try {
       // In production, submit to booking API
-      const appointmentId = await _therapistService.bookAppointment({
-        therapistId,
+      const therapistServiceInstance = TherapistService.getInstance();
+      const appointmentId = await therapistServiceInstance.bookAppointment({
+        _therapistId: therapistId,
         patientId: 'user-1',
         date: selectedDate!,
-        _time: selectedTime,
+        time: selectedTime,
         duration: 50,
-        type: formData.sessionType as unknown,
-        format: formData.format as unknown,
+        type: formData.sessionType as 'initial' | 'crisis' | 'followup',
+        format: formData.format as 'video' | 'phone' | 'in-person',
         reason: formData.reason,
         insurance: formData.hasInsurance ? {
           provider: formData.insuranceProvider,
           memberId: formData.memberId,
           groupNumber: formData.groupNumber
         } : undefined,
-        paymentMethod: formData.paymentMethod as unknown
+        paymentMethod: formData.paymentMethod as 'insurance' | 'self-pay' | 'sliding-scale'
       });
       
       onSuccess(appointmentId.id);
-    } catch (error) {
+    } catch (_error) {
       logger.error('Booking failed:');
-      // Handle undefined
+      // Handle error
     } finally {
       setLoading(false);
     }
   };
 
   const canProceedToNext = () => {
-    switch (_currentStep) {
+    switch (currentStep) {
       case 1:
         return selectedDate && selectedTime;
       case 2:
@@ -206,8 +209,8 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       case 3:
         return formData.firstName && formData.lastName && formData.email && formData.phone;
       case 4:
-        return formData.hasInsurance ? 
-          (formData.insuranceProvider && formData.memberId) : 
+        return formData.hasInsurance ?
+          (formData.insuranceProvider && formData.memberId) :
           formData.paymentMethod;
       default:
         return true;
@@ -319,15 +322,15 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                             <div className="space-y-2">
                               {periodSlots.map(slot => (
                                 <button
-                                  key={slot._time}
-                                  onClick={() => handleTimeSelect(slot._time)}
+                                  key={slot.time}
+                                  onClick={() => handleTimeSelect(slot.time)}
                                   className={`w-full p-2 rounded-md text-sm transition-colors ${
-                                    selectedTime === slot._time
+                                    selectedTime === slot.time
                                       ? 'bg-blue-600 text-white'
                                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                                   }`}
                                 >
-                                  {slot._time}
+                                  {slot.time}
                                 </button>
                               ))}
                             </div>
@@ -355,7 +358,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                   <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Session Type</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { value: 'initial', label: 'Initial Consultation', description: 'First _time meeting' },
+                      { value: 'initial', label: 'Initial Consultation', description: 'First time meeting' },
                       { value: 'followup', label: 'Follow-up Session', description: 'Continuing treatment' }
                     ].map(option => (
                       <button
@@ -404,7 +407,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Reason for Visit (_Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Reason for Visit (Optional)</label>
                   <textarea
                     value={formData.reason}
                     onChange={(e) => updateFormData('reason', e.target.value)}
@@ -484,7 +487,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div className="border-t pt-4">
-                  <h4 className="font-medium text-gray-900 mb-4">Emergency Contact (_Optional)</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">Emergency Contact (Optional)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Name</label>

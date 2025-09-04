@@ -146,8 +146,8 @@ export const TherapistSelector: React.FC<TherapistSelectorProps> = ({
   selectedTherapist,
   _showDetailedView = true
 }) => {
-  const [___hoveredCard, _setHoveredCard] = useState<string | null>(null);
-  const [filterSpecialty, _setFilterSpecialty] = useState<string>('all');
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [filterSpecialty, setFilterSpecialty] = useState<string>('all');
 
   const specialties = [...new Set(therapists.map(t => t.specialty))];
   const filteredTherapists = filterSpecialty === 'all' 

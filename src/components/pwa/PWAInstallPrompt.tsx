@@ -5,13 +5,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Download, 
-  _Wifi, 
-  WifiOff, 
-  Bell, 
-  Shield, 
-  Zap, 
+import {
+  Download,
+  Wifi,
+  WifiOff,
+  Bell,
+  Shield,
+  Zap,
   X,
   Smartphone,
   CheckCircle
@@ -45,23 +45,23 @@ const installBenefits = [
 export function PWAInstallPrompt() {
   const { isAppInstallable, installApp, deviceInfo } = useMobileFeatures();
   const { vibrate } = useVibration();
-  const [showPrompt, _setShowPrompt] = useState(false);
-  const [isInstalling, _setIsInstalling] = useState(false);
-  const [_installSuccess, _setInstallSuccess] = useState(false);
-  const [dismissCount, _setDismissCount] = useState(() => {
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [installSuccess, setInstallSuccess] = useState(false);
+  const [dismissCount, setDismissCount] = useState(() => {
     const count = localStorage.getItem('pwa_dismiss_count');
-    return count ? parseInt(_count) : 0;
+    return count ? parseInt(count) : 0;
   });
 
   useEffect(() => {
     // Show prompt after user engagement (30 seconds on site)
     // But not if dismissed more than 3 times
     if (isAppInstallable && dismissCount < 3) {
-      const _timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         setShowPrompt(true);
       }, 30000);
 
-      return () => clearTimeout(_timer);
+      return () => clearTimeout(timer);
     }
   }, [isAppInstallable, dismissCount]);
 
@@ -86,13 +86,13 @@ export function PWAInstallPrompt() {
     vibrate([50]);
     setIsInstalling(true);
 
-    const _success = await installApp();
+    const success = await installApp();
     
-    if (_success) {
+    if (success) {
       vibrate([100, 50, 100]);
       setInstallSuccess(true);
       
-      // Hide prompt after showing _success
+      // Hide prompt after showing success
       setTimeout(() => {
         setShowPrompt(false);
         setInstallSuccess(false);
@@ -289,7 +289,7 @@ export function PWAInstallPrompt() {
 // Standalone component for showing install status in settings
 export function PWAInstallStatus() {
   const { deviceInfo, isAppInstallable, installApp } = useMobileFeatures();
-  const [isInstalled, _setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     setIsInstalled(

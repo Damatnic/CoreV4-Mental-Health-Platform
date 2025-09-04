@@ -18,18 +18,18 @@ interface DeviceInfo {
   devicePixelRatio: number;
 }
 
-interface _TouchGesture {
+interface TouchGesture {
   type: 'swipe' | 'pinch' | 'tap' | 'longPress' | 'doubleTap';
   direction?: 'up' | 'down' | 'left' | 'right';
   distance?: number;
-  _scale?: number;
+  scale?: number;
   duration?: number;
 }
 
 export function useMobileFeatures() {
-  const [deviceInfo, _setDeviceInfo] = useState<DeviceInfo>(() => getDeviceInfo());
-  const [isAppInstallable, _setIsAppInstallable] = useState(false);
-  const [deferredPrompt, _setDeferredPrompt] = useState<unknown>(null);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(() => getDeviceInfo());
+  const [isAppInstallable, setIsAppInstallable] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   // Update device info on resize and orientation change
   useEffect(() => {
@@ -50,7 +50,7 @@ export function useMobileFeatures() {
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(_e);
+      setDeferredPrompt(e);
       setIsAppInstallable(true);
     };
 
@@ -62,12 +62,12 @@ export function useMobileFeatures() {
   }, []);
 
   // Install PWA
-  const installApp   = useCallback(async () => {
+  const installApp = useCallback(async () => {
     if (!deferredPrompt) return false;
 
     try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+      (deferredPrompt as any).prompt();
+      const { outcome } = await (deferredPrompt as any).userChoice;
       
       if (outcome === 'accepted') {
         setIsAppInstallable(false);
@@ -75,7 +75,7 @@ export function useMobileFeatures() {
         
         // Track installation
         if ('gtag' in window) {
-          (window as unknown).gtag('event', 'pwainstall', {
+          (window as any).gtag('event', 'pwainstall', {
             event_category: 'engagement',
             event_label: 'success'
           });
@@ -91,8 +91,8 @@ export function useMobileFeatures() {
   }, [deferredPrompt]);
 
   // Request persistent storage for offline data
-  const __requestPersistentStorage   = useCallback(async () => {
-    if ('storage' in navigator && 'persist' in navigator.storage) {
+  const requestPersistentStorage = useCallback(async () => {
+    if ('storage' in navigator && navigator.storage && 'persist' in navigator.storage) {
       try {
         const granted = await navigator.storage.persist();
         return granted;
@@ -106,13 +106,13 @@ export function useMobileFeatures() {
 
   // Share functionality
   const share = useCallback(async (data: ShareData) => {
-    if ('share' in navigator && deviceInfo.isMobile) {
+    if ('share' in navigator && navigator.share && deviceInfo.isMobile) {
       try {
-        await navigator.share(_data);
+        await navigator.share(data);
         return true;
       } catch (error) {
         if (error instanceof Error && error.name !== 'AbortError') {
-          logger.error('Share failed:', error);
+          logger.error('Share failed:', String(error));
         }
         return false;
       }
@@ -133,10 +133,10 @@ export function useMobileFeatures() {
   }, [deviceInfo.isMobile]);
 
   // Wake lock for keeping screen on during crisis situations
-  const __requestWakeLock   = useCallback(async () => {
+  const requestWakeLock = useCallback(async () => {
     if ('wakeLock' in navigator) {
       try {
-        const wakeLock = await (navigator as unknown).wakeLock.request('screen');
+        const wakeLock = await (navigator as any).wakeLock.request('screen');
         return wakeLock;
       } catch (error) {
         logger.error('Wake lock request failed:');
@@ -169,14 +169,14 @@ export function useTouchGestures(
   element: React.RefObject<HTMLElement>,
   handlers: {
     onSwipe?: (direction: 'up' | 'down' | 'left' | 'right', distance: number) => void;
-    onPinch?: (_scale: number) => void;
+    onPinch?: (scale: number) => void;
     onTap?: (x: number, y: number) => void;
     onDoubleTap?: (x: number, y: number) => void;
     onLongPress?: (x: number, y: number) => void;
   }
 ) {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const ____touchEndRef   = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const lastTapRef = useRef<number>(0);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isPinchingRef = useRef(false);
@@ -223,8 +223,8 @@ export function useTouchGestures(
       // Handle pinch
       if (isPinchingRef.current && e.touches.length === 2 && handlers.onPinch && e.touches[0] && e.touches[1]) {
         const distance = getDistance(e.touches[0], e.touches[1]);
-        const _scale = distance / initialPinchDistanceRef.current;
-        handlers.onPinch(_scale);
+        const scale = distance / initialPinchDistanceRef.current;
+        handlers.onPinch(scale);
       }
     };
 
@@ -263,8 +263,8 @@ export function useTouchGestures(
       }
       // Swipe detection
       else if (handlers.onSwipe && distance > 50 && duration < 500) {
-        const absX = Math.abs(_deltaX);
-        const absY = Math.abs(_deltaY);
+        const absX = Math.abs(deltaX);
+        const absY = Math.abs(deltaY);
 
         if (absX > absY) {
           handlers.onSwipe(deltaX > 0 ? 'right' : 'left', absX);
@@ -293,19 +293,19 @@ export function useTouchGestures(
 
 // Helper functions
 function getDeviceInfo(): DeviceInfo {
-  const _userAgent = navigator._userAgent.toLowerCase();
+  const userAgent = navigator.userAgent.toLowerCase();
   const width = window.innerWidth;
   const height = window.innerHeight;
 
   return {
-    isMobile: /iphone|ipod|android|blackberry|windows phone/.test(_userAgent) || width < 768,
-    isTablet: /ipad|android/.test(_userAgent) && width >= 768 && width < 1024,
-    isIOS: /iphone|ipad|ipod/.test(_userAgent),
-    isAndroid: /android/.test(_userAgent),
-    isPWA: window.matchMedia('(display-mode: standalone)').matches || 
-           (window.navigator as unknown).standalone === true,
+    isMobile: /iphone|ipod|android|blackberry|windows phone/.test(userAgent) || width < 768,
+    isTablet: /ipad|android/.test(userAgent) && width >= 768 && width < 1024,
+    isIOS: /iphone|ipad|ipod/.test(userAgent),
+    isAndroid: /android/.test(userAgent),
+    isPWA: window.matchMedia('(display-mode: standalone)').matches ||
+           (window.navigator as any).standalone === true,
     hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-    screenSize: getScreenSize(_width),
+    screenSize: getScreenSize(width),
     orientation: width > height ? 'landscape' : 'portrait',
     devicePixelRatio: window.devicePixelRatio || 1
   };
@@ -359,12 +359,12 @@ export function usePullToRefresh(
   } = {}
 ) {
   const { threshold = 80, disabled = false } = options;
-  const [_isPulling, _setIsPulling] = useState(false);
-  const [pullDistance, _setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
   const startYRef = useRef(0);
 
   useEffect(() => {
-    if (_disabled) return;
+    if (disabled) return;
 
     const handleTouchStart = (e: TouchEvent) => {
       if (window.scrollY === 0) {

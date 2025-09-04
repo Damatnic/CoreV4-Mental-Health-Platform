@@ -14,7 +14,7 @@ import {
   CrisisLevelConfig
 } from '../constants/crisis';
 
-import { _secureStorage } from '../services/security/SecureLocalStorage';
+import { secureStorage } from '../services/security/SecureLocalStorage';
 import { logger } from './logger';
 
 // Re-export types
@@ -127,11 +127,11 @@ export function detectCrisisLevel(text: string): CrisisAssessment {
   };
 
   // Store assessment for trend analysis
-  storeCrisisAssessment(_assessment);
+  storeCrisisAssessment(assessment);
 
   // Emit crisis level change event
   window.dispatchEvent(new CustomEvent(CRISIS_EVENTS.levelChanged, {
-    detail: _assessment
+    detail: assessment
   }));
 
   return assessment;
@@ -181,7 +181,7 @@ export async function handleEmergencyCall(
     }));
 
   } catch (error) {
-    logger.error('Failed to initiate emergency contact:', error);
+    logger.error('Failed to initiate emergency contact:', String(error));
     interaction.metadata!.error = error instanceof Error ? error.message : '[Error details unavailable]';
   }
 
@@ -299,7 +299,7 @@ async function storeCrisisAssessment(_assessment: CrisisAssessment): Promise<voi
       const _trimmed = assessments.slice(-50);
       localStorage.setItem(CRISIS_STORAGE_KEYS.lastAssessment, JSON.stringify(_trimmed));
     } catch (error) {
-    logger.error('Failed to store _assessment in localStorage:', fallbackError);
+    logger.error('Failed to store assessment in localStorage:', 'Storage operation failed');
     }
   }
 }
@@ -323,7 +323,7 @@ async function storeCrisisInteraction(interaction: CrisisInteraction): Promise<v
       const _trimmed = interactions.slice(-100);
       localStorage.setItem(CRISIS_STORAGE_KEYS.interactions, JSON.stringify(_trimmed));
     } catch (error) {
-    logger.error('Failed to store interaction in localStorage:', fallbackError);
+    logger.error('Failed to store interaction in localStorage:', 'Storage operation failed');
     }
   }
 }
@@ -397,7 +397,7 @@ export async function getRecentAssessments(limit: number = 10): Promise<CrisisAs
           assessments.push(cursor.value);
           cursor.continue();
         } else {
-          resolve(_assessments);
+          resolve(assessments);
         }
       };
       request.onerror = () => reject(request.error);
@@ -410,7 +410,7 @@ export async function getRecentAssessments(limit: number = 10): Promise<CrisisAs
       const assessments = JSON.parse(_stored);
       return assessments.slice(-limit).reverse();
     } catch (error) {
-    logger.error('Failed to get assessments from localStorage:', fallbackError);
+    logger.error('Failed to get assessments from localStorage:', 'Storage operation failed');
       return [];
     }
   }
@@ -457,7 +457,7 @@ export async function getCrisisTrends(days: number = 7): Promise<{
   // Calculate trend (compare first half to second half)
   const midpoint = Math.floor(levelNumbers.length / 2);
   const firstHalf = levelNumbers.slice(0, midpoint);
-  const secondHalf = levelNumbers.slice(_midpoint);
+  const secondHalf = levelNumbers.slice(midpoint);
   
   const firstAvg = firstHalf.reduce((sum, level) => sum + level, 0) / firstHalf.length;
   const secondAvg = secondHalf.reduce((sum, level) => sum + level, 0) / secondHalf.length;

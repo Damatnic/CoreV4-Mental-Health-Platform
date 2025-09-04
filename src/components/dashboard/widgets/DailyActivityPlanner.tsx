@@ -6,14 +6,14 @@ import {
   Battery,
   Brain,
   Heart,
-  _AlertCircle,
+  AlertCircle,
   CheckCircle,
-  _XCircle,
-  _ChevronRight,
+  XCircle,
+  ChevronRight,
   Plus,
   Edit2,
   Trash2,
-  _RefreshCw,
+  RefreshCw,
   Zap,
   Cloud,
   Sun,
@@ -23,9 +23,9 @@ import {
   TrendingUp,
   Sparkles
 } from 'lucide-react';
-import { format, _addMinutes, isSameDay, isToday, isTomorrow } from 'date-fns';
-import { useActivityStore } from '../../../stores/activityStore';
-import { _useWellnessStore } from '../../../stores/wellnessStore';
+import { format, addMinutes, isSameDay, isToday, isTomorrow } from 'date-fns';
+import { __useActivityStore } from '../../../stores/activityStore';
+import { useWellnessStore } from '../../../stores/wellnessStore';
 
 interface TimeSlot {
   time: string;
@@ -62,9 +62,9 @@ const CATEGORY_COLORS = {
 };
 
 export const DailyActivityPlanner: React.FC = () => {
-  const { activities, _dailySchedule, addActivity, _updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
+  const { activities, dailySchedule, addActivity, updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = __useActivityStore();
   
-  const { moodEntries } = _useWellnessStore();
+  const { moodEntries } = useWellnessStore();
   
   const [selectedDate, _setSelectedDate] = useState(new Date());
   const [currentEnergyLevel, _setCurrentEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');
@@ -77,7 +77,7 @@ export const DailyActivityPlanner: React.FC = () => {
   
   // Initialize time slots and load schedule
   useEffect(() => {
-    generateDailySchedule(_selectedDate);
+    generateDailySchedule(selectedDate);
     initializeTimeSlots();
     
     // Get current mood from recent entries
@@ -85,11 +85,11 @@ export const DailyActivityPlanner: React.FC = () => {
       isSameDay(new Date(entry.timestamp), new Date())
     );
     if (todayMood) {
-      setCurrentMood(todayMood.moodScore);
+      _setCurrentMood(todayMood.moodScore);
       // Determine energy level based on mood
-      if (todayMood.moodScore <= 3) setCurrentEnergyLevel('low');
-      else if (todayMood.moodScore <= 7) setCurrentEnergyLevel('medium');
-      else setCurrentEnergyLevel('high');
+      if (todayMood.moodScore <= 3) _setCurrentEnergyLevel('low');
+      else if (todayMood.moodScore <= 7) _setCurrentEnergyLevel('medium');
+      else _setCurrentEnergyLevel('high');
     }
   }, [selectedDate, moodEntries, generateDailySchedule, initializeTimeSlots]);
   
@@ -102,7 +102,7 @@ export const DailyActivityPlanner: React.FC = () => {
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const _time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        slots.push({ time });
+        slots.push({ time: _time });
       }
     }
     
@@ -114,7 +114,7 @@ export const DailyActivityPlanner: React.FC = () => {
     dayActivities.forEach(activity => {
       if (activity.scheduledTime) {
         const _time = format(new Date(activity.scheduledTime), 'HH:mm');
-        const slotIndex = slots.findIndex(slot => slot.time === time);
+        const slotIndex = slots.findIndex(slot => slot.time === _time);
         if (slotIndex !== -1 && slots[slotIndex]) {
           slots[slotIndex]!.activity = {
             id: activity.id,
@@ -129,30 +129,30 @@ export const DailyActivityPlanner: React.FC = () => {
       }
     });
     
-    setTimeSlots(_slots);
+    _setTimeSlots(slots);
   };
   
   // Handle bad mental health day adaptation
   const handleBadDayAdaptation = () => {
-    setAdaptiveMode(true);
+    _setAdaptiveMode(true);
     adaptScheduleForBadDay();
     
     // Show supportive message
     setTimeout(() => {
-      setAdaptiveMode(false);
+      _setAdaptiveMode(false);
     }, 3000);
   };
   
   // Get activity recommendations
   const recommendations = getActivityRecommendations(currentEnergyLevel, currentMood);
-  const rescheduleingSuggestions = suggestReschedule(_currentEnergyLevel);
+  const rescheduleingSuggestions = suggestReschedule(currentEnergyLevel);
   
   // Quick add activity
   const quickAddActivity = (slot: TimeSlot) => {
-    const timeParts = slot.time.split(':').map(_Number);
+    const timeParts = slot.time.split(':').map(Number);
     const hours = timeParts[0] ?? 9;
     const minutes = timeParts[1] ?? 0;
-    const scheduledTime = new Date(_selectedDate);
+    const scheduledTime = new Date(selectedDate);
     scheduledTime.setHours(hours, minutes, 0, 0);
     
     addActivity({
@@ -183,10 +183,10 @@ export const DailyActivityPlanner: React.FC = () => {
   
   // Reschedule activity
   const __handleReschedule = (_activityId: string, newTime: string) => {
-    const timeParts = newTime.split(':').map(_Number);
+    const timeParts = newTime.split(':').map(Number);
     const hours = timeParts[0] ?? 9;
     const minutes = timeParts[1] ?? 0;
-    const newScheduledTime = new Date(_selectedDate);
+    const newScheduledTime = new Date(selectedDate);
     newScheduledTime.setHours(hours, minutes, 0, 0);
     
     rescheduleActivity(_activityId, newScheduledTime);
@@ -196,7 +196,7 @@ export const DailyActivityPlanner: React.FC = () => {
   // Get time period of day
   const getTimePeriod = (time: string) => {
     const hourStr = time.split(':')[0];
-    const hour = hourStr ? parseInt(_hourStr) : 9;
+    const hour = hourStr ? parseInt(hourStr) : 9;
     if (hour < 6) return { name: 'Early Morning', icon: Moon, color: 'from-indigo-500 to-purple-500' };
     if (hour < 12) return { name: 'Morning', icon: Sun, color: 'from-yellow-400 to-orange-400' };
     if (hour < 14) return { name: 'Noon', icon: Sun, color: 'from-orange-400 to-red-400' };
@@ -227,7 +227,7 @@ export const DailyActivityPlanner: React.FC = () => {
               return (
                 <button
                   key={level}
-                  onClick={() => setCurrentEnergyLevel(_level)}
+                  onClick={() => _setCurrentEnergyLevel(level)}
                   className={`p-2 rounded transition-all ${
                     currentEnergyLevel === level
                       ? 'bg-white dark:bg-gray-600 shadow-sm'
@@ -256,7 +256,7 @@ export const DailyActivityPlanner: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setShowRecommendations(!showRecommendations)}
+            onClick={() => _setShowRecommendations(!showRecommendations)}
             className="p-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/30 transition-colors"
           >
             <Brain className="w-4 h-4" />
@@ -266,7 +266,7 @@ export const DailyActivityPlanner: React.FC = () => {
       
       {/* Adaptive Mode Message */}
       <AnimatePresence>
-        {adaptiveMode && (
+        {___adaptiveMode && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -340,7 +340,7 @@ export const DailyActivityPlanner: React.FC = () => {
                     <span className="text-sm">{activity.title}</span>
                     <button
                       onClick={() => {
-                        const tomorrow = new Date(_selectedDate);
+                        const tomorrow = new Date(selectedDate);
                         tomorrow.setDate(tomorrow.getDate() + 1);
                         rescheduleActivity(activity.id, tomorrow);
                       }}
@@ -439,7 +439,7 @@ export const DailyActivityPlanner: React.FC = () => {
                       {/* Actions */}
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => setEditingActivity(slot.activity!.id)}
+                          onClick={() => _setEditingActivity(slot.activity!.id)}
                           className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -455,7 +455,7 @@ export const DailyActivityPlanner: React.FC = () => {
                   </div>
                 ) : (
                   <button
-                    onClick={() => quickAddActivity(_slot)}
+                    onClick={() => quickAddActivity(slot)}
                     className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-all"
                   >
                     <Plus className="w-4 h-4" />

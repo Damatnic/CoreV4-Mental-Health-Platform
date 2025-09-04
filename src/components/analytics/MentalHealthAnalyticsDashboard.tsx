@@ -111,12 +111,12 @@ interface RiskFactor {
 }
 
 export function MentalHealthAnalyticsDashboard() {
-  const [analyticsData, _setAnalyticsData] = useState<AnalyticsData | null>(null);
-  const [timeframe, _setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [___selectedMetrics, _setSelectedMetrics] = useState<string[]>([]);
-  const [privacyMode, _setPrivacyMode] = useState(false);
-  const [____loading, _setLoading] = useState(true);
-  const [activeTab, _setActiveTab] = useState<'overview' | 'trends' | 'goals' | 'insights' | 'interventions'>('overview');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [_selectedMetrics, _setSelectedMetrics] = useState<string[]>([]);
+  const [privacyMode, setPrivacyMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'goals' | 'insights' | 'interventions'>('overview');
 
   // Fetch analytics _data
   useEffect(() => {
@@ -124,7 +124,7 @@ export function MentalHealthAnalyticsDashboard() {
   }, [timeframe]);
 
   // Memoized calculations for performance
-  const __overallWellnessScore   = useMemo(() => {
+  const overallWellnessScore = useMemo(() => {
     if (!analyticsData) return null;
     
     const scores = analyticsData.metrics.map(metric => {
@@ -160,7 +160,7 @@ export function MentalHealthAnalyticsDashboard() {
     }
   };
 
-  if (_loading) {
+  if (loading) {
     return <AnalyticsDashboardSkeleton />;
   }
 
@@ -203,7 +203,7 @@ export function MentalHealthAnalyticsDashboard() {
             {/* Timeframe Selector */}
             <select
               value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value as unknown)}
+              onChange={(e) => setTimeframe(e.target.value as 'week' | 'month' | 'quarter' | 'year')}
               className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="week">Past Week</option>
@@ -239,7 +239,7 @@ export function MentalHealthAnalyticsDashboard() {
               
               <div className="text-right">
                 <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-                  {privacyMode ? '••' : Math.round(_overallWellnessScore)}
+                  {privacyMode ? '••' : Math.round(overallWellnessScore)}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   out of 100
@@ -311,7 +311,7 @@ export function MentalHealthAnalyticsDashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as unknown)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'trends' | 'goals' | 'insights' | 'interventions')}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -448,19 +448,19 @@ function AnalyticsOverview({ _data, privacyMode }: { _data: AnalyticsData | null
 }
 
 // Additional component implementations would continue here...
-function TrendsAnalysis({ _trends, _metrics, _privacyMode }: unknown) {
+function TrendsAnalysis({ trends: _trends, metrics: _metrics, privacyMode: _privacyMode }: { trends: TrendAnalysis[]; metrics: MentalHealthMetric[]; privacyMode: boolean }) {
   return <div>Trends Analysis Component</div>;
 }
 
-function GoalsProgress({ _goals, _privacyMode }: unknown) {
+function GoalsProgress({ goals: _goals, privacyMode: _privacyMode }: { goals: GoalProgress[]; privacyMode: boolean }) {
   return <div>Goals Progress Component</div>;
 }
 
-function InsightsPanel({ insights: _insights, _privacyMode }: unknown) {
+function InsightsPanel({ insights: _insights, privacyMode: _privacyMode }: { insights: AnalyticsInsight[]; privacyMode: boolean }) {
   return <div>Insights Panel Component</div>;
 }
 
-function InterventionsAnalysis({ interventions: _interventions, _privacyMode }: unknown) {
+function InterventionsAnalysis({ interventions: _interventions, privacyMode: _privacyMode }: { interventions: InterventionEffectiveness[]; privacyMode: boolean }) {
   return <div>Interventions Analysis Component</div>;
 }
 
@@ -494,7 +494,7 @@ async function generateMockAnalyticsData(timeframe: string): Promise<AnalyticsDa
   // In production, this would fetch real analytics _data
   return {
     userId: 'mock-user',
-    timeframe: timeframe as unknown,
+    timeframe: timeframe as 'week' | 'month' | 'quarter' | 'year',
     metrics: [
       {
         id: 'mood-score',

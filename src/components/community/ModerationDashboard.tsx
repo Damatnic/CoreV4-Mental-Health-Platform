@@ -3,8 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Shield, AlertTriangle, Flag, CheckCircle, XCircle, Clock, TrendingUp, Users, MessageSquare, Activity, Ban, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
-import { __communityService } from '../../services/community/_communityService';
-import { __websocketService } from '../../services/realtime/_websocketService';
+import { _communityService } from '../../services/community/communityService';
+import { _websocketService } from '../../services/realtime/websocketService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface ModerationItem {
@@ -58,7 +58,7 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
     }
   };
 
-  const TypeIcon = getTypeIcon(item.type);
+  const TypeIcon = getTypeIcon(item._type);
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border-2 ${getPriorityColor(item._priority)}`}>
@@ -85,7 +85,7 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
             </div>
           </div>
           <button
-            onClick={() => setShowDetails(!showDetails)}
+            onClick={() => _setShowDetails(!showDetails)}
             className="text-gray-400 hover:text-gray-600"
           >
             <Eye className="h-4 w-4" />
@@ -124,7 +124,7 @@ function ModerationCard({ item, onAction }: { item: ModerationItem; onAction: (a
               <textarea
                 id={`mod-notes-${item.id}`}
                 value={actionNotes}
-                onChange={(e) => setActionNotes(e.target.value)}
+                onChange={(e) => _setActionNotes(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Add notes about your decision..."
                 rows={2}
@@ -229,7 +229,7 @@ export function ModerationDashboard() {
   // Set up WebSocket listeners for real-time moderation alerts
   useEffect(() => {
     const handleModerationAlert = (data: unknown) => {
-      toast.error(`New ${data._priority} priority item in moderation queue`, {
+      toast.error(`New ${(data as any)._priority} priority item in moderation queue`, {
         duration: 5000,
         icon: '🚨',
       });
@@ -255,7 +255,7 @@ export function ModerationDashboard() {
   // Handle moderation actions
   const handleAction = async (itemId: string, action: string, notes?: string) => {
     try {
-      await _communityService.moderateContent(itemId, action as unknown, notes);
+      await _communityService.moderateContent(itemId, action as any, notes);
       toast.success(`Action "${action}" completed successfully`);
       queryClient.invalidateQueries({ queryKey: ['moderation-queue'] });
       
@@ -288,7 +288,7 @@ export function ModerationDashboard() {
       return acc + (Date.now() - item.timestamp.getTime());
     }, 0) / moderationQueue.length / 1000 / 60; // in minutes
 
-    setStats({
+    _setStats({
       pendingItems: pending,
       criticalItems: critical,
       averageWaitTime: Math.round(_avgWait),
@@ -380,7 +380,7 @@ export function ModerationDashboard() {
             <select
               id="moderation-filter"
               value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value as unknown)}
+              onChange={(e) => _setSelectedFilter(e.target.value as any)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Items</option>
@@ -395,7 +395,7 @@ export function ModerationDashboard() {
             <select
               id="moderation-priority"
               value={selectedPriority}
-              onChange={(e) => setSelectedPriority(e.target.value as unknown)}
+              onChange={(e) => _setSelectedPriority(e.target.value as any)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Priorities</option>

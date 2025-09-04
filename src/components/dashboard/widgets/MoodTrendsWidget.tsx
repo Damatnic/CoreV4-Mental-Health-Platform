@@ -88,7 +88,7 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       },
       tooltip: {
         callbacks: {
-          label: (context: unknown) => `Mood: ${context.parsed.y}/5`
+          label: (context: any) => `Mood: ${context.parsed.y}/5`
         }
       }
     },
@@ -134,7 +134,7 @@ export function MoodTrendsWidget({ moodData, error }: MoodTrendsWidgetProps) {
       }
     });
     
-    return Object.entries(_emotionCounts)
+    return Object.entries(emotionCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([emotion]) => emotion);

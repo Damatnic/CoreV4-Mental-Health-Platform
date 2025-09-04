@@ -21,9 +21,9 @@ const TherapistChat: React.FC<TherapistChatProps> = ({
   fullScreen = true 
 }) => {
   const { session, isTyping, isConnected, sendMessage, endSession: _endSession } = useAITherapist({ therapist, sessionId });
-  const [inputText, _setInputText] = useState('');
-  const [showSessionInfo, _setShowSessionInfo] = useState(false);
-  const messagesEndRef = useRef<unknown>(null);
+  const [inputText, setInputText] = useState('');
+  const [showSessionInfo, setShowSessionInfo] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom when new messages arrive

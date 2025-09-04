@@ -3,7 +3,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import {
-  _WebSocketEvent,
+  WebSocketEvent,
   CrisisWebSocketEvent,
   CommunityWebSocketEvent,
   NotificationWebSocketEvent,
@@ -185,8 +185,8 @@ export class WebSocketService {
     });
 
     this.socket.on(WSEventType.ERROR, (error: unknown) => {
-      logger.error('WebSocket error:', error);
-      this.connectionState.lastError = error;
+      logger.error('WebSocket error:', String(error));
+      this.connectionState.lastError = error as Error;
       this.emit(WSEventType.ERROR, { error, timestamp: new Date() });
     });
 
@@ -197,7 +197,7 @@ export class WebSocketService {
     });
 
     this.socket.on(WSEventType.AUTH_FAILURE, (data: unknown) => {
-      logger.error('WebSocket authentication failed:', data);
+      logger.error('WebSocket authentication failed:', String(data));
       this.emit(WSEventType.AUTH_FAILURE, data);
       this.disconnect();
     });
@@ -464,7 +464,7 @@ export class WebSocketService {
   // Crisis escalation handling
   private handleCrisisEscalation(event: CrisisWebSocketEvent): void {
     // Trigger emergency protocols
-    logger.error('CRISIS ESCALATION:', event);
+    logger.error('CRISIS ESCALATION:', JSON.stringify(event));
     
     // Show critical notification
     this.showNotification(
@@ -606,7 +606,7 @@ export class WebSocketService {
     const users: TypingUser[] = [];
     this.typingUsers.forEach((user, key) => {
       if (key.startsWith(`${_room}:`)) {
-        users.push(_user);
+        users.push(user);
       }
     });
     return users;
@@ -635,14 +635,14 @@ export class WebSocketService {
     // Also store locally for offline access
     try {
       const logs = JSON.parse(secureStorage.getItem('critical_events') || '[]');
-      logs.push(_logEntry);
+      logs.push(logEntry);
       
       // Keep only last 100 events
       if (logs.length > 100) {
         logs.splice(0, logs.length - 100);
       }
       
-      secureStorage.setItem('critical_events', JSON.stringify(_logs));
+      secureStorage.setItem('critical_events', JSON.stringify(logs));
     } catch (error) {
       logger.error('Failed to log critical event:');
     }

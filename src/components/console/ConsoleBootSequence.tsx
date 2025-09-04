@@ -29,7 +29,7 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
 
     // Show skip button after 2 seconds
     const _skipTimer = setTimeout(() => {
-      setShowSkip(true);
+      _setShowSkip(true);
     }, 2000);
 
     // Play startup sound
@@ -38,7 +38,7 @@ export function ConsoleBootSequence({ onBootComplete, skipBoot = false }: Consol
     // Progress through boot stages
     const _timer = setTimeout(() => {
       if (bootStage < bootStages.length - 1) {
-        setBootStage(bootStage + 1);
+        _setBootStage(bootStage + 1);
       } else {
         // Boot complete
         setTimeout(onBootComplete, 500);

@@ -34,15 +34,15 @@ const NotificationCenterPage = lazyWithPreload(() => import('./pages/Notificatio
 // Preload critical pages immediately
 if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
   // Preload crisis-related content during idle time
-  (window as unknown).requestIdleCallback(() => {
-    (WellnessPage as unknown).preload?.();
-    (AITherapyPage as unknown).preload?.(); // Preload AI Therapy as it&apos;s frequently accessed
+  (window as any).requestIdleCallback(() => {
+    (WellnessPage as any).preload?.();
+    (AITherapyPage as any).preload?.(); // Preload AI Therapy as it's frequently accessed
   }, { timeout: 2000 });
   
   // Preload frequently accessed pages
   setTimeout(() => {
-    (CommunityPage as unknown).preload?.();
-    (SettingsPage as unknown).preload?.();
+    (CommunityPage as any).preload?.();
+    (SettingsPage as any).preload?.();
   }, 3000);
 }
 
@@ -68,7 +68,7 @@ const createQueryClient = () => new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: (failureCount, error: unknown) => {
+      retry: (failureCount, error: any) => {
         // Don't retry on 4xx errors except 408 (_timeout)
         if (error?.response?.status >= 400 && error?.response?.status < 500 && error?.response?.status !== 408) {
           return false;
@@ -80,7 +80,7 @@ const createQueryClient = () => new QueryClient({
       networkMode: 'online',
     },
     mutations: {
-      retry: (failureCount, error: unknown) => {
+      retry: (failureCount, error: any) => {
         if (error?.response?.status >= 400 && error?.response?.status < 500) {
           return false;
         }
@@ -143,7 +143,7 @@ const RouteWrapper = memo(({
   priority = UpdatePriority.MEDIUM,
   fallback = <PageLoadingSpinner />
 }: {
-  component: React.ComponentType<unknown>;
+  component: React.ComponentType<any>;
   priority?: UpdatePriority;
   fallback?: React.ReactNode;
 }) => {
