@@ -152,14 +152,14 @@ class RateLimiterService {
     endpoint: string;
     ip: string;
     userId?: string;
-    _method?: string;
+    method?: string;
     headers?: Record<string, string>;
   }): Promise<{
     allowed: boolean;
     info: RateLimitInfo;
     reason?: string;
   }> {
-    const { endpoint, ip, userId, _method = 'GET' } = params;
+    const { endpoint, ip, userId, method = 'GET' } = params;
 
     // Check if IP is blocked
     if (this.isIPBlocked(ip)) {

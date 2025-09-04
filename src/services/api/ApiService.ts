@@ -125,7 +125,7 @@ export class ApiService {
           
           try {
             await this.refreshAccessToken();
-            return this.axiosInstance(_originalRequest);
+            return this.axiosInstance(originalRequest);
           } catch (error) {
             this.handleLogout();
             throw new ApiServiceError(

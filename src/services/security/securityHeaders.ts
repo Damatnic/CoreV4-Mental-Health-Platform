@@ -151,7 +151,7 @@ class SecurityHeadersService {
    */
   generateNonce(): string {
     const array = new Uint8Array(16);
-    crypto.getRandomValues(_array);
+    crypto.getRandomValues(array);
     this.nonce = btoa(String.fromCharCode(...array));
     return this.nonce;
   }
@@ -272,17 +272,17 @@ class SecurityHeadersService {
     return [
       'accelerometer=()',
       'ambient-light-sensor=()',
-      'autoplay=(_self)',
+      'autoplay=(self)',
       'battery=()',
       'camera=()',
-      'cross-origin-isolated=(_self)',
+      'cross-origin-isolated=(self)',
       'display-capture=()',
-      'document-_domain=()',
-      'encrypted-media=(_self)',
+      'document-domain=()',
+      'encrypted-media=(self)',
       'execution-while-not-rendered=()',
       'execution-while-out-of-viewport=()',
-      'fullscreen=(_self)',
-      'geolocation=(_self)', // May be needed for crisis location services
+      'fullscreen=(self)',
+      'geolocation=(self)', // May be needed for crisis location services
       'gyroscope=()',
       'keyboard-map=()',
       'magnetometer=()',
@@ -295,7 +295,7 @@ class SecurityHeadersService {
       'screen-wake-lock=()',
       'sync-xhr=()',
       'usb=()',
-      'web-share=(_self)',
+      'web-share=(self)',
       'xr-spatial-tracking=()',
     ].join(', ');
   }
@@ -330,7 +330,7 @@ class SecurityHeadersService {
     const meta = document.createElement('meta');
     meta.httpEquiv = 'Content-Security-Policy';
     meta.content = this.buildCSP(true); // Pass true to filter out meta-incompatible directives
-    document.head.appendChild(_meta);
+    document.head.appendChild(meta);
   }
 
   /**
@@ -351,8 +351,8 @@ class SecurityHeadersService {
       
       // Support wildcard subdomains
       if (allowed.startsWith('*.')) {
-        const _domain = allowed.slice(2);
-        return origin.endsWith(_domain);
+        const domain = allowed.slice(2);
+        return origin.endsWith(domain);
       }
       
       return false;
@@ -365,7 +365,7 @@ class SecurityHeadersService {
   getCORSHeaders(origin: string, _method: string): Record<string, string> {
     const headers: Record<string, string> = {};
     
-    if (this.validateOrigin(_origin)) {
+    if (this.validateOrigin(origin)) {
       headers['Access-Control-Allow-Origin'] = origin;
       headers['Access-Control-Allow-Methods'] = this.config.cors.allowedMethods.join(', ');
       headers['Access-Control-Allow-Headers'] = this.config.cors.allowedHeaders.join(', ');
@@ -391,7 +391,7 @@ class SecurityHeadersService {
       // Send to reporting endpoint
       if (this.config.csp.reportUri) {
         await fetch(this.config.csp.reportUri, {
-          _method: 'POST',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },

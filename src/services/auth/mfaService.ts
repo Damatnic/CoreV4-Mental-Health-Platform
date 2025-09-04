@@ -65,7 +65,7 @@ class MultiFactorAuthService {
   /**
    * Setup TOTP (Time-based One-Time Password) authentication
    */
-  async setupTOTP(_userId: string): Promise<TOTPSetup> {
+  async setupTOTP(userId: string): Promise<TOTPSetup> {
     try {
       // Generate secret
       const secret = this.generateTOTPSecret();
@@ -74,7 +74,7 @@ class MultiFactorAuthService {
       const backupCodes = this.generateBackupCodes();
       
       // Store encrypted setup
-      await this.storeMFASetup(_userId, {
+      await this.storeMFASetup(userId, {
         method: 'totp',
         enabled: false,
         verified: false,
@@ -87,12 +87,12 @@ class MultiFactorAuthService {
       });
 
       // Generate QR code URL
-      const qrCodeUrl = this.generateTOTPQRCode(_userId, secret);
+      const qrCodeUrl = this.generateTOTPQRCode(userId, secret);
 
       // Log setup initiation
       await auditLogger.log({
         event: 'MFA_ENABLED',
-        _userId,
+        userId,
         details: { method: 'totp' },
         severity: 'info',
       });
@@ -105,7 +105,7 @@ class MultiFactorAuthService {
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
@@ -116,9 +116,9 @@ class MultiFactorAuthService {
   /**
    * Verify TOTP setup with initial code
    */
-  async verifyTOTPSetup(_userId: string, code: string): Promise<boolean> {
+  async verifyTOTPSetup(userId: string, code: string): Promise<boolean> {
     try {
-      const setup = await this.getMFASetup(_userId, 'totp');
+      const setup = await this.getMFASetup(userId, 'totp');
       if (!setup) {
         throw new Error('TOTP not configured');
       }
@@ -130,11 +130,11 @@ class MultiFactorAuthService {
         // Mark as verified and enabled
         setup.enabled = true;
         setup.verified = true;
-        await this.storeMFASetup(_userId, setup);
+        await this.storeMFASetup(userId, setup);
 
         await auditLogger.log({
           event: 'MFA_ENABLED',
-          _userId,
+          userId,
           details: { method: 'totp', verified: true },
           severity: 'info',
         });
@@ -144,7 +144,7 @@ class MultiFactorAuthService {
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'warning',
       });
@@ -155,13 +155,13 @@ class MultiFactorAuthService {
   /**
    * Setup SMS authentication
    */
-  async setupSMS(_userId: string, _phoneNumber: string): Promise<void> {
+  async setupSMS(userId: string, _phoneNumber: string): Promise<void> {
     try {
       // Validate phone number
       const sanitizedPhone = this.sanitizePhoneNumber(_phoneNumber);
       
       // Store setup
-      await this.storeMFASetup(_userId, {
+      await this.storeMFASetup(userId, {
         method: 'sms',
         enabled: false,
         verified: false,
@@ -172,18 +172,18 @@ class MultiFactorAuthService {
       });
 
       // Send verification code
-      await this.sendSMSCode(_userId, sanitizedPhone);
+      await this.sendSMSCode(userId, sanitizedPhone);
 
       await auditLogger.log({
         event: 'MFA_ENABLED',
-        _userId,
+        userId,
         details: { method: 'sms' },
         severity: 'info',
       });
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
@@ -194,10 +194,10 @@ class MultiFactorAuthService {
   /**
    * Setup email authentication
    */
-  async setupEmail(_userId: string, email: string): Promise<void> {
+  async setupEmail(userId: string, email: string): Promise<void> {
     try {
       // Store setup
-      await this.storeMFASetup(_userId, {
+      await this.storeMFASetup(userId, {
         method: 'email',
         enabled: false,
         verified: false,
@@ -208,18 +208,18 @@ class MultiFactorAuthService {
       });
 
       // Send verification code
-      await this.sendEmailCode(_userId, email);
+      await this.sendEmailCode(userId, email);
 
       await auditLogger.log({
         event: 'MFA_ENABLED',
-        _userId,
+        userId,
         details: { method: 'email' },
         severity: 'info',
       });
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
@@ -230,7 +230,7 @@ class MultiFactorAuthService {
   /**
    * Setup biometric authentication
    */
-  async setupBiometric(_userId: string): Promise<boolean> {
+  async setupBiometric(userId: string): Promise<boolean> {
     try {
       // Check if WebAuthn is available
       if (!window.PublicKeyCredential) {
@@ -238,10 +238,10 @@ class MultiFactorAuthService {
       }
 
       // Create credential options
-      const credentialOptions = await this.createBiometricCredential(_userId);
+      const credentialOptions = await this.createBiometricCredential(userId);
       
       // Store setup
-      await this.storeMFASetup(_userId, {
+      await this.storeMFASetup(userId, {
         method: 'biometric',
         enabled: true,
         verified: true,
@@ -251,7 +251,7 @@ class MultiFactorAuthService {
 
       await auditLogger.log({
         event: 'MFA_ENABLED',
-        _userId,
+        userId,
         details: { method: 'biometric' },
         severity: 'info',
       });
@@ -260,7 +260,7 @@ class MultiFactorAuthService {
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
@@ -271,13 +271,13 @@ class MultiFactorAuthService {
   /**
    * Create MFA challenge for login
    */
-  async createChallenge(_userId: string, _method?: MFAMethod): Promise<MFAChallenge> {
+  async createChallenge(userId: string, method?: MFAMethod): Promise<MFAChallenge> {
     try {
-      // Get user's MFA _methods
-      const _methods = await this.getUserMFAMethods(_userId);
+      // Get user's MFA methods
+      const methods = await this.getUserMFAMethods(userId);
       
       // Select method (use provided or default to most secure available)
-      const selectedMethod = method || this.selectBestMethod(_methods);
+      const selectedMethod = method || this.selectBestMethod(methods);
       
       if (!selectedMethod) {
         throw new Error('No MFA method configured');
@@ -296,11 +296,11 @@ class MultiFactorAuthService {
       this.activeChallenges.set(challenge.challengeId, challenge);
 
       // Send code based on method
-      await this.sendChallengeCode(_userId, selectedMethod);
+      await this.sendChallengeCode(userId, selectedMethod);
 
       await auditLogger.log({
         event: 'MFA_CHALLENGE_SUCCESS',
-        _userId,
+        userId,
         details: { method: selectedMethod, challengeId: challenge.challengeId },
         severity: 'info',
       });
@@ -309,7 +309,7 @@ class MultiFactorAuthService {
     } catch (error) {
       await auditLogger.log({
         event: 'MFA_CHALLENGE_FAILED',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error) },
         severity: 'warning',
       });
@@ -321,7 +321,7 @@ class MultiFactorAuthService {
    * Verify MFA challenge response
    */
   async verifyChallenge(
-    _userId: string,
+    userId: string,
     challengeId: string,
     code: string
   ): Promise<boolean> {
@@ -345,7 +345,7 @@ class MultiFactorAuthService {
         
         await auditLogger.log({
           event: 'SECURITY_ALERT',
-          _userId,
+          userId,
           details: { reason: 'max_mfa_attempts_exceeded', challengeId },
           severity: 'critical',
         });
@@ -358,17 +358,17 @@ class MultiFactorAuthService {
       
       switch (challenge.method) {
         case 'totp':
-          isValid = await this.verifyTOTP(_userId, code);
+          isValid = await this.verifyTOTP(userId, code);
           break;
         case 'sms':
         case 'email':
-          isValid = await this.verifyTemporaryCode(_userId, code);
+          isValid = await this.verifyTemporaryCode(userId, code);
           break;
         case 'backup':
-          isValid = await this.verifyBackupCode(_userId, code);
+          isValid = await this.verifyBackupCode(userId, code);
           break;
         case 'biometric':
-          isValid = await this.verifyBiometric(_userId, code);
+          isValid = await this.verifyBiometric(userId, code);
           break;
       }
 
@@ -377,18 +377,18 @@ class MultiFactorAuthService {
         this.activeChallenges.delete(_challengeId);
         
         // Update last used
-        await this.updateLastUsed(_userId, challenge.method);
+        await this.updateLastUsed(userId, challenge.method);
         
         await auditLogger.log({
           event: 'MFA_CHALLENGE_SUCCESS',
-          _userId,
+          userId,
           details: { method: challenge.method, challengeId },
           severity: 'info',
         });
       } else {
         await auditLogger.log({
           event: 'MFA_CHALLENGE_FAILED',
-          _userId,
+          userId,
           details: { 
             method: challenge.method, 
             challengeId,
@@ -413,20 +413,20 @@ class MultiFactorAuthService {
   /**
    * Disable MFA method
    */
-  async disableMFA(_userId: string, method: MFAMethod): Promise<void> {
+  async disableMFA(userId: string, method: MFAMethod): Promise<void> {
     try {
-      await this.removeMFASetup(_userId, method);
+      await this.removeMFASetup(userId, method);
       
       await auditLogger.log({
         event: 'MFA_DISABLED',
-        _userId,
+        userId,
         details: { method },
         severity: 'info',
       });
     } catch (error) {
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { error: error instanceof Error ? error.message : String(error), action: 'mfa_setup_failed' },
         severity: 'error',
       });
@@ -437,9 +437,9 @@ class MultiFactorAuthService {
   /**
    * Get user's enabled MFA methods
    */
-  async getUserMFAMethods(_userId: string): Promise<MFASetup[]> {
-    const _key = `mfa_${_userId}`;
-    const stored = await secureStorage.getItem(_key);
+  async getUserMFAMethods(userId: string): Promise<MFASetup[]> {
+    const key = `mfa_${userId}`;
+    const stored = await secureStorage.getItem(key);
     
     if (!stored || !stored.methods) {
       return [];
@@ -451,21 +451,21 @@ class MultiFactorAuthService {
   /**
    * Check if user has MFA enabled
    */
-  async hasMFAEnabled(_userId: string): Promise<boolean> {
-    const _methods = await this.getUserMFAMethods(_userId);
-    return _methods.length > 0;
+  async hasMFAEnabled(userId: string): Promise<boolean> {
+    const methods = await this.getUserMFAMethods(userId);
+    return methods.length > 0;
   }
 
   /**
    * Generate recovery codes
    */
-  async generateRecoveryCodes(_userId: string): Promise<string[]> {
+  async generateRecoveryCodes(userId: string): Promise<string[]> {
     try {
       const codes = this.generateBackupCodes();
       
       // Store encrypted codes
-      const _key = `mfa_recovery_${_userId}`;
-      await secureStorage.setItem(_key, {
+      const key = `mfa_recovery_${userId}`;
+      await secureStorage.setItem(key, {
         codes: await cryptoService.encrypt(JSON.stringify(_codes)),
         generated: new Date(),
         used: [],
@@ -473,7 +473,7 @@ class MultiFactorAuthService {
       
       await auditLogger.log({
         event: 'SECURITY_ALERT',
-        _userId,
+        userId,
         details: { action: 'recovery_codes_generated' },
         severity: 'info',
       });
@@ -497,13 +497,13 @@ class MultiFactorAuthService {
     return secret;
   }
 
-  private generateTOTPQRCode(_userId: string, secret: string): string {
+  private generateTOTPQRCode(userId: string, secret: string): string {
     const issuer = 'Mental Health Platform';
     const algorithm = 'SHA1';
     const digits = this.CODE_LENGTH;
     const period = this.TOTP_WINDOW;
     
-    const _otpauth = `_otpauth://totp/${issuer}:${_userId}?secret=${secret}&issuer=${issuer}&algorithm=${algorithm}&digits=${digits}&period=${period}`;
+    const _otpauth = `_otpauth://totp/${issuer}:${userId}?secret=${secret}&issuer=${issuer}&algorithm=${algorithm}&digits=${digits}&period=${period}`;
     
     // In production, generate actual QR code
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(_otpauth)}`;
@@ -562,21 +562,21 @@ class MultiFactorAuthService {
     return digits;
   }
 
-  private async sendSMSCode(_userId: string, _phoneNumber: string): Promise<void> {
+  private async sendSMSCode(userId: string, _phoneNumber: string): Promise<void> {
     const code = this.generateVerificationCode();
     
     // Store temporary code
-    await this.storeTemporaryCode(_userId, code);
+    await this.storeTemporaryCode(userId, code);
     
     // In production, send actual SMS
     logger.info(`SMS to ${_phoneNumber}: Your verification code is ${code}`);
   }
 
-  private async sendEmailCode(_userId: string, email: string): Promise<void> {
+  private async sendEmailCode(userId: string, email: string): Promise<void> {
     const code = this.generateVerificationCode();
     
     // Store temporary code
-    await this.storeTemporaryCode(_userId, code);
+    await this.storeTemporaryCode(userId, code);
     
     // In production, send actual email
     logger.info(`Email to ${email}: Your verification code is ${code}`);
@@ -586,22 +586,22 @@ class MultiFactorAuthService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  private async storeTemporaryCode(_userId: string, code: string): Promise<void> {
-    const _key = `mfa_temp_${_userId}`;
-    await secureStorage.setItem(_key, {
+  private async storeTemporaryCode(userId: string, code: string): Promise<void> {
+    const key = `mfa_temp_${userId}`;
+    await secureStorage.setItem(key, {
       code: await cryptoService.encrypt(code),
       expiresAt: new Date(Date.now() + this.CHALLENGE_EXPIRY),
     });
   }
 
-  private async verifyTemporaryCode(_userId: string, code: string): Promise<boolean> {
-    const _key = `mfa_temp_${_userId}`;
-    const stored = await secureStorage.getItem(_key);
+  private async verifyTemporaryCode(userId: string, code: string): Promise<boolean> {
+    const key = `mfa_temp_${userId}`;
+    const stored = await secureStorage.getItem(key);
     
     if (!stored) return false;
     
     if (new Date() > new Date(stored.expiresAt)) {
-      await secureStorage.removeItem(_key);
+      await secureStorage.removeItem(key);
       return false;
     }
     
@@ -609,22 +609,22 @@ class MultiFactorAuthService {
     const isValid = storedCode === code;
     
     if (isValid) {
-      await secureStorage.removeItem(_key);
+      await secureStorage.removeItem(key);
     }
     
     return isValid;
   }
 
-  private async verifyTOTP(_userId: string, code: string): Promise<boolean> {
-    const setup = await this.getMFASetup(_userId, 'totp');
+  private async verifyTOTP(userId: string, code: string): Promise<boolean> {
+    const setup = await this.getMFASetup(userId, 'totp');
     if (!setup) return false;
     
     const secret = await cryptoService.decrypt(setup.metadata?.secret || '');
     return await this.verifyTOTPCode(secret, code);
   }
 
-  private async verifyBackupCode(_userId: string, code: string): Promise<boolean> {
-    const setup = await this.getMFASetup(_userId, 'totp');
+  private async verifyBackupCode(userId: string, code: string): Promise<boolean> {
+    const setup = await this.getMFASetup(userId, 'totp');
     if (!setup) return false;
     
     const backupCodes = JSON.parse(
@@ -644,44 +644,44 @@ class MultiFactorAuthService {
       if (setup.metadata) {
         setup.metadata.usedBackupCodes = usedCodes;
       }
-      await this.storeMFASetup(_userId, setup);
+      await this.storeMFASetup(userId, setup);
     }
     
     return isValid;
   }
 
-  private async verifyBiometric(_userId: string, credential: string): Promise<boolean> {
+  private async verifyBiometric(userId: string, credential: string): Promise<boolean> {
     // In production, verify WebAuthn credential
     logger.info('Verifying biometric credential:', credential);
     return true; // Simplified for development
   }
 
-  private async createBiometricCredential(_userId: string): Promise<unknown> {
+  private async createBiometricCredential(userId: string): Promise<unknown> {
     // In production, create WebAuthn credential
     return {
       credentialId: cryptoService.generateSecureUUID(),
-      publicKey: 'mock_public_key',
+      publicKey: 'mock_publickey',
     };
   }
 
-  private async storeMFASetup(_userId: string, setup: MFASetup): Promise<void> {
-    const _key = `mfa_${_userId}`;
-    const existing = await secureStorage.getItem(_key) || { _methods: [] };
+  private async storeMFASetup(userId: string, setup: MFASetup): Promise<void> {
+    const key = `mfa_${userId}`;
+    const existing = await secureStorage.getItem(key) || { methods: [] };
     
     // Update or add method
     const index = existing.methods.findIndex((m: MFASetup) => m.method === setup.method);
     if (index >= 0) {
-      existing._methods[index] = setup;
+      existing.methods[index] = setup;
     } else {
-      existing._methods.push(setup);
+      existing.methods.push(setup);
     }
     
-    await secureStorage.setItem(_key, existing);
+    await secureStorage.setItem(key, existing);
   }
 
-  private async getMFASetup(_userId: string, method: MFAMethod): Promise<MFASetup | null> {
-    const _key = `mfa_${_userId}`;
-    const stored = await secureStorage.getItem(_key);
+  private async getMFASetup(userId: string, method: MFAMethod): Promise<MFASetup | null> {
+    const key = `mfa_${userId}`;
+    const stored = await secureStorage.getItem(key);
     
     if (!stored || !stored.methods) {
       return null;
@@ -690,30 +690,30 @@ class MultiFactorAuthService {
     return stored.methods.find((m: MFASetup) => m.method === method) || null;
   }
 
-  private async removeMFASetup(_userId: string, method: MFAMethod): Promise<void> {
-    const _key = `mfa_${_userId}`;
-    const existing = await secureStorage.getItem(_key);
+  private async removeMFASetup(userId: string, method: MFAMethod): Promise<void> {
+    const key = `mfa_${userId}`;
+    const existing = await secureStorage.getItem(key);
     
     if (existing && existing.methods) {
-      existing._methods = existing._methods.filter((m: MFASetup) => m.method !== method);
-      await secureStorage.setItem(_key, existing);
+      existing.methods = existing.methods.filter((m: MFASetup) => m.method !== method);
+      await secureStorage.setItem(key, existing);
     }
   }
 
-  private async updateLastUsed(_userId: string, method: MFAMethod): Promise<void> {
-    const setup = await this.getMFASetup(_userId, method);
+  private async updateLastUsed(userId: string, method: MFAMethod): Promise<void> {
+    const setup = await this.getMFASetup(userId, method);
     if (setup) {
       setup.lastUsed = new Date();
-      await this.storeMFASetup(_userId, setup);
+      await this.storeMFASetup(userId, setup);
     }
   }
 
-  private selectBestMethod(_methods: MFASetup[]): MFAMethod | null {
+  private selectBestMethod(methods: MFASetup[]): MFAMethod | null {
     // Priority order: biometric > totp > sms > email
     const priority: MFAMethod[] = ['biometric', 'totp', 'sms', 'email'];
     
     for (const method of priority) {
-      if (_methods.some(m => m.method === method)) {
+      if (methods.some(m => m.method === method)) {
         return method;
       }
     }
@@ -721,21 +721,21 @@ class MultiFactorAuthService {
     return null;
   }
 
-  private async sendChallengeCode(_userId: string, method: MFAMethod): Promise<void> {
+  private async sendChallengeCode(userId: string, method: MFAMethod): Promise<void> {
     switch (method) {
       case "sms": {
-        const smsSetup = await this.getMFASetup(_userId, 'sms');
+        const smsSetup = await this.getMFASetup(userId, 'sms');
         if (smsSetup) {
           const phone = await cryptoService.decrypt(smsSetup.metadata?._phoneNumber || '');
-          await this.sendSMSCode(_userId, phone);
+          await this.sendSMSCode(userId, phone);
         }
         break;
       }
       case "email": {
-        const emailSetup = await this.getMFASetup(_userId, 'email');
+        const emailSetup = await this.getMFASetup(userId, 'email');
         if (emailSetup) {
           const email = await cryptoService.decrypt(emailSetup.metadata?.email || '');
-          await this.sendEmailCode(_userId, email);
+          await this.sendEmailCode(userId, email);
         }
         break;
       }
