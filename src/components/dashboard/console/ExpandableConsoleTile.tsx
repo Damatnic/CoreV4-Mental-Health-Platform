@@ -394,14 +394,14 @@ export function ExpandableConsoleTile({
     // Provide haptic feedback
     vibrate(urgent ? [50, 30] : [25]);
     
-    // Toggle expansion
-    setIsExpanded(!isExpanded);
-    
-    // If collapsed, navigate to main route after a delay
-    if (!isExpanded && !options.length) {
+    // If there are expandable options, toggle expansion
+    if (options && options.length > 0) {
+      setIsExpanded(!isExpanded);
+    } else {
+      // If no expandable options, navigate directly
       setTimeout(() => navigate(to), 150);
     }
-  }, [isExpanded, navigate, to, urgent, vibrate, options.length]);
+  }, [isExpanded, navigate, to, urgent, vibrate, options]);
 
   // Handle option click
   const handleOptionClick = useCallback((option: ExpandableOption, e: React.MouseEvent) => {
@@ -627,7 +627,7 @@ export function ExpandableConsoleTile({
 
           {/* Expandable Options Panel */}
           <AnimatePresence>
-            {isExpanded && options.length > 0 && (
+            {isExpanded && options && options.length > 0 && (
               <motion.div
                 ref={expandedRef}
                 initial={{ opacity: 0, height: 0 }}
