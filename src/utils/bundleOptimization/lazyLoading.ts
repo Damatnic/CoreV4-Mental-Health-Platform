@@ -290,9 +290,9 @@ export class ComponentPreloader {
 
 // Route-based code splitting
 export const RouteComponents = {
-  // Core routes (always loaded)
+  // Core routes (always loaded) - Now with responsive dashboard
   Dashboard: createLazyComponent(
-    () => import('../../pages/HomePage'),
+    () => import('../../components/dashboard/ResponsiveDashboard').then(m => ({ default: m.ResponsiveDashboard })),
     'Dashboard'
   ),
   
