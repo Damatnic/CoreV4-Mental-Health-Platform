@@ -32,6 +32,7 @@ const SettingsPage = lazyWithPreload(() => import('./pages/Settings'));
 const AnalyticsPage = lazyWithPreload(() => import('./pages/Analytics'));
 const AccessibilityPage = lazyWithPreload(() => import('./pages/AccessibilitySettings'));
 const NotificationCenterPage = lazyWithPreload(() => import('./pages/NotificationCenter'));
+const NavigationTestPage = lazyWithPreload(() => import('./test/NavigationTest'));
 
 // Preload critical pages immediately
 if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
@@ -344,6 +345,18 @@ function App() {
                       />
                     } 
                   />
+                  
+                  {/* Temporary test route for debugging navigation */}
+                  {import.meta.env.DEV && (
+                    <Route 
+                      path="/test-nav" 
+                      element={
+                        <Suspense fallback={<PageLoadingSpinner />}>
+                          <NavigationTestPage />
+                        </Suspense>
+                      } 
+                    />
+                  )}
                 </Routes>
               </EnhancedLayout>
             </Router>

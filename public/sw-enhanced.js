@@ -555,4 +555,30 @@ async function getLastCheckIn() {
   }
 }
 
+// Handle messages from the main app
+self.addEventListener('message', (event) => {
+  // Handle SKIP_WAITING message to activate new service worker immediately
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    console.log('[SW] Skip waiting activated');
+    return; // Don't use async response to avoid "listener indicated async response" error
+  }
+  
+  // Handle CACHE_URLS message for dynamic caching
+  if (event.data && event.data.type === 'CACHE_URLS') {
+    const urlsToCache = event.data.payload;
+    event.waitUntil(
+      caches.open(DYNAMIC_CACHE)
+        .then((cache) => cache.addAll(urlsToCache))
+        .then(() => {
+          console.log('[SW] URLs cached successfully');
+        })
+        .catch((error) => {
+          console.error('[SW] Cache URLs failed:', error);
+        })
+    );
+    return; // Don't use async response to avoid "listener indicated async response" error
+  }
+});
+
 console.log('[SW] Enhanced service worker loaded');

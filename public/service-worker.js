@@ -514,32 +514,29 @@ async function clearPendingData() {
 
 // Pre-cache dynamic content when online
 self.addEventListener('message', (event) => {
-  if (event.data.type === 'CACHE_URLS') {
+  // Handle CACHE_URLS message
+  if (event.data && event.data.type === 'CACHE_URLS') {
     const urlsToCache = event.data.payload;
     event.waitUntil(
       caches.open(DYNAMIC_CACHE)
         .then((cache) => cache.addAll(urlsToCache))
         .then(() => {
-          // Send response back if ports are available
-          if (event.ports && event.ports[0]) {
-            event.ports[0].postMessage({ success: true });
-          }
+          console.log('[Service Worker] URLs cached successfully');
         })
         .catch((error) => {
           console.error('[Service Worker] Cache URLs failed:', error);
-          if (event.ports && event.ports[0]) {
-            event.ports[0].postMessage({ success: false, error: error.message });
-          }
         })
     );
+    // Don't use event.ports for simple acknowledgment - it causes async listener errors
+    return;
   }
   
-  if (event.data.type === 'SKIP_WAITING') {
-    event.waitUntil(self.skipWaiting());
-    // Send acknowledgment if ports are available
-    if (event.ports && event.ports[0]) {
-      event.ports[0].postMessage({ success: true });
-    }
+  // Handle SKIP_WAITING message
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    console.log('[Service Worker] Skip waiting activated');
+    // Don't use event.ports for simple acknowledgment - it causes async listener errors
+    return;
   }
 });
 
