@@ -3,8 +3,8 @@
  * Provides offline functionality, caching, and background sync
  */
 
-const CACHE_NAME = 'astral-core-v4-cache-v1';
-const DYNAMIC_CACHE = 'astral-core-dynamic-v1';
+const CACHE_NAME = 'astral-core-v4-cache-v2';
+const DYNAMIC_CACHE = 'astral-core-dynamic-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Critical assets to cache for offline use (only existing files)

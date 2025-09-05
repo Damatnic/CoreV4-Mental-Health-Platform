@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache - Astral Core</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .cache-status { 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            background: #333;
+        }
+        button { 
+            background: #dc2626; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #b91c1c; }
+        .success { background: #059669; }
+        .info { background: #0891b2; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Cache Management - Astral Core</h1>
+    
+    <div id="status" class="cache-status">
+        <h3>Current Cache Status</h3>
+        <p>Checking cache and service worker status...</p>
+    </div>
+    
+    <div>
+        <button onclick="clearAllCaches()">🗑️ Clear All Caches</button>
+        <button onclick="unregisterServiceWorker()">🔄 Reset Service Worker</button>
+        <button onclick="forceRefresh()">⚡ Force Page Refresh</button>
+        <button onclick="clearBrowserData()">🧹 Clear Browser Data</button>
+    </div>
+    
+    <div>
+        <button onclick="testDashboardFunctionality()">🧪 Test Dashboard Functions</button>
+        <button onclick="window.location.href = '/'">🏠 Return to App</button>
+    </div>
+
+    <script>
+        async function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.className = `cache-status ${type}`;
+            status.innerHTML = `<h3>Status Update</h3><p>${message}</p>`;
+        }
+
+        async function clearAllCaches() {
+            try {
+                updateStatus('Clearing all caches...', 'info');
+                
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    const deletePromises = cacheNames.map(cacheName => {
+                        console.log('Deleting cache:', cacheName);
+                        return caches.delete(cacheName);
+                    });
+                    await Promise.all(deletePromises);
+                    updateStatus(`✅ Successfully cleared ${cacheNames.length} caches: ${cacheNames.join(', ')}`, 'success');
+                } else {
+                    updateStatus('❌ Cache API not supported in this browser', 'info');
+                }
+            } catch (error) {
+                updateStatus(`❌ Error clearing caches: ${error.message}`, 'error');
+                console.error('Cache clearing error:', error);
+            }
+        }
+
+        async function unregisterServiceWorker() {
+            try {
+                updateStatus('Unregistering service worker...', 'info');
+                
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    const unregisterPromises = registrations.map(registration => {
+                        console.log('Unregistering SW:', registration.scope);
+                        return registration.unregister();
+                    });
+                    await Promise.all(unregisterPromises);
+                    updateStatus(`✅ Successfully unregistered ${registrations.length} service workers`, 'success');
+                    
+                    // Clear any indexed DB data
+                    if ('indexedDB' in window) {
+                        // This will clear any offline data storage
+                        indexedDB.deleteDatabase('astral-core-offline');
+                    }
+                } else {
+                    updateStatus('❌ Service Workers not supported in this browser', 'info');
+                }
+            } catch (error) {
+                updateStatus(`❌ Error unregistering service worker: ${error.message}`, 'error');
+                console.error('SW unregister error:', error);
+            }
+        }
+
+        async function clearBrowserData() {
+            updateStatus('Clearing browser storage data...', 'info');
+            
+            try {
+                // Clear localStorage
+                if (localStorage) {
+                    localStorage.clear();
+                    console.log('localStorage cleared');
+                }
+                
+                // Clear sessionStorage
+                if (sessionStorage) {
+                    sessionStorage.clear();
+                    console.log('sessionStorage cleared');
+                }
+                
+                // Clear IndexedDB databases
+                if ('indexedDB' in window) {
+                    const dbs = ['astral-core-offline', 'mood_data', 'crisis_data'];
+                    for (const db of dbs) {
+                        try {
+                            indexedDB.deleteDatabase(db);
+                        } catch (e) {
+                            console.log(`Could not delete ${db}:`, e);
+                        }
+                    }
+                }
+                
+                updateStatus('✅ Browser storage cleared successfully', 'success');
+            } catch (error) {
+                updateStatus(`❌ Error clearing browser data: ${error.message}`, 'error');
+            }
+        }
+
+        async function forceRefresh() {
+            updateStatus('Force refreshing page...', 'info');
+            
+            // Add timestamp to force cache bypass
+            const timestamp = Date.now();
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/?v=${timestamp}&cache=false`;
+        }
+
+        async function testDashboardFunctionality() {
+            updateStatus('Testing dashboard functionality...', 'info');
+            
+            // Navigate to dashboard with fresh cache
+            const timestamp = Date.now();
+            const dashboardUrl = `${window.location.origin}/?test=dashboard&v=${timestamp}`;
+            window.open(dashboardUrl, '_blank');
+        }
+
+        // Auto-run cache status check
+        async function checkCacheStatus() {
+            let statusMsg = '';
+            
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                statusMsg += `📦 Found ${cacheNames.length} caches: ${cacheNames.join(', ')}<br>`;
+            }
+            
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                statusMsg += `🔄 Found ${registrations.length} service worker registrations<br>`;
+                
+                registrations.forEach((registration, index) => {
+                    const state = registration.active ? registration.active.state : 'none';
+                    statusMsg += `SW ${index + 1}: ${registration.scope} (${state})<br>`;
+                });
+            }
+            
+            if (!statusMsg) {
+                statusMsg = 'No caches or service workers found.';
+            }
+            
+            updateStatus(statusMsg, 'info');
+        }
+
+        // Run status check on page load
+        checkCacheStatus();
+    </script>
+</body>
+</html>
