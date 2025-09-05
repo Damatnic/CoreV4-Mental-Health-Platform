@@ -1,8 +1,8 @@
-import { useState, _useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  _Calendar, Clock, Video, MapPin, _FileText, CheckCircle, 
-  _AlertCircle, ChevronRight, Edit2, Phone, _MessageSquare,
+import {
+  Calendar, Clock, Video, MapPin, FileText, CheckCircle,
+  AlertCircle, ChevronRight, Edit2, Phone, MessageSquare,
   Target, Brain, Heart, Clipboard, TrendingUp, Star
 } from 'lucide-react';
 
@@ -75,11 +75,11 @@ export function TherapySessionWidget({
   onCompleteHomework,
   _onAddNote
 }: TherapySessionWidgetProps) {
-  const [activeTab, _setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
-  const [selectedSession, _setSelectedSession] = useState<TherapySession | null>(null);
-  const [___showPreparation, _setShowPreparation] = useState(false);
-  const [_preparationTopics, _setPreparationTopics] = useState<string[]>([]);
-  const [_sessionQuestions, _setSessionQuestions] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'homework' | 'history'>('upcoming');
+  const [selectedSession, setSelectedSession] = useState<TherapySession | null>(null);
+  const [showPreparation, setShowPreparation] = useState(false);
+  const [preparationTopics, setPreparationTopics] = useState<string[]>([]);
+  const [sessionQuestions, setSessionQuestions] = useState<string[]>([]);
 
   // Get next upcoming session
   const nextSession = sessions
@@ -128,8 +128,8 @@ export function TherapySessionWidget({
   };
 
   // Session status color
-  const __getStatusColor = (_status: string) => {
-    switch (_status) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
       case 'confirmed': return 'text-green-600 bg-green-50';
       case 'scheduled': return 'text-blue-600 bg-blue-50';
       case 'in-progress': return 'text-purple-600 bg-purple-50';
@@ -146,7 +146,7 @@ export function TherapySessionWidget({
         {(['upcoming', 'homework', 'history'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(_tab)}
+            onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -187,7 +187,7 @@ export function TherapySessionWidget({
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-primary-600">
-                      {getTimeUntilSession(_nextSession)}
+                      {getTimeUntilSession(nextSession)}
                     </div>
                     <div className="text-xs text-gray-600">
                       {new Date(nextSession.dateTime).toLocaleTimeString('en-US', {
@@ -253,13 +253,13 @@ export function TherapySessionWidget({
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">Preparation Progress</span>
                       <span className="text-primary-600 font-medium">
-                        {Math.round(calculatePreparationProgress(_nextSession))}%
+                        {Math.round(calculatePreparationProgress(nextSession))}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-primary-600 h-2 rounded-full transition-all"
-                        style={{ width: `${calculatePreparationProgress(_nextSession)}%` }}
+                        style={{ width: `${calculatePreparationProgress(nextSession)}%` }}
                       />
                     </div>
                   </div>
@@ -269,7 +269,7 @@ export function TherapySessionWidget({
                 <div className="flex space-x-2">
                   {nextSession.format === 'telehealth' && (
                     <button
-                      onClick={() => onJoinTelehealth?.(_nextSession)}
+                      onClick={() => onJoinTelehealth?.(nextSession)}
                       className="flex-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center text-sm"
                     >
                       <Video className="h-4 w-4 mr-1" />
@@ -278,7 +278,7 @@ export function TherapySessionWidget({
                   )}
                   <button
                     onClick={() => {
-                      setSelectedSession(_nextSession);
+                      setSelectedSession(nextSession);
                       setShowPreparation(true);
                     }}
                     className="flex-1 px-3 py-2 bg-white text-primary-600 border border-primary-600 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center text-sm"
@@ -287,7 +287,7 @@ export function TherapySessionWidget({
                     Prepare
                   </button>
                   <button
-                    onClick={() => onReschedule?.(_nextSession)}
+                    onClick={() => onReschedule?.(nextSession)}
                     className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -505,7 +505,7 @@ export function TherapySessionWidget({
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
-                    onPrepareSession?.(_selectedSession);
+                    onPrepareSession?.(selectedSession);
                     setShowPreparation(false);
                   }}
                   className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"

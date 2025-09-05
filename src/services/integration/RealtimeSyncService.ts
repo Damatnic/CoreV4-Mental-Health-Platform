@@ -5,8 +5,8 @@
 
 import { io, Socket } from 'socket.io-client';
 import { EventEmitter } from 'events';
-import { _useWellnessStore } from '../../stores/wellnessStore';
-import { __useActivityStore } from '../../stores/activityStore';
+import { useWellnessStore } from '../../stores/wellnessStore';
+import { useActivityStore } from '../../stores/activityStore';
 import { logger } from '../../utils/logger';
 
 // Real-time event types
@@ -133,8 +133,8 @@ class RealtimeSyncService extends EventEmitter {
           reconnection: this.config.reconnection,
           reconnectionAttempts: this.config.reconnectionAttempts,
           reconnectionDelay: this.config.reconnectionDelay,
-          _timeout: this.config._timeout,
-          _auth: _auth || {}
+          timeout: this.config._timeout,
+          auth: _auth || {}
         });
         
         this.setupSocketListeners();
@@ -142,7 +142,7 @@ class RealtimeSyncService extends EventEmitter {
         // Set connection timeout
         const _timeout = setTimeout(() => {
           reject(new Error('Connection _timeout'));
-        }, this.config.timeout);
+        }, this.config._timeout);
         
         this.socket.once('connect', () => {
           clearTimeout(_timeout);
@@ -174,35 +174,35 @@ class RealtimeSyncService extends EventEmitter {
     this.subscribe({
       channel: 'crisis',
       events: ['alert', 'support_connected', 'message', 'status_update'],
-      handler: (_data) => this.handleCrisisUpdate(data)
+      handler: (data) => this.handleCrisisUpdate(data)
     });
     
     // Community channel subscription
     this.subscribe({
       channel: 'community',
       events: ['post_created', 'comment_added', 'user_joined', 'user_left', 'typing'],
-      handler: (_data) => this.handleCommunityUpdate(data)
+      handler: (data) => this.handleCommunityUpdate(data)
     });
     
     // Professional care channel subscription
     this.subscribe({
       channel: 'professional',
       events: ['therapist_available', 'appointment_reminder', 'prescription_update', 'care_teammessage'],
-      handler: (_data) => this.handleProfessionalUpdate(data)
+      handler: (data) => this.handleProfessionalUpdate(data)
     });
     
     // Wellness channel subscription
     this.subscribe({
       channel: 'wellness',
       events: ['mood_check_reminder', 'goal_milestone', 'insight'],
-      handler: (_data) => this.handleWellnessUpdate(data)
+      handler: (data) => this.handleWellnessUpdate(data)
     });
     
     // Notifications channel subscription
     this.subscribe({
       channel: 'notifications',
       events: ['received', 'read', 'cleared'],
-      handler: (_data) => this.handleNotificationUpdate(data)
+      handler: (data) => this.handleNotificationUpdate(data)
     });
   }
   
@@ -219,7 +219,7 @@ class RealtimeSyncService extends EventEmitter {
       this.emit(RealtimeEvent.DISCONNECTED);
     });
     
-    this.socket.on('reconnect', (attempt: number) => {
+    this.socket.on('reconnect', (attempt: any) => {
       this.reconnectAttempts = attempt;
       this.isConnected = true;
       this.emit(RealtimeEvent.RECONNECTING, attempt);
@@ -227,22 +227,22 @@ class RealtimeSyncService extends EventEmitter {
       this.flushMessageQueue();
     });
     
-    this.socket.on('error', (error: Error) => {
+    this.socket.on('error', (error: any) => {
       this.emit(RealtimeEvent.ERROR, error);
     });
     
     // Message handling
-    this.socket.on('message', (message: RealtimeMessage) => {
+    this.socket.on('message', (message: any) => {
       this.handleMessage(message);
     });
     
     // Presence updates
-    this.socket.on('presence:update', (_presence: UserPresence) => {
+    this.socket.on('presence:update', (_presence: any) => {
       this.updatePresence(_presence);
     });
     
     // Subscribe to configured channels
-    this.subscriptions.forEach((_config, _key) => {
+    this.subscriptions.forEach((config, _key) => {
       config.events.forEach(event => {
         const _eventName = `${config.channel}:${event}`;
         this.socket!.on(_eventName, (data: unknown) => {
@@ -286,14 +286,14 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle crisis updates
    */
-  private handleCrisisUpdate(data: unknown) {
+  private handleCrisisUpdate(data: any) {
     const { _type, _payload } = data;
     
     switch (_type) {
       case 'alert':
         this.emit(RealtimeEvent.CRISIS_ALERT_RECEIVED, _payload);
         // Update wellness store with crisis event
-        _useWellnessStore.getState().recordCrisisEvent(_payload);
+        useWellnessStore.getState().recordCrisisEvent(_payload);
         break;
         
       case 'support_connected':
@@ -313,7 +313,7 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle community updates
    */
-  private handleCommunityUpdate(data: unknown) {
+  private handleCommunityUpdate(data: any) {
     const { _type, _payload } = data;
     
     switch (_type) {
@@ -352,7 +352,7 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle professional care updates
    */
-  private handleProfessionalUpdate(data: unknown) {
+  private handleProfessionalUpdate(data: any) {
     const { _type, _payload } = data;
     
     switch (_type) {
@@ -363,11 +363,11 @@ class RealtimeSyncService extends EventEmitter {
       case 'appointment_reminder':
         this.emit(RealtimeEvent.APPOINTMENT_REMINDER, _payload);
         // Update activity store with appointment reminder
-        __useActivityStore.getState().addActivity({
-          title: _payload.title,
-          _type: 'appointment',
+        useActivityStore.getState().addActivity({
+          title: (_payload as any).title,
+          type: 'appointment',
           category: 'professional',
-          scheduledTime: new Date(_payload.time),
+          scheduledTime: new Date((_payload as any).time),
           completed: false
         });
         break;
@@ -385,7 +385,7 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle wellness updates
    */
-  private handleWellnessUpdate(data: unknown) {
+  private handleWellnessUpdate(data: any) {
     const { _type, _payload } = data;
     
     switch (_type) {
@@ -396,16 +396,16 @@ class RealtimeSyncService extends EventEmitter {
       case 'goal_milestone':
         this.emit(RealtimeEvent.GOAL_MILESTONE_REACHED, _payload);
         // Update activity store with milestone
-        __useActivityStore.getState().updateGoalProgress(
-          _payload.goalId,
-          _payload.progress
+        useActivityStore.getState().updateGoalProgress(
+          (_payload as any).goalId,
+          (_payload as any).progress
         );
         break;
         
       case 'insight':
         this.emit(RealtimeEvent.WELLNESS_INSIGHT, _payload);
         // Regenerate insights in wellness store
-        _useWellnessStore.getState().generateInsights();
+        useWellnessStore.getState().generateInsights();
         break;
     }
   }
@@ -413,7 +413,7 @@ class RealtimeSyncService extends EventEmitter {
   /**
    * Handle notification updates
    */
-  private handleNotificationUpdate(data: unknown) {
+  private handleNotificationUpdate(data: any) {
     const { _type, _payload } = data;
     
     switch (_type) {
@@ -535,7 +535,7 @@ class RealtimeSyncService extends EventEmitter {
       _type: channel,
       _payload: data,
       timestamp: new Date(),
-      _userId: this.config.auth?.userId,
+      _userId: this.config._auth?._userId,
       metadata: { event }
     };
     
@@ -649,7 +649,7 @@ class RealtimeSyncService extends EventEmitter {
     this.isConnected = false;
     this.subscriptions.clear();
     this.messageQueue = [];
-    this.presence.clear();
+    this._presence.clear();
     this.emit(RealtimeEvent.DISCONNECTED);
   }
   
@@ -674,7 +674,7 @@ class RealtimeSyncService extends EventEmitter {
 }
 
 // Export singleton instance
-export const __realtimeSyncService = RealtimeSyncService.getInstance();
+export const realtimeSyncService = RealtimeSyncService.getInstance();
 
 // Export React hook
 export function useRealtimeSync() {

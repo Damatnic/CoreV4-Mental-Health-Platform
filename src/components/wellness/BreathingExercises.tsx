@@ -73,15 +73,15 @@ interface BreathingSession {
 }
 
 export const BreathingExercises: React.FC = () => {
-  const [selectedPattern, _setSelectedPattern] = useState<keyof typeof BREATHING_PATTERNS>('4-7-8');
+  const [selectedPattern, setSelectedPattern] = useState<keyof typeof BREATHING_PATTERNS>('4-7-8');
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'holdIn' | 'exhale' | 'holdOut'>('inhale');
   const [_timeRemaining, setTimeRemaining] = useState(0);
-  const [__cycleCount, setCycleCount] = useState(0);
+  const [cycleCount, setCycleCount] = useState(0);
   const [sessionDuration, setSessionDuration] = useState(0);
-  const [soundEnabled, _setSoundEnabled] = useState(true);
-  const [showSettings, _setShowSettings] = useState(false);
-  const [customDuration, _setCustomDuration] = useState(5); // minutes
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [customDuration, setCustomDuration] = useState(5); // minutes
   const [sessions, setSessions] = useState<BreathingSession[]>([]);
   const [stressLevelBefore, setStressLevelBefore] = useState<number | null>(null);
   
@@ -92,7 +92,7 @@ export const BreathingExercises: React.FC = () => {
   // Initialize audio context
   useEffect(() => {
     if (typeof window !== 'undefined' && !audioContext.current) {
-      audioContext.current = new (window.AudioContext || (window as unknown).webkitAudioContext)();
+      audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     
     // Load saved sessions
@@ -127,7 +127,7 @@ export const BreathingExercises: React.FC = () => {
   const getNextPhase = (pattern: typeof BREATHING_PATTERNS[keyof typeof BREATHING_PATTERNS], current: string) => {
     if ('holdIn' in pattern) {
       // Box breathing pattern
-      switch (_current) {
+      switch (current) {
         case 'inhale': return 'holdIn';
         case 'holdIn': return 'exhale';
         case 'exhale': return 'holdOut';
@@ -136,7 +136,7 @@ export const BreathingExercises: React.FC = () => {
       }
     } else if ('hold' in pattern) {
       // 4-7-8 or triangle pattern
-      switch (_current) {
+      switch (current) {
         case 'inhale': return 'hold';
         case 'hold': return 'exhale';
         case 'exhale': return 'inhale';
@@ -149,8 +149,8 @@ export const BreathingExercises: React.FC = () => {
   };
 
   // Get duration for current phase
-  const getPhaseDuration = (pattern: typeof BREATHING_PATTERNS[keyof typeof BREATHING_PATTERNS], _phase: string) => {
-    switch (_phase) {
+  const getPhaseDuration = (pattern: typeof BREATHING_PATTERNS[keyof typeof BREATHING_PATTERNS], phase: string) => {
+    switch (phase) {
       case 'inhale': return pattern.inhale;
       case 'hold': return 'hold' in pattern ? pattern.hold : 0;
       case 'holdIn': return 'holdIn' in pattern ? pattern.holdIn : 0;
@@ -206,8 +206,8 @@ export const BreathingExercises: React.FC = () => {
       setTimeRemaining(prev => {
         if (prev <= 0.1) {
           const pattern = BREATHING_PATTERNS[selectedPattern];
-          const nextPhase = getNextPhase(pattern, currentPhase) as unknown;
-          const nextDuration = getPhaseDuration(pattern, nextPhase);
+          const nextPhase = getNextPhase(pattern, currentPhase);
+          const nextDuration = getPhaseDuration(pattern, nextPhase as string);
           
           // Play sound for _phase transition
           const frequencies: Record<string, number> = {
@@ -217,9 +217,9 @@ export const BreathingExercises: React.FC = () => {
             exhale: 349,   // F4
             holdOut: 392   // G4
           };
-          playSound(frequencies[nextPhase] || 261, 0.2);
+          playSound(frequencies[nextPhase as string] || 261, 0.2);
           
-          setCurrentPhase(_nextPhase);
+          setCurrentPhase(nextPhase as 'inhale' | 'hold' | 'holdIn' | 'exhale' | 'holdOut');
           
           // Increment cycle count
           if (nextPhase === 'inhale') {
@@ -249,7 +249,7 @@ export const BreathingExercises: React.FC = () => {
 
   // Get phase display text
   const getPhaseText = () => {
-    switch (_currentPhase) {
+    switch (currentPhase) {
       case 'inhale': return 'Breathe In';
       case 'hold':
       case 'holdIn': return 'Hold';
@@ -263,9 +263,9 @@ export const BreathingExercises: React.FC = () => {
   const getCircleScale = () => {
     const pattern = BREATHING_PATTERNS[selectedPattern];
     const totalDuration = getPhaseDuration(pattern, currentPhase);
-    const progress = 1 - (timeRemaining / totalDuration);
+    const progress = 1 - (_timeRemaining / totalDuration);
     
-    switch (_currentPhase) {
+    switch (currentPhase) {
       case 'inhale': return 1 + progress * 0.5;
       case 'hold':
       case 'holdIn': return 1.5;
@@ -289,7 +289,7 @@ export const BreathingExercises: React.FC = () => {
 
       {/* Pattern Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {Object.entries(_BREATHING_PATTERNS).map(([key, pattern]) => {
+        {Object.entries(BREATHING_PATTERNS).map(([key, pattern]) => {
           const Icon = pattern.icon;
           return (
             <motion.div
@@ -492,7 +492,7 @@ export const BreathingExercises: React.FC = () => {
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(level => (
                         <button
                           key={level}
-                          onClick={() => setStressLevelBefore(_level)}
+                          onClick={() => setStressLevelBefore(level)}
                           className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                             stressLevelBefore === level
                               ? 'bg-blue-500 text-white'

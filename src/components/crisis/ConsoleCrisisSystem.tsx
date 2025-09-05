@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield } from 'lucide-react';
-import { _EmergencyContactsLazy, _SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { _CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { ConsoleFocusable } from '../console/ConsoleFocusable';
 import { logger, LogLevel } from '../../utils/logger';
 
@@ -75,7 +75,7 @@ export function ConsoleCrisisSystem() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (_position) => setUserLocation(_position),
-        (error) => logger.error('Location access denied', new Error(error.message), { category: LogLevel.CRISIS }),
+        (error) => logger.error('Location access denied', 'ConsoleCrisisSystem', error),
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
@@ -84,7 +84,7 @@ export function ConsoleCrisisSystem() {
   // Emergency handlers
   const handleEmergencyCall = useCallback((number: string, service: string) => {
     const timestamp = new Date().toISOString();
-    logger.logCrisisIntervention('emergency_callinitiated', undefined, {
+    logger.crisis('emergency_call_initiated', 'critical', 'ConsoleCrisisSystem', {
       service,
       timestamp,
       responseTime
@@ -97,7 +97,7 @@ export function ConsoleCrisisSystem() {
     const smsUrl = `sms:${number}${keyword ? `?&body=${encodeURIComponent(keyword)}` : ''}`;
     window.location.href = smsUrl;
     
-    logger.logCrisisIntervention('crisis_textinitiated', undefined, {
+    logger.crisis('crisis_text_initiated', 'critical', 'ConsoleCrisisSystem', {
       number,
       keyword,
       timestamp: new Date().toISOString()
@@ -290,7 +290,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-24 rounded border border-cyan-500/20"></div>}>
-                  <_EmergencyContactsLazy />
+                  <EmergencyContactsLazy />
                 </Suspense>
               </motion.div>
             )}
@@ -312,7 +312,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
-                  <_SafetyPlanLazy />
+                  <SafetyPlanLazy />
                 </Suspense>
               </motion.div>
             )}
@@ -324,7 +324,7 @@ export function ConsoleCrisisSystem() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <Suspense fallback={<div className="animate-pulse bg-gray-800 h-32 rounded border border-cyan-500/20"></div>}>
-                  <_CrisisChatLazy />
+                  <CrisisChatLazy />
                 </Suspense>
               </motion.div>
             )}

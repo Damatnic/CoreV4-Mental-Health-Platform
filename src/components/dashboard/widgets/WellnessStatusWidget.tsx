@@ -1,8 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus, _Heart, _Brain, Target, Award } from 'lucide-react';
-import { WellnessStatus } from '../../../types/dashboard';
+import { Award, Minus, Target, TrendingDown, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { WellnessStatus } from '../../../types/dashboard';
 
 interface WellnessStatusWidgetProps {
   data?: WellnessStatus;
@@ -10,7 +9,7 @@ interface WellnessStatusWidgetProps {
 }
 
 export function WellnessStatusWidget({ data, error }: WellnessStatusWidgetProps) {
-  const __navigate   = useNavigate();
+  const navigate = useNavigate();
 
   if (error) {
     return (

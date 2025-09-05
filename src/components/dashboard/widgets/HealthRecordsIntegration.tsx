@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { motion, _AnimatePresence } from 'framer-motion';
-import { 
-  FileText, Download, Upload, _Share2, Lock, Shield, 
-  Activity, Heart, Brain, _Pill, _Calendar, _Clock,
-  AlertCircle, CheckCircle, _Info, TrendingUp, TrendingDown,
-  ChevronRight, _Filter, Search, Eye, EyeOff, RefreshCw,
-  _User, _Users, Clipboard, _Award, _BarChart3, Database,
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FileText, Download, Upload, Share2, Lock, Shield,
+  Activity, Heart, Brain, Pill, Calendar, Clock,
+  AlertCircle, CheckCircle, Info, TrendingUp, TrendingDown,
+  ChevronRight, Filter, Search, Eye, EyeOff, RefreshCw,
+  User, Users, Clipboard, Award, BarChart3, Database,
   Minus, XCircle
 } from 'lucide-react';
 
@@ -138,12 +138,12 @@ export function HealthRecordsIntegration({
   _onUpdatePrivacy,
   onRefreshData
 }: HealthRecordsIntegrationProps) {
-  const [activeTab, _setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
-  const [__selectedRecord, _setSelectedRecord] = useState<HealthRecord | null>(null);
-  const [__showDetails, _setShowDetails] = useState(false);
-  const [searchQuery, _setSearchQuery] = useState('');
-  const [filterType, _setFilterType] = useState<string>('all');
-  const [showPrivateRecords, _setShowPrivateRecords] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'assessments' | 'diagnoses' | 'labs' | 'insurance' | 'emergency'>('overview');
+  const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [showPrivateRecords, setShowPrivateRecords] = useState(false);
 
   // Calculate health metrics
   const calculateHealthMetrics = () => {
@@ -280,10 +280,10 @@ export function HealthRecordsIntegration({
         <button
           onClick={() => {
             const input = document.createElement('input');
-            input._type = '_file';
+            input.type = 'file';
             input.onchange = (e) => {
-              const _file = (e.target as HTMLInputElement).files?.[0];
-              if (_file) onImportRecords?.(_file);
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file) onImportRecords?.(file);
             };
             input.click();
           }}

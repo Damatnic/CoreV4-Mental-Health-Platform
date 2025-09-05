@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { motion, _AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  MessageSquare, Phone, Video, _Mail, Send, Paperclip, 
+  MessageSquare, Phone, Video, Mail, Send, Paperclip, 
   Calendar, Clock, Shield, Lock, CheckCircle, AlertCircle,
-  User, _Users, FileText, Download, Upload, Info, _Bell,
-  _ChevronRight, Search, _Filter, Archive, _Star, _Reply
+  User, Users, FileText, Download, Upload, Info, Bell,
+  ChevronRight, Search, Filter, Archive, Star, Reply
 } from 'lucide-react';
 
 interface Message {
@@ -103,13 +103,13 @@ export function ProviderCommunication({
   _onMarkAsRead,
   onArchiveThread
 }: ProviderCommunicationProps) {
-  const [activeTab, _setActiveTab] = useState<'messages' | 'appointments' | 'documents' | 'secure'>('messages');
-  const [selectedThread, _setSelectedThread] = useState<CommunicationThread | null>(null);
-  const [__composeMode, _setComposeMode] = useState(false);
-  const [messageContent, _setMessageContent] = useState('');
-  const [searchQuery, _setSearchQuery] = useState('');
-  const [filterCategory, _setFilterCategory] = useState<string>('all');
-  const [__showUploadModal, _setShowUploadModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'messages' | 'appointments' | 'documents' | 'secure'>('messages');
+  const [selectedThread, setSelectedThread] = useState<CommunicationThread | null>(null);
+  const [composeMode, setComposeMode] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Get unread message count
   const unreadCount = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);
@@ -199,7 +199,7 @@ export function ProviderCommunication({
         {(['messages', 'appointments', 'documents', 'secure'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(_tab)}
+            onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium transition-all capitalize ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'

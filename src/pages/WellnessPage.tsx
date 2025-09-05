@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { WellnessToolsSuite } from '../components/wellness/WellnessToolsSuite';
 
 export function WellnessPage() {
-  const [____showFullSuite, _setShowFullSuite] = useState(true); // Default to full suite
+  const [___showFullSuite, __setShowFullSuite] = useState(true); // Default to full suite
 
   // If full suite is active, render it
-  if (_showFullSuite) {
+  if (___showFullSuite) {
     return (
       <div className="h-screen">
         <WellnessToolsSuite 
@@ -78,7 +78,7 @@ export function WellnessPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            onClick={() => setShowFullSuite(true)}
+            onClick={() => __setShowFullSuite(true)}
             className="px-6 py-3 bg-gradient-to-r from-console-accent/80 to-blue-500 text-white rounded-console font-semibold backdrop-blur-md border border-console-accent/20 hover:shadow-console-glow transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-console-accent/50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -131,7 +131,7 @@ export function WellnessPage() {
                   </p>
                 </div>
                 <motion.button
-                  onClick={() => setShowFullSuite(true)}
+                  onClick={() => __setShowFullSuite(true)}
                   className="w-full px-4 py-3 bg-gradient-to-r from-console-accent/20 to-blue-500/20 text-console-accent border border-console-accent/30 rounded-console font-medium transition-all duration-300 hover:from-console-accent/30 hover:to-blue-500/30 hover:shadow-console-glow hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-console-accent/50 backdrop-blur-sm"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

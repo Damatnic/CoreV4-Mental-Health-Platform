@@ -62,7 +62,7 @@ export interface VoiceNavigationAction {
 export class AdvancedAccessibilityService {
   private recognition: SpeechRecognition | null = null;
   private synthesis: SpeechSynthesis | null = null;
-  private eyeTracker: unknown = null;
+  private eyeTracker: { isReady?: boolean } | null = null;
   private isVoiceActive = false;
   private isEyeTrackingActive = false;
   private currentProfile: AccessibilityProfile | null = null;
@@ -78,7 +78,7 @@ export class AdvancedAccessibilityService {
     try {
       // Initialize Speech Recognition
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         this.recognition = new SpeechRecognition();
         this.setupSpeechRecognition();
       }
@@ -146,14 +146,13 @@ export class AdvancedAccessibilityService {
         
         // Mock eye tracking initialization
         this.eyeTracker = {
-          isReady: true,
-          calibration: null
-        };
+          isReady: true
+        } as any;
       }
     } catch (error) {
       logger.warn('Eye tracking not available', {
         category: LogCategory.ACCESSIBILITY,
-        metadata: { error: error instanceof Error ? error.message : String(error) }
+        _metadata: { error: error instanceof Error ? error.message : String(error) }
       });
     }
   }
@@ -367,7 +366,7 @@ export class AdvancedAccessibilityService {
         await action.execute();
         
         // Log command usage
-        await this.logCommandUsage(_command);
+        await this.logCommandUsage(command);
         
       } else {
         await this.speak('Command not recognized. Try saying "emergency help", "navigate home", or "mood tracker".');
@@ -393,7 +392,7 @@ export class AdvancedAccessibilityService {
       const phraseWords = normalizedPhrase.split(' ');
       
       const matches = keywords.filter(keyword => 
-        phraseWords.some(word => word.includes(keyword) || keyword.includes(_word))
+        phraseWords.some(word => word.includes(keyword) || keyword.includes(word))
       );
 
       // If more than 50% of keywords match, consider it a match
@@ -416,10 +415,10 @@ export class AdvancedAccessibilityService {
         this.synthesis.cancel();
       }
 
-      const utterance = new SpeechSynthesisUtterance(_text);
+      const utterance = new SpeechSynthesisUtterance(text);
       
       // Configure voice settings based on priority
-      switch (_priority) {
+      switch (priority) {
         case 'emergency':
           utterance.rate = 1.2;
           utterance.pitch = 1.1;
@@ -443,14 +442,14 @@ export class AdvancedAccessibilityService {
         voice.lang.startsWith('en') && voice.name.includes('Female')
       ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
       
-      if (_preferredVoice) {
+      if (preferredVoice) {
         utterance.voice = preferredVoice;
       }
 
       return new Promise((resolve, reject) => {
         utterance.onend = () => resolve();
         utterance.onerror = (error) => reject(error);
-        this.synthesis!.speak(_utterance);
+        this.synthesis!.speak(utterance);
       });
 
     } catch (error) {
@@ -514,7 +513,7 @@ export class AdvancedAccessibilityService {
     const body = document.body;
     const hasHighContrast = body.classList.contains('high-contrast');
     
-    if (_hasHighContrast) {
+    if (hasHighContrast) {
       body.classList.remove('high-contrast');
     } else {
       body.classList.add('high-contrast');
@@ -537,7 +536,7 @@ export class AdvancedAccessibilityService {
       };
 
       // Store usage data for analytics (privacy-preserving)
-      const usageLog = await secureStorage.getItem('voice_command_usage') || [];
+      const usageLog = (await secureStorage.getItem('voice_command_usage') || []) as any[];
       usageLog.push(_usage);
       
       // Keep only last 100 commands
@@ -553,10 +552,10 @@ export class AdvancedAccessibilityService {
     try {
       const profile = await secureStorage.getItem('accessibility_profile');
       
-      if (_profile) {
-        this.currentProfile = profile;
-        await this.applyAccessibilitySettings(_profile);
-        return profile;
+      if (profile && typeof profile === 'object' && 'userId' in profile) {
+        this.currentProfile = profile as AccessibilityProfile;
+        await this.applyAccessibilitySettings(profile as AccessibilityProfile);
+        return profile as AccessibilityProfile;
       } else {
         // Create default profile
         const defaultProfile: AccessibilityProfile = {

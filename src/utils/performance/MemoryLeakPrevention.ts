@@ -45,7 +45,6 @@ export class CleanupManager {
   private intervals: Set<number> = new Set();
   private timeouts: Set<number> = new Set();
   private animationFrames: Set<number> = new Set();
-// @ts-expect-error - MutationObserver is a global API
   private observers: Set<MutationObserver | IntersectionObserver | ResizeObserver> = new Set();
   private eventListeners: Map<EventTarget, Map<string, EventListener>> = new Map();
   private abortControllers: Set<AbortController> = new Set();
@@ -101,10 +100,10 @@ export class CleanupManager {
   ): void {
     target.addEventListener(type, listener, options);
     
-    if (!this.eventListeners.has(_target)) {
+    if (!this.eventListeners.has(target)) {
       this.eventListeners.set(target, new Map());
     }
-    this.eventListeners.get(_target)!.set(type, listener);
+    this.eventListeners.get(target)!.set(type, listener);
   }
   
   /**
@@ -114,24 +113,20 @@ export class CleanupManager {
    */
   createMutationObserver(callback: MutationCallback): MutationObserver {
     const observer = new MutationObserver(callback);
-    this.observers.add(_observer);
+    this.observers.add(observer);
     return observer;
   }
   
   /**
    * Create a managed intersection observer
    */
-// @ts-expect-error - IntersectionObserver is a global API
-// @ts-expect-error - IntersectionObserver is a global API
   createIntersectionObserver(
     callback: IntersectionObserverCallback,
     options?: IntersectionObserverInit
   ): IntersectionObserver {
     const observer = new IntersectionObserver(callback, options);
-    this.observers.add(_observer);
+    this.observers.add(observer);
     return observer;
-// @ts-expect-error - ResizeObserver is a global API
-// @ts-expect-error - ResizeObserver is a global API
   }
   
   /**
@@ -139,7 +134,7 @@ export class CleanupManager {
    */
   createResizeObserver(callback: ResizeObserverCallback): ResizeObserver {
     const observer = new ResizeObserver(callback);
-    this.observers.add(_observer);
+    this.observers.add(observer);
     return observer;
   }
   
@@ -148,7 +143,7 @@ export class CleanupManager {
    */
   createAbortController(): AbortController {
     const controller = new AbortController();
-    this.abortControllers.add(_controller);
+    this.abortControllers.add(controller);
     return controller;
   }
   
@@ -221,11 +216,11 @@ export class MemoryEfficientEventEmitter<T extends Record<string, any>> {
       });
     }
     
-    eventListeners.add(listener);
+    eventListeners.add(listener as (data: unknown) => void);
     
     // Return cleanup function
     return () => {
-      eventListeners.delete(listener);
+      eventListeners.delete(listener as (data: unknown) => void);
       if (eventListeners.size === 0) {
         this.listeners.delete(event);
       }
@@ -239,7 +234,7 @@ export class MemoryEfficientEventEmitter<T extends Record<string, any>> {
         try {
           listener(data);
         } catch (error) {
-          logger.error(`Error in event listener for ${String(event)}:`, error);
+          logger.error(`Error in event listener for ${String(event)}:`, String(error));
         }
       });
     }
@@ -402,7 +397,7 @@ export function createDebouncedFunction<T extends (...args: unknown[]) => any>(
   
   debounced.cancel = function() {
     if (timeoutId !== null) {
-      clearTimeout(_timeoutId);
+      clearTimeout(timeoutId);
     }
     lastInvokeTime = 0;
     lastArgs = null;
@@ -417,7 +412,6 @@ export function createDebouncedFunction<T extends (...args: unknown[]) => any>(
   
   return debounced as T & { cancel: () => void; flush: () => void };
 }
-// @ts-expect-error - IntersectionObserver is a global API
 
 /**
  * Memory-efficient image loader with automatic cleanup
@@ -453,7 +447,6 @@ export class ImageLoader {
         reject(new Error(`Failed to load image: ${src}`));
       };
       
-// @ts-expect-error - IntersectionObserver is a global API
       img.src = src;
     });
     
@@ -469,7 +462,7 @@ export class ImageLoader {
             this.load(src).then(img => {
               element.src = img.src;
               observer.disconnect();
-              this.observers.delete(_element);
+              this.observers.delete(element);
             });
           }
         });
@@ -477,7 +470,7 @@ export class ImageLoader {
       { rootMargin: '50px' }
     );
     
-    observer.observe(_element);
+    observer.observe(element);
     this.observers.set(element, observer);
   }
   

@@ -245,7 +245,7 @@ export function useWidgetData(widgetType: string, widgetId: string) {
         setTimeout(() => {
           const mockData = generateMockDashboardData(user?.id);
           
-          switch (_widgetType) {
+          switch (widgetType) {
             case 'wellness_status':
               resolve(mockData.wellnessStatus);
               break;

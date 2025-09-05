@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Stethoscope, _Calendar, Pill, Brain, Users, FileText,
-  MessageSquare, _Shield, Activity, TrendingUp, _Bell,
-  _Settings, ChevronLeft, ChevronRight, Grid3x3
+import {
+  Stethoscope, Calendar, Pill, Brain, Users, FileText,
+  MessageSquare, Shield, Activity, TrendingUp, Bell,
+  Settings, ChevronLeft, ChevronRight, Grid3x3
 } from 'lucide-react';
 import { DashboardWidget } from './DashboardWidget';
 import { TherapySessionWidget } from './widgets/TherapySessionWidget';
@@ -16,8 +16,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 export function ProfessionalCareDashboard() {
   const { user } = useAuth();
-  const [activeView, _setActiveView] = useState<'overview' | 'therapy' | 'team' | 'medication' | 'treatment' | 'communication' | 'records'>('overview');
-  const [isCollapsed, _setIsCollapsed] = useState(false);
+  const [activeView, setActiveView] = useState<'overview' | 'therapy' | 'team' | 'medication' | 'treatment' | 'communication' | 'records'>('overview');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Mock data for demonstration
   const mockTherapySessions = [
@@ -28,9 +28,9 @@ export function ProfessionalCareDashboard() {
       providerSpecialty: 'Clinical Psychologist',
       dateTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       duration: 50,
-      type: 'individual' as const,
+      _type: 'individual' as const,
       format: 'telehealth' as const,
-      status: 'confirmed' as const,
+      _status: 'confirmed' as const,
       insuranceCovered: true,
       copay: 25,
       sessionGoals: [
@@ -45,7 +45,7 @@ export function ProfessionalCareDashboard() {
     {
       id: '1',
       name: 'Dr. Sarah Johnson',
-      role: 'therapist' as const,
+      _role: 'therapist' as const,
       specialty: 'Anxiety & Depression',
       credentials: 'PhD, Licensed Clinical Psychologist',
       contactInfo: {
@@ -54,7 +54,7 @@ export function ProfessionalCareDashboard() {
         officePhone: '555-0100'
       },
       availability: {
-        status: 'available' as const,
+        _status: 'available' as const,
         officeHours: 'Mon-Fri 9AM-5PM',
         preferredContactMethod: 'portal' as const
       },
@@ -69,7 +69,7 @@ export function ProfessionalCareDashboard() {
     {
       id: '2',
       name: 'Dr. Michael Chen',
-      role: 'psychiatrist' as const,
+      _role: 'psychiatrist' as const,
       specialty: 'Medication Management',
       credentials: 'MD, Board Certified Psychiatrist',
       contactInfo: {
@@ -77,7 +77,7 @@ export function ProfessionalCareDashboard() {
         email: 'dr.chen@mentalhealth.com'
       },
       availability: {
-        status: 'busy' as const,
+        _status: 'busy' as const,
         officeHours: 'Mon-Thu 8AM-4PM',
         preferredContactMethod: 'phone' as const
       },
@@ -172,7 +172,7 @@ export function ProfessionalCareDashboard() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveView(item.id as unknown)}
+                  onClick={() => setActiveView(item.id as any)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                     activeView === item.id
                       ? 'bg-primary-100 text-primary-700'

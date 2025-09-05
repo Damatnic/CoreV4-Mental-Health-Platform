@@ -80,8 +80,8 @@ interface CrisisResourcesProps {
 }
 
 export function CrisisResources({ location }: CrisisResourcesProps) {
-  const [resources, _setResources] = useState<Resource[]>(_MOCK_RESOURCES);
-  const [filteredResources, _setFilteredResources] = useState<Resource[]>(_MOCK_RESOURCES);
+  const [resources, _setResources] = useState<Resource[]>(MOCK_RESOURCES);
+  const [filteredResources, _setFilteredResources] = useState<Resource[]>(MOCK_RESOURCES);
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +100,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
       filtered = filtered.filter(r => 
         r.name.toLowerCase().includes(query) ||
         r.services.some(s => s.toLowerCase().includes(query)) ||
-        r.address?.toLowerCase().includes(query)
+        r._address?.toLowerCase().includes(query)
       );
     }
 
@@ -109,7 +109,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
       filtered.sort((a, b) => (a.distance || 999) - (b.distance || 999));
     }
 
-    setFilteredResources(_filtered);
+    _setFilteredResources(filtered);
   }, [resources, selectedType, searchQuery, location]);
 
   // Fetch real resources (in production, this would call an API)
@@ -122,7 +122,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
         ...resource,
         distance: calculateDistance(lat, lng, resource.lat || 0, resource.lng || 0)
       }));
-      setResources(resourcesWithDistance);
+      _setResources(resourcesWithDistance);
     } catch (error) {
       logger.error('Error fetching resources', 'CrisisResources', error);
     } finally {
@@ -185,7 +185,7 @@ export function CrisisResources({ location }: CrisisResourcesProps) {
               ))}
             </select>
             <button
-              onClick={() => setShowMap(!showMap)}
+              onClick={() => _setShowMap(!showMap)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
             >
               <MapPin className="h-4 w-4" />
@@ -373,7 +373,7 @@ function ResourceCard({ resource, onCall, onGetDirections }: ResourceCardProps) 
       <div className="flex gap-3">
         {resource.phone && (
           <button
-            onClick={() => onCall(resource.phone)}
+            onClick={() => onCall(resource.phone!)}
             className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
           >
             <Phone className="h-4 w-4" />
@@ -382,7 +382,7 @@ function ResourceCard({ resource, onCall, onGetDirections }: ResourceCardProps) 
         )}
         {resource._address && (
           <button
-            onClick={() => onGetDirections(resource._address)}
+            onClick={() => onGetDirections(resource._address!)}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
           >
             <Navigation className="h-4 w-4" />

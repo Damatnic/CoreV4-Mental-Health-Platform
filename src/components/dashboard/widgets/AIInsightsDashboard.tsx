@@ -1,7 +1,7 @@
 // AI Insights Dashboard Widget
 // Displays AI-powered mental health insights, patterns, and recommendations
 
-import React, { useState, _useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
@@ -9,11 +9,11 @@ import {
   AlertCircle,
   Target,
   Activity,
-  _Calendar,
+  Calendar,
   ChevronRight,
   Info,
   CheckCircle,
-  _XCircle,
+  XCircle,
   BarChart3,
   Sparkles,
   Shield,
@@ -30,31 +30,31 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  _Star,
-  _TrendingDown,
+  Star,
+  TrendingDown,
   Users,
   Sun,
   Moon,
   Cloud,
   Pill,
-  _BookOpen,
+  BookOpen,
   Settings,
 } from 'lucide-react';
-import { useAIInsights, _useProgressMetrics, _useTherapeuticIntelligence } from '../../../hooks/useAIInsights';
+import { useAIInsights, useProgressMetrics, useTherapeuticIntelligence } from '../../../hooks/useAIInsights';
 import {
-  _AIInsight,
-  _PatternAnalysis,
-  _PredictiveModel,
-  _PersonalizedRecommendation,
+  AIInsight,
+  PatternAnalysis,
+  PredictiveModel,
+  PersonalizedRecommendation,
   InsightCategory,
-  _ProgressMetrics,
-  _TherapeuticIntelligence,
+  ProgressMetrics,
+  TherapeuticIntelligence,
 } from '../../../types/ai-insights';
 
 export function AIInsightsDashboard() {
-  const { insightsDashboard, filteredInsights, isLoading, error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, _dismissInsight, requestRefresh, insightStats, isMarkingActioned, isDismissing,  } = useAIInsights();
+  const { insightsDashboard, filteredInsights, isLoading, error, selectedInsightCategory, setSelectedInsightCategory, insightTimeRange, setInsightTimeRange, markInsightActioned, dismissInsight, requestRefresh, insightStats, isMarkingActioned, isDismissing } = useAIInsights();
 
-  const [_expandedInsight, _setExpandedInsight] = useState<string | null>(null);
+  const [expandedInsight, _setExpandedInsight] = useState<string | null>(null);
   const [activeTab, _setActiveTab] = useState<'insights' | 'patterns' | 'predictions' | 'recommendations' | 'progress'>('insights');
   const [showFilters, _setShowFilters] = useState(false);
 
@@ -95,7 +95,7 @@ export function AIInsightsDashboard() {
   };
 
   // Trend indicator
-  const TrendIndicator = ({ trend, value }: { _trend: 'up' | 'down' | 'stable'; value?: number }) => {
+  const TrendIndicator = ({ trend, value }: { trend: 'up' | 'down' | 'stable'; value?: number }) => {
     const config = {
       up: { icon: ArrowUpRight, _color: 'text-green-600', bg: 'bg-green-50' },
       down: { icon: ArrowDownRight, _color: 'text-red-600', bg: 'bg-red-50' },
@@ -108,7 +108,7 @@ export function AIInsightsDashboard() {
         <Icon className={`w-4 h-4 ${_color}`} />
         {value !== undefined && (
           <span className={`text-sm font-medium ${_color}`}>
-            {_trend === 'up' ? '+' : _trend === 'down' ? '-' : ''}{Math.abs(_value)}%
+            {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{Math.abs(value)}%
           </span>
         )}
       </div>
@@ -182,13 +182,13 @@ export function AIInsightsDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => _setShowFilters(!showFilters)}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <Filter className="w-5 h-5" />
             </button>
             <button
-              onClick={requestRefresh}
+              onClick={() => requestRefresh()}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <RefreshCw className="w-5 h-5" />
@@ -251,7 +251,7 @@ export function AIInsightsDashboard() {
                   return (
                     <button
                       key={category}
-                      onClick={() => setSelectedInsightCategory(_category)}
+                      onClick={() => setSelectedInsightCategory(category)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
                         selectedInsightCategory === category
                           ? 'bg-primary-100 text-primary-700 border border-primary-300'
@@ -269,7 +269,7 @@ export function AIInsightsDashboard() {
                 {(['week', 'month', 'quarter', 'year'] as const).map(range => (
                   <button
                     key={range}
-                    onClick={() => setInsightTimeRange(_range)}
+                    onClick={() => setInsightTimeRange(range)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       insightTimeRange === range
                         ? 'bg-primary-100 text-primary-700 border border-primary-300'
@@ -299,7 +299,7 @@ export function AIInsightsDashboard() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as unknown)}
+                onClick={() => _setActiveTab(tab.id as any)}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                   activeTab === tab.id
                     ? 'bg-white text-primary-600 shadow-sm'
@@ -332,8 +332,8 @@ export function AIInsightsDashboard() {
                   <p className="text-gray-500">No insights available for the selected filters</p>
                 </div>
               ) : (
-                filteredInsights.map(insight => {
-                  const { icon: CategoryIcon, _color: categoryColor, bgColor } = categoryConfig[insight.category];
+                filteredInsights.map((insight: any) => {
+                  const { icon: CategoryIcon, _color: categoryColor, bgColor } = categoryConfig[insight.category as keyof typeof categoryConfig] || categoryConfig.all;
                   const isExpanded = expandedInsight === insight.id;
 
                   return (
@@ -353,7 +353,7 @@ export function AIInsightsDashboard() {
                           </div>
                         </div>
                         <button
-                          onClick={() => setExpandedInsight(isExpanded ? null : insight.id)}
+                          onClick={() => _setExpandedInsight(isExpanded ? null : insight.id)}
                           className="p-1 hover:bg-white/50 rounded transition-colors"
                         >
                           {isExpanded ? (
@@ -397,7 +397,7 @@ export function AIInsightsDashboard() {
                               <div className="mb-4">
                                 <h4 className="text-sm font-semibold text-gray-700 mb-2">Evidence</h4>
                                 <div className="space-y-2">
-                                  {insight.evidenceBase.map((evidence, idx) => (
+                                  {insight.evidenceBase.map((evidence: any, idx: any) => (
                                     <div key={idx} className="flex items-start gap-2 text-sm">
                                       <Info className="w-4 h-4 text-gray-400 mt-0.5" />
                                       <div>
@@ -421,7 +421,7 @@ export function AIInsightsDashboard() {
                               <div>
                                 <h4 className="text-sm font-semibold text-gray-700 mb-2">Recommended Actions</h4>
                                 <div className="space-y-2">
-                                  {insight.actions.map(action => (
+                                  {insight.actions.map((action: any) => (
                                     <div key={action.id} className="bg-white/80 rounded-lg p-3">
                                       <div className="flex items-center justify-between mb-2">
                                         <span className="font-medium text-gray-900">{action.action}</span>
@@ -460,7 +460,7 @@ export function AIInsightsDashboard() {
                             {/* Tags */}
                             {insight.tags.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-3">
-                                {insight.tags.map(tag => (
+                                {insight.tags.map((tag: any) => (
                                   <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
                                     #{tag}
                                   </span>
@@ -565,7 +565,7 @@ export function AIInsightsDashboard() {
                       <span className="text-sm text-gray-500">Accuracy:</span>
                       <div className="flex items-center gap-1">
                         <div className="w-24">
-                          <ProgressBar value={model.accuracy.overall * 100} color="bg-green-500" />
+                          <ProgressBar value={model.accuracy.overall * 100} _color="bg-green-500" />
                         </div>
                         <span className="text-sm font-medium text-gray-700">
                           {Math.round(model.accuracy.overall * 100)}%
@@ -603,7 +603,7 @@ export function AIInsightsDashboard() {
                                   <div className="w-20">
                                     <ProgressBar 
                                       value={Math.abs(factor.impact) * 100}
-                                      color={factor.impact > 0 ? 'bg-green-500' : 'bg-red-500'}
+                                      _color={factor.impact > 0 ? 'bg-green-500' : 'bg-red-500'}
                                     />
                                   </div>
                                   <span className={`text-xs ${factor.modifiable ? 'text-blue-600' : 'text-gray-400'}`}>
@@ -642,7 +642,7 @@ export function AIInsightsDashboard() {
                           <span className="text-sm text-gray-600">{feature.feature}</span>
                           <div className="flex items-center gap-2">
                             <div className="w-20">
-                              <ProgressBar value={feature.importance * 100} color="bg-purple-500" />
+                              <ProgressBar value={feature.importance * 100} _color="bg-purple-500" />
                             </div>
                             <span className="text-xs text-gray-500">{Math.round(feature.importance * 100)}%</span>
                           </div>
@@ -794,7 +794,7 @@ export function AIInsightsDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Overall Wellness Score</h3>
                   <TrendIndicator 
-                    trend={convertTrend(insightsDashboard.progressMetrics.overallWellness._trend)}
+                    trend={convertTrend(insightsDashboard.progressMetrics.overallWellness.trend)}
                     value={insightsDashboard.progressMetrics.overallWellness.changeRate}
                   />
                 </div>
@@ -805,7 +805,7 @@ export function AIInsightsDashboard() {
                   <div className="flex-1">
                     <ProgressBar 
                       value={insightsDashboard.progressMetrics.overallWellness.score}
-                      color="bg-gradient-to-r from-primary-500 to-purple-500"
+                      _color="bg-gradient-to-r from-primary-500 to-purple-500"
                     />
                     <p className="text-sm text-gray-600 mt-2">
                       Projected to reach {insightsDashboard.progressMetrics.overallWellness.projectedScore} in 30 days
@@ -819,10 +819,10 @@ export function AIInsightsDashboard() {
                     <div key={component.name} className="bg-white/80 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-medium text-gray-600">{component.name}</span>
-                        <TrendIndicator trend={convertTrend(component._trend)} />
+                        <TrendIndicator trend={convertTrend(component.trend)} />
                       </div>
                       <div className="text-2xl font-bold text-gray-900">{component.score}</div>
-                      <ProgressBar value={component.score} color="bg-gray-400" />
+                      <ProgressBar value={component.score} _color="bg-gray-400" />
                     </div>
                   ))}
                 </div>
@@ -834,15 +834,15 @@ export function AIInsightsDashboard() {
                   { label: 'Short Term (7 days)', data: insightsDashboard.progressMetrics.trendAnalysis.shortTerm },
                   { label: 'Medium Term (30 days)', data: insightsDashboard.progressMetrics.trendAnalysis.mediumTerm },
                   { label: 'Long Term (90 days)', data: insightsDashboard.progressMetrics.trendAnalysis.longTerm },
-                ].map(_trend => (
-                  <div key={_trend.label} className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{_trend.label}</h4>
+                ].map(trend => (
+                  <div key={trend.label} className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{trend.label}</h4>
                     <div className="flex items-center justify-between mb-2">
-                      <TrendIndicator trend={_trend.data.direction} value={_trend.data.magnitude} />
-                      <ConfidenceIndicator confidence={_trend.data.confidence} />
+                      <TrendIndicator trend={convertTrend(trend.data.direction)} value={trend.data.magnitude} />
+                      <ConfidenceIndicator confidence={trend.data.confidence} />
                     </div>
                     <div className="text-xs text-gray-500">
-                      Key factors: {_trend.data.keyFactors.join(', ')}
+                      Key factors: {trend.data.keyFactors.join(', ')}
                     </div>
                   </div>
                 ))}
@@ -889,7 +889,7 @@ export function AIInsightsDashboard() {
                       </div>
                       <ProgressBar 
                         value={domain.progress * 100}
-                        color={domain.progress >= 0.7 ? 'bg-green-500' : domain.progress >= 0.4 ? 'bg-yellow-500' : 'bg-red-500'}
+                        _color={domain.progress >= 0.7 ? 'bg-green-500' : domain.progress >= 0.4 ? 'bg-yellow-500' : 'bg-red-500'}
                       />
                       {domain.subMetrics.length > 0 && (
                         <div className="mt-3 grid grid-cols-2 gap-2">

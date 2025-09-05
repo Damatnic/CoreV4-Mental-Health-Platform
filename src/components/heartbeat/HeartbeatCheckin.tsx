@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Heart, _Users, Wifi, WifiOff, Volume2, VolumeX, 
+  Heart, Users, Wifi, WifiOff, Volume2, VolumeX, 
   Phone, MessageCircle, Shield, Clock, Activity
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
@@ -26,7 +26,7 @@ interface HeartbeatState {
 }
 
 const HeartbeatCheckin: React.FC = () => {
-  const [partners, _setPartners] = useState<Partner[]>([
+  const [partners, setPartners] = useState<Partner[]>([
     {
       id: 'partner-1',
       name: 'Sarah',
@@ -45,7 +45,7 @@ const HeartbeatCheckin: React.FC = () => {
     }
   ]);
   
-  const [heartbeatState, _setHeartbeatState] = useState<HeartbeatState>({
+  const [heartbeatState, setHeartbeatState] = useState<HeartbeatState>({
     isConnected: true,
     isHolding: false,
     holdDuration: 0,
@@ -54,9 +54,9 @@ const HeartbeatCheckin: React.FC = () => {
     missedCheckins: 0
   });
 
-  const [selectedPartner, _setSelectedPartner] = useState<Partner | null>(null);
-  const [___showCrisisAlert, _setShowCrisisAlert] = useState(false);
-  const [soundEnabled, _setSoundEnabled] = useState(true);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   
   const { vibrate } = useVibration();
   const holdTimerRef = useRef<NodeJS.Timeout>();

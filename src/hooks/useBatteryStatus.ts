@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { secureStorage } from '../services/security/SecureLocalStorage';
 
+// Battery Manager API interface
+interface BatteryManager extends EventTarget {
+  level: number;
+  charging: boolean;
+  chargingTime: number | null;
+  dischargingTime: number | null;
+}
+
 interface BatteryStatus {
   level: number | null;
   charging: boolean;
@@ -9,7 +17,7 @@ interface BatteryStatus {
 }
 
 export function useBatteryStatus(): BatteryStatus {
-  const [_batteryStatus, _setBatteryStatus] = useState<BatteryStatus>({
+  const [_batteryStatus, __setBatteryStatus] = useState<BatteryStatus>({
     level: null,
     charging: false,
     chargingTime: null,
@@ -17,10 +25,11 @@ export function useBatteryStatus(): BatteryStatus {
   });
 
   useEffect(() => {
-    let battery: unknown = null;
+    let battery: BatteryManager | null = null;
+    const eventHandlers: Array<{ event: string; handler: EventListener }> = [];
 
-    const updateBatteryStatus = (batteryManager: unknown) => {
-      setBatteryStatus({
+    const updateBatteryStatus = (batteryManager: BatteryManager) => {
+      __setBatteryStatus({
         level: batteryManager.level,
         charging: batteryManager.charging,
         chargingTime: batteryManager.chargingTime,
@@ -51,16 +60,25 @@ export function useBatteryStatus(): BatteryStatus {
       try {
         // Check if Battery API is available
         if ('getBattery' in navigator) {
-          battery = await (navigator as unknown).getBattery();
+          battery = await (navigator as any).getBattery() as BatteryManager;
           
           // Initial update
           updateBatteryStatus(battery);
 
-          // Set up event listeners
-          battery.addEventListener('levelchange', () => updateBatteryStatus(battery));
-          battery.addEventListener('chargingchange', () => updateBatteryStatus(battery));
-          battery.addEventListener('chargingtimechange', () => updateBatteryStatus(battery));
-          battery.addEventListener('dischargingtimechange', () => updateBatteryStatus(battery));
+          // Create bound event handlers
+          const createHandler = () => {
+            if (battery) {
+              updateBatteryStatus(battery);
+            }
+          };
+
+          // Set up event listeners with stored references
+          const events = ['levelchange', 'chargingchange', 'chargingtimechange', 'dischargingtimechange'];
+          events.forEach(eventName => {
+            const handler = createHandler;
+            battery?.addEventListener(eventName, handler);
+            eventHandlers.push({ event: eventName, handler });
+          });
         }
       } catch (error) {
         console.error('Battery API not available:');
@@ -72,13 +90,12 @@ export function useBatteryStatus(): BatteryStatus {
     // Cleanup
     return () => {
       if (battery) {
-        battery.removeEventListener('levelchange', () => updateBatteryStatus(battery));
-        battery.removeEventListener('chargingchange', () => updateBatteryStatus(battery));
-        battery.removeEventListener('chargingtimechange', () => updateBatteryStatus(battery));
-        battery.removeEventListener('dischargingtimechange', () => updateBatteryStatus(battery));
+        eventHandlers.forEach(({ event, handler }) => {
+          battery?.removeEventListener(event, handler);
+        });
       }
     };
   }, []);
 
-  return batteryStatus;
+  return _batteryStatus;
 }

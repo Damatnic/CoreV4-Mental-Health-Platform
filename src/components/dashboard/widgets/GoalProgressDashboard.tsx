@@ -2,73 +2,73 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
-  _TrendingUp,
-  _Award,
-  _Calendar,
+  TrendingUp,
+  Award,
+  Calendar,
   ChevronRight,
   Plus,
-  _Edit2,
+  Edit2,
   Pause,
   Play,
-  _X,
+  X,
   CheckCircle,
   Flag,
   Star,
-  _Zap,
+  Zap,
   Trophy,
   Clock,
-  _AlertCircle,
+  AlertCircle,
   Sparkles,
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { __useActivityStore } from '../../../stores/activityStore';
-import { _format, differenceInDays, _addDays } from 'date-fns';
+import { useActivityStore } from '../../../stores/activityStore';
+import { format, differenceInDays, addDays } from 'date-fns';
 
 interface GoalProgressDashboardProps {
-  _onGoalClick?: (goal: unknown) => void;
+  onGoalClick?: (goal: unknown) => void;
   onAddGoal?: () => void;
   onViewDetails?: (goalId: string) => void;
 }
 
 export function GoalProgressDashboard({
-  _onGoalClick,
+  onGoalClick,
   onAddGoal,
   onViewDetails
 }: GoalProgressDashboardProps) {
-  const { goals, updateGoalProgress, completeGoal, pauseGoal, abandonGoal, addMilestone, completeMilestone } = __useActivityStore();
+  const { goals, updateGoalProgress, completeGoal, pauseGoal, abandonGoal, addMilestone, completeMilestone } = useActivityStore();
 
-  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
-  const [___showAddMilestone, _setShowAddMilestone] = useState<string | null>(null);
-  const [milestoneTitle, _setMilestoneTitle] = useState('');
-  const [milestoneTarget, _setMilestoneTarget] = useState<number>(0);
-  const [_expandedGoal, _setExpandedGoal] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showAddMilestone, setShowAddMilestone] = useState<string | null>(null);
+  const [milestoneTitle, setMilestoneTitle] = useState('');
+  const [milestoneTarget, setMilestoneTarget] = useState<number>(0);
+  const [expandedGoal, setExpandedGoal] = useState<string | null>(null);
 
   // Filter goals by category and status
-  const activeGoals = goals.filter(g => g.status === 'active');
-  const completedGoals = goals.filter(g => g.status === 'completed');
-  const __pausedGoals = goals.filter(g => g.status === 'paused');
+  const activeGoals = goals.filter((g: any) => g.status === 'active');
+  const completedGoals = goals.filter((g: any) => g.status === 'completed');
+  const pausedGoals = goals.filter((g: any) => g.status === 'paused');
 
-  const filteredGoals = selectedCategory === 'all' 
-    ? activeGoals 
-    : activeGoals.filter(g => g.category === selectedCategory);
+  const filteredGoals = selectedCategory === 'all'
+    ? activeGoals
+    : activeGoals.filter((g: any) => g.category === selectedCategory);
 
   // Calculate overall progress
   const overallProgress = activeGoals.length > 0
-    ? activeGoals.reduce((sum, goal) => sum + goal.progress, 0) / activeGoals.length
+    ? activeGoals.reduce((sum: number, goal: any) => sum + goal.progress, 0) / activeGoals.length
     : 0;
 
   // Get category stats
-  const _categoryStats = {
-    therapy: activeGoals.filter(g => g.category === 'therapy').length,
-    wellness: activeGoals.filter(g => g.category === 'wellness').length,
-    social: activeGoals.filter(g => g.category === 'social').length,
-    professional: activeGoals.filter(g => g.category === 'professional').length,
-    personal: activeGoals.filter(g => g.category === 'personal').length,
+  const categoryStats = {
+    therapy: activeGoals.filter((g: any) => g.category === 'therapy').length,
+    wellness: activeGoals.filter((g: any) => g.category === 'wellness').length,
+    social: activeGoals.filter((g: any) => g.category === 'social').length,
+    professional: activeGoals.filter((g: any) => g.category === 'professional').length,
+    personal: activeGoals.filter((g: any) => g.category === 'personal').length,
   };
 
   // Get goal color based on progress and deadline
-  const getGoalColor = (goal: unknown) => {
+  const getGoalColor = (goal: any) => {
     if (goal.status === 'completed') return 'bg-green-100 border-green-300';
     if (goal.status === 'paused') return 'bg-gray-100 border-gray-300';
     
@@ -93,8 +93,8 @@ export function GoalProgressDashboard({
   };
 
   // Get priority icon
-  const getPriorityIcon = (_priority: string) => {
-    switch (_priority) {
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
       case 'high': return <Flag className="h-3 w-3 text-red-500" />;
       case 'medium': return <Flag className="h-3 w-3 text-yellow-500" />;
       case 'low': return <Flag className="h-3 w-3 text-gray-400" />;
@@ -119,7 +119,7 @@ export function GoalProgressDashboard({
   // Calculate days until deadline
   const getDaysUntilDeadline = (targetDate: Date | undefined) => {
     if (!targetDate) return null;
-    const days = differenceInDays(new Date(_targetDate), new Date());
+    const days = differenceInDays(new Date(targetDate), new Date());
     if (days < 0) return { text: 'Overdue', color: 'text-red-600' };
     if (days === 0) return { text: 'Due today', color: 'text-red-600' };
     if (days === 1) return { text: 'Due tomorrow', color: 'text-orange-600' };
@@ -181,10 +181,10 @@ export function GoalProgressDashboard({
           >
             All ({activeGoals.length})
           </button>
-          {Object.entries(_categoryStats).map(([category, count]) => (
+          {Object.entries(categoryStats).map(([category, count]) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(_category)}
+              onClick={() => setSelectedCategory(category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -216,7 +216,7 @@ export function GoalProgressDashboard({
               </button>
             </motion.div>
           ) : (
-            filteredGoals.map((goal) => {
+            filteredGoals.map((goal: any) => {
               const isExpanded = expandedGoal === goal.id;
               const deadline = getDaysUntilDeadline(goal.targetDate);
               const isSmartGoal = goal.specific && goal.measurable && goal.achievable && goal.relevant && goal.timeBound;
@@ -230,7 +230,7 @@ export function GoalProgressDashboard({
                   exit={{ opacity: 0, x: -20 }}
                   className={`
                     p-4 rounded-lg border transition-all cursor-pointer
-                    ${getGoalColor(_goal)}
+                    ${getGoalColor(goal)}
                     ${isExpanded ? 'ring-2 ring-primary-500' : ''}
                   `}
                   onClick={() => setExpandedGoal(isExpanded ? null : goal.id)}
@@ -240,7 +240,7 @@ export function GoalProgressDashboard({
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
                         <h4 className="font-medium text-gray-900">{goal.title}</h4>
-                        {getPriorityIcon(goal._priority)}
+                        {getPriorityIcon(goal.priority)}
                         {isSmartGoal && (
                           <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center">
                             <CheckCircle className="h-3 w-3 mr-1" />
@@ -345,7 +345,7 @@ export function GoalProgressDashboard({
                       </motion.div>
                       
                       {/* Milestones on progress bar */}
-                      {goal.milestones.map((milestone) => {
+                      {goal.milestones.map((milestone: any) => {
                         const position = (milestone.targetValue / goal.targetValue) * 100;
                         return (
                           <div
@@ -377,7 +377,7 @@ export function GoalProgressDashboard({
                           <div className="mb-3">
                             <h5 className="text-sm font-medium text-gray-700 mb-2">Milestones</h5>
                             <div className="space-y-1">
-                              {goal.milestones.map((milestone) => (
+                              {goal.milestones.map((milestone: any) => (
                                 <div
                                   key={milestone.id}
                                   className="flex items-center justify-between p-2 bg-white/50 rounded-lg"
@@ -490,7 +490,7 @@ export function GoalProgressDashboard({
                         {(goal.insights && goal.insights.length > 0) && (
                           <div className="mt-3 p-2 bg-blue-50 rounded-lg">
                             <h5 className="text-xs font-medium text-blue-700 mb-1">Insights</h5>
-                            {goal.insights.map((insight, index) => (
+                            {goal.insights.map((insight: any, index: number) => (
                               <p key={index} className="text-xs text-blue-600">{insight}</p>
                             ))}
                           </div>
@@ -499,7 +499,7 @@ export function GoalProgressDashboard({
                         {(goal.celebrations && goal.celebrations.length > 0) && (
                           <div className="mt-2 p-2 bg-yellow-50 rounded-lg">
                             <h5 className="text-xs font-medium text-yellow-700 mb-1">Celebrations</h5>
-                            {goal.celebrations.map((celebration, index) => (
+                            {goal.celebrations.map((celebration: any, index: number) => (
                               <p key={index} className="text-xs text-yellow-600 flex items-center">
                                 <Star className="h-3 w-3 mr-1" />
                                 {celebration}

@@ -27,8 +27,8 @@ import {
   BarChart3,
   Accessibility,
   Bell,
-  _Gamepad2,
-  _Zap,
+  Gamepad2,
+  Zap,
   Power
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
@@ -41,7 +41,7 @@ import { getConsoleNavStyle, getConsoleAccentColor } from '../../utils/console';
 
 interface NavItem {
   id: string;
-  _path: string;
+  path: string;
   icon: React.ReactNode;
   label: string;
   badge?: number;
@@ -52,20 +52,20 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   {
     id: 'home',
-    _path: '/',
+    path: '/',
     icon: <Home className="h-6 w-6" />,
     label: 'Home'
   },
   {
     id: 'wellness',
-    _path: '/wellness',
+    path: '/wellness',
     icon: <Heart className="h-6 w-6" />,
     label: 'Wellness',
     color: 'text-pink-500'
   },
   {
     id: 'community',
-    _path: '/community',
+    path: '/community',
     icon: <Users className="h-6 w-6" />,
     label: 'Community',
     requiresAuth: true,
@@ -73,7 +73,7 @@ const mainNavItems: NavItem[] = [
   },
   {
     id: 'schedule',
-    _path: '/schedule',
+    path: '/schedule',
     icon: <Calendar className="h-6 w-6" />,
     label: 'Schedule',
     requiresAuth: true,
@@ -84,65 +84,65 @@ const mainNavItems: NavItem[] = [
 const drawerItems: NavItem[] = [
   {
     id: 'crisis',
-    _path: '/crisis',
+    path: '/crisis',
     icon: <AlertTriangle className="h-5 w-5" />,
     label: 'Crisis Support',
     color: 'text-red-500'
   },
   {
     id: 'mood',
-    _path: '/wellness/mood',
+    path: '/wellness/mood',
     icon: <Activity className="h-5 w-5" />,
     label: 'Mood Tracker'
   },
   {
     id: 'meditation',
-    _path: '/wellness/meditation',
+    path: '/wellness/meditation',
     icon: <Brain className="h-5 w-5" />,
     label: 'Meditation'
   },
   {
     id: 'journal',
-    _path: '/wellness/journal',
+    path: '/wellness/journal',
     icon: <BookOpen className="h-5 w-5" />,
     label: 'Journal'
   },
   {
     id: 'goals',
-    _path: '/goals',
+    path: '/goals',
     icon: <Target className="h-5 w-5" />,
     label: 'Goals',
     requiresAuth: true
   },
   {
     id: 'safety',
-    _path: '/crisis/safety-plan',
+    path: '/crisis/safety-plan',
     icon: <Shield className="h-5 w-5" />,
     label: 'Safety Plan',
     requiresAuth: true
   },
   {
     id: 'analytics',
-    _path: '/analytics',
+    path: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
     label: 'Analytics',
     requiresAuth: true
   },
   {
     id: 'accessibility',
-    _path: '/accessibility',
+    path: '/accessibility',
     icon: <Accessibility className="h-5 w-5" />,
     label: 'Accessibility'
   },
   {
     id: 'notifications',
-    _path: '/notifications',
+    path: '/notifications',
     icon: <Bell className="h-5 w-5" />,
     label: 'Notifications'
   },
   {
     id: 'settings',
-    _path: '/settings',
+    path: '/settings',
     icon: <Settings className="h-5 w-5" />,
     label: 'Settings'
   }
@@ -178,14 +178,14 @@ export function MobileBottomNav() {
   const { isAuthenticated } = useAuth();
   const { vibrate } = useVibration();
   const { deviceInfo, isMobileDevice } = useMobileFeatures();
-  const { _navigationMode, isPerformanceMode } = useConsoleNavigation();
-  const [isDrawerOpen, _setIsDrawerOpen] = useState(false);
-  const [___showCrisisActions, _setShowCrisisActions] = useState(false);
-  const [consoleMode, _setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
-  const [isConsoleStyleActive, _setIsConsoleStyleActive] = useState(true);
-  const [___activeTab, _setActiveTab] = useState(() => {
+  const { navigationMode, isPerformanceMode } = useConsoleNavigation();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showCrisisActions, setShowCrisisActions] = useState(false);
+  const [consoleMode, setConsoleMode] = useState<'playstation' | 'xbox' | 'switch'>('playstation');
+  const [isConsoleStyleActive, setIsConsoleStyleActive] = useState(true);
+  const [activeTab, setActiveTab] = useState(() => {
     const currentPath = location.pathname;
-    const item = mainNavItems.find(item => item._path === currentPath);
+    const item = mainNavItems.find(item => item.path === currentPath);
     return item?.id || 'home';
   });
   
@@ -222,7 +222,7 @@ export function MobileBottomNav() {
         } else if (gesture.direction === 'left') {
           // Cycle console modes
           const modes: typeof consoleMode[] = ['playstation', 'xbox', 'switch'];
-          const currentIndex = modes.indexOf(_consoleMode);
+          const currentIndex = modes.indexOf(consoleMode);
           const _nextMode = modes[(currentIndex + 1) % modes.length] || 'playstation';
           setConsoleMode(_nextMode);
           vibrate(_consoleTapPattern);
@@ -244,8 +244,8 @@ export function MobileBottomNav() {
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
         announcement.textContent = 'Emergency console activated - Crisis actions menu opened';
-        document.body.appendChild(_announcement);
-        setTimeout(() => document.body.removeChild(_announcement), 1000);
+        document.body.appendChild(announcement);
+        setTimeout(() => document.body.removeChild(announcement), 1000);
       });
 
       // Double-tap to toggle performance mode
@@ -291,7 +291,7 @@ export function MobileBottomNav() {
   useEffect(() => {
     const currentPath = location.pathname;
     const item = mainNavItems.find(item => 
-      currentPath === item._path || currentPath.startsWith(`${item._path  }/`)
+      currentPath === item.path || currentPath.startsWith(`${item.path  }/`)
     );
     if (item) {
       setActiveTab(item.id);
@@ -340,7 +340,7 @@ export function MobileBottomNav() {
 
   // Don&apos;t show navigation on certain pages
   const hideNavPaths = ['/auth/login', '/auth/register', '/onboarding'];
-  if (hideNavPaths.some(_path => location.pathname.startsWith(_path))) {
+  if (hideNavPaths.some(path => location.pathname.startsWith(path))) {
     return null;
   }
 
@@ -484,7 +484,7 @@ export function MobileBottomNav() {
         ref={navRef}
         className={`
           fixed bottom-0 left-0 right-0 z-40 safe-area-pb transition-all duration-300
-          ${isConsoleStyleActive ? getConsoleNavStyle(_consoleMode) : 'bg-white border-t border-gray-200'}
+          ${isConsoleStyleActive ? getConsoleNavStyle(consoleMode) : 'bg-white border-t border-gray-200'}
           ${isPerformanceMode ? 'console-performance-nav' : ''}
         `}
         data-console-mode={consoleMode}
@@ -503,7 +503,7 @@ export function MobileBottomNav() {
               >
                 <div className="flex items-center space-x-1">
                   <div className="w-2 h-2 rounded-full bg-console-accent" />
-                  <span className="text-[8px] font-bold" style={{ color: getConsoleAccentColor(_consoleMode) }}>
+                  <span className="text-[8px] font-bold" style={{ color: getConsoleAccentColor(consoleMode) }}>
                     {consoleMode.toUpperCase()}
                   </span>
                 </div>
@@ -568,7 +568,7 @@ export function MobileBottomNav() {
                     {item.badge && item.badge > 0 && (
                       <span 
                         className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1"
-                        style={{ backgroundColor: getConsoleAccentColor(_consoleMode) }}
+                        style={{ backgroundColor: getConsoleAccentColor(consoleMode) }}
                       >
                         {item.badge > 99 ? '99+' : item.badge}
                       </span>
@@ -601,7 +601,7 @@ export function MobileBottomNav() {
                     <motion.div
                       layoutId="activeConsoleTab"
                       className="absolute top-0 left-0 right-0 h-0.5"
-                      style={{ backgroundColor: getConsoleAccentColor(_consoleMode) }}
+                      style={{ backgroundColor: getConsoleAccentColor(consoleMode) }}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -639,7 +639,7 @@ export function MobileBottomNav() {
                   <div className="relative">
                     <Power className={`h-6 w-6 transition-all duration-300 ${
                       isDrawerOpen ? 'rotate-180 scale-110' : ''
-                    }`} style={{ color: isDrawerOpen ? getConsoleAccentColor(_consoleMode) : undefined }} />
+                    }`} style={{ color: isDrawerOpen ? getConsoleAccentColor(consoleMode) : undefined }} />
                     {isDrawerOpen && (
                       <motion.div
                         className="absolute inset-0 rounded-full"

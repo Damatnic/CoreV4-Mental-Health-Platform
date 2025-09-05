@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, Phone, Mail, Calendar, _Clock, MapPin, Star, Shield,
-  Video, MessageSquare, FileText, _Activity, _Award, AlertCircle,
-  _ChevronRight, Edit2, MoreVertical, _Heart, Brain, Pill,
-  Users, Briefcase, Stethoscope, UserCheck, _Settings
+import {
+  User, Phone, Mail, Calendar, Clock, MapPin, Star, Shield,
+  Video, MessageSquare, FileText, Activity, Award, AlertCircle,
+  ChevronRight, Edit2, MoreVertical, Heart, Brain, Pill,
+  Users, Briefcase, Stethoscope, UserCheck, Settings
 } from 'lucide-react';
 
 interface CareProvider {
@@ -59,9 +59,9 @@ export function CareTeamDashboard({
   onEditProvider,
   onAddProvider
 }: CareTeamDashboardProps) {
-  const [___selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
-  const [___showContactOptions, _setShowContactOptions] = useState<string | null>(null);
-  const [filterRole, _setFilterRole] = useState<string>('all');
+  const [selectedProvider, _setSelectedProvider] = useState<CareProvider | null>(null);
+  const [showContactOptions, _setShowContactOptions] = useState<string | null>(null);
+  const [filterRole, setFilterRole] = useState<string>('all');
 
   // Get provider icon based on _role
   const _getProviderIcon = (_role: string) => {
@@ -101,27 +101,27 @@ export function CareTeamDashboard({
   };
 
   // Filter providers by role
-  const filteredProviders = filterRole === 'all' 
-    ? providers 
-    : providers.filter(p => p.role === filterRole);
+  const filteredProviders = filterRole === 'all'
+    ? providers
+    : providers.filter(p => p._role === filterRole);
 
   // Group providers by role
-  const __groupedProviders = filteredProviders.reduce((acc, provider) => {
+  const groupedProviders = filteredProviders.reduce((acc, provider) => {
     if (!acc[provider._role]) {
       acc[provider._role] = [];
     }
-    acc[provider.role]?.push(provider);
+    acc[provider._role]?.push(provider);
     return acc;
   }, {} as Record<string, CareProvider[]>);
 
   // Primary providers (therapist, psychiatrist, primary care)
-  const primaryProviders = providers.filter(p => 
-    ['therapist', 'psychiatrist', 'primary_care'].includes(p.role)
+  const primaryProviders = providers.filter(p =>
+    ['therapist', 'psychiatrist', 'primary_care'].includes(p._role)
   );
 
   // Support team
-  const supportTeam = providers.filter(p => 
-    ['case_manager', 'peer_support', 'specialist'].includes(p.role)
+  const supportTeam = providers.filter(p =>
+    ['case_manager', 'peer_support', 'specialist'].includes(p._role)
   );
 
   return (
@@ -231,7 +231,7 @@ export function CareTeamDashboard({
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <Users className="h-12 w-12 mb-3 text-gray-300" />
             <p className="text-center">
-              No {filterRole === 'all' ? 'providers' : getRoleDisplayName(_filterRole).toLowerCase()} found
+              No {filterRole === 'all' ? 'providers' : getRoleDisplayName(filterRole).toLowerCase()} found
             </p>
             <button
               onClick={onAddProvider}
@@ -273,7 +273,7 @@ function ProviderCard({
   onViewDetails?: (provider: CareProvider) => void;
   onEdit?: (provider: CareProvider) => void;
 }) {
-  const [showActions, _setShowActions] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
   const _getProviderIcon = (_role: string) => {
     switch (_role) {

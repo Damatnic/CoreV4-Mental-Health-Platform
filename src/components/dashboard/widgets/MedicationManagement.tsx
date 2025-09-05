@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Pill, Clock, _Calendar, AlertTriangle, CheckCircle, XCircle,
-  TrendingUp, TrendingDown, Minus, _Info, _Bell, _RefreshCw,
-  _Phone, _FileText, Activity, Shield, AlertCircle, ChevronRight,
-  Package, _Droplets, Sun, Moon, Coffee, BedDouble
+import {
+  Pill, Clock, Calendar, AlertTriangle, CheckCircle, XCircle,
+  TrendingUp, TrendingDown, Minus, Info, Bell, RefreshCw,
+  Phone, FileText, Activity, Shield, AlertCircle, ChevronRight,
+  Package, Droplets, Sun, Moon, Coffee, BedDouble, X
 } from 'lucide-react';
 
 interface Medication {
@@ -90,11 +90,11 @@ export function MedicationManagement({
   onContactPharmacy,
   onContactPrescriber
 }: MedicationManagementProps) {
-  const [activeTab, _setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
-  const [selectedMedication, _setSelectedMedication] = useState<Medication | null>(null);
-  const [___showDetails, _setShowDetails] = useState(false);
-  const [__showSideEffectReport, _setShowSideEffectReport] = useState(false);
-  const [____timeOfDay, _setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  const [activeTab, setActiveTab] = useState<'today' | 'all' | 'adherence' | 'effects'>('today');
+  const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showSideEffectReport, setShowSideEffectReport] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
   // Get current time period
   useEffect(() => {
@@ -117,11 +117,11 @@ export function MedicationManagement({
     medications.forEach(med => {
       med.schedule.forEach(sched => {
         if (!sched.time || !sched.time.includes(':')) return;
-        const timeParts = sched.time.split(':').map(_Number);
+        const timeParts = sched.time.split(':').map(Number);
         if (timeParts.length !== 2 || timeParts[0] === undefined || timeParts[1] === undefined) return;
         const hours = timeParts[0];
-        const _minutes = timeParts[1];
-        if (isNaN(_hours) || isNaN(_minutes)) return;
+        const minutes = timeParts[1];
+        if (isNaN(hours) || isNaN(minutes)) return;
         let timeCategory = 'morning';
         
         if (hours < 12) timeCategory = 'morning';
@@ -159,7 +159,7 @@ export function MedicationManagement({
     if (!time || !time.includes(':')) return <Clock className="h-4 w-4" />;
     const hourStr = time.split(':')[0];
     if (!hourStr) return <Clock className="h-4 w-4" />;
-    const hour = parseInt(_hourStr);
+    const hour = parseInt(hourStr);
     if (hour < 6 || hour >= 22) return <Moon className="h-4 w-4" />;
     if (hour < 12) return <Sun className="h-4 w-4" />;
     if (hour < 17) return <Coffee className="h-4 w-4" />;
@@ -222,7 +222,7 @@ export function MedicationManagement({
         {(['today', 'all', 'adherence', 'effects'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(_tab)}
+            onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -615,13 +615,13 @@ export function MedicationManagement({
                 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => onRefillRequest?.(_selectedMedication)}
+                    onClick={() => onRefillRequest?.(selectedMedication)}
                     className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     Request Refill
                   </button>
                   <button
-                    onClick={() => onContactPrescriber?.(_selectedMedication)}
+                    onClick={() => onContactPrescriber?.(selectedMedication)}
                     className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Contact Prescriber

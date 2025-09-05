@@ -310,3 +310,6 @@ export interface ValidationRule {
   value?: unknown;
   message: string;
 }
+
+// Export dashboard types
+export type { QuickAction } from './dashboard';

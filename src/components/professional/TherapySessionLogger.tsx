@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Clock, _Calendar, Save, Star, _TrendingUp, Target, 
-  Brain, _Heart, CheckCircle, Plus, _Minus, FileText,
-  _MessageSquare, Lightbulb, AlertTriangle, Award,
-  BarChart3, _PieChart, _LineChart, Activity, _Users,
-  PlayCircle, PauseCircle, _RotateCcw, _Timer,
-  Mic, MicOff, Video, VideoOff, _Settings, X, Square
+  Clock, Calendar, Save, Star, TrendingUp, Target, 
+  Brain, Heart, CheckCircle, Plus, Minus, FileText,
+  MessageSquare, Lightbulb, AlertTriangle, Award,
+  BarChart3, PieChart, LineChart, Activity, Users,
+  PlayCircle, PauseCircle, RotateCcw, Timer,
+  Mic, MicOff, Video, VideoOff, Settings, X, Square
 } from 'lucide-react';
 
 interface TherapySession {
@@ -125,15 +125,15 @@ export function TherapySessionLogger({
   readOnly = false,
   isProvider = false
 }: TherapySessionLoggerProps) {
-  const [activeTab, _setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
-  const [sessionTimer, _setSessionTimer] = useState(0);
-  const [isTimerRunning, _setIsTimerRunning] = useState(false);
-  const [currentSession, _setCurrentSession] = useState<TherapySession>(_session);
-  const [newNote, _setNewNote] = useState('');
-  const [noteType, _setNoteType] = useState<SessionNote['type']>('observation');
-  const [___showRiskAssessment, _setShowRiskAssessment] = useState(false);
-  const [audioEnabled, _setAudioEnabled] = useState(true);
-  const [videoEnabled, _setVideoEnabled] = useState(true);
+  const [activeTab, setActiveTab] = useState<'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome'>('session');
+  const [sessionTimer, setSessionTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [currentSession, setCurrentSession] = useState<TherapySession>(session);
+  const [newNote, setNewNote] = useState('');
+  const [noteType, setNoteType] = useState<SessionNote['type']>('observation');
+  const [____showRiskAssessment, setShowRiskAssessment] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(true);
 
   // _Timer effect
   useEffect(() => {
@@ -159,12 +159,12 @@ export function TherapySessionLogger({
   // Handle session start
   const handleStartSession = () => {
     setIsTimerRunning(true);
-    const _updatedSession = {
+    const updatedSession = {
       ...currentSession,
       status: 'in-progress' as const,
       actualDuration: 0
     };
-    setCurrentSession(_updatedSession);
+    setCurrentSession(updatedSession);
     onStartSession?.(session.id);
   };
 
@@ -176,12 +176,12 @@ export function TherapySessionLogger({
   // Handle session end
   const handleEndSession = () => {
     setIsTimerRunning(false);
-    const _updatedSession = {
+    const updatedSession = {
       ...currentSession,
       status: 'completed' as const,
       actualDuration: sessionTimer / 60 // Convert to minutes
     };
-    setCurrentSession(_updatedSession);
+    setCurrentSession(updatedSession);
     onEndSession?.(session.id);
   };
 
@@ -199,12 +199,12 @@ export function TherapySessionLogger({
     };
 
     const updatedNotes = [...(currentSession.notes || []), note];
-    const _updatedSession = {
+    const updatedSession = {
       ...currentSession,
       notes: updatedNotes
     };
 
-    setCurrentSession(_updatedSession);
+    setCurrentSession(updatedSession);
     setNewNote('');
     onSaveNotes?.(session.id, updatedNotes);
   };
@@ -273,7 +273,7 @@ export function TherapySessionLogger({
             {/* _Timer Display */}
             <div className="text-center">
               <div className="text-3xl font-mono font-bold">
-                {formatTime(_sessionTimer)}
+                {formatTime(sessionTimer)}
               </div>
               <div className="text-xs text-primary-200">
                 {currentSession.duration} min scheduled
@@ -371,7 +371,7 @@ export function TherapySessionLogger({
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as unknown)}
+              onClick={() => setActiveTab(id as 'session' | 'goals' | 'techniques' | 'notes' | 'homework' | 'outcome')}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-all flex items-center space-x-2 ${
                 activeTab === id
                   ? 'text-primary-600 border-primary-600'
@@ -1054,7 +1054,7 @@ export function TherapySessionLogger({
 
       {/* Risk Assessment Modal */}
       <AnimatePresence>
-        {showRiskAssessment && currentSession.outcome?.riskAssessment && (
+        {____showRiskAssessment && currentSession.outcome?.riskAssessment && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

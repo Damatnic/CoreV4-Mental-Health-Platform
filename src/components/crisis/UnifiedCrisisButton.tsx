@@ -14,10 +14,10 @@ import {
   getEmergencyLocation,
   getRecommendedContacts
 } from '../../utils/crisis';
-import { 
-  CRISIS_ACTIONS, 
-  EMERGENCY_CONTACTS as _EMERGENCY_CONTACTS, 
-  HAPTIC_PATTERNS, 
+import {
+  CRISIS_ACTIONS,
+  EMERGENCY_CONTACTS as _EMERGENCY_CONTACTS,
+  __HAPTIC_PATTERNS as HAPTIC_PATTERNS,
   CRISIS_THEMES,
   CrisisLevel,
   CrisisTheme

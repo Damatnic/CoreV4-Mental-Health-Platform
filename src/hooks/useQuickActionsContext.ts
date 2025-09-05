@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, _useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { QuickAction } from '../types/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { secureStorage } from '../services/security/SecureLocalStorage';
@@ -184,9 +184,9 @@ export function useQuickActionsContext(): QuickActionsContext {
     }
   ];
 
-  const [actions, _setActions] = useState<QuickAction[]>(_defaultActions);
-  const [customActions, _setCustomActions] = useState<QuickAction[]>([]);
-  const [actionHistory, _setActionHistory] = useState<string[]>([]);
+  const [actions, setActions] = useState<QuickAction[]>(defaultActions);
+  const [customActions, setCustomActions] = useState<QuickAction[]>([]);
+  const [actionHistory, setActionHistory] = useState<string[]>([]);
 
   // Load custom actions and history from localStorage
   useEffect(() => {
@@ -196,7 +196,7 @@ export function useQuickActionsContext(): QuickActionsContext {
     if (_savedCustomActions) {
       try {
         const parsed = JSON.parse(_savedCustomActions);
-        setCustomActions(_parsed);
+        setCustomActions(parsed);
         setActions([...defaultActions, ...parsed]);
       } catch (error) {
         logger.error('Error loading custom actions:');
@@ -254,12 +254,12 @@ export function useQuickActionsContext(): QuickActionsContext {
     }
     
     // Log analytics
-    logger.info('Action executed:', {
+    logger.info('Action executed', JSON.stringify({
       id: action.id,
       label: action.label,
       category: action.category,
       timestamp: new Date().toISOString()
-    });
+    }));
   }, [navigate]);
 
   // Add custom action
@@ -306,7 +306,7 @@ export function useQuickActionsContext(): QuickActionsContext {
     
     return sortedIds
       .map(id => actions.find(a => a.id === id))
-      .filter(_Boolean) as QuickAction[];
+      .filter(Boolean) as QuickAction[];
   }, [actionHistory, actions]);
 
   // Get recent actions
@@ -315,7 +315,7 @@ export function useQuickActionsContext(): QuickActionsContext {
     
     return recentIds
       .map(id => actions.find(a => a.id === id))
-      .filter(_Boolean) as QuickAction[];
+      .filter(Boolean) as QuickAction[];
   }, [actionHistory, actions]);
 
   // Search actions

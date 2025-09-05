@@ -129,11 +129,11 @@ class Logger {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           const lowerKey = key.toLowerCase();
           if (sensitiveFields.some(_field => lowerKey.includes(_field))) {
-            sanitized[key] = '[REDACTED]';
-          } else if (typeof data[key] === 'object') {
-            sanitized[key] = this.sanitizeData(data[key]);
+            (sanitized as any)[key] = '[REDACTED]';
+          } else if (typeof (data as any)[key] === 'object') {
+            (sanitized as any)[key] = this.sanitizeData((data as any)[key]);
           } else {
-            sanitized[key] = data[key];
+            (sanitized as any)[key] = (data as any)[key];
           }
         }
       }
@@ -150,7 +150,7 @@ class Logger {
       level,
       category: context?.category || LogCategory.SYSTEM,
       message,
-      context: context ? this.sanitizeData(_context) : undefined,
+      context: context ? this.sanitizeData(context) as LogContext : undefined,
       environment: this.isDevelopment ? 'development' : 'production'
     };
   }
@@ -171,15 +171,15 @@ class Logger {
       case LogLevel.DEBUG:
       case LogLevel.INFO:
         if (this.isDevelopment) {
-          logger.info(message, entry.context || '');
+          logger.info(message, entry.context || undefined);
         }
         break;
       case LogLevel.WARN:
-        logger.warn(message, entry.context || '');
+        logger.warn(message, entry.context || undefined);
         break;
       case LogLevel.ERROR:
       case LogLevel.CRITICAL:
-        logger.error(message, entry.context || '');
+        logger.error(message, (entry.context as unknown as Error) || undefined);
         break;
     }
   }
@@ -203,7 +203,7 @@ class Logger {
     // Send to remote logging service (if configured)
     if (!this.isDevelopment) {
       try {
-        await this.sendToRemoteLogging(_entriesToFlush);
+        await this.sendToRemoteLogging(entriesToFlush);
       } catch (error) {
         // Fallback to console if remote logging fails
         logger.error('[Logger] Failed to send logs to remote service');
@@ -281,7 +281,7 @@ class Logger {
         error: error ? {
           message: error.message,
           stack: error.stack,
-          code: (error as unknown).code
+          code: (error as any).code
         } : undefined
       };
       
@@ -298,7 +298,7 @@ class Logger {
       error: error ? {
         message: error.message,
         stack: error.stack,
-        code: (error as unknown).code
+        code: (error as any).code
       } : undefined
     };
     
@@ -317,7 +317,7 @@ class Logger {
       category: LogCategory.CRISIS,
       action,
       userId,
-      _metadata: this.sanitizeData(_metadata)
+      _metadata: this.sanitizeData(_metadata) as Record<string, any>
     });
   }
 
@@ -326,7 +326,7 @@ class Logger {
       category: LogCategory.WELLNESS,
       action,
       userId,
-      _metadata: this.sanitizeData(_metadata)
+      _metadata: this.sanitizeData(_metadata) as Record<string, any>
     });
   }
 
@@ -337,7 +337,7 @@ class Logger {
       performanceMetrics: {
         duration: value
       },
-      metadata
+      _metadata: metadata
     });
   }
 
@@ -346,7 +346,7 @@ class Logger {
       category: LogCategory.SECURITY,
       action: event,
       userId,
-      _metadata: this.sanitizeData(_metadata)
+      _metadata: this.sanitizeData(_metadata) as Record<string, any>
     });
   }
 

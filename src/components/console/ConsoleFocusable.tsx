@@ -1,6 +1,10 @@
 import React, { ReactNode, forwardRef } from 'react';
 
 interface ConsoleFocusableProps {
+  id?: string;
+  group?: string;
+  priority?: number;
+  onActivate?: () => void;
   children: ReactNode;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -12,16 +16,20 @@ interface ConsoleFocusableProps {
 }
 
 export const ConsoleFocusable = forwardRef<HTMLDivElement, ConsoleFocusableProps>(
-  ({ 
-    children, 
-    onFocus, 
-    onBlur, 
-    className = '', 
+  ({
+    id,
+    group,
+    priority,
+    onActivate,
+    children,
+    onFocus,
+    onBlur,
+    className = '',
     tabIndex = 0,
     role = 'button',
     ariaLabel,
     disabled = false,
-    ...props 
+    ...props
   }, ref) => {
     const handleFocus = () => {
       if (!disabled && onFocus) {
@@ -35,15 +43,25 @@ export const ConsoleFocusable = forwardRef<HTMLDivElement, ConsoleFocusableProps
       }
     };
 
+    const handleActivate = () => {
+      if (!disabled && onActivate) {
+        onActivate();
+      }
+    };
+
     return (
       <div
         ref={ref}
+        id={id}
         className={`${className} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         tabIndex={disabled ? -1 : tabIndex}
         role={role}
         aria-label={ariaLabel}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onClick={handleActivate}
+        data-group={group}
+        data-priority={priority}
         {...props}
       >
         {children}

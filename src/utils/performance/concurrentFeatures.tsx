@@ -11,7 +11,7 @@ import React, {
   lazy,
   memo,
   useCallback,
-  _useMemo,
+  useMemo,
   ComponentType,
   ReactNode,
 } from 'react';
@@ -32,7 +32,7 @@ export enum UpdatePriority {
 export function usePrioritizedTransition(priority: UpdatePriority = UpdatePriority.MEDIUM) {
   const [isPending, startTransition] = useTransition();
   
-  const __prioritizedTransition   = useCallback((callback: () => void) => {
+  const prioritizedTransition = useCallback((callback: () => void) => {
     if (priority === UpdatePriority.CRISIS) {
       // Crisis updates run immediately
       callback();
@@ -55,7 +55,7 @@ export function usePrioritizedDeferredValue<T>(
   value: T,
   priority: UpdatePriority = UpdatePriority.MEDIUM
 ): T {
-  const __deferred   = useDeferredValue(_value);
+  const deferred = useDeferredValue(value);
   
   // For crisis priority, return immediate value
   if (priority === UpdatePriority.CRISIS) {
@@ -159,14 +159,14 @@ export function lazyWithPreload<T extends ComponentType<unknown>>(
   let preloadPromise: Promise<{ default: T }> | null = null;
   
   const LazyComponent = lazy(() => {
-    if (_preloadPromise) {
+    if (preloadPromise) {
       return preloadPromise;
     }
     return importFn();
   });
   
   // Add preload method
-  (LazyComponent as unknown).preload = () => {
+  (LazyComponent as any).preload = () => {
     if (!preloadPromise) {
       preloadPromise = importFn();
     }
@@ -229,8 +229,8 @@ export function optimizedMemo<P extends object>(
  * Shallow equality check for props
  */
 function shallowEqual<T extends object>(prevProps: T, nextProps: T): boolean {
-  const prevKeys = Object.keys(_prevProps);
-  const nextKeys = Object.keys(_nextProps);
+  const prevKeys = Object.keys(prevProps);
+  const nextKeys = Object.keys(nextProps);
   
   if (prevKeys.length !== nextKeys.length) {
     return false;
@@ -297,7 +297,6 @@ export function LazyLoad({
   const ref = React.useRef<HTMLDivElement>(null);
   
   React.useEffect(() => {
-// @ts-expect-error - IntersectionObserver is a global API
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -337,7 +336,7 @@ export async function timeSlice<T>(
     
     await new Promise(resolve => {
       startTransition(() => {
-        chunk.forEach(_processor);
+        chunk.forEach(processor);
         setTimeout(resolve, delay);
       });
     });

@@ -200,7 +200,7 @@ class CommunityService {
 
     // Add response interceptor for error handling
     this.apiClient.interceptors.response.use(
-      (_response) => response,
+      (_response) => _response,
       (error) => {
         if (error.response?.status === 401) {
           // Handle unauthorized access

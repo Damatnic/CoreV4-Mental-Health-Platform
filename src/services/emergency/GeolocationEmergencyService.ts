@@ -1,4 +1,4 @@
-import { _EmergencyService, _EmergencyContact, LocationCoordinates } from '../../types/emergency';
+import { EmergencyService, EmergencyContact, LocationCoordinates } from '../../types/emergency';
 import { CrisisProfile } from '../../types/ai-insights';
 import { logger, LogCategory } from '../logging/logger';
 import { secureStorage } from '../security/secureStorage';
@@ -47,7 +47,7 @@ export class GeolocationEmergencyService {
       this.updatePermissionStatus(permission.state);
 
       permission.addEventListener('change', () => {
-        this.updatePermissionStatus(permission._state);
+        this.updatePermissionStatus(permission.state);
       });
 
     } catch (error) {
@@ -96,7 +96,7 @@ export class GeolocationEmergencyService {
 
           logger.info('Location permission granted', {
             category: LogCategory.EMERGENCY,
-            metadata: {
+            _metadata: {
               accuracy: this.permissionStatus.accuracy,
               coordinates: this.currentLocation
             }
@@ -272,11 +272,11 @@ export class GeolocationEmergencyService {
   }> {
     try {
       // Find appropriate service based on crisis level
-      const service = selectedService || await this.selectBestService(_crisisProfile);
+      const service = selectedService || await this.selectBestService(crisisProfile);
       
       logger.info('Triggering emergency response:', {
         category: LogCategory.EMERGENCY,
-        metadata: {
+        _metadata: {
           crisisLevel: crisisProfile.riskLevel,
           service: service.name,
           location: this.currentLocation
@@ -285,12 +285,12 @@ export class GeolocationEmergencyService {
 
       // For critical situations, auto-initiate emergency contact
       if (crisisProfile.riskLevel === 'critical') {
-        return await this.initiateEmergencyCall(_service);
+        return await this.initiateEmergencyCall(service);
       }
 
       // For high-risk situations, prepare emergency response
       if (crisisProfile.riskLevel === 'high') {
-        return await this.prepareEmergencyResponse(_service);
+        return await this.prepareEmergencyResponse(service);
       }
 
       // For moderate risk, provide emergency options
@@ -367,7 +367,7 @@ export class GeolocationEmergencyService {
 
       logger.info('Emergency call initiated:', {
         category: LogCategory.EMERGENCY,
-        metadata: emergencyInfo
+        _metadata: emergencyInfo
       });
 
       return {
@@ -425,7 +425,7 @@ export class GeolocationEmergencyService {
 
       logger.info('Location shared with emergency services:', {
         category: LogCategory.EMERGENCY,
-        metadata: { location: this.currentLocation }
+        _metadata: { location: this.currentLocation }
       });
       return true;
 

@@ -9,7 +9,7 @@ export type ConsoleMode = 'playstation' | 'xbox' | 'switch';
 /**
  * Get console navigation style based on current console mode
  */
-export const __getConsoleNavStyle = (_mode: ConsoleMode = 'playstation'): string => {
+export const getConsoleNavStyle = (_mode: ConsoleMode = 'playstation'): string => {
   switch (_mode) {
     case 'playstation':
       return 'bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 border-t border-blue-700';
@@ -32,7 +32,7 @@ export const getConsoleAccentColor = (_mode: ConsoleMode = 'playstation', opacit
     switch: '239, 68, 68', // Red-500 RGB
   };
 
-  const rgb = colors[mode];
+  const rgb = colors[_mode];
   return opacity === 1 ? `rgb(${rgb})` : `rgba(${rgb}, ${opacity})`;
 };
 

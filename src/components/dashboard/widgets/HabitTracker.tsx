@@ -1,17 +1,17 @@
-import { useState, _useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame,
-  _Calendar,
+  Calendar,
   CheckCircle2,
   Circle,
-  _TrendingUp,
-  _Award,
+  TrendingUp,
+  Award,
   Plus,
   Pause,
-  _Play,
+  Play,
   RefreshCw,
-  _Bell,
+  Bell,
   ChevronRight,
   Star,
   Zap,
@@ -26,10 +26,10 @@ import {
   Book,
   Edit2,
   BarChart3,
-  _Target
+  Target
 } from 'lucide-react';
-import { __useActivityStore } from '../../../stores/activityStore';
-import { format, startOfWeek, addDays, isSameDay, isToday, _subDays } from 'date-fns';
+import { useActivityStore } from '../../../stores/activityStore';
+import { format, startOfWeek, addDays, isSameDay, isToday, subDays } from 'date-fns';
 
 interface HabitTrackerProps {
   _onHabitClick?: (habit: unknown) => void;
@@ -42,13 +42,13 @@ export function HabitTracker({
   onAddHabit,
   onViewAnalytics
 }: HabitTrackerProps) {
-  const { habits, completeHabit, resetHabitStreak, pauseHabit, _updateHabit, stackHabits } = __useActivityStore();
+  const { habits, completeHabit, resetHabitStreak, pauseHabit, updateHabit, stackHabits } = useActivityStore();
 
-  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
-  const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showStackingMode, _setShowStackingMode] = useState(false);
-  const [selectedForStacking, _setSelectedForStacking] = useState<string[]>([]);
-  const [_expandedHabit, _setExpandedHabit] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showStackingMode, setShowStackingMode] = useState(false);
+  const [selectedForStacking, setSelectedForStacking] = useState<string[]>([]);
+  const [expandedHabit, setExpandedHabit] = useState<string | null>(null);
 
   // Filter active habits
   const activeHabits = habits.filter(h => h.isActive);
@@ -76,8 +76,8 @@ export function HabitTracker({
   };
 
   // Get habit icon based on name/description
-  const getHabitIcon = (habit: unknown) => {
-    const _name = habit.name.toLowerCase();
+  const getHabitIcon = (habit: any) => {
+    const name = habit.name.toLowerCase();
     if (name.includes('water') || name.includes('hydrat')) return Droplets;
     if (name.includes('sleep') || name.includes('bed')) return Moon;
     if (name.includes('wake') || name.includes('morning')) return Sun;
@@ -85,7 +85,7 @@ export function HabitTracker({
     if (name.includes('exercise') || name.includes('workout')) return Zap;
     if (name.includes('read') || name.includes('journal')) return Book;
     if (name.includes('eat') || name.includes('meal')) return Apple;
-    return getCategoryIcon(habit._category);
+    return getCategoryIcon(habit.category);
   };
 
   // Get streak fire color
@@ -98,24 +98,24 @@ export function HabitTracker({
   };
 
   // Check if habit was completed today
-  const isCompletedToday = (habit: unknown) => {
+  const isCompletedToday = (habit: any) => {
     if (!habit.lastCompleted) return false;
     return isSameDay(new Date(habit.lastCompleted), new Date());
   };
 
   // Get habit completion history for the week
-  const getWeekHistory = (habit: unknown) => {
+  const getWeekHistory = (habit: any) => {
     const weekStart = startOfWeek(new Date());
     const days = [];
     
     for (let i = 0; i < 7; i++) {
       const day = addDays(weekStart, i);
-      const completed = habit.lastCompleted && 
+      const completed = habit.lastCompleted &&
         isSameDay(new Date(habit.lastCompleted), day);
       days.push({
         date: day,
         completed,
-        isToday: isToday(_day)
+        isToday: isToday(day)
       });
     }
     
@@ -123,7 +123,7 @@ export function HabitTracker({
   };
 
   // Calculate habit effectiveness
-  const getHabitEffectiveness = (habit: unknown) => {
+  const getHabitEffectiveness = (habit: any) => {
     if (!habit.correlatedMoodImprovement) return null;
     const effectiveness = habit.correlatedMoodImprovement * 20; // Scale to 0-100
     return Math.min(100, Math.max(0, effectiveness));
@@ -132,7 +132,7 @@ export function HabitTracker({
   // Handle habit stacking
   const handleStackHabits = () => {
     if (selectedForStacking.length >= 2) {
-      stackHabits(_selectedForStacking);
+      stackHabits(selectedForStacking);
       setSelectedForStacking([]);
       setShowStackingMode(false);
     }
@@ -211,21 +211,21 @@ export function HabitTracker({
           >
             All ({activeHabits.length})
           </button>
-          {['physical', 'mental', 'emotional', 'social', 'spiritual'].map((_category) => {
-            const count = activeHabits.filter(h => h._category === _category).length;
-            const Icon = getCategoryIcon(_category);
+          {['physical', 'mental', 'emotional', 'social', 'spiritual'].map((category) => {
+            const count = activeHabits.filter(h => h.category === category).length;
+            const Icon = getCategoryIcon(category);
             return (
               <button
-                key={_category}
-                onClick={() => setSelectedCategory(_category)}
+                key={category}
+                onClick={() => setSelectedCategory(category)}
                 className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors flex items-center space-x-1 ${
-                  selectedCategory === _category
+                  selectedCategory === category
                     ? 'bg-primary-100 text-primary-700'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Icon className="h-3 w-3" />
-                <span>{_category.charAt(0).toUpperCase() + _category.slice(1)} ({count})</span>
+                <span>{category.charAt(0).toUpperCase() + category.slice(1)} ({count})</span>
               </button>
             );
           })}
@@ -272,9 +272,9 @@ export function HabitTracker({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <AnimatePresence mode="popLayout">
               {filteredHabits.map((habit) => {
-                const Icon = getHabitIcon(_habit);
-                const completed = isCompletedToday(_habit);
-                const effectiveness = getHabitEffectiveness(_habit);
+                const Icon = getHabitIcon(habit);
+                const completed = isCompletedToday(habit);
+                const effectiveness = getHabitEffectiveness(habit);
                 const isSelected = selectedForStacking.includes(habit.id);
                 
                 return (
@@ -291,7 +291,7 @@ export function HabitTracker({
                       hover:shadow-md
                     `}
                     onClick={() => {
-                      if (_showStackingMode) {
+                      if (showStackingMode) {
                         toggleStackingSelection(habit.id);
                       } else if (!completed) {
                         completeHabit(habit.id);
@@ -339,7 +339,7 @@ export function HabitTracker({
 
                     {/* Week Overview */}
                     <div className="flex items-center justify-between mb-2">
-                      {getWeekHistory(_habit).map((day, index) => (
+                      {getWeekHistory(habit).map((day, index) => (
                         <div
                           key={index}
                           className={`
@@ -405,8 +405,8 @@ export function HabitTracker({
           <div className="space-y-2">
             <AnimatePresence mode="popLayout">
               {filteredHabits.map((habit) => {
-                const Icon = getHabitIcon(_habit);
-                const completed = isCompletedToday(_habit);
+                const Icon = getHabitIcon(habit);
+                const completed = isCompletedToday(habit);
                 const isExpanded = expandedHabit === habit.id;
                 
                 return (
@@ -475,7 +475,7 @@ export function HabitTracker({
                         >
                           {/* Week History */}
                           <div className="flex items-center justify-between mb-3">
-                            {getWeekHistory(_habit).map((day, index) => (
+                            {getWeekHistory(habit).map((day, index) => (
                               <div key={index} className="text-center">
                                 <div className="text-xs text-gray-500 mb-1">
                                   {format(day.date, 'EEE')}

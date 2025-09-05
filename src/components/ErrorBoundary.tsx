@@ -57,11 +57,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({ error, errorInfo });
     
     // Log error with multiple logging systems
-    logger.error('Component error caught by ErrorBoundary', { error, errorInfo });
+    logger.error('Component error caught by ErrorBoundary', JSON.stringify({ error: error.message, errorInfo: errorInfo.componentStack }));
     
     // Log to crisis-aware logging system if available
-    if (logger?.logCrisisIntervention) {
-      logger.logCrisisIntervention('componenterror', undefined, {
+    if ((logger as any)?.logCrisisIntervention) {
+      (logger as any).logCrisisIntervention('componenterror', undefined, {
         error: error.message,
         component: errorInfo.componentStack,
         severity: 'high',
@@ -71,7 +71,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Log error details for debugging
-    logger.error('🚨 ERROR BOUNDARY CAUGHT:', {
+    logger.error('🚨 ERROR BOUNDARY CAUGHT:', JSON.stringify({
       error: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
@@ -79,7 +79,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href
-    });
+    }));
 
     // Send error to monitoring service
     this.reportError(error, errorInfo);
@@ -122,8 +122,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       // Send to Sentry if available
-      if ((window as unknown).Sentry) {
-        (window as unknown).Sentry.captureException(error, {
+      if ((window as any).Sentry) {
+        (window as any).Sentry.captureException(error, {
           tags: {
             component: 'ErrorBoundary',
             errorId: this.state.errorId
@@ -134,14 +134,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         });
       }
     } catch (error) {
-      logger.error('Failed to report error', 'ErrorBoundary', error);
+      logger.error('Failed to report error: ErrorBoundary', String(error));
     }
   };
 
   private handleReset = () => {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++;
-      logger.info(`Retrying... (${this.retryCount}/${this.maxRetries})`, 'ErrorBoundary');
+      logger.info(`Retrying... (${this.retryCount}/${this.maxRetries}) - ErrorBoundary`);
       
       this.setState({
         hasError: false,
@@ -164,8 +164,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   private handleEmergencyCall = (number: string) => {
-    if (logger?.logCrisisIntervention) {
-      logger.logCrisisIntervention('emergency_call_fromerror_boundary', undefined, {
+    if ((logger as any)?.logCrisisIntervention) {
+      (logger as any).logCrisisIntervention('emergency_call_from_error_boundary', undefined, {
         number,
         error_context: this.state.error?.message
       });
@@ -348,7 +348,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       // Support react-error-boundary FallbackComponent prop
       if (this.props.FallbackComponent && this.state.error) {
         const FallbackComponent = this.props.FallbackComponent;
-        return <FallbackComponent error={this.state.error} resetErrorBoundary={this.handleReset} />;
+        return <FallbackComponent />;
       }
 
       // Support our own fallback prop
@@ -430,14 +430,14 @@ export function useErrorBoundary() {
 export const _setupGlobalErrorHandling = () => {
   // Handle uncaught JavaScript errors
   window.addEventListener('error', (event) => {
-    logger.error('🚨 UNCAUGHT ERROR:', {
+    logger.error('🚨 UNCAUGHT ERROR:', JSON.stringify({
       message: event.message,
       source: event.filename,
       line: event.lineno,
       column: event.colno,
       error: event.error?.stack,
       timestamp: new Date().toISOString()
-    });
+    }));
 
     // Store error for analysis
     const errorReport = {
@@ -453,17 +453,17 @@ export const _setupGlobalErrorHandling = () => {
     try {
       localStorage.setItem(`uncaughterror_${Date.now()}`, JSON.stringify(errorReport));
     } catch (err) {
-      logger.error('Failed to store error report', 'ErrorBoundary', err);
+      logger.error('Failed to store error report: ErrorBoundary', String(err));
     }
   });
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    logger.error('🚨 UNHANDLED PROMISE REJECTION:', {
-      reason: event.reason,
-      promise: event.promise,
+    logger.error('🚨 UNHANDLED PROMISE REJECTION:', JSON.stringify({
+      reason: String(event.reason),
+      promise: String(event.promise),
       timestamp: new Date().toISOString()
-    });
+    }));
 
     // Store rejection for analysis
     const rejectionReport = {
@@ -476,7 +476,7 @@ export const _setupGlobalErrorHandling = () => {
     try {
       localStorage.setItem(`rejection_${Date.now()}`, JSON.stringify(rejectionReport));
     } catch (err) {
-      logger.error('Failed to store rejection report', 'ErrorBoundary', err);
+      logger.error('Failed to store rejection report: ErrorBoundary', String(err));
     }
   });
 

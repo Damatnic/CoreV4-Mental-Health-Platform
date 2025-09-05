@@ -34,7 +34,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
 };
 
 // Cache for feature flags
-const flagCache = new Map<string, { _value: unknown; timestamp: number }>();
+const flagCache = new Map<string, { value: unknown; timestamp: number }>();
 
 /**
  * Hook for feature flag management
@@ -48,12 +48,12 @@ export function useFeatureFlag(
     fallbackValue = false, endpoint = '/api/feature-flags' } = config;
 
   const { user } = useAuth();
-  const [___flagValue, _setFlagValue] = useState<unknown>(() => {
+  const [flagValue, setFlagValue] = useState<typeof fallbackValue>(() => {
     // Check cache first
-    if (_enableCache) {
-      const cached = flagCache.get(_flagName);
+    if (enableCache) {
+      const cached = flagCache.get(flagName);
       if (cached && Date.now() - cached.timestamp < cacheDuration) {
-        return cached._value;
+        return cached.value;
       }
     }
     
@@ -61,7 +61,7 @@ export function useFeatureFlag(
     const override = secureStorage.getItem(`feature_flag_${flagName}`);
     if (override !== null) {
       try {
-        return JSON.parse(_override);
+        return JSON.parse(override);
       } catch (error) {
         return override;
       }
@@ -72,14 +72,14 @@ export function useFeatureFlag(
   });
 
   useEffect(() => {
-    let _mounted = true;
+    let mounted = true;
 
     const fetchFeatureFlag = async () => {
       // Check cache
-      if (_enableCache) {
-        const cached = flagCache.get(_flagName);
+      if (enableCache) {
+        const cached = flagCache.get(flagName);
         if (cached && Date.now() - cached.timestamp < cacheDuration) {
-          if (_mounted) setFlagValue(cached._value);
+          if (mounted) setFlagValue(cached.value);
           return;
         }
       }
@@ -87,58 +87,58 @@ export function useFeatureFlag(
       try {
         // DISABLED: Feature flag server calls to prevent console spam
         // Use local defaults only for now
-        const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
+        const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
         
         // Cache the result
-        if (_enableCache) {
+        if (enableCache) {
           flagCache.set(flagName, {
-            _value,
+            value,
             timestamp: Date.now()
           });
         }
         
-        if (_mounted) setFlagValue(_value);
+        if (mounted) setFlagValue(value);
       } catch (error) {
         // Silent fallback to prevent console spam
-        const _value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
-        if (_mounted) setFlagValue(_value);
+        const value = DEFAULT_FLAGS[flagName] ?? fallbackValue;
+        if (mounted) setFlagValue(value);
       }
     };
 
     fetchFeatureFlag();
 
     return () => {
-      _mounted = false;
+      mounted = false;
     };
   }, [flagName, user, enableCache, cacheDuration, fallbackValue, endpoint]);
 
-  return flagValue;
+  return flagValue as boolean | string | number | object | undefined;
 }
 
 /**
  * Hook to get all feature flags
  */
 export function useFeatureFlags(): FeatureFlags {
-  const [flags, _setFlags] = useState<FeatureFlags>(_DEFAULT_FLAGS);
+  const [flags, setFlags] = useState<FeatureFlags>(DEFAULT_FLAGS);
   const { user } = useAuth();
 
   useEffect(() => {
-    let _mounted = true;
+    let mounted = true;
 
     const fetchAllFlags = async () => {
       try {
         // DISABLED: Use local defaults only to prevent console spam
-        if (_mounted) setFlags(_DEFAULT_FLAGS);
+        if (mounted) setFlags(DEFAULT_FLAGS);
       } catch (error) {
         // Silent fallback
-        if (_mounted) setFlags(_DEFAULT_FLAGS);
+        if (mounted) setFlags(DEFAULT_FLAGS);
       }
     };
 
     fetchAllFlags();
 
     return () => {
-      _mounted = false;
+      mounted = false;
     };
   }, [user]);
 
@@ -149,25 +149,25 @@ export function useFeatureFlags(): FeatureFlags {
  * Hook to override feature flags (for testing)
  */
 export function useFeatureFlagOverride() {
-  const __setOverride   = useCallback((flagName: string, _value: unknown) => {
-    secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(_value));
+  const setOverride   = useCallback((flagName: string, value: unknown) => {
+    secureStorage.setItem(`feature_flag_${flagName}`, JSON.stringify(value));
     // Clear cache to force refresh
-    flagCache.delete(_flagName);
+    flagCache.delete(flagName);
     // Trigger re-render
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
-  const __clearOverride   = useCallback((flagName: string) => {
+  const clearOverride   = useCallback((flagName: string) => {
     secureStorage.removeItem(`feature_flag_${flagName}`);
-    flagCache.delete(_flagName);
+    flagCache.delete(flagName);
     window.dispatchEvent(new Event('feature-flag-change'));
   }, []);
 
-  const __clearAllOverrides   = useCallback(() => {
-    const keys = Object.keys(_localStorage);
+  const clearAllOverrides   = useCallback(() => {
+    const keys = Object.keys(localStorage);
     keys.forEach(key => {
       if (key.startsWith('feature_flag_')) {
-        secureStorage.removeItem(_key);
+        secureStorage.removeItem(key);
       }
     });
     flagCache.clear();
@@ -185,15 +185,22 @@ export function useFeatureFlagOverride() {
 function _getUserSegment(user: unknown): string {
   if (!user) return 'anonymous';
   
+  const typedUser = user as { 
+    role?: string; 
+    subscriptionTier?: string; 
+    betaTester?: boolean; 
+    createdAt?: string | Date;
+  };
+  
   // Determine segment based on user properties
-  if (user.role === 'admin') return 'admin';
-  if (user.role === 'professional') return 'professional';
-  if (user.subscriptionTier === 'premium') return 'premium';
-  if (user.betaTester) return 'beta';
+  if (typedUser.role === 'admin') return 'admin';
+  if (typedUser.role === 'professional') return 'professional';
+  if (typedUser.subscriptionTier === 'premium') return 'premium';
+  if (typedUser.betaTester) return 'beta';
   
   // Check account age
-  if (user.createdAt) {
-    const accountAge = Date.now() - new Date(user.createdAt).getTime();
+  if (typedUser.createdAt) {
+    const accountAge = Date.now() - new Date(typedUser.createdAt).getTime();
     const daysOld = accountAge / (1000 * 60 * 60 * 24);
     
     if (daysOld < 7) return 'new_user';

@@ -15,7 +15,7 @@ interface EmergencyContact {
 
 export function EmergencyContacts() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [__showAddForm, setShowAddForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState<EmergencyContact | null>(null);
   const [formData, setFormData] = useState({
     name: '',

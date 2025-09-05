@@ -4,43 +4,43 @@
  */
 
 // Import services
-import { dataIntegrationService, _IntegrationEvent } from './DataIntegrationService';
-import { realtimeSyncService, _RealtimeEvent } from './RealtimeSyncService';
-import { crisisIntegrationService, _CrisisEventType, _CrisisSeverity } from './CrisisIntegrationService';
+import { dataIntegrationService, IntegrationEvent } from './DataIntegrationService';
+import { realtimeSyncService, RealtimeEvent } from './RealtimeSyncService';
+import { crisisIntegrationService, CrisisEventType, CrisisSeverity } from './CrisisIntegrationService';
 import { logger } from '../../utils/logger';
 
 // Core integration services
 export { 
   dataIntegrationService,
   useDataIntegration,
-  _IntegrationEvent
+  IntegrationEvent
 } from './DataIntegrationService';
 
 export {
   realtimeSyncService,
   useRealtimeSync,
-  _RealtimeEvent
+  RealtimeEvent
 } from './RealtimeSyncService';
 
 export {
   crisisIntegrationService,
   useCrisisIntegration,
-  _CrisisEventType,
-  _CrisisSeverity
+  CrisisEventType,
+  CrisisSeverity
 } from './CrisisIntegrationService';
 
 // Integration utilities
 export const initializeIntegration = async (userId: string, token: string) => {
   try {
     // Initialize real-time connection
-    await realtimeSyncService.connect({ userId, token });
+    await realtimeSyncService.connect({ _userId: userId, token });
     
     // Start data integration monitoring
     dataIntegrationService.forceSync();
     
     // Initialize crisis monitoring
     const crisisStatus = crisisIntegrationService.getCrisisStatus();
-    logger.info('Crisis monitoring initialized:', crisisStatus);
+    logger.info('Crisis monitoring initialized:', JSON.stringify(crisisStatus));
     
     return {
       success: true,
@@ -51,10 +51,10 @@ export const initializeIntegration = async (userId: string, token: string) => {
       }
     };
   } catch (error) {
-    logger.error('Failed to initialize integration services:');
+    logger.error('Failed to initialize integration services:', (error as Error).message);
     return {
       success: false,
-      undefined
+      error: (error as Error).message
     };
   }
 };

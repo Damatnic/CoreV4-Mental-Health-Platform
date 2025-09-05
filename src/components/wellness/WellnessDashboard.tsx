@@ -10,27 +10,27 @@ import {
   Calendar,
   Award,
   Target,
-  _BarChart3,
-  _LineChart,
-  _PieChart,
-  _Clock,
+  BarChart3,
+  LineChart,
+  PieChart,
+  Clock,
   Zap,
   Droplets,
   Coffee,
   Apple,
-  _ChevronRight,
+  ChevronRight,
   Plus,
-  _Filter,
+  Filter,
   Download,
-  _Share2,
+  Share2,
   Settings,
-  _Bell,
+  Bell,
   CheckCircle,
   Circle,
   AlertCircle,
   TrendingDown
 } from 'lucide-react';
-import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, _subDays } from 'date-fns';
+import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday, subDays } from 'date-fns';
 import { useWellnessStore } from '../../stores/wellnessStore';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 
@@ -141,7 +141,7 @@ interface WellnessGoal {
 
 export const WellnessDashboard: React.FC = () => {
   // Use Zustand store for state management
-  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, _monthlyScore, addWellnessGoal, _updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = useWellnessStore();
+  const { moodEntries, wellnessMetrics, wellnessGoals, wellnessInsights, weeklyScore, monthlyScore, addWellnessGoal, updateGoalProgress, calculateWellnessScores, generateInsights, exportData } = useWellnessStore();
 
   const [wellnessData, setWellnessData] = useState<WellnessData[]>([]);
   const [todayData, setTodayData] = useState<WellnessData>({
@@ -152,7 +152,7 @@ export const WellnessDashboard: React.FC = () => {
   const [habitStreaks, setHabitStreaks] = useState<HabitStreak[]>([]);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [newGoal, setNewGoal] = useState<Partial<WellnessGoal & { description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }>>({});
-  const [_selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
   const [showExportOptions, setShowExportOptions] = useState(false);
 
   // Load saved data and calculate scores on mount
@@ -161,23 +161,23 @@ export const WellnessDashboard: React.FC = () => {
     generateInsights();
     
     // Load legacy localStorage data if exists
-    const _savedData = secureStorage.getItem('wellnessData');
-    const _savedStreaks = secureStorage.getItem('habitStreaks');
-    const _savedToday = secureStorage.getItem('wellnessTodayData');
+    const savedData = secureStorage.getItem('wellnessData');
+    const savedStreaks = secureStorage.getItem('habitStreaks');
+    const savedToday = secureStorage.getItem('wellnessTodayData');
     
-    if (_savedData) {
-      setWellnessData(JSON.parse(_savedData).map((d: unknown) => ({
+    if (savedData) {
+      setWellnessData(JSON.parse(savedData).map((d: any) => ({
         ...d,
         date: new Date(d.date)
       })));
     }
     
-    if (_savedStreaks) {
-      setHabitStreaks(JSON.parse(_savedStreaks));
+    if (savedStreaks) {
+      setHabitStreaks(JSON.parse(savedStreaks));
     }
     
-    if (_savedToday) {
-      const today = JSON.parse(_savedToday);
+    if (savedToday) {
+      const today = JSON.parse(savedToday);
       if (new Date(today.date).toDateString() === new Date().toDateString()) {
         setTodayData({
           ...today,
@@ -215,8 +215,8 @@ export const WellnessDashboard: React.FC = () => {
     const today = new Date().toDateString();
     const existingStreak = habitStreaks.find(s => s.habitId === habitId);
     
-    if (_existingStreak) {
-      const yesterday = new Date(Date._now() - 86400000).toDateString();
+    if (existingStreak) {
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
       const newStreak = { ...existingStreak };
       
       if (existingStreak.lastCompleted === today) {
@@ -233,11 +233,11 @@ export const WellnessDashboard: React.FC = () => {
       
       newStreak.lastCompleted = today;
       
-      const _updatedStreaks = habitStreaks.map(s => 
+      const updatedStreaks = habitStreaks.map(s =>
         s.habitId === habitId ? newStreak : s
       );
-      setHabitStreaks(_updatedStreaks);
-      secureStorage.setItem('habitStreaks', JSON.stringify(_updatedStreaks));
+      setHabitStreaks(updatedStreaks);
+      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
     } else {
       // New streak
       const newStreak: HabitStreak = {
@@ -246,14 +246,14 @@ export const WellnessDashboard: React.FC = () => {
         longest: 1,
         lastCompleted: today
       };
-      const _updatedStreaks = [...habitStreaks, newStreak];
-      setHabitStreaks(_updatedStreaks);
-      secureStorage.setItem('habitStreaks', JSON.stringify(_updatedStreaks));
+      const updatedStreaks = [...habitStreaks, newStreak];
+      setHabitStreaks(updatedStreaks);
+      secureStorage.setItem('habitStreaks', JSON.stringify(updatedStreaks));
     }
   };
 
   // Add sleep data
-  const __addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
+  const addSleepData = (hours: number, quality: keyof typeof SLEEP_QUALITY) => {
     setTodayData({
       ...todayData,
       sleep: { hours, quality }
@@ -261,7 +261,7 @@ export const WellnessDashboard: React.FC = () => {
   };
 
   // Add exercise data
-  const __addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
+  const addExercise = (type: keyof typeof EXERCISE_TYPES, duration: number) => {
     const calories = EXERCISE_TYPES[type].calories * duration;
     const exercises = todayData.exercise || [];
     exercises.push({ type, duration, calories });
@@ -280,11 +280,11 @@ export const WellnessDashboard: React.FC = () => {
     });
   };
 
-  // Save day&apos;s data
-  const __saveDayData = () => {
-    const _updatedData = [...wellnessData, todayData];
-    setWellnessData(_updatedData);
-    secureStorage.setItem('wellnessData', JSON.stringify(_updatedData));
+  // Save day's data
+  const saveDayData = () => {
+    const updatedData = [...wellnessData, todayData];
+    setWellnessData(updatedData);
+    secureStorage.setItem('wellnessData', JSON.stringify(updatedData));
     
     // Reset today&apos;s data
     setTodayData({
@@ -328,12 +328,12 @@ export const WellnessDashboard: React.FC = () => {
     
     // Otherwise calculate based on current day data
     let score = 0;
-    let _factors = 0;
+    let factors = 0;
     
     // Habits score (30%)
     const completedHabits = (todayData.habits?.length || 0) / DAILY_HABITS.length;
     score += completedHabits * 30;
-    _factors++;
+    factors++;
     
     // Mood score from recent entries (30%)
     const recentMoodEntries = moodEntries.filter(entry => {
@@ -345,15 +345,15 @@ export const WellnessDashboard: React.FC = () => {
     if (recentMoodEntries.length > 0) {
       const avgMood = recentMoodEntries.reduce((sum, e) => sum + e.moodScore, 0) / recentMoodEntries.length;
       score += (avgMood / 10) * 30;
-      _factors++;
+      factors++;
     }
     
     // Sleep score (20%)
     if (todayData.sleep) {
-      const sleepScore = (todayData.sleep.hours / 8) * 0.5 + 
+      const sleepScore = (todayData.sleep.hours / 8) * 0.5 +
                         (SLEEP_QUALITY[todayData.sleep.quality].value / 5) * 0.5;
       score += sleepScore * 20;
-      _factors++;
+      factors++;
     }
     
     // Exercise score (10%)
@@ -361,7 +361,7 @@ export const WellnessDashboard: React.FC = () => {
       const exerciseMinutes = todayData.exercise.reduce((sum, e) => sum + e.duration, 0);
       const exerciseScore = Math.min(exerciseMinutes / 30, 1);
       score += exerciseScore * 10;
-      _factors++;
+      factors++;
     }
     
     // Hydration score (10%)
@@ -373,9 +373,9 @@ export const WellnessDashboard: React.FC = () => {
 
   // Get weekly stats
   const getWeeklyStats = () => {
-    const _now = new Date();
-    const weekStart = startOfWeek(_now);
-    const weekEnd = endOfWeek(_now);
+    const now = new Date();
+    const weekStart = startOfWeek(now);
+    const weekEnd = endOfWeek(now);
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
     
     return days.map(day => {
@@ -439,9 +439,9 @@ export const WellnessDashboard: React.FC = () => {
   // Export data using store&apos;s export function
   const handleExportData = (format: 'json' | 'csv') => {
     if (format === 'json') {
-      // Use the store&apos;s export function
-      const _dataStr = exportData();
-      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
+      // Use the store's export function
+      const dataStr = exportData();
+      const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(dataStr)}`;
       const exportFileDefaultName = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.json`;
       
       const linkElement = document.createElement('a');
@@ -478,8 +478,8 @@ export const WellnessDashboard: React.FC = () => {
         csvContent += `${formatDate(date, 'yyyy-MM-dd')},${avgMood.toFixed(1)},${avgStress.toFixed(1)},${dayMetrics?.sleepHours || 0},${dayMetrics?.exerciseMinutes || 0},${dayMetrics?.waterIntake || 0},${calculateWellnessScore()}\n`;
       });
       
-      const _blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = URL.createObjectURL(_blob);
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `wellness-data-${formatDate(new Date(), 'yyyy-MM-dd')}.csv`;

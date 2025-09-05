@@ -22,35 +22,35 @@ interface AnalyticsEvent {
 
 export const useAnalytics = () => {
   // All tracking methods are no-ops - we never collect any data
-  const __trackEvent   = useCallback(async (event: AnalyticsEvent | string, _properties?: Record<string, any>) => {
+  const trackEvent = useCallback(async (event: AnalyticsEvent | string, _properties?: Record<string, any>) => {
     // Intentionally empty - no data collection
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Analytics disabled - No data collected:', typeof event === 'string' ? event : event.action);
     }
   }, []);
 
-  const __trackPageView   = useCallback(async (page: string, _properties?: Record<string, any>) => {
+  const trackPageView = useCallback(async (page: string, _properties?: Record<string, any>) => {
     // Intentionally empty - no page tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Page view not tracked:', page);
     }
   }, []);
 
-  const __trackError   = useCallback(async (errorType: string, errorDetails: Record<string, any>) => {
+  const trackError = useCallback(async (errorType: string, errorDetails: Record<string, any>) => {
     // Only log errors locally for debugging, never send anywhere
     if (process.env.NODE_ENV === 'development') {
       logger.error('[Local Error Log]', errorType, errorDetails);
     }
   }, []);
 
-  const __trackTiming   = useCallback(async (category: string, variable: string, _time: number, _label?: string) => {
+  const trackTiming = useCallback(async (category: string, variable: string, _time: number, _label?: string) => {
     // Intentionally empty - no performance tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Timing not tracked:', category, variable);
     }
   }, []);
 
-  const __trackInteraction   = useCallback(async (element: string, action: string, _value?: unknown) => {
+  const trackInteraction = useCallback(async (element: string, action: string, _value?: unknown) => {
     // Intentionally empty - no interaction tracking
     if (process.env.NODE_ENV === 'development') {
       logger.info('[Privacy Mode] Interaction not tracked:', element, action);

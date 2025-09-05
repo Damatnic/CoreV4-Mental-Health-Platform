@@ -4,13 +4,13 @@ import { motion } from 'framer-motion';
 import { 
   BarChart3, 
   Heart, 
-  _Users, 
+  Users, 
   Stethoscope,
   AlertTriangle,
   ChevronLeft,
-  _ChevronRight,
+  ChevronRight,
   Brain,
-  _Activity
+  Activity
 } from 'lucide-react';
 import { useVibration } from '../../hooks/useVibration';
 
@@ -47,7 +47,7 @@ const navItems: NavItem[] = [
     label: 'Crisis Support',
     icon: AlertTriangle,
     color: 'text-red-400',
-    _urgent: false, // DISABLED: Removed annoying demo urgency
+    urgent: false, // DISABLED: Removed annoying demo urgency
   },
   {
     path: '/professional',
@@ -60,7 +60,7 @@ const navItems: NavItem[] = [
 export function MobileNavigation() {
   const location = useLocation();
   const { vibrate } = useVibration();
-  const [isDesktopSidebarCollapsed, _setIsDesktopSidebarCollapsed] = useState(false);
+  const [isDesktopSidebarCollapsed, __setIsDesktopSidebarCollapsed] = useState(false);
 
   // Apply collapsed class to body for proper spacing
   React.useEffect(() => {
@@ -79,7 +79,7 @@ export function MobileNavigation() {
     if (path === '/') {
       return location.pathname === '/';
     }
-    return location.pathname.startsWith(_path);
+    return location.pathname.startsWith(path);
   };
 
   const handleNavClick = (_urgent?: boolean) => {
@@ -107,7 +107,7 @@ export function MobileNavigation() {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => handleNavClick(item._urgent)}
+                onClick={() => handleNavClick(item.urgent)}
                 className="console-focusable relative flex flex-col items-center justify-center py-2 px-2 group transition-all duration-300 flex-1 min-h-[56px] min-w-[56px]"
                 style={{
                   pointerEvents: 'auto',
@@ -158,7 +158,7 @@ export function MobileNavigation() {
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   
                   {/* Enhanced _urgent indicator for crisis */}
-                  {item._urgent && (
+                  {item.urgent && (
                     <motion.span 
                       className="absolute -top-1 -right-1 flex h-3 w-3"
                       animate={{ scale: [1, 1.2, 1] }}
@@ -204,7 +204,7 @@ export function MobileNavigation() {
             >
               <Link
                 to={item.path}
-                onClick={() => handleNavClick(item._urgent)}
+                onClick={() => handleNavClick(item.urgent)}
                 className={`
                   console-focusable relative w-20 h-20 rounded-console-lg flex flex-col items-center justify-center
                   transition-all duration-300 group overflow-hidden border min-h-[56px] min-w-[56px]
@@ -238,7 +238,7 @@ export function MobileNavigation() {
                   <Icon className="h-6 w-6 flex-shrink-0" />
                   
                   {/* Enhanced _urgent indicator */}
-                  {item._urgent && (
+                  {item.urgent && (
                     <motion.span 
                       className="absolute -top-1 -right-1 flex h-3 w-3"
                       animate={{ scale: [1, 1.3, 1] }}
@@ -287,7 +287,7 @@ export function MobileNavigation() {
         
         {/* Collapse/Expand Toggle */}
         <motion.button
-          onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+          onClick={() => __setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
           className="console-focusable mb-4 mx-4 p-3 rounded-console-lg bg-gray-700/30 hover:bg-gray-600/40 border border-gray-600/50 hover:border-console-accent/50 transition-all duration-300 shadow-console-card min-h-[56px] min-w-[56px] flex items-center justify-center group"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -322,7 +322,7 @@ export function MobileNavigation() {
               >
                 <Link
                   to={item.path}
-                  onClick={() => handleNavClick(item._urgent)}
+                  onClick={() => handleNavClick(item.urgent)}
                   className={`
                     console-focusable relative flex items-center transition-all duration-300 group overflow-hidden rounded-console-lg min-h-[56px] min-w-[56px]
                     ${isDesktopSidebarCollapsed ? 'p-4 justify-center' : 'p-4'}
@@ -351,7 +351,7 @@ export function MobileNavigation() {
                     <Icon className="h-6 w-6 flex-shrink-0" />
                     
                     {/* Enhanced _urgent indicator */}
-                    {item._urgent && (
+                    {item.urgent && (
                       <motion.span 
                         className="absolute -top-1 -right-1 flex h-3 w-3"
                         animate={{ scale: [1, 1.3, 1] }}

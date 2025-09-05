@@ -1,5 +1,5 @@
-import { TrendingUp, TrendingDown, Minus, _Target, Flame, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Activity, Flame, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { WellnessStatus as WellnessStatusType } from '../../../types/dashboard';
 
 interface WellnessStatusProps {

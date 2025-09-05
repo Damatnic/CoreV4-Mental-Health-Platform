@@ -8,8 +8,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface EventCardProps {
   event: Event;
-  onRegister: (_eventId: string) => void;
-  onUnregister: (_eventId: string) => void;
+  onRegister: (eventId: string) => void;
+  onUnregister: (eventId: string) => void;
 }
 
 function EventCard({ event, onRegister, onUnregister }: EventCardProps) {
@@ -344,7 +344,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
                     />
                     <span className="ml-2 text-sm text-gray-700">Online</span>
                   </label>
-                  <label className="flex items-center" htmlFor="location-online">
+                  <label className="flex items-center" htmlFor="location-in-person">
                     <input
                       type="radio"
                       name="location-type"
@@ -395,7 +395,7 @@ function CreateEventModal({ isOpen, onClose, groupId }: CreateEventModalProps) {
             {/* Max Attendees */}
             <div>
               <label htmlFor="max-attendees" className="block text-sm font-medium text-gray-700 mb-1">
-                Maximum Attendees (_optional)
+                Maximum Attendees (optional)
               </label>
               <input
                 id="max-attendees"

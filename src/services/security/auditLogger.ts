@@ -144,14 +144,14 @@ class AuditLoggerService {
 
       // Add signature if enabled
       if (this.config.enableSignatures) {
-        entry.signature = await this.signLogEntry(_entry);
+        entry.signature = await this.signLogEntry(entry);
       }
 
       // Add to memory buffer
-      this.logs.push(_entry);
+      this.logs.push(entry);
 
       // Check if immediate persistence is needed
-      if (this.shouldPersistImmediately(_entry)) {
+      if (this.shouldPersistImmediately(entry)) {
         await this.persistLogs();
       }
 
@@ -162,7 +162,7 @@ class AuditLoggerService {
 
       // Send critical events to monitoring service
       if (entry.severity === 'critical') {
-        this.notifyCriticalEvent(_entry);
+        this.notifyCriticalEvent(entry);
       }
     } catch (error) {
       logger.error('Failed to log audit event:');
@@ -256,7 +256,7 @@ class AuditLoggerService {
       if (format === 'json') {
         return JSON.stringify(logs, null, 2);
       } else {
-        return this.convertToCSV(_logs);
+        return this.convertToCSV(logs);
       }
     } catch (error) {
       logger.error('Failed to export audit logs:');
@@ -276,7 +276,7 @@ class AuditLoggerService {
       const logWithoutSignature = { ...log };
       delete logWithoutSignature.signature;
       
-      const dataToVerify = JSON.stringify(_logWithoutSignature);
+      const dataToVerify = JSON.stringify(logWithoutSignature);
       return await cryptoService.verifySignature(
         dataToVerify,
         log.signature
@@ -315,7 +315,7 @@ class AuditLoggerService {
     
     const logs = await this.query({ startDate, endDate: now });
     
-    const __stats = {
+    const stats = {
       totalEvents: logs.length,
       byEvent: {} as Record<string, number>,
       bySeverity: {} as Record<string, number>,
@@ -372,7 +372,7 @@ class AuditLoggerService {
   private async loadStoredLogs(): Promise<void> {
     try {
       const storedLogs = await secureStorage.getItem('audit_logs');
-      if (storedLogs && Array.isArray(_storedLogs)) {
+      if (storedLogs && Array.isArray(storedLogs)) {
         // Only load recent logs into memory
         const recentDate = new Date();
         recentDate.setDate(recentDate.getDate() - 1);
@@ -391,7 +391,7 @@ class AuditLoggerService {
       if (this.logs.length === 0) return;
       
       // Get existing logs
-      const existingLogs = await secureStorage.getItem('audit_logs') || [];
+      const existingLogs = (await secureStorage.getItem('audit_logs') as AuditLogEntry[]) || [];
       
       // Combine and deduplicate
       const allLogs = [...existingLogs, ...this.logs];
@@ -454,7 +454,7 @@ class AuditLoggerService {
   }
 
   private async getAllLogs(): Promise<AuditLogEntry[]> {
-    const storedLogs = await secureStorage.getItem('audit_logs') || [];
+    const storedLogs = (await secureStorage.getItem('audit_logs') as AuditLogEntry[]) || [];
     return [...storedLogs, ...this.logs];
   }
 
@@ -462,8 +462,8 @@ class AuditLoggerService {
     const entryWithoutSignature = { ...entry };
     delete entryWithoutSignature.signature;
     
-    const _dataToSign = JSON.stringify(_entryWithoutSignature);
-    return await cryptoService.signData(_dataToSign);
+    const dataToSign = JSON.stringify(entryWithoutSignature);
+    return await cryptoService.signData(dataToSign);
   }
 
   private shouldPersistImmediately(entry: AuditLogEntry): boolean {
@@ -477,7 +477,7 @@ class AuditLoggerService {
 
   private notifyCriticalEvent(entry: AuditLogEntry): void {
     // In production, send to monitoring service
-    logger.error('CRITICAL AUDIT EVENT:', entry);
+    logger.error('CRITICAL AUDIT EVENT', JSON.stringify(entry));
     
     // Could trigger alerts, emails, etc.
     if (window.navigator.onLine) {
@@ -485,7 +485,7 @@ class AuditLoggerService {
       fetch('/api/monitoring/critical', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(_entry),
+        body: JSON.stringify(entry),
       }).catch(err => logger.error('Failed to notify monitoring:', err));
     }
   }

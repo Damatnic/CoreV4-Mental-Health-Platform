@@ -42,8 +42,8 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
     };
 
     // Only log in development for debugging
-    if (_enableLogging) {
-      logger.info(`[Local Performance] ${name}:`, value, metadata);
+    if (enableLogging) {
+      logger.info(`[Local Performance] ${name}: ${value}`, JSON.stringify(metadata));
     }
 
     // Keep metrics in local buffer for app optimization only
@@ -66,8 +66,8 @@ export function usePerformanceMonitor(config: PerformanceMonitorConfig = {}) {
   }, []);
 
   return {
-    recordMetric,
-    flushMetrics,
+    recordMetric: __recordMetric,
+    flushMetrics: __flushMetrics,
     getMetrics: () => [...metricsBuffer.current] // Local access only
   };
 }

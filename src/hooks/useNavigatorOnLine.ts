@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
  * Provides real-time network connectivity status
  */
 export function useNavigatorOnLine() {
-  const [isOnline, _setIsOnline] = useState(() => {
+  const [isOnline, setIsOnline] = useState(() => {
     if (typeof window !== 'undefined' && 'navigator' in window) {
       return navigator.onLine;
     }
@@ -50,7 +50,7 @@ export function useNavigatorOnLine() {
  * Hook to detect slow network connections
  */
 export function useNetworkQuality() {
-  const [___quality, _setQuality] = useState<'fast' | 'slow' | 'offline'>('fast');
+  const [quality, setQuality] = useState<'fast' | 'slow' | 'offline'>('fast');
   const isOnline = useNavigatorOnLine();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function useNetworkQuality() {
     }
 
     if ('connection' in navigator) {
-      const connection = (navigator as unknown).connection;
+      const connection = (navigator as any).connection;
       
       const updateConnectionQuality = () => {
         if (!connection) return;

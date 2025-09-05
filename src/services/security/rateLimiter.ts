@@ -5,7 +5,7 @@
  */
 
 import { auditLogger } from './auditLogger';
-import { _cryptoService } from './cryptoService';
+import { cryptoService } from './cryptoService';
 import { secureStorage } from './SecureLocalStorage';
 import { logger } from '../../utils/logger';
 
@@ -223,7 +223,7 @@ class RateLimiterService {
     }
 
     // Increment request count
-    this.incrementRequestCount(_key);
+    this.incrementRequestCount(key);
 
     // Update IP reputation
     this.updateIPReputation(ip, true);
@@ -448,13 +448,13 @@ class RateLimiterService {
 
   private generateKey(ip: string, userId?: string, endpoint?: string): string {
     const parts = [ip];
-    if (_userId) parts.push(_userId);
+    if (userId) parts.push(userId);
     if (endpoint) parts.push(endpoint);
     return parts.join(':');
   }
 
   private getRequestCount(key: string, windowMs: number): number {
-    const counts = this.requestCounts.get(_key) || [];
+    const counts = this.requestCounts.get(key) || [];
     const now = Date.now();
     const windowStart = now - windowMs;
     
@@ -470,7 +470,7 @@ class RateLimiterService {
   }
 
   private incrementRequestCount(key: string): void {
-    const counts = this.requestCounts.get(_key) || [];
+    const counts = this.requestCounts.get(key) || [];
     counts.push(Date.now());
     this.requestCounts.set(key, counts);
   }
@@ -656,7 +656,7 @@ class RateLimiterService {
     this.requestCounts.forEach((counts, key) => {
       const validCounts = counts.filter(timestamp => timestamp > oneHourAgo);
       if (validCounts.length === 0) {
-        this.requestCounts.delete(_key);
+        this.requestCounts.delete(key);
       } else if (validCounts.length !== counts.length) {
         this.requestCounts.set(key, validCounts);
       }
@@ -707,11 +707,11 @@ class RateLimiterService {
       this.blockedIPs.forEach((blockUntil, ip) => {
         data[ip] = blockUntil.toISOString();
       });
-      secureStorage.setItem('blockedips', JSON.stringify(_data));
+      secureStorage.setItem('blockedips', JSON.stringify(data));
     } catch (error) {
       logger.error('Failed to persist blocked IPs:');
     }
   }
 }
 
-export const _rateLimiter = RateLimiterService.getInstance();
+export const rateLimiter = RateLimiterService.getInstance();

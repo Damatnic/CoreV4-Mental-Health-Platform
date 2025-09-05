@@ -3,19 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, AlertTriangle, Search, User, Settings, LogOut, 
-  Home, _BarChart3, Heart, Users, Stethoscope, _Bell, 
+  Home, BarChart3, Heart, Users, Stethoscope, Bell, 
   ChevronDown, Star, Clock, Command, Accessibility,
-  Sparkles, _Moon, _Sun, _ChevronLeft, Phone, MessageCircle,
-  Wind, Timer, BookOpen, _Activity
+  Sparkles, Moon, Sun, ChevronLeft, Phone, MessageCircle,
+  Wind, Timer, BookOpen, Activity
 } from 'lucide-react';
 import { NavigationProvider, useNavigation } from '../navigation/NavigationContext';
 import { GlobalSearch } from '../navigation/GlobalSearch';
 import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
 import { FloatingCrisisButton } from '../navigation/FloatingCrisisButton';
-import { _MobileNavigation } from './MobileNavigation';
+import { MobileNavigation } from './MobileNavigation';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../hooks/useAuth';
-import { _PrivacyBanner, _FreeBadge } from './PrivacyBanner';
+import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
 import { toast } from 'react-hot-toast';
 
 interface EnhancedLayoutProps {
@@ -267,7 +267,10 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
   const location = useLocation();
   const { mode, isSearchOpen, setSearchOpen, isMobileMenuOpen, setMobileMenuOpen, preferences, crisisDetected } = useNavigation();
   const [isInstallable, setIsInstallable] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<unknown>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<{
+    prompt: () => void;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  } | null>(null);
   const [_notificationCount] = useState(0);
 
   // Enhanced keyboard navigation
@@ -300,14 +303,14 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     if (path === '/') {
       return location.pathname === '/';
     }
-    return location.pathname.startsWith(_path);
+    return location.pathname.startsWith(path);
   };
 
   // PWA Install Prompt
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(_e);
+      setDeferredPrompt(e as any);
       setIsInstallable(true);
     };
 

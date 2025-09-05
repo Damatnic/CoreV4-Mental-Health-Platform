@@ -49,11 +49,11 @@ interface PerformanceStats {
 
 export function PerformanceDashboard() {
   const { deviceInfo } = useMobileFeatures();
-  const [stats, _setStats] = useState<PerformanceStats | null>(null);
-  const [isLoading, _setIsLoading] = useState(true);
-  const [refreshInterval, _setRefreshInterval] = useState(5000); // 5 seconds
-  const [showDetails, _setShowDetails] = useState(false);
-  const [selectedMetric, _setSelectedMetric] = useState<string | null>(null);
+  const [stats, setStats] = useState<PerformanceStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(5000); // 5 seconds
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   const refreshStats = useCallback(async () => {
     try {
@@ -61,10 +61,10 @@ export function PerformanceDashboard() {
       const _metrics = performanceMonitor.getMetrics();
       
       // Get memory info if available
-      const memoryInfo = (performance as unknown).memory || {};
+      const memoryInfo = (performance as any).memory || {};
       
       // Get connection info if available
-      const connection = (navigator as unknown).connection || {};
+      const connection = (navigator as any).connection || {};
       
       const _newStats: PerformanceStats = {
         crisisResponseTime: summary.crisis_response_time?.avg || 0,

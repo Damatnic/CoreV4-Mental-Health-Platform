@@ -1,7 +1,7 @@
 // Professional Support System Integration Service
 // Manages therapist onboarding, verification, appointments, and video sessions
 
-import { __apiService } from '../api/ApiService';
+import { _apiService } from '../api/ApiService';
 import { _wsService } from '../websocket/WebSocketService';
 import { logger } from '../../utils/logger';
 import {
@@ -10,7 +10,9 @@ import {
   User,
   TherapistCredentials,
   PaymentInfo,
-  _ApiResponse
+  ApiResponse,
+  WeeklySchedule,
+  ReminderSettings
 } from '../api/types';
 
 // Video calling providers
@@ -92,7 +94,7 @@ interface TherapistOnboarding {
   };
   availability: {
     timezone: string;
-    regularHours: unknown;
+    regularHours: WeeklySchedule;
     sessionDuration: number;
     bufferTime: number;
   };
@@ -244,7 +246,7 @@ export class TherapistService {
       const verificationStatus = await this.initiateVerification(therapist.id);
       
       // Step 4: Schedule onboarding call if needed
-      const nextSteps = this.determineNextSteps(_verificationStatus);
+      const nextSteps = this.determineNextSteps(verificationStatus);
       
       return {
         _therapistId: therapist.id,
@@ -252,8 +254,8 @@ export class TherapistService {
         nextSteps
       };
     } catch (error) {
-      logger.error('Onboarding failed:');
-      throw undefined;
+      logger.error('Onboarding failed:', error as string);
+      throw error;
     }
   }
 
@@ -324,10 +326,10 @@ export class TherapistService {
         }
       }
 
-      await Promise.all(_uploads);
+      await Promise.all(uploads);
       return true;
     } catch (error) {
-      logger.error('Document upload failed:');
+      logger.error('Document upload failed:', error as string);
       return false;
     }
   }
@@ -415,12 +417,12 @@ export class TherapistService {
       // Step 3: Create appointment
       const appointment = await _apiService.bookAppointment({
         patientId: request.patientId,
-        _therapistId: request._therapistId,
+        therapistId: request._therapistId,
         scheduledTime: this.combineDateAndTime(request.date, request.time),
         duration: request.duration,
         type: request.type,
         format: request.format,
-        _status: 'scheduled',
+        status: 'scheduled',
         payment: paymentInfo,
         reminder: {
           email: true,
@@ -436,12 +438,12 @@ export class TherapistService {
       }
       
       // Step 5: Send confirmation
-      await this.sendAppointmentConfirmation(_appointment);
+      await this.sendAppointmentConfirmation(appointment);
       
       return appointment;
     } catch (error) {
-      logger.error('Appointment booking failed:');
-      throw undefined;
+      logger.error('Appointment booking failed:', error as string);
+      throw error;
     }
   }
 
@@ -483,8 +485,8 @@ export class TherapistService {
   }
 
   private combineDateAndTime(date: Date, time: string): Date {
-    const [hours, minutes] = time.split(':').map(_Number);
-    const combined = new Date(_date);
+    const [hours, minutes] = time.split(':').map(Number);
+    const combined = new Date(date);
     combined.setHours(hours || 0, minutes || 0, 0, 0);
     return combined;
   }
@@ -505,14 +507,14 @@ export class TherapistService {
     if (method === 'insurance' && request.insurance) {
       // In production, verify insurance and get copay _amount
       return {
-        _amount: 30, // Typical copay
+        amount: 30, // Typical copay
         currency: this.paymentConfig!.currency,
         method: 'insurance',
-        _status: 'pending',
+        status: 'pending',
         insuranceClaim: {
           claimNumber: `CLM-${Date.now()}`,
           provider: request.insurance.provider,
-          _status: 'submitted',
+          status: 'submitted',
           copay: 30
         }
       };
@@ -524,18 +526,18 @@ export class TherapistService {
       const __paymentIntent = await this.createPaymentIntent(_amount, request);
       
       return {
-        _amount,
+        amount: _amount,
         currency: this.paymentConfig!.currency,
         method: 'self-pay',
-        _status: 'pending'
+        status: 'pending'
       };
     }
     
     return {
-      _amount,
+      amount: _amount,
       currency: this.paymentConfig!.currency,
       method,
-      _status: 'pending'
+      status: 'pending'
     };
   }
 
@@ -560,7 +562,7 @@ export class TherapistService {
     _wsService.emit('appointment:confirmed', appointment);
     
     // In production, also send email/SMS confirmation
-    logger.info('Appointment confirmed:', appointment);
+    logger.info('Appointment confirmed:', JSON.stringify(appointment));
   }
 
   public async cancelAppointment(
@@ -572,8 +574,8 @@ export class TherapistService {
       const appointment = await _apiService.cancelAppointment(appointmentId, reason);
       
       // Process refund if needed
-      if (appointment.payment?._status === 'paid') {
-        await this.processRefund(_appointment);
+      if (appointment.payment?.status === 'paid') {
+        await this.processRefund(appointment);
       }
       
       // Notify both parties
@@ -583,8 +585,8 @@ export class TherapistService {
         cancelledBy
       });
     } catch (error) {
-      logger.error('Appointment cancellation failed:');
-      throw undefined;
+      logger.error('Appointment cancellation failed:', error as string);
+      throw error;
     }
   }
 
@@ -596,9 +598,9 @@ export class TherapistService {
     let refundAmount = 0;
     
     if (hoursUntilAppointment >= 24) {
-      refundAmount = appointment.payment!._amount; // Full refund
+      refundAmount = appointment.payment!.amount; // Full refund
     } else if (hoursUntilAppointment >= 12) {
-      refundAmount = appointment.payment!._amount * 0.5; // 50% refund
+      refundAmount = appointment.payment!.amount * 0.5; // 50% refund
     }
     // No refund for < 12 hours
     
@@ -614,13 +616,13 @@ export class TherapistService {
 
   public async startVideoSession(appointmentId: string): Promise<VideoSession> {
     try {
-      const appointment = await this.getAppointmentDetails(_appointmentId);
+      const appointment = await this.getAppointmentDetails(appointmentId);
       
       // Generate video room and tokens
-      const roomId = await this.generateVideoRoom(_appointmentId);
+      const roomId = await this.generateVideoRoom(appointmentId);
       const tokens = await this.generateVideoTokens(roomId, [
         appointment.patientId,
-        appointment._therapistId
+        appointment.therapistId
       ]);
       
       // Create session
@@ -636,7 +638,7 @@ export class TherapistService {
       
       // Start recording if enabled
       if (this.videoConfig?.settings.recording) {
-        await this.startRecording(_roomId);
+        await this.startRecording(roomId);
       }
       
       // Notify participants
@@ -648,8 +650,8 @@ export class TherapistService {
       
       return this.activeVideoSession;
     } catch (error) {
-      logger.error('Failed to start video session:');
-      throw undefined;
+      logger.error('Failed to start video session:', error as string);
+      throw error;
     }
   }
 
@@ -659,12 +661,12 @@ export class TherapistService {
     return {
       id: appointmentId,
       patientId: 'patient-1',
-      _therapistId: 'therapist-1',
+      therapistId: 'therapist-1',
       scheduledTime: new Date(),
       duration: 50,
       type: 'followup',
       format: 'video',
-      _status: 'in-progress'
+      status: 'in-progress'
     } as Appointment;
   }
 
@@ -717,7 +719,7 @@ export class TherapistService {
       
       // Update session status
       this.activeVideoSession.endTime = new Date();
-      this.activeVideoSession.status = 'ended';
+      this.activeVideoSession._status = 'ended';
       
       // Notify participants
       _wsService.emit('video:session:ended', {
@@ -729,8 +731,8 @@ export class TherapistService {
       // Clean up
       this.activeVideoSession = null;
     } catch (error) {
-      logger.error('Failed to end video session:');
-      throw undefined;
+      logger.error('Failed to end video session:', error as string);
+      throw error;
     }
   }
 
@@ -745,22 +747,22 @@ export class TherapistService {
 
   private handleTherapistAvailability(data: unknown): void {
     // Update local cache
-    logger.info('Therapist availability update:', data);
+    logger.info('Therapist availability update:', data as string);
   }
 
   private handleAppointmentUpdate(data: unknown): void {
     // Handle appointment updates
-    logger.info('Appointment update:', data);
+    logger.info('Appointment update:', data as string);
   }
 
   private handleVideoSessionStart(data: unknown): void {
     // Handle video session start
-    logger.info('Video session started:', data);
+    logger.info('Video session started:', data as string);
   }
 
   private handleVideoSessionEnd(data: unknown): void {
     // Handle video session end
-    logger.info('Video session ended:', data);
+    logger.info('Video session ended:', data as string);
   }
 
   // ============================================
@@ -779,16 +781,16 @@ export class TherapistService {
     
     // Calculate metrics
     const revenue = appointments
-      .filter(a => a.payment?._status === 'paid')
-      .reduce((sum, a) => sum + (a.payment?._amount || 0), 0);
+      .filter((a: Appointment) => a.payment?.status === 'paid')
+      .reduce((sum: number, a: Appointment) => sum + (a.payment?.amount || 0), 0);
     
     const avgRating = therapist.ratings.length > 0
-      ? therapist.ratings.reduce((sum, r) => sum + r.rating, 0) / therapist.ratings.length
+      ? therapist.ratings.reduce((sum: number, r) => sum + r.rating, 0) / therapist.ratings.length
       : 0;
     
     const upcomingSessions = appointments
-      .filter(a => a._status === 'scheduled' && a.scheduledTime > new Date())
-      .sort((a, b) => a.scheduledTime.getTime() - b.scheduledTime.getTime())
+      .filter((a: Appointment) => a.status === 'scheduled' && a.scheduledTime > new Date())
+      .sort((a: Appointment, b: Appointment) => a.scheduledTime.getTime() - b.scheduledTime.getTime())
       .slice(0, 5);
     
     return {
@@ -821,9 +823,9 @@ export class TherapistService {
     notes: unknown
   ): Promise<void> {
     // In production, save encrypted notes
-    logger.info('Updating client notes:', { _therapistId, clientId, notes });
+    logger.info('Updating client notes:', JSON.stringify({ _therapistId, clientId, notes }));
   }
 }
 
 // Export singleton instance
-export const _therapistService = TherapistService.getInstance();
+export const therapistService = TherapistService.getInstance();

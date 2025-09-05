@@ -16,7 +16,6 @@ declare global {
 }
 
 // Initialize global error handling and runtime guards immediately
-console.log('🐛 DEBUG: _setupGlobalErrorHandling type:', typeof _setupGlobalErrorHandling);
 _setupGlobalErrorHandling();
 setupRuntimeGuards();
 
@@ -24,7 +23,7 @@ setupRuntimeGuards();
 if (import.meta.env.PROD) {
   import('web-vitals').then((vitals) => {
     // Send to analytics instead of console.log in production
-    const _logMetric = (metric: unknown) => {
+    const _logMetric = (metric: any) => {
       // Only log critical performance issues, not every metric
       if (metric.rating === 'poor' && import.meta.env.DEV) {
         logger.warn(`Poor performance metric: ${metric.name}: ${metric.value}`, 'WebVitals');

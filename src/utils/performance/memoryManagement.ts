@@ -35,7 +35,6 @@ class ResourceManager {
   private cleanupFunctions: Map<string, () => void> = new Map();
   private timers: Map<string, number> = new Map();
   private intervals: Map<string, number> = new Map();
-// @ts-expect-error - IntersectionObserver is a global API
   private observers: Map<string, IntersectionObserver | MutationObserver | ResizeObserver> = new Map();
   private eventListeners: Map<string, { element: EventTarget; event: string; handler: EventListener }[]> = new Map();
   
@@ -97,7 +96,7 @@ class ResourceManager {
   cleanup(id: string): void {
     // Run cleanup function
     const cleanupFn = this.cleanupFunctions.get(id);
-    if (_cleanupFn) {
+    if (cleanupFn) {
       cleanupFn();
       this.cleanupFunctions.delete(id);
     }
@@ -193,7 +192,7 @@ export function useResourceCleanup(componentId: string) {
     registerCleanup: (cleanup: () => void) => resourceManager.registerCleanup(componentId, cleanup),
     registerTimer: (timerId: number) => resourceManager.registerTimer(componentId, timerId),
     registerInterval: (intervalId: number) => resourceManager.registerInterval(componentId, intervalId),
-    registerObserver: (observer: unknown) => resourceManager.registerObserver(componentId, observer),
+    registerObserver: (observer: unknown) => resourceManager.registerObserver(componentId, observer as MutationObserver | IntersectionObserver | ResizeObserver),
     registerEventListener: (element: EventTarget, event: string, handler: EventListener) => 
       resourceManager.registerEventListener(componentId, element, event, handler),
   };
@@ -379,7 +378,7 @@ export function debounceWithCleanup<T extends (...args: unknown[]) => any>(
     }, delay);
   }) as T;
   
-  (debounced as unknown).cancel = () => {
+  (debounced as any).cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -407,8 +406,8 @@ export function throttleWithCleanup<T extends (...args: unknown[]) => any>(
       
       timeoutId = window.setTimeout(() => {
         inThrottle = false;
-        if (_lastArgs) {
-          throttled(...lastArgs);
+        if (lastArgs) {
+          throttled(...(lastArgs as Parameters<T>));
           lastArgs = null;
         }
       }, limit);
@@ -417,7 +416,7 @@ export function throttleWithCleanup<T extends (...args: unknown[]) => any>(
     }
   }) as T;
   
-  (throttled as unknown).cancel = () => {
+  (throttled as any).cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -438,7 +437,7 @@ export class MemoryLeakDetector {
   
   takeSnapshot(): void {
     if ('memory' in performance) {
-      const memory = (performance as unknown).memory;
+      const memory = (performance as any).memory;
       this.snapshots.push({
         timestamp: Date.now(),
         usedJSHeapSize: memory.usedJSHeapSize,
@@ -459,7 +458,7 @@ export class MemoryLeakDetector {
     // Check if memory is consistently increasing
     let increasing = true;
     for (let i = 1; i < this.snapshots.length; i++) {
-      if (this.snapshots[i].usedJSHeapSize <= this.snapshots[i - 1].usedJSHeapSize) {
+      if ((this.snapshots[i] as any).usedJSHeapSize <= (this.snapshots[i - 1] as any).usedJSHeapSize) {
         increasing = false;
         break;
       }
@@ -468,8 +467,8 @@ export class MemoryLeakDetector {
     if (increasing) {
       const firstSnapshot = this.snapshots[0];
       const lastSnapshot = this.snapshots[this.snapshots.length - 1];
-      const increase = lastSnapshot.usedJSHeapSize - firstSnapshot.usedJSHeapSize;
-      const timeElapsed = lastSnapshot.timestamp - firstSnapshot.timestamp;
+      const increase = (lastSnapshot as any).usedJSHeapSize - (firstSnapshot as any).usedJSHeapSize;
+      const timeElapsed = (lastSnapshot as any).timestamp - (firstSnapshot as any).timestamp;
       
       // Leak detected if memory increased by more than 10MB in 1 minute
       if (increase > 10 * 1024 * 1024 && timeElapsed < 60000) {

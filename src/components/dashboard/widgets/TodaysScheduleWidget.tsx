@@ -102,16 +102,16 @@ export function TodaysScheduleWidget({ data, error }: TodaysScheduleWidgetProps)
               transition={{ delay: index * 0.1 }}
               className="relative bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
-                if (item._type === 'therapy') navigate('/professional/therapy');
-                else if (item._type === 'medication') navigate('/wellness/medications');
+                if (item.type === 'therapy') navigate('/professional/therapy');
+                else if (item.type === 'medication') navigate('/wellness/medications');
                 else navigate('/schedule');
               }}
             >
               {getPriorityIndicator(item.priority)}
               
               <div className="flex items-start space-x-3 pl-2">
-                <div className={`p-2 rounded-lg ${getStatusColor(item._status)}`}>
-                  {getItemIcon(item._type)}
+                <div className={`p-2 rounded-lg ${getStatusColor(item.status)}`}>
+                  {getItemIcon(item.type)}
                 </div>
                 
                 <div className="flex-1 min-w-0">

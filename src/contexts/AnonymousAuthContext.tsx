@@ -10,7 +10,7 @@ import { logger } from '../utils/logger';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { secureStorage } from '../services/security/SecureLocalStorage';
-import { _ApiService } from '../services/api/ApiService';
+import { ApiService } from '../services/api/ApiService';
 
 interface AnonymousUser {
   id: string; // Random session ID _stored locally only
@@ -234,31 +234,61 @@ function getOrCreateAnonymousUser(): AnonymousUser {
   return newUser;
 }
 
+// Type for partial user data during migration
+type PartialUserData = {
+  [key: string]: any;
+  id?: string;
+  sessionStarted?: Date | string;
+  lastActive?: Date | string;
+  sessionStats?: any;
+  profile?: {
+    [key: string]: any;
+    supportPreferences?: any;
+    mentalHealthGoals?: any;
+    triggerWarnings?: any;
+    copingStrategies?: any;
+    medication?: any;
+    therapyExperience?: any;
+    crisisHistory?: any;
+  };
+  preferences?: {
+    [key: string]: any;
+    notifications?: any;
+    privacy?: any;
+  };
+};
+
 // Migrate user data from older versions
 function migrateUserData(oldUser: unknown): AnonymousUser {
+  // Type assertion to handle unknown type safely
+  const userData = oldUser as PartialUserData;
+  
   const migratedUser: AnonymousUser = {
-    ...oldUser,
+    ...userData,
+    id: userData.id || `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    sessionStarted: userData.sessionStarted ? new Date(userData.sessionStarted) : new Date(),
+    isAnonymous: true,
     profile: {
-      ...oldUser.profile,
-      supportPreferences: oldUser.profile?.supportPreferences || {
+      ...userData.profile,
+      supportPreferences: userData.profile?.supportPreferences || {
         peerSupport: true,
         professionalSupport: false,
         groupActivities: true,
         onlineTherapy: false,
       },
-      mentalHealthGoals: oldUser.profile?.mentalHealthGoals || [],
-      triggerWarnings: oldUser.profile?.triggerWarnings || [],
-      copingStrategies: oldUser.profile?.copingStrategies || [],
-      medication: oldUser.profile?.medication || {
+      mentalHealthGoals: userData.profile?.mentalHealthGoals || [],
+      triggerWarnings: userData.profile?.triggerWarnings || [],
+      copingStrategies: userData.profile?.copingStrategies || [],
+      medication: userData.profile?.medication || {
         taking: false,
         reminders: false,
       },
-      therapyExperience: oldUser.profile?.therapyExperience || 'none',
-      crisisHistory: oldUser.profile?.crisisHistory || false,
+      therapyExperience: userData.profile?.therapyExperience || 'none',
+      crisisHistory: userData.profile?.crisisHistory || false,
     },
     preferences: {
-      ...oldUser.preferences,
-      notifications: oldUser.preferences?.notifications || {
+      ...userData.preferences,
+      notifications: userData.preferences?.notifications || {
         enabled: true,
         types: {
           moodReminders: true,
@@ -273,16 +303,16 @@ function migrateUserData(oldUser: unknown): AnonymousUser {
           weekendDifferent: false,
         },
       },
-      privacy: oldUser.preferences?.privacy || {
+      privacy: userData.preferences?.privacy || {
         shareProgress: false,
         allowCommunityInteraction: true,
         dataRetentionDays: 365,
         exportDataOnExit: false,
       },
     },
-    lastActive: oldUser.lastActive ? new Date(oldUser.lastActive) : new Date(),
+    lastActive: userData.lastActive ? new Date(userData.lastActive) : new Date(),
     dataVersion: '2.0',
-    sessionStats: oldUser.sessionStats || {
+    sessionStats: userData.sessionStats || {
       moodEntriesCount: 0,
       wellnessActivitiesCompleted: 0,
       communityInteractions: 0,
@@ -300,13 +330,13 @@ function migrateUserData(oldUser: unknown): AnonymousUser {
 
 export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AnonymousUser>(getOrCreateAnonymousUser);
-  const [sessionDuration, _setSessionDuration] = useState(0);
+  const [sessionDuration, __setSessionDuration] = useState(0);
   
   // Update session duration every minute
   useEffect(() => {
     const updateDuration = () => {
       const _minutes = Math.floor((Date.now() - user.sessionStarted.getTime()) / 60000);
-      setSessionDuration(_minutes);
+      __setSessionDuration(_minutes);
     };
     
     updateDuration();
@@ -315,6 +345,34 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [user.sessionStarted]);
   
+  // Cleanup stale data function
+  const cleanupStaleData = () => {
+    if (isDataStale()) {
+      logger.info('🧹 Cleaning up stale _data based on privacy preferences');
+      clearLocalData();
+    }
+  };
+
+  // Validate data integrity
+  const validateDataIntegrity = (): boolean => {
+    try {
+      // Check essential fields
+      if (!user.id || !user.sessionStarted || !user.dataVersion) {
+        return false;
+      }
+      
+      // Check data structure
+      if (!user.profile || !user.preferences || !user.sessionStats) {
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      logger.error('Data integrity validation failed:');
+      return false;
+    }
+  };
+
   // Auto-update last active and cleanup stale data
   useEffect(() => {
     const handleActivity = () => updateLastActive();
@@ -339,7 +397,28 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
         document.removeEventListener(event, handleActivity);
       });
     };
-  }, [cleanupStaleData]);
+  }, []);
+  
+  // Get session insights
+  const getSessionInsights = () => {
+    return {
+      totalSessions: 1, // Could be enhanced to track multiple sessions
+      averageSessionDuration: sessionDuration,
+      mostUsedFeatures: [
+        user.sessionStats.moodEntriesCount > 0 ? 'Mood Tracking' : '',
+        user.sessionStats.wellnessActivitiesCompleted > 0 ? 'Wellness Activities' : '',
+        user.sessionStats.communityInteractions > 0 ? 'Community' : '',
+        user.sessionStats.therapeuticContentAccessed > 0 ? 'Therapeutic Content' : '',
+      ].filter(Boolean),
+      wellnessProgress: Math.min(
+        (user.sessionStats.moodEntriesCount + 
+         user.sessionStats.wellnessActivitiesCompleted + 
+         user.sessionStats.therapeuticContentAccessed) / 3,
+        100
+      ),
+      lastWeekActivity: [0, 0, 0, 0, 0, 0, 0], // Placeholder for weekly activity
+    };
+  };
   
   // Save user to secure storage whenever it changes
   useEffect(() => {
@@ -469,55 +548,6 @@ export function AnonymousAuthProvider({ children }: { children: ReactNode }) {
     staleDate.setDate(staleDate.getDate() - retentionDays);
     
     return new Date(user.lastActive) < staleDate;
-  };
-  
-  // Clean up stale data based on privacy preferences
-  const cleanupStaleData = () => {
-    if (isDataStale()) {
-      logger.info('🧹 Cleaning up stale _data based on privacy preferences');
-      clearLocalData();
-    }
-  };
-  
-  // Validate data integrity
-  const validateDataIntegrity = (): boolean => {
-    try {
-      // Check essential fields
-      if (!user.id || !user.sessionStarted || !user.dataVersion) {
-        return false;
-      }
-      
-      // Check data structure
-      if (!user.profile || !user.preferences || !user.sessionStats) {
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      logger.error('Data integrity validation failed:');
-      return false;
-    }
-  };
-  
-  // Get session insights
-  const getSessionInsights = () => {
-    return {
-      totalSessions: 1, // Could be enhanced to track multiple sessions
-      averageSessionDuration: sessionDuration,
-      mostUsedFeatures: [
-        user.sessionStats.moodEntriesCount > 0 ? 'Mood Tracking' : '',
-        user.sessionStats.wellnessActivitiesCompleted > 0 ? 'Wellness Activities' : '',
-        user.sessionStats.communityInteractions > 0 ? 'Community' : '',
-        user.sessionStats.therapeuticContentAccessed > 0 ? 'Therapeutic Content' : '',
-      ].filter(Boolean),
-      wellnessProgress: Math.min(
-        (user.sessionStats.moodEntriesCount + 
-         user.sessionStats.wellnessActivitiesCompleted + 
-         user.sessionStats.therapeuticContentAccessed) / 3,
-        100
-      ),
-      lastWeekActivity: [0, 0, 0, 0, 0, 0, 0], // Placeholder for weekly activity
-    };
   };
   
   const value: AnonymousAuthContextType = {

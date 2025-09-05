@@ -88,22 +88,22 @@ class WebSocketService {
 
         this.socket.on('disconnect', (reason: unknown) => {
           this.isConnected = false;
-          logger.warn('WebSocket disconnected:', reason);
+          logger.warn('WebSocket disconnected:', String(reason));
           this.emit('connection:lost', { reason });
           this.handleReconnection();
         });
 
-        this.socket.on('connecterror', (error: unknown) => {
-          logger.error('WebSocket connection error:', error);
-          this.emit('connection:error', { error: error.message });
+        this.socket.on('connect_error', (error: unknown) => {
+          logger.error('WebSocket connection error:', String(error));
+          this.emit('connection:error', { error: String(error) });
           reject(error);
         });
 
         // Set up core event listeners
         this.setupCoreEventListeners();
       } catch (error) {
-        logger.error('Failed to initialize WebSocket:');
-        reject(_undefined);
+        logger.error('Failed to initialize WebSocket:', String(error));
+        reject(error);
       }
     });
   }
@@ -113,27 +113,32 @@ class WebSocketService {
     if (!this.socket) return;
 
     // User presence events
-    this.socket.on('presence:update', (data: UserPresence) => {
+    this.socket.on('presence:update', (...args: unknown[]) => {
+      const data = args[0] as UserPresence;
       this.presenceCache.set(data.userId, data);
       this.emit('presence:update', data);
     });
 
-    this.socket.on('presence:bulk', (users: UserPresence[]) => {
+    this.socket.on('presence:bulk', (...args: unknown[]) => {
+      const users = args[0] as UserPresence[];
       users.forEach(user => this.presenceCache.set(user.userId, user));
       this.emit('presence:bulk', users);
     });
 
     // Typing indicators
-    this.socket.on('typing:start', (data: TypingIndicator) => {
+    this.socket.on('typing:start', (...args: unknown[]) => {
+      const data = args[0] as TypingIndicator;
       this.emit('typing:start', data);
     });
 
-    this.socket.on('typing:stop', (data: TypingIndicator) => {
+    this.socket.on('typing:stop', (...args: unknown[]) => {
+      const data = args[0] as TypingIndicator;
       this.emit('typing:stop', data);
     });
 
     // Real-time messages
-    this.socket.on('message:new', (message: RealtimeMessage) => {
+    this.socket.on('message:new', (...args: unknown[]) => {
+      const message = args[0] as RealtimeMessage;
       // Check for crisis keywords and handle appropriately
       if (this.detectCrisisContent(message.content)) {
         this.handleCrisisMessage(message);
@@ -141,35 +146,42 @@ class WebSocketService {
       this.emit('message:new', message);
     });
 
-    this.socket.on('message:update', (message: RealtimeMessage) => {
+    this.socket.on('message:update', (...args: unknown[]) => {
+      const message = args[0] as RealtimeMessage;
       this.emit('message:update', message);
     });
 
-    this.socket.on('message:delete', (messageId: string) => {
+    this.socket.on('message:delete', (...args: unknown[]) => {
+      const messageId = args[0] as string;
       this.emit('message:delete', messageId);
     });
 
     // Notifications
-    this.socket.on('notification:new', (notification: NotificationEvent) => {
+    this.socket.on('notification:new', (...args: unknown[]) => {
+      const notification = args[0] as NotificationEvent;
       this.handleNotification(notification);
       this.emit('notification:new', notification);
     });
 
     // Room events
-    this.socket.on('room:joined', (roomId: string) => {
+    this.socket.on('room:joined', (...args: unknown[]) => {
+      const roomId = args[0] as string;
       this.emit('room:joined', roomId);
     });
 
-    this.socket.on('room:left', (roomId: string) => {
+    this.socket.on('room:left', (...args: unknown[]) => {
+      const roomId = args[0] as string;
       this.emit('room:left', roomId);
     });
 
     // Crisis support events
-    this.socket.on('crisis:alert', (data: unknown) => {
+    this.socket.on('crisis:alert', (...args: unknown[]) => {
+      const data = args[0];
       this.handleCrisisAlert(data);
     });
 
-    this.socket.on('support:request', (data: unknown) => {
+    this.socket.on('support:request', (...args: unknown[]) => {
+      const data = args[0];
       this.emit('support:request', data);
     });
   }
@@ -200,10 +212,11 @@ class WebSocketService {
       }
 
       this.socket.emit('room:join', roomId, (response: unknown) => {
-        if (response.success) {
+        const res = response as { success: boolean; error?: string };
+        if (res.success) {
           resolve();
         } else {
-          reject(new Error(response.error || 'Failed to join room'));
+          reject(new Error(res.error || 'Failed to join room'));
         }
       });
     });
@@ -226,10 +239,10 @@ class WebSocketService {
     if (!this.socket?.connected) return;
 
     // Clear existing timer for this room
-    const _timerId = this.typingTimers.get(_roomId);
-    if (_timerId) {
-      clearTimeout(_timerId);
-      this.typingTimers.delete(_roomId);
+    const timerId = this.typingTimers.get(roomId);
+    if (timerId) {
+      clearTimeout(timerId);
+      this.typingTimers.delete(roomId);
     }
 
     if (isTyping) {
@@ -284,7 +297,7 @@ class WebSocketService {
     ];
     
     const lowerContent = content.toLowerCase();
-    return crisisKeywords.some(_keyword => lowerContent.includes(_keyword));
+    return crisisKeywords.some(keyword => lowerContent.includes(keyword));
   }
 
   // Handle crisis messages
@@ -323,7 +336,8 @@ class WebSocketService {
   // Handle crisis alerts
   private handleCrisisAlert(data: unknown): void {
     // Show urgent notification to available crisis counselors
-    toast.error(`Crisis support needed in ${data.roomName || 'chat'}`, {
+    const alertData = data as { roomName?: string };
+    toast.error(`Crisis support needed in ${alertData.roomName || 'chat'}`, {
       duration: 10000,
       icon: '🚨',
     });
@@ -442,4 +456,4 @@ class WebSocketService {
 }
 
 // Export singleton instance
-export const _websocketService = new WebSocketService();
+export const websocketService = new WebSocketService();

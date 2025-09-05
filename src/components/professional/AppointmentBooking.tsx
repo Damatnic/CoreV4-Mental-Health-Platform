@@ -160,12 +160,12 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
       setFormData(prev => ({
         ...prev,
         [parent as keyof typeof formData]: {
-          ...(prev[parent as keyof typeof prev] as Record<string, unknown> || {}),
+          ...(prev[parent as keyof typeof prev] as any || {}),
           [child as string]: value
         }
       }));
     } else {
-      setFormData(prev => ({ ...prev, [field as keyof typeof formData]: value }));
+      setFormData(prev => ({ ...prev, [field as keyof typeof formData]: value as any }));
     }
   };
 
@@ -191,7 +191,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
         paymentMethod: formData.paymentMethod as 'insurance' | 'self-pay' | 'sliding-scale'
       });
       
-      onSuccess(appointmentId.id);
+      onSuccess((appointmentId as any).id);
     } catch (_error) {
       logger.error('Booking failed:');
       // Handle error
@@ -280,7 +280,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 
                 {/* Date Selection */}
                 <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Available Dates</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Available Dates</label>
                   <div className="grid grid-cols-7 gap-2">
                     {availableDays.map((date, index) => {
                       const isSelected = selectedDate?.toDateString() === date.toDateString();
@@ -308,7 +308,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 {/* Time Selection */}
                 {selectedDate && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
                       Available Times for {selectedDate.toLocaleDateString()}
                     </label>
                     <div className="grid grid-cols-3 gap-4">
@@ -355,7 +355,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 <h3 className="text-xl font-semibold">Session Details</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Session Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Session Type</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { value: 'initial', label: 'Initial Consultation', description: 'First time meeting' },
@@ -378,7 +378,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3" htmlFor="has-insurance">Session Format</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Session Format</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { value: 'video', label: 'Video Call', icon: Video, description: 'Secure video session' },
@@ -407,7 +407,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Reason for Visit (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Reason for Visit (Optional)</label>
                   <textarea
                     value={formData.reason}
                     onChange={(e) => updateFormData('reason', e.target.value)}
@@ -432,7 +432,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">First Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                     <input
                       type="text"
                       value={formData.firstName}
@@ -442,7 +442,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Last Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
                     <input
                       type="text"
                       value={formData.lastName}
@@ -455,7 +455,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Email *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                     <input
                       type="email"
                       value={formData.email}
@@ -465,7 +465,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Phone *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
                     <input
                       type="tel"
                       value={formData.phone}
@@ -477,7 +477,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Date of Birth</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                   <input
                     type="date"
                     value={formData.dateOfBirth}
@@ -490,7 +490,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                   <h4 className="font-medium text-gray-900 mb-4">Emergency Contact (Optional)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                       <input
                         type="text"
                         value={formData.emergencyContact.name}
@@ -499,7 +499,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Phone</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                       <input
                         type="tel"
                         value={formData.emergencyContact.phone}
@@ -547,7 +547,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                   {formData.hasInsurance && (
                     <div className="ml-7 space-y-4 p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Insurance Provider *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Provider *</label>
                         <select
                           value={formData.insuranceProvider}
                           onChange={(e) => updateFormData('insuranceProvider', e.target.value)}
@@ -563,7 +563,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Member ID *</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Member ID *</label>
                           <input
                             type="text"
                             value={formData.memberId}
@@ -573,7 +573,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="has-insurance">Group Number</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Group Number</label>
                           <input
                             type="text"
                             value={formData.groupNumber}
@@ -611,7 +611,7 @@ export function AppointmentBooking({ therapistId, onClose, onSuccess }: Appointm
                           { value: 'full-rate', label: `Full Rate - $${therapist?.sessionRate || 180}` },
                           { value: 'sliding-scale', label: 'Sliding Scale - Based on income' }
                         ].map(option => (
-                          <label key={option.value} className="flex items-center gap-3" htmlFor="has-insurance">
+                          <label key={option.value} className="flex items-center gap-3">
                             <input
                               type="radio"
                               name="payment-method"

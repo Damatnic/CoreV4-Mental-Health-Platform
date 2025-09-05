@@ -48,9 +48,9 @@ export function VirtualizedList<T>({
   estimatedItemSize = 150,
   getItemKey,
 }: VirtualizedListProps<T>) {
-  const listRef = useRef<unknown>(null);
+  const listRef = useRef<any>(null);
   const [isNearEnd, setIsNearEnd] = React.useState(false);
-  const __lastScrollTop   = useRef(0);
+  const lastScrollTop = useRef(0);
   const scrollFrameId = useRef<number>();
 
   // Performance monitoring
@@ -85,7 +85,7 @@ export function VirtualizedList<T>({
   ItemRenderer.displayName = 'ItemRenderer';
 
   // Handle scroll with throttling for performance
-  const __handleScroll   = useCallback(({ scrollOffset, _scrollDirection }: unknown) => {
+  const handleScroll = useCallback(({ scrollOffset, scrollDirection }: any) => {
     // Cancel previous frame
     if (scrollFrameId.current) {
       cancelAnimationFrame(scrollFrameId.current);
@@ -118,20 +118,20 @@ export function VirtualizedList<T>({
   }, [items.length, isNearEnd, onEndReached, endReachedThreshold, height, itemHeight, isVariableHeight, estimatedItemSize]);
 
   // Get item size for variable height list
-  const __getItemSize   = useMemo(() => {
+  const getItemSize = useMemo(() => {
     if (isVariableHeight) {
       return itemHeight as (index: number) => number;
     }
-    return (index: number) => itemHeight as number;
+    return () => itemHeight as number;
   }, [itemHeight, isVariableHeight]);
 
   // Custom item key for better performance
   const itemKey = useCallback((index: number, data: T[]) => {
-    if (_getItemKey) {
+    if (getItemKey) {
       return getItemKey(index, data);
     }
     // Use a stable key based on item properties if possible
-    const item = data[index] as unknown;
+    const item = data[index] as any;
     return item?.id || item?.key || `item-${index}`;
   }, [getItemKey]);
 
@@ -178,6 +178,18 @@ export function VirtualizedList<T>({
 /**
  * Optimized post list item component
  */
+interface VirtualizedPostItemProps {
+  post: any;
+  style?: React.CSSProperties;
+  onLike: (id: string) => void;
+  onComment: (id: string) => void;
+  onShare: (id: string) => void;
+  onEdit: (post: any) => void;
+  onDelete: (id: string) => void;
+  onReport: (id: string) => void;
+  isOwner: boolean;
+}
+
 export const VirtualizedPostItem = memo(
 ({ 
   post, 
@@ -189,7 +201,7 @@ export const VirtualizedPostItem = memo(
   onDelete,
   onReport,
   isOwner,
-}: unknown) => {
+}: VirtualizedPostItemProps) => {
   // Defer non-critical updates
   const [showActions, setShowActions] = React.useState(false);
   
@@ -218,7 +230,7 @@ export const VirtualizedPostItem = memo(
             <div className="flex items-center space-x-1">
               {isOwner ? (
                 <>
-                  <button onClick={() => onEdit(_post)} className="p-1 text-gray-400 hover:text-blue-600">
+                  <button onClick={() => onEdit(post)} className="p-1 text-gray-400 hover:text-blue-600">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
@@ -290,13 +302,21 @@ VirtualizedPostItem.displayName = 'VirtualizedPostItem';
 /**
  * Auto-sizing text area with virtualization support
  */
+interface VirtualizedTextAreaProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  maxLength?: number;
+  className?: string;
+}
+
 export const VirtualizedTextArea = memo(({ 
   value, 
   onChange, 
   placeholder,
   maxLength = 5000,
   className = '',
-}: unknown) => {
+}: VirtualizedTextAreaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const adjustHeight = useCallback(() => {

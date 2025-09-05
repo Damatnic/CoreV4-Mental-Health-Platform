@@ -82,13 +82,13 @@ export enum WSEventType {
   PEER_SUPPORT_ENDED = 'peer_support:ended',
   
   // Notification Events
-  NOTIFICATION_APPOINTMENT = '_notification:appointment',
-  NOTIFICATION_MEDICATION = '_notification:medication',
-  NOTIFICATION_CRISIS_CHECK = '_notification:crisis_check',
-  NOTIFICATION_SYSTEM = '_notification:system',
-  NOTIFICATION_WELLNESS = '_notification:wellness',
-  NOTIFICATION_ACHIEVEMENT = '_notification:achievement',
-  NOTIFICATION_REMINDER = '_notification:reminder',
+  NOTIFICATION_APPOINTMENT = 'notification:appointment',
+  NOTIFICATION_MEDICATION = 'notification:medication',
+  NOTIFICATION_CRISIS_CHECK = 'notification:crisis_check',
+  NOTIFICATION_SYSTEM = 'notification:system',
+  NOTIFICATION_WELLNESS = 'notification:wellness',
+  NOTIFICATION_ACHIEVEMENT = 'notification:achievement',
+  NOTIFICATION_REMINDER = 'notification:reminder',
   
   // Presence Events
   PRESENCE_UPDATE = 'presence:update',
@@ -229,7 +229,6 @@ export interface TypingUser {
   timestamp: number;
 }
 
-
 export interface QueuedMessage {
   event: string;
   data: unknown;
@@ -239,7 +238,7 @@ export interface QueuedMessage {
 
 export interface NotificationOptions {
   icon?: string;
-  _priority?: 'low' | 'normal' | 'high' | 'critical';
+  priority?: 'low' | 'normal' | 'high' | 'critical';
   actions?: { action: string; title: string }[];
   requireInteraction?: boolean;
   celebrationEffect?: boolean;
@@ -271,13 +270,13 @@ export class EnhancedWebSocketService {
   private typingUsers: Map<string, TypingUser> = new Map();
   private messageQueue: QueuedMessage[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;
-  private currentUser: unknown = null;
+  private currentUser: any = null;
   private activeRooms: Set<string> = new Set();
   
   // Enhanced real-time features
   private userPresences: Map<string, UserPresence> = new Map();
-  private notificationQueue: Notification[] = [];
-  private activeNotifications: Map<string, Notification> = new Map();
+  private notificationQueue: any[] = [];
+  private activeNotifications: Map<string, any> = new Map();
   private messageThreads: Map<string, EnhancedMessage[]> = new Map();
   private peerSupportSessions: Map<string, PeerSupportSession> = new Map();
   private realTimeAnalytics = {
@@ -290,7 +289,6 @@ export class EnhancedWebSocketService {
   // Notification system
   private notificationPermission: NotificationPermission = 'default';
   private serviceWorker: ServiceWorker | null = null;
-// @ts-expect-error - PushSubscription is a global API
   private pushSubscription: PushSubscription | null = null;
 
   private constructor() {
@@ -324,7 +322,7 @@ export class EnhancedWebSocketService {
   }
   
   private initializeNotificationSystem(): void {
-    // Initialize _notification permissions
+    // Initialize notification permissions
     if ('Notification' in window) {
       this.notificationPermission = Notification.permission;
       
@@ -340,18 +338,18 @@ export class EnhancedWebSocketService {
   
   private loadNotificationPreferences(): void {
     try {
-      const _prefs = secureStorage.getItem('notification_preferences');
-      if (_prefs) {
-        const preferences = JSON.parse(_prefs);
-        logger.debug('Loaded _notification preferences', 'EnhancedWebSocket', preferences);
+      const prefs = secureStorage.getItem('notification_preferences');
+      if (prefs) {
+        const preferences = JSON.parse(prefs);
+        logger.debug('Loaded notification preferences', 'EnhancedWebSocket', preferences);
       }
     } catch (error) {
-      logger.error('Failed to load _notification preferences:');
+      logger.error('Failed to load notification preferences:', String(error));
     }
   }
 
   // Initialize WebSocket connection with enhanced monitoring
-  public connect(token: string, user: unknown): void {
+  public connect(token: string, user: any): void {
     if (this.socket?.connected) {
       logger.debug('WebSocket already connected', 'EnhancedWebSocket');
       return;
@@ -421,7 +419,7 @@ export class EnhancedWebSocketService {
           messagesQueued: this.messageQueue.length
         });
       }
-    }, 10000); // Check every 10 seconds
+    }, 10000);
   }
 
   // Setup comprehensive event listeners for mental health platform
@@ -438,8 +436,8 @@ export class EnhancedWebSocketService {
       this.emit(WSEventType.CONNECT, { timestamp: new Date() });
       
       // Rejoin rooms after reconnection
-      this.activeRooms.forEach(_room => {
-        this.joinRoom(_room);
+      this.activeRooms.forEach(room => {
+        this.joinRoom(room);
       });
       
       // Restore user presence after reconnection
@@ -458,8 +456,8 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.ERROR, (error: unknown) => {
-      logger.error('WebSocket error:', error);
-      this.connectionState.lastError = error;
+      logger.error('WebSocket error:', String(error));
+      this.connectionState.lastError = error as Error;
       this.emit(WSEventType.ERROR, { error, timestamp: new Date() });
     });
 
@@ -484,7 +482,7 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.AUTH_FAILURE, (data: unknown) => {
-      logger.error('WebSocket authentication failed:', data);
+      logger.error('WebSocket authentication failed:', JSON.stringify(data));
       this.emit(WSEventType.AUTH_FAILURE, data);
       this.disconnect();
     });
@@ -498,15 +496,15 @@ export class EnhancedWebSocketService {
       logger.crisis('Crisis alert received', 'high', 'EnhancedWebSocket', data);
       this.emit(WSEventType.CRISIS_ALERT, data);
       
-      // Auto-join crisis _room if it's for current user
-      if (data.userId === this.currentUser?.id) {
-        this.joinCrisisSession(data.sessionId);
+      // Auto-join crisis room if it's for current user
+      if ((data as any).userId === this.currentUser?.id) {
+        this.joinCrisisSession((data as any).sessionId);
       }
       
       // Show critical crisis notification
       this.showNotification('Crisis Support Activated', 'Immediate support is available', {
         icon: '🚨',
-        _priority: 'critical',
+        priority: 'critical',
         requireInteraction: true,
         actions: [
           { action: 'emergency', title: 'Emergency Services' },
@@ -525,7 +523,7 @@ export class EnhancedWebSocketService {
     this.socket.on(WSEventType.CRISIS_INTERVENTION, (data: unknown) => {
       this.showNotification('Professional Support', 'A crisis counselor is joining your session', {
         icon: '👨⚕️',
-        _priority: 'high',
+        priority: 'high',
         requireInteraction: true
       });
       this.emit(WSEventType.CRISIS_INTERVENTION, data);
@@ -540,7 +538,7 @@ export class EnhancedWebSocketService {
       this.emit(WSEventType.COMMUNITY_POST_NEW, data);
       this.realTimeAnalytics.communityInteractions++;
       
-      this.showNotification('New Community Post', `${data.author}: "${data.preview}"`, {
+      this.showNotification('New Community Post', `${(data as any).author}: "${(data as any).preview}"`, {
         icon: '💬',
         actions: [
           { action: 'view', title: 'View Post' },
@@ -550,7 +548,7 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.COMMUNITY_POST_LIKED, (data: unknown) => {
-      if (data.authorId === this.currentUser?.id) {
+      if ((data as any).authorId === this.currentUser?.id) {
         this.showNotification('Post Appreciated', 'Someone found your post helpful', {
           icon: '❤️',
           soundType: 'success'
@@ -559,10 +557,10 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.COMMUNITY_MODERATION, (data: unknown) => {
-      if (data.userId === this.currentUser?.id) {
-        this.showNotification('Community Guidelines', data.message, {
+      if ((data as any).userId === this.currentUser?.id) {
+        this.showNotification('Community Guidelines', (data as any).message, {
           icon: '⚠️',
-          _priority: 'high',
+          priority: 'high',
           requireInteraction: true
         });
       }
@@ -576,7 +574,7 @@ export class EnhancedWebSocketService {
     // Wellness notifications
     this.socket.on(WSEventType.NOTIFICATION_MEDICATION, (data: unknown) => {
       this.emit(WSEventType.NOTIFICATION_MEDICATION, data);
-      this.showNotification('Medication Reminder', data.payload.message, {
+      this.showNotification('Medication Reminder', (data as any).payload.message, {
         icon: '💊',
         actions: [
           { action: 'taken', title: 'Taken' },
@@ -600,9 +598,9 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.NOTIFICATION_ACHIEVEMENT, (data: unknown) => {
-      this.showNotification('Achievement Unlocked!', data.title, {
-        icon: data.icon || '🏆',
-        _celebrationEffect: true,
+      this.showNotification('Achievement Unlocked!', (data as any).title, {
+        icon: (data as any).icon || '🏆',
+        celebrationEffect: true,
         soundType: 'success',
         actions: [
           { action: 'view', title: 'View Progress' },
@@ -616,15 +614,17 @@ export class EnhancedWebSocketService {
   private setupPresenceEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.PRESENCE_UPDATE, (data: UserPresence) => {
-      this.userPresences.set(data.userId, data);
-      this.emit(WSEventType.PRESENCE_UPDATE, data);
+    this.socket.on(WSEventType.PRESENCE_UPDATE, (data: unknown) => {
+      const presence = data as UserPresence;
+      this.userPresences.set(presence.userId, presence);
+      this.emit(WSEventType.PRESENCE_UPDATE, presence);
     });
 
     this.socket.on(WSEventType.PRESENCE_MOOD_CHANGE, (data: unknown) => {
-      const presence = this.userPresences.get(data.userId);
+      const moodData = data as { userId: string; moodStatus: any };
+      const presence = this.userPresences.get(moodData.userId);
       if (presence) {
-        presence.moodStatus = data.moodStatus;
+        presence.moodStatus = moodData.moodStatus;
         this.emit(WSEventType.PRESENCE_MOOD_CHANGE, data);
       }
     });
@@ -637,7 +637,7 @@ export class EnhancedWebSocketService {
     this.socket.on(WSEventType.PEER_SUPPORT_REQUEST, (data: unknown) => {
       this.showNotification('Peer Support Request', 'Someone nearby needs support', {
         icon: '🤝',
-        _priority: 'high',
+        priority: 'high',
         requireInteraction: true,
         actions: [
           { action: 'accept', title: 'Offer Support' },
@@ -648,10 +648,11 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.PEER_SUPPORT_MATCHED, (data: unknown) => {
-      const session = this.peerSupportSessions.get(data.sessionId);
+      const matchData = data as { sessionId: string; participants: string[] };
+      const session = this.peerSupportSessions.get(matchData.sessionId);
       if (session) {
         session.status = 'matched';
-        session.participants = data.participants;
+        session.participants = matchData.participants;
       }
       this.emit(WSEventType.PEER_SUPPORT_MATCHED, data);
     });
@@ -662,7 +663,7 @@ export class EnhancedWebSocketService {
     if (!this.socket) return;
 
     this.socket.on(WSEventType.THERAPIST_HOMEWORK_ASSIGNED, (data: unknown) => {
-      this.showNotification('New Therapy Homework', `Your therapist assigned: ${data.title}`, {
+      this.showNotification('New Therapy Homework', `Your therapist assigned: ${(data as any).title}`, {
         icon: '📚',
         actions: [
           { action: 'view', title: 'View Assignment' },
@@ -674,7 +675,7 @@ export class EnhancedWebSocketService {
     this.socket.on(WSEventType.THERAPIST_SESSION_START, (_data: unknown) => {
       this.showNotification('Therapy Session Starting', 'Your therapist is ready', {
         icon: '👨⚕️',
-        _priority: 'high',
+        priority: 'high',
         requireInteraction: true,
         actions: [{ action: 'join', title: 'Join Session' }]
       });
@@ -686,15 +687,17 @@ export class EnhancedWebSocketService {
     if (!this.socket) return;
 
     this.socket.on(WSEventType.GROUP_SESSION_START, (data: unknown) => {
-      this.showNotification('Group Session Starting', `${data.groupName} session is beginning`, {
+      const groupData = data as { groupName: string; groupId: string; sessionId: string };
+      this.showNotification('Group Session Starting', `${groupData.groupName} session is beginning`, {
         icon: '👥',
         actions: [{ action: 'join', title: 'Join Now' }]
       });
-      this.joinGroupSession(data.groupId, data.sessionId);
+      this.joinGroupSession(groupData.groupId, groupData.sessionId);
     });
 
     this.socket.on(WSEventType.GROUP_ACTIVITY_START, (data: unknown) => {
-      this.showNotification('Group Activity', `${data.activityName} is starting in your group`, {
+      const activityData = data as { activityName: string };
+      this.showNotification('Group Activity', `${activityData.activityName} is starting in your group`, {
         icon: '🎯',
         actions: [{ action: 'participate', title: 'Participate' }]
       });
@@ -706,15 +709,17 @@ export class EnhancedWebSocketService {
     if (!this.socket) return;
 
     this.socket.on(WSEventType.WELLNESS_MILESTONE, (data: unknown) => {
-      this.showNotification('Wellness Milestone!', `You've reached ${data.milestone}!`, {
+      const milestoneData = data as { milestone: string };
+      this.showNotification('Wellness Milestone!', `You've reached ${milestoneData.milestone}!`, {
         icon: '🎉',
-        _celebrationEffect: true,
+        celebrationEffect: true,
         soundType: 'success'
       });
     });
 
     this.socket.on(WSEventType.MOOD_PATTERN_ALERT, (data: unknown) => {
-      this.showNotification('Mood Pattern Insight', data.insight, {
+      const moodData = data as { insight: string };
+      this.showNotification('Mood Pattern Insight', moodData.insight, {
         icon: '📈',
         actions: [
           { action: 'view-insights', title: 'View Insights' },
@@ -724,7 +729,8 @@ export class EnhancedWebSocketService {
     });
 
     this.socket.on(WSEventType.HABIT_STREAK_UPDATE, (data: unknown) => {
-      this.showNotification(`${data.habitName} Streak!`, `${data.streakCount} days strong! 🔥`, {
+      const habitData = data as { habitName: string; streakCount: number };
+      this.showNotification(`${habitData.habitName} Streak!`, `${habitData.streakCount} days strong! 🔥`, {
         icon: '🔥',
         soundType: 'success'
       });
@@ -733,9 +739,9 @@ export class EnhancedWebSocketService {
 
   // Enhanced notification handling
   private showNotification(title: string, message: string, options: NotificationOptions = {}): void {
-    const { icon = '🔔', _priority = 'normal', actions = [], requireInteraction = false, _celebrationEffect = false, soundType = 'gentle', vibrationPattern } = options;
+    const { icon = '🔔', priority = 'normal', actions = [], requireInteraction = false, celebrationEffect = false, soundType = 'gentle', vibrationPattern } = options;
 
-    if (!this.shouldShowNotification(_priority)) return;
+    if (!this.shouldShowNotification(priority)) return;
 
     const notificationId = `notification-${Date.now()}`;
     const notificationData = {
@@ -743,14 +749,14 @@ export class EnhancedWebSocketService {
       title,
       message,
       timestamp: new Date(),
-      _priority,
+      priority,
       actions,
       isRead: false,
       category: this.categorizeNotification(title, message)
     };
 
-    this.activeNotifications.set(notificationId, notificationData as unknown);
-    this.saveNotificationHistory(_notificationData);
+    this.activeNotifications.set(notificationId, notificationData);
+    this.saveNotificationHistory(notificationData);
 
     if ('Notification' in window && Notification.permission === 'granted') {
       const browserNotification = new Notification(title, {
@@ -758,8 +764,8 @@ export class EnhancedWebSocketService {
         icon: this.getNotificationIcon(icon),
         badge: '/icon-72x72.png',
         tag: notificationId,
-        requireInteraction: requireInteraction || _priority === 'critical',
-        silent: _priority === 'low' || soundType === 'none',
+        requireInteraction: requireInteraction || priority === 'critical',
+        silent: priority === 'low' || soundType === 'none',
         data: { notificationId, category: notificationData.category }
       });
 
@@ -767,34 +773,34 @@ export class EnhancedWebSocketService {
         this.handleNotificationClick(notificationId, 'click', event);
       };
 
-      const autoCloseDelay = this.getAutoCloseDelay(_priority);
+      const autoCloseDelay = this.getAutoCloseDelay(priority);
       if (autoCloseDelay > 0) {
         setTimeout(() => {
           browserNotification.close();
-          this.markNotificationAsRead(_notificationId);
+          this.markNotificationAsRead(notificationId);
         }, autoCloseDelay);
       }
     }
 
-    if (_celebrationEffect) {
+    if (celebrationEffect) {
       this.triggerCelebrationEffect();
     }
 
-    if (vibrationPattern && 'vibrate' in navigator) {
-      navigator.vibrate(_vibrationPattern);
+    if (vibrationPattern && 'vibrate' in navigator && navigator.vibrate) {
+      navigator.vibrate(vibrationPattern);
     } else {
-      const defaultPattern = this.getVibrationPattern(_priority);
-      if (defaultPattern && 'vibrate' in navigator) {
-        navigator.vibrate(_defaultPattern);
+      const defaultPattern = this.getVibrationPattern(priority);
+      if (defaultPattern && 'vibrate' in navigator && navigator.vibrate) {
+        navigator.vibrate(defaultPattern);
       }
     }
 
-    this.playNotificationSound(_soundType);
+    this.playNotificationSound(soundType);
     this.emit('notification:new', notificationData);
   }
 
   // Helper methods for notification system
-  private shouldShowNotification(_priority: string): boolean {
+  private shouldShowNotification(priority: string): boolean {
     if (this.notificationPermission !== 'granted') return false;
 
     const now = new Date();
@@ -803,8 +809,8 @@ export class EnhancedWebSocketService {
     const quietEnd = 7 * 60;
 
     const isQuietHours = currentTime >= quietStart || currentTime <= quietEnd;
-    if (isQuietHours && _priority !== 'critical') {
-      this.queueNotificationForLater({ _priority } as unknown);
+    if (isQuietHours && priority !== 'critical') {
+      this.queueNotificationForLater({ priority } as any);
       return false;
     }
 
@@ -835,8 +841,8 @@ export class EnhancedWebSocketService {
     return iconMap[icon] || '/icon-192x192.png';
   }
 
-  private getAutoCloseDelay(_priority: string): number {
-    switch (_priority) {
+  private getAutoCloseDelay(priority: string): number {
+    switch (priority) {
       case 'low': return 3000;
       case 'normal': return 5000;
       case 'high': return 10000;
@@ -845,8 +851,8 @@ export class EnhancedWebSocketService {
     }
   }
 
-  private getVibrationPattern(_priority: string): number[] | null {
-    switch (_priority) {
+  private getVibrationPattern(priority: string): number[] | null {
+    switch (priority) {
       case 'low': return [100];
       case 'normal': return [200, 100, 200];
       case 'high': return [300, 100, 300, 100, 300];
@@ -856,57 +862,57 @@ export class EnhancedWebSocketService {
   }
 
   private playNotificationSound(soundType: string): void {
-    logger.debug(`Playing _notification sound: ${soundType}`, 'EnhancedWebSocket');
+    logger.debug(`Playing notification sound: ${soundType}`, 'EnhancedWebSocket');
   }
 
   private triggerCelebrationEffect(): void {
-    this.emit('_notification:celebration', { type: 'achievement' });
+    this.emit('notification:celebration', { type: 'achievement' });
   }
 
   private handleNotificationClick(notificationId: string, action: string, _event: unknown): void {
-    const _notification = this.activeNotifications.get(_notificationId);
-    if (!_notification) return;
+    const notification = this.activeNotifications.get(notificationId);
+    if (!notification) return;
 
-    this.markNotificationAsRead(_notificationId);
+    this.markNotificationAsRead(notificationId);
 
     switch (action) {
       case 'click':
         window.focus();
-        this.emit('_notification:clicked', { notificationId, _notification });
+        this.emit('notification:clicked', { notificationId, notification });
         break;
       case 'taken':
         this.emit('medication:taken', { notificationId, timestamp: new Date() });
         break;
       case 'support':
-        this.emit('support:requested', { notificationId, urgency: (_notification as unknown)._priority });
+        this.emit('support:requested', { notificationId, urgency: notification.priority });
         break;
     }
   }
 
   private markNotificationAsRead(notificationId: string): void {
-    const _notification = this.activeNotifications.get(_notificationId);
-    if (_notification) {
-      (_notification as unknown).isRead = true;
-      this.emit('_notification:read', { notificationId });
+    const notification = this.activeNotifications.get(notificationId);
+    if (notification) {
+      notification.isRead = true;
+      this.emit('notification:read', { notificationId });
     }
   }
 
-  private queueNotificationForLater(_notification: Notification): void {
-    this.notificationQueue.push(_notification);
+  private queueNotificationForLater(notification: any): void {
+    this.notificationQueue.push(notification);
   }
 
-  private saveNotificationHistory(_notification: unknown): void {
+  private saveNotificationHistory(notification: any): void {
     try {
       const history = JSON.parse(secureStorage.getItem('notification_history') || '[]');
-      history.push(_notification);
+      history.push(notification);
       
       if (history.length > 100) {
         history.splice(0, history.length - 100);
       }
       
-      secureStorage.setItem('notification_history', JSON.stringify(_history));
+      secureStorage.setItem('notification_history', JSON.stringify(history));
     } catch (error) {
-      logger.error('Failed to save _notification to history:');
+      logger.error('Failed to save notification to history:', String(error));
     }
   }
 
@@ -915,12 +921,12 @@ export class EnhancedWebSocketService {
     const queuedNotifications = [...this.notificationQueue];
     this.notificationQueue = [];
     
-    queuedNotifications.forEach(_notification => {
-      if (this.shouldShowNotification((_notification as unknown)._priority)) {
+    queuedNotifications.forEach(notification => {
+      if (this.shouldShowNotification(notification.priority)) {
         this.showNotification(
-          (_notification as unknown).title,
-          (_notification as unknown).body,
-          { _priority: (_notification as unknown)._priority }
+          notification.title,
+          notification.body,
+          { priority: notification.priority }
         );
       }
     });
@@ -947,14 +953,14 @@ export class EnhancedWebSocketService {
 
   // Message queue management
   private queueMessage(event: string, data: unknown): void {
-    const _queuedMessage: QueuedMessage = {
+    const queuedMessage: QueuedMessage = {
       event,
       data,
       timestamp: Date.now(),
       retries: 0
     };
 
-    this.messageQueue.push(_queuedMessage);
+    this.messageQueue.push(queuedMessage);
     this.connectionState.messagesQueued = this.messageQueue.length;
     this.saveQueuedMessages();
   }
@@ -970,7 +976,7 @@ export class EnhancedWebSocketService {
         this.socket.emit(message.event, message.data);
         this.connectionState.lastSuccessfulMessage = new Date();
       } catch (error) {
-        logger.error('Failed to send queued message:');
+        logger.error('Failed to send queued message:', String(error));
         
         if (Date.now() - message.timestamp < 86400000 && message.retries < 3) {
           message.retries++;
@@ -987,42 +993,42 @@ export class EnhancedWebSocketService {
     try {
       secureStorage.setItem('wsmessage_queue', JSON.stringify(this.messageQueue));
     } catch (error) {
-      logger.error('Failed to save message queue:');
+      logger.error('Failed to save message queue:', String(error));
     }
   }
 
   private loadQueuedMessages(): void {
     try {
-      const _saved = secureStorage.getItem('wsmessage_queue');
-      if (_saved) {
-        this.messageQueue = JSON.parse(_saved);
+      const saved = secureStorage.getItem('wsmessage_queue');
+      if (saved) {
+        this.messageQueue = JSON.parse(saved);
         this.connectionState.messagesQueued = this.messageQueue.length;
       }
     } catch (error) {
-      logger.error('Failed to load message queue:');
+      logger.error('Failed to load message queue:', String(error));
       this.messageQueue = [];
     }
   }
 
   // Room management
-  public joinRoom(_room: string): void {
+  public joinRoom(room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('join:_room', { _room });
-      this.activeRooms.add(_room);
+      this.socket.emit('join:room', { room });
+      this.activeRooms.add(room);
     }
   }
 
-  public leaveRoom(_room: string): void {
+  public leaveRoom(room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('leave:_room', { _room });
-      this.activeRooms.delete(_room);
+      this.socket.emit('leave:room', { room });
+      this.activeRooms.delete(room);
     }
   }
 
   // Crisis session management
   public joinCrisisSession(sessionId: string): void {
-    const _room = `crisis:${sessionId}`;
-    this.joinRoom(_room);
+    const room = `crisis:${sessionId}`;
+    this.joinRoom(room);
     this.emit('crisis:joined', { sessionId });
   }
 
@@ -1032,7 +1038,7 @@ export class EnhancedWebSocketService {
       escalationLevel,
       timestamp: new Date(),
       userId: this.currentUser?.id,
-      context: 'userinitiated_escalation'
+      context: 'user_initiated_escalation'
     };
     
     if (this.socket?.connected) {
@@ -1040,11 +1046,11 @@ export class EnhancedWebSocketService {
     }
     
     this.realTimeAnalytics.crisisAlertsHandled++;
-    this.logCriticalEvent('crisis_escalationinitiated', escalationData);
+    this.logCriticalEvent('crisis_escalation_initiated', escalationData);
     
     this.showNotification('Crisis Support Activated', 'Professional help is being contacted', {
       icon: '🚨',
-      _priority: 'critical',
+      priority: 'critical',
       requireInteraction: true,
       actions: [
         { action: 'emergency', title: 'Call Emergency' },
@@ -1056,7 +1062,7 @@ export class EnhancedWebSocketService {
   }
 
   // Peer support session management
-  public initiatePeerSupportSession(supportType: 'crisis' | 'general' | 'specific', metadata?: unknown): void {
+  public initiatePeerSupportSession(supportType: 'crisis' | 'general' | 'specific', metadata?: any): void {
     const sessionId = `peer-support-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const session: PeerSupportSession = {
       id: sessionId,
@@ -1082,7 +1088,7 @@ export class EnhancedWebSocketService {
     }
     
     this.realTimeAnalytics.supportSessionsInitiated++;
-    this.emit('peer_support:sessioninitiated', { sessionId, session });
+    this.emit('peer_support:session_initiated', { sessionId, session });
   }
 
   // Real-time presence management
@@ -1108,33 +1114,33 @@ export class EnhancedWebSocketService {
 
   // Group session management
   public joinGroupSession(groupId: string, sessionId: string): void {
-    const _room = `group:${groupId}:${sessionId}`;
-    this.joinRoom(_room);
+    const room = `group:${groupId}:${sessionId}`;
+    this.joinRoom(room);
   }
 
   // Event emitter methods
-  public on(event: string, handler: (...args: unknown[]) => any): void {
+  public on(event: string, handler: (...args: any[]) => void): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler);
   }
 
-  public off(event: string, handler: (...args: unknown[]) => any): void {
+  public off(event: string, handler: (...args: any[]) => void): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.delete(handler);
     }
   }
 
-  public emit(event: string, data: unknown): void {
+  public emit(event: string, data?: any): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach(handler => {
         try {
           handler(data);
         } catch (error) {
-          logger.error(`Error in event handler for ${event}`);
+          logger.error(`Error in event handler for ${event}:`, String(error));
         }
       });
     }
@@ -1155,14 +1161,14 @@ export class EnhancedWebSocketService {
 
   // Crisis escalation handling
   private handleCrisisEscalation(event: unknown): void {
-    logger.error('CRISIS ESCALATION:', event);
+    logger.error('CRISIS ESCALATION:', String(event));
     
     this.showNotification(
       'Emergency Alert',
       'Crisis situation requires immediate attention',
       {
         icon: '🚨',
-        _priority: 'critical',
+        priority: 'critical',
         requireInteraction: true
       }
     );
@@ -1184,18 +1190,18 @@ export class EnhancedWebSocketService {
     
     try {
       const logs = JSON.parse(secureStorage.getItem('critical_events') || '[]');
-      logs.push(_logEntry);
+      logs.push(logEntry);
       
       if (logs.length > 100) {
         logs.splice(0, logs.length - 100);
       }
       
-      secureStorage.setItem('critical_events', JSON.stringify(_logs));
+      secureStorage.setItem('critical_events', JSON.stringify(logs));
     } catch (error) {
-      logger.error('Failed to log critical event:');
+      logger.error('Failed to log critical event:', String(error));
     }
   }
 }
 
 // Export singleton instance
-export const __enhancedWsService = EnhancedWebSocketService.getInstance();
+export const enhancedWsService = EnhancedWebSocketService.getInstance();

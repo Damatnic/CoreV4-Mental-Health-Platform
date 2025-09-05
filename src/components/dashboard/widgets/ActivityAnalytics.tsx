@@ -24,7 +24,7 @@ import {
   ChevronRight,
   Info
 } from 'lucide-react';
-import { __useActivityStore } from '../../../stores/activityStore';
+import { useActivityStore } from '../../../stores/activityStore';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, subDays, addDays, isToday } from 'date-fns';
 
 interface ActivityAnalyticsProps {
@@ -36,7 +36,7 @@ export function ActivityAnalytics({
   onExportData,
   onViewDetails
 }: ActivityAnalyticsProps) {
-  const { activityHistory, activities, goals, habits, correlateActivitiesWithMood, analyzeActivityEffectiveness, exportProgressReport } = __useActivityStore();
+  const { activityHistory, activities, goals, habits, correlateActivitiesWithMood, analyzeActivityEffectiveness, exportProgressReport } = useActivityStore();
 
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

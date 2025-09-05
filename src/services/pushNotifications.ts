@@ -82,7 +82,6 @@ class PushNotificationService {
     return permission;
   }
 
-// @ts-expect-error - PushSubscription is a global API
   async subscribeToNotifications(): Promise<PushSubscription | null> {
     if (!this.registration) return null;
 
@@ -124,7 +123,6 @@ class PushNotificationService {
     }
     return outputArray;
   }
-// @ts-expect-error - PushSubscription is a global API
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     // Send subscription to your server
@@ -278,7 +276,7 @@ class PushNotificationService {
   // Get all scheduled notifications
   async getScheduledNotifications(): Promise<NotificationSchedule[]> {
     const db = await this.openNotificationDB();
-    return await db.getAll('schedules');
+    return (await db.getAll('schedules')) as NotificationSchedule[];
   }
 
   // Update notification schedule
@@ -325,7 +323,7 @@ class PushNotificationService {
       case 'snooze':
         // Snooze for 10 minutes
         setTimeout(() => {
-          this.showMedicationReminder(data.medication, data.dosage);
+          this.showMedicationReminder((data as any).medication, (data as any).dosage);
         }, 10 * 60 * 1000);
         break;
       
@@ -360,9 +358,9 @@ class PushNotificationService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          medication: data.medication,
-          dosage: data.dosage,
-          timestamp: data.timestamp,
+          medication: (data as any).medication,
+          dosage: (data as any).dosage,
+          timestamp: (data as any).timestamp,
           action: 'taken'
         })
       });
@@ -452,7 +450,7 @@ class PushNotificationService {
       const notifications = await this.registration.getNotifications();
       const db = await this.openNotificationDB();
       const schedules = await db.getAll('schedules');
-      const activeSchedules = schedules.filter(s => s.enabled);
+      const activeSchedules = schedules.filter((s: any) => s.enabled);
       
       return {
         active: notifications.length,

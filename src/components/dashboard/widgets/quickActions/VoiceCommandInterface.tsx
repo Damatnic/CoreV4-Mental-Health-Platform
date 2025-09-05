@@ -3,6 +3,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { logger } from '../../../../utils/logger';
 
+// Speech Recognition API types - custom names to avoid conflicts
+interface CustomSpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface CustomSpeechRecognitionErrorEvent {
+  error: 'no-speech' | 'audio-capture' | 'not-allowed' | 'network' | 'aborted' | 'language-not-supported' | 'service-not-allowed' | 'bad-grammar';
+}
+
+interface CustomSpeechRecognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (() => void) | null;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+// Extended window interface for Speech Recognition
+interface ExtendedWindow extends Window {
+  SpeechRecognition?: any;
+  webkitSpeechRecognition?: any;
+}
+
 interface VoiceCommandInterfaceProps {
   isActive: boolean;
   onCommand: (command: string) => void;
@@ -16,14 +45,14 @@ export function VoiceCommandInterface({
   onClose,
   supportedCommands = []
 }: VoiceCommandInterfaceProps) {
-  const [isListening, _setIsListening] = useState(false);
-  const [transcript, _setTranscript] = useState('');
-  const [interimTranscript, _setInterimTranscript] = useState('');
-  const [status, _setStatus] = useState<'idle' | 'listening' | 'processing' | 'success' | 'error'>('idle');
-  const [errorMessage, _setErrorMessage] = useState('');
-  const [volume, _setVolume] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [volume, setVolume] = useState(0);
   
-  const recognitionRef = useRef<unknown>(null);
+  const recognitionRef = useRef<CustomSpeechRecognition | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -38,11 +67,93 @@ export function VoiceCommandInterface({
 
   const commands = supportedCommands.length > 0 ? supportedCommands : defaultCommands;
 
+  // Update volume meter
+  const updateVolume = useCallback(() => {
+    if (!analyserRef.current) return;
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    
+    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+    setVolume(average / 255);
+    
+    animationFrameRef.current = requestAnimationFrame(updateVolume);
+  }, []);
+
+  // Initialize audio analyzer for volume visualization
+  const initializeAudioAnalyzer = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContextRef.current = new AudioContext();
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      
+      analyserRef.current.fftSize = 256;
+      microphoneRef.current.connect(analyserRef.current);
+      
+      updateVolume();
+    } catch (error) {
+      logger.error('Error initializing audio analyzer:', undefined, error);
+    }
+  }, [updateVolume]);
+
+  // Stop audio analyzer
+  const stopAudioAnalyzer = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    
+    if (microphoneRef.current) {
+      microphoneRef.current.disconnect();
+    }
+    
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close();
+    }
+    
+    setVolume(0);
+  }, []);
+
+  // Process recognized command
+  const processCommand = useCallback((command: string) => {
+    setStatus('processing');
+    const lowerCommand = command.toLowerCase();
+    
+    // Find matching command
+    const matchedCommand = commands.find(cmd => 
+      lowerCommand.includes(cmd.toLowerCase())
+    );
+    
+    if (matchedCommand) {
+      setStatus('success');
+      onCommand(lowerCommand);
+      
+      // Provide audio feedback
+      const utterance = new SpeechSynthesisUtterance(`Executing ${matchedCommand}`);
+      utterance.rate = 1.2;
+      window.speechSynthesis.speak(utterance);
+      
+      setTimeout(() => {
+        setStatus('idle');
+        setTranscript('');
+      }, 2000);
+    } else {
+      setStatus('error');
+      setErrorMessage('Command not recognized. Please try again.');
+      
+      setTimeout(() => {
+        setStatus('listening');
+        setErrorMessage('');
+      }, 2000);
+    }
+  }, [commands, onCommand]);
+
   // Initialize speech recognition
   useEffect(() => {
     if (!isActive) return;
 
-    const SpeechRecognition = (window as unknown).SpeechRecognition || (window as unknown).webkitSpeechRecognition;
+    const extWindow = window as ExtendedWindow;
+    const SpeechRecognition = extWindow.SpeechRecognition || extWindow.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
       setErrorMessage('Voice commands not supported in this browser');
@@ -62,16 +173,22 @@ export function VoiceCommandInterface({
       initializeAudioAnalyzer();
     };
 
-    recognition.onresult = (event: unknown) => {
+    recognition.onresult = (event: any) => {
       let interim = '';
       let final = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          final += `${transcript  } `;
-        } else {
-          interim += transcript;
+      const speechEvent = event as CustomSpeechRecognitionEvent;
+      if (speechEvent.results) {
+        for (let i = speechEvent.resultIndex; i < speechEvent.results.length; i++) {
+          const result = speechEvent.results[i];
+          if (result && result[0]) {
+            const transcript = result[0].transcript;
+            if (result.isFinal) {
+              final += `${transcript} `;
+            } else {
+              interim += transcript;
+            }
+          }
         }
       }
 
@@ -83,12 +200,13 @@ export function VoiceCommandInterface({
       setInterimTranscript(interim);
     };
 
-    recognition.onerror = (event: unknown) => {
-      logger.error('Speech recognition error:', event.error);
+    recognition.onerror = (event: any) => {
+      const errorEvent = event as CustomSpeechRecognitionErrorEvent;
+      logger.error('Speech recognition error:', undefined, errorEvent.error);
       setStatus('error');
       setIsListening(false);
       
-      switch (event.error) {
+      switch (errorEvent.error) {
         case 'no-speech':
           setErrorMessage('No speech detected. Please try again.');
           break;
@@ -110,7 +228,7 @@ export function VoiceCommandInterface({
       stopAudioAnalyzer();
     };
 
-    recognitionRef.current = recognition;
+    recognitionRef.current = recognition as CustomSpeechRecognition;
 
     return () => {
       if (recognitionRef.current) {
@@ -118,91 +236,10 @@ export function VoiceCommandInterface({
       }
       stopAudioAnalyzer();
     };
-  }, [isActive, initializeAudioAnalyzer]);
-
-  // Initialize audio analyzer for volume visualization
-  const initializeAudioAnalyzer = async () => {
-    try {
-      const _stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContextRef.current = new AudioContext();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      microphoneRef.current = audioContextRef.current.createMediaStreamSource(_stream);
-      
-      analyserRef.current.fftSize = 256;
-      microphoneRef.current.connect(analyserRef.current);
-      
-      updateVolume();
-    } catch (error) {
-      logger.error('Error initializing audio analyzer:');
-    }
-  };
-
-  // Update volume meter
-  const updateVolume = () => {
-    if (!analyserRef.current) return;
-
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteFrequencyData(dataArray);
-    
-    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-    setVolume(average / 255);
-    
-    animationFrameRef.current = requestAnimationFrame(_updateVolume);
-  };
-
-  // Stop audio analyzer
-  const stopAudioAnalyzer = () => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    
-    if (microphoneRef.current) {
-      microphoneRef.current.disconnect();
-    }
-    
-    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-      audioContextRef.current.close();
-    }
-    
-    setVolume(0);
-  };
-
-  // Process recognized command
-  const __processCommand   = useCallback((command: string) => {
-    setStatus('processing');
-    const lowerCommand = command.toLowerCase();
-    
-    // Find matching command
-    const matchedCommand = commands.find(cmd => 
-      lowerCommand.includes(cmd.toLowerCase())
-    );
-    
-    if (_matchedCommand) {
-      setStatus('success');
-      onCommand(_lowerCommand);
-      
-      // Provide audio feedback
-      const utterance = new SpeechSynthesisUtterance(`Executing ${matchedCommand}`);
-      utterance.rate = 1.2;
-      window.speechSynthesis.speak(_utterance);
-      
-      setTimeout(() => {
-        setStatus('idle');
-        setTranscript('');
-      }, 2000);
-    } else {
-      setStatus('error');
-      setErrorMessage('Command not recognized. Please try again.');
-      
-      setTimeout(() => {
-        setStatus('listening');
-        setErrorMessage('');
-      }, 2000);
-    }
-  }, [commands, onCommand]);
+  }, [isActive, initializeAudioAnalyzer, stopAudioAnalyzer, processCommand]);
 
   // Toggle listening
-  const toggleListening = () => {
+  const toggleListening = useCallback(() => {
     if (!recognitionRef.current) return;
 
     if (isListening) {
@@ -213,15 +250,15 @@ export function VoiceCommandInterface({
       recognitionRef.current.start();
       setIsListening(true);
     }
-  };
+  }, [isListening]);
 
   // Speak command list
-  const speakCommands = () => {
+  const speakCommands = useCallback(() => {
     const commandList = commands.join(', ');
     const utterance = new SpeechSynthesisUtterance(`Available commands are: ${commandList}`);
     utterance.rate = 0.9;
-    window.speechSynthesis.speak(_utterance);
-  };
+    window.speechSynthesis.speak(utterance);
+  }, [commands]);
 
   if (!isActive) return null;
 

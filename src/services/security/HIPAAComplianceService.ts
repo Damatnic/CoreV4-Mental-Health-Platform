@@ -2,7 +2,7 @@
 // Ensures all PHI (Protected Health Information) is handled according to HIPAA standards
 
 import CryptoJS from 'crypto-js';
-import { _secureStorage } from './SecureLocalStorage';
+import { secureStorage } from './SecureLocalStorage';
 import { logger } from '../../utils/logger';
 
 // HIPAA compliance requirements
@@ -228,7 +228,7 @@ export class HIPAAComplianceService {
 
   // Encrypt object with PHI fields
   public encryptObject<T extends Record<string, any>>(obj: T, phiFields: string[]): T {
-    const encrypted = { ...obj } as unknown;
+    const encrypted = { ...obj } as Record<string, any>;
     
     for (const field of phiFields) {
       if (field in encrypted && encrypted[field]) {
@@ -236,12 +236,12 @@ export class HIPAAComplianceService {
       }
     }
     
-    return encrypted;
+    return encrypted as T;
   }
 
   // Decrypt object with PHI fields
   public decryptObject<T extends Record<string, any>>(obj: T, phiFields: string[]): T {
-    const decrypted = { ...obj } as unknown;
+    const decrypted = { ...obj } as Record<string, any>;
     
     for (const field of phiFields) {
       if (field in decrypted && decrypted[field]) {
@@ -254,7 +254,7 @@ export class HIPAAComplianceService {
       }
     }
     
-    return decrypted;
+    return decrypted as T;
   }
 
   // ============================================
@@ -283,7 +283,7 @@ export class HIPAAComplianceService {
       if (acl.resourceId && acl.resourceId !== resourceId) return false;
       
       // Check permission
-      if (!acl.permissions.includes(_permission)) return false;
+      if (!acl.permissions.includes(permission)) return false;
       
       // Check expiration
       if (acl.expiresAt && acl.expiresAt < new Date()) return false;
@@ -361,7 +361,7 @@ export class HIPAAComplianceService {
         return false;
       });
       
-      this.accessControlList.set(userId, filtered);
+      this.accessControlList.set(userId, __filtered || []);
     }
     
     // Audit the revocation
@@ -554,7 +554,7 @@ export class HIPAAComplianceService {
     // 5. Document remediation steps
     
     // Send breach notification
-    await this.sendBreachNotifications(_notification);
+    await this.sendBreachNotifications(notification);
   }
 
   // Send breach notifications
@@ -710,14 +710,14 @@ export class HIPAAComplianceService {
 
   private async notifyUser(userId: string, breach: BreachNotification): Promise<void> {
     // Send notification to user
-    logger.crisis(`Notifying user about HIPAA breach`, '_critical', 'HIPAACompliance', { userId, breachId: breach.id });
+    logger.crisis(`Notifying user about HIPAA breach`, 'critical', 'HIPAACompliance', { userId, breachId: breach.id });
   }
 
   private async notifyAuthorities(breach: BreachNotification): Promise<void> {
     // Notify HHS and other required authorities
-    logger.crisis(`Notifying authorities about HIPAA breach`, '_critical', 'HIPAACompliance', { breachId: breach.id });
+    logger.crisis(`Notifying authorities about HIPAA breach`, 'critical', 'HIPAACompliance', { breachId: breach.id });
   }
 }
 
 // Export singleton instance
-export const __hipaaService = HIPAAComplianceService.getInstance();
+export const hipaaService = HIPAAComplianceService.getInstance();

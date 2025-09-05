@@ -71,11 +71,11 @@ export function ConsoleTile({
   delay = 0,
   children,
 }: ConsoleTileProps) {
-  const __navigate   = useNavigate();
+  const navigate = useNavigate();
   const { isMobileDevice, isSmallScreen, deviceInfo } = useMobileFeatures();
   const { isPerformanceMode } = useConsoleNavigation();
   const { vibrate } = useVibration();
-  const [_isPressed, _setIsPressed] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const tileRef = useRef<HTMLDivElement>(null);
   
   const sizeMap = getMobileSizeMap(isMobileDevice, isSmallScreen);
@@ -179,7 +179,7 @@ export function ConsoleTile({
         className="h-full"
         onActivate={() => {
           vibrate(urgent ? [80, 40] : [40]);
-          navigate(_to);
+          navigate(to);
         }}
       >
         <motion.div

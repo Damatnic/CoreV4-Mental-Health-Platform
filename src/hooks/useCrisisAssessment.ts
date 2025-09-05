@@ -21,18 +21,18 @@ interface CrisisAssessmentHook {
 }
 
 export function useCrisisAssessment(): CrisisAssessmentHook {
-  const [assessmentData, _setAssessmentData] = useState<AssessmentData | null>(() => {
+  const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(() => {
     // Load from secure storage (crisis assessments are sensitive mental health data)
-    const _stored = secureStorage.getItem('crisis_assessment');
-    if (_stored) {
+    const stored = secureStorage.getItem('crisis_assessment');
+    if (stored) {
       try {
-        const parsed = JSON.parse(_stored);
+        const parsed = JSON.parse(stored);
         return {
           ...parsed,
           timestamp: parsed.timestamp ? new Date(parsed.timestamp) : null
         };
       } catch (error) {
-        logger.error('Failed to parse _stored assessment', e as Error, {
+        logger.error('Failed to parse stored assessment', error as Error, {
           category: LogCategory.CRISIS
         });
       }
@@ -40,10 +40,10 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
     return null;
   });
 
-  const [isAssessing, _setIsAssessing] = useState(false);
-  const [lastAssessment, _setLastAssessment] = useState<Date | null>(() => {
-    const _stored = secureStorage.getItem('last_crisis_assessment');
-    return _stored ? new Date(_stored) : null;
+  const [isAssessing, setIsAssessing] = useState(false);
+  const [lastAssessment, setLastAssessment] = useState<Date | null>(() => {
+    const stored = secureStorage.getItem('last_crisis_assessment');
+    return stored ? new Date(stored) : null;
   });
 
   // Save assessment data to secure storage (encrypted for sensitive data)
@@ -112,7 +112,7 @@ export function useCrisisAssessment(): CrisisAssessmentHook {
       if (hoursSinceAssessment > 24) {
         logger.info('Crisis assessment is stale', {
           category: LogCategory.CRISIS,
-          metadata: { hoursSinceAssessment }
+          _metadata: { hoursSinceAssessment }
         });
       }
     }

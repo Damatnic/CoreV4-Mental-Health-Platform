@@ -303,7 +303,7 @@ class GamificationService {
       platinum: '💎',
     };
 
-    const emoji = achievement.icon || tierEmojis[achievement.tier] || '🏆';
+    const emoji = _achievement.icon || tierEmojis[_achievement.tier as keyof typeof tierEmojis] || '🏆';
     
     toast.success(
       `${emoji} Achievement Unlocked!\n${_achievement.name}\n${_achievement.description}\n+${_achievement.points} points`,

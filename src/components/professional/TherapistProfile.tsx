@@ -17,22 +17,22 @@ import {
   Languages,
   Shield,
   CheckCircle,
-  _Heart,
-  _BookOpen,
+  Heart,
+  BookOpen,
   Users,
-  _FileText,
+  FileText,
   Play,
   Pause,
   Briefcase,
   Volume2,
   VolumeX,
-  _ChevronLeft,
-  _ChevronRight,
+  ChevronLeft,
+  ChevronRight,
   ThumbsUp,
   Flag,
   Share2
 } from 'lucide-react';
-import { _therapistService } from '../../services/professional/TherapistService';
+import { therapistService } from '../../services/professional/TherapistService';
 
 interface TherapistProfileProps {
   therapistId: string;
@@ -143,20 +143,84 @@ const mockExperience: ExperienceItem[] = [
   }
 ];
 
+interface Therapist {
+  id: string;
+  name: string;
+  title: string;
+  credentials: string[];
+  specializations: string[];
+  approaches: string[];
+  description: string;
+  longBio: string;
+  rating: number;
+  reviewCount: number;
+  experience: number;
+  location: {
+    city: string;
+    state: string;
+    address: string;
+    isVirtual: boolean;
+    acceptsInPerson: boolean;
+  };
+  availability: {
+    nextAvailable: Date;
+    weeklySlots: number;
+    timeZone: string;
+    regularHours: {
+      monday: string;
+      tuesday: string;
+      wednesday: string;
+      thursday: string;
+      friday: string;
+      saturday: string;
+      sunday: string;
+    };
+  };
+  insurance: {
+    accepted: string[];
+    selfPay: boolean;
+    slidingScale: boolean;
+    sessionRate: number;
+  };
+  languages: string[];
+  demographics: {
+    age: string;
+    gender: string;
+    ethnicity: string[];
+  };
+  verified: boolean;
+  acceptingNew: boolean;
+  responseTime: string;
+  badges: string[];
+  contact: {
+    phone: string;
+    email: string;
+    website: string;
+  };
+  virtualPlatforms?: string[];
+  photos: string[];
+  introVideo?: string;
+  specialtyAreas: {
+    name: string;
+    description: string;
+    experience: string;
+  }[];
+}
+
 export function TherapistProfile({ therapistId, onBookAppointment, _onClose }: TherapistProfileProps) {
-  const [therapist, _setTherapist] = useState<unknown>(null);
-  const [activeTab, _setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
-  const [___selectedReview, _setSelectedReview] = useState<Review | null>(null);
-  const [isVideoPlaying, _setIsVideoPlaying] = useState(false);
-  const [isMuted, _setIsMuted] = useState(true);
-  const [____loading, _setLoading] = useState(true);
+  const [therapist, setTherapist] = useState<Therapist | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'credentials' | 'availability'>('overview');
+  const [_selectedReview, _setSelectedReview] = useState<Review | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTherapist = async () => {
       setLoading(true);
       try {
         // In production, fetch from API
-        const _therapistData = {
+        const therapistData: Therapist = {
           id: therapistId,
           name: 'Dr. Sarah Chen, PhD',
           title: 'Licensed Clinical Psychologist',
@@ -242,7 +306,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
           ]
         };
         
-        setTherapist(_therapistData);
+        setTherapist(therapistData);
       } catch (error) {
         logger.error('Failed to load therapist:');
       } finally {
@@ -279,7 +343,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
     );
   };
 
-  if (_loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -427,7 +491,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as unknown)}
+                    onClick={() => setActiveTab(tab.id as 'overview' | 'reviews' | 'credentials' | 'availability')}
                     className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
@@ -519,7 +583,7 @@ When not in session, Dr. Chen enjoys reading, hiking, and spending time with her
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold mb-4">Specialty Areas</h2>
                   <div className="space-y-6">
-                    {therapist.specialtyAreas.map((area: unknown, index: number) => (
+                    {therapist.specialtyAreas.map((area, index) => (
                       <div key={index} className="border-l-4 border-blue-200 pl-4">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">{area.name}</h3>

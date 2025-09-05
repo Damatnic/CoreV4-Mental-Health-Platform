@@ -325,7 +325,7 @@ const production: SecurityConfig = {
 
 // Determine current environment
 const getEnvironment = (): 'development' | 'staging' | 'production' => {
-  const _env = import.meta._env.MODE;
+  const _env = import.meta.env.MODE;
   
   switch (_env) {
     case 'production':

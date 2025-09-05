@@ -216,10 +216,10 @@ class FieldEncryptionService {
       if (config.sensitivity === 'critical') {
         await auditLogger.log({
           event: 'PHI_MODIFICATION',
-          _userId,
+          userId: _userId,
           details: {
             action: 'field_encrypted',
-            _fieldName,
+            fieldName: _fieldName,
             sensitivity: config.sensitivity,
           },
           severity: 'info',
@@ -228,7 +228,7 @@ class FieldEncryptionService {
 
       return encryptedField;
     } catch (error) {
-      logger.error(`Failed to encrypt field ${_fieldName}:`, error);
+      logger.error(`Failed to encrypt field ${_fieldName}:`, String(error));
       throw new Error('Field encryption failed');
     }
   }
@@ -267,10 +267,10 @@ class FieldEncryptionService {
         if (config.sensitivity === 'critical') {
           await auditLogger.log({
             event: 'PHI_ACCESS',
-            _userId,
+            userId: _userId,
             details: {
               action: 'field_decrypted',
-              _fieldName,
+              fieldName: _fieldName,
               sensitivity: config.sensitivity,
             },
             severity: 'info',
@@ -282,7 +282,7 @@ class FieldEncryptionService {
 
       return encryptedData;
     } catch (error) {
-      logger.error(`Failed to decrypt field ${_fieldName}:`, error);
+      logger.error(`Failed to decrypt field ${_fieldName}:`, String(error));
       throw new Error('Field decryption failed');
     }
   }
@@ -296,9 +296,9 @@ class FieldEncryptionService {
     _userId?: string
   ): Promise<Record<string, any>> {
     const encrypted: Record<string, any> = {};
-    const fieldsToEncrypt = fieldList || Object.keys(_obj);
+    const fieldsToEncrypt = fieldList || Object.keys(obj);
 
-    for (const key of Object.keys(_obj)) {
+    for (const key of Object.keys(obj)) {
       if (fieldsToEncrypt.includes(key) && FIELD_CONFIGS[key]) {
         encrypted[key] = await this.encryptField(key, obj[key], _userId);
       } else {
@@ -318,9 +318,9 @@ class FieldEncryptionService {
     _userId?: string
   ): Promise<Record<string, any>> {
     const decrypted: Record<string, any> = {};
-    const fieldsToDecrypt = fieldList || Object.keys(_obj);
+    const fieldsToDecrypt = fieldList || Object.keys(obj);
 
-    for (const key of Object.keys(_obj)) {
+    for (const key of Object.keys(obj)) {
       if (fieldsToDecrypt.includes(key) && FIELD_CONFIGS[key]) {
         decrypted[key] = await this.decryptField(key, obj[key], _userId);
       } else {
@@ -359,7 +359,7 @@ class FieldEncryptionService {
     // Audit search operation
     await auditLogger.log({
       event: 'DATA_ACCESS',
-      _userId,
+      userId: _userId,
       details: {
         action: 'encrypted_search',
         _fieldName,
@@ -413,7 +413,7 @@ class FieldEncryptionService {
       const encrypted = await cryptoService.encrypt(decrypted);
       
       // Update metadata
-      const newMetadata = this.keyMetadata.get(_newKeyId);
+      const newMetadata = this.keyMetadata.get(newKeyId);
       if (!newMetadata) {
         throw new Error('New key not found');
       }
@@ -551,11 +551,11 @@ class FieldEncryptionService {
 
   private async detokenizeValue(token: string, _fieldName: string): Promise<unknown> {
     // Retrieve from vault
-    let encrypted = this.tokenVault.get(_token);
+    let encrypted = this.tokenVault.get(token);
     
     if (!encrypted) {
       // Try loading from storage
-      encrypted = await secureStorage.getItem(`token_${token}`);
+      encrypted = await secureStorage.getItem(`token_${token}`) as string;
     }
     
     if (!encrypted) {
@@ -579,9 +579,9 @@ class FieldEncryptionService {
     // Preserve format characteristics
     if (config.dataType === 'date') {
       return `enc_date_${encrypted.substring(0, 10)}`;
-    } else if (config.fieldName === 'phone_number') {
+    } else if (config._fieldName === 'phone_number') {
       return `enc_phone_${encrypted.substring(0, 10)}`;
-    } else if (config.fieldName === 'email') {
+    } else if (config._fieldName === 'email') {
       return `enc_${encrypted.substring(0, 20)}@encrypted.local`;
     }
     
@@ -598,8 +598,8 @@ class FieldEncryptionService {
     if (encrypted.startsWith('enc_')) {
       // Need to retrieve full encrypted value from storage
       const fullEncrypted = await secureStorage.getItem(`fpe_${encrypted}`);
-      if (_fullEncrypted) {
-        _actualEncrypted = fullEncrypted;
+      if (fullEncrypted) {
+        _actualEncrypted = fullEncrypted as string;
       }
     }
     
@@ -642,7 +642,7 @@ class FieldEncryptionService {
       if (word.length > 2) { // Skip very short words
         const token = await this.generateSearchToken(word, _fieldName);
         
-        const entries = fieldIndex.get(_token) || [];
+        const entries = fieldIndex.get(token) || [];
         if (!entries.includes(encrypted)) {
           entries.push(encrypted);
           fieldIndex.set(token, entries);
@@ -731,4 +731,4 @@ class FieldEncryptionService {
   }
 }
 
-export const _fieldEncryption = FieldEncryptionService.getInstance();
+export const fieldEncryption = FieldEncryptionService.getInstance();

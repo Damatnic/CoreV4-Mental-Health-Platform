@@ -437,7 +437,7 @@ export class OfflineCrisisResourceManager {
   // Add custom emergency contact
   public addCustomEmergencyContact(contact: OfflineEmergencyContact): void {
     contact.id = `custom-${Date.now()}`;
-    this.emergencyContacts.push(_contact);
+    this.emergencyContacts.push(contact);
     this.saveCustomResources();
   }
 
@@ -473,7 +473,7 @@ export class OfflineCrisisResourceManager {
     this.safetyPlans = this.safetyPlans.filter(p => p.id !== safetyPlan.id);
     
     // Add new plan
-    this.safetyPlans.push(_safetyPlan);
+    this.safetyPlans.push(safetyPlan);
     this.saveSafetyPlans();
     
     return safetyPlan;

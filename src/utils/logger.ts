@@ -62,14 +62,14 @@ class Logger {
     
     if (typeof data === 'object' && data !== null) {
       // Deep clone and sanitize object
-      const sanitized: unknown = Array.isArray(data) ? [] : {};
+      const sanitized: any = Array.isArray(data) ? [] : {};
       for (const key in data) {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           // Skip sensitive field names entirely
           if (['password', 'token', 'secret', 'apiKey', 'privateKey'].includes(key.toLowerCase())) {
-            sanitized[key] = '[REDACTED]';
+            (sanitized as any)[key] = '[REDACTED]';
           } else {
-            sanitized[key] = this.sanitizeData((data as unknown)[key]);
+            (sanitized as any)[key] = this.sanitizeData((data as any)[key]);
           }
         }
       }

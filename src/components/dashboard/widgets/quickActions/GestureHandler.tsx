@@ -63,7 +63,7 @@ export function GestureHandler({
       longPressTimerRef.current = setTimeout(() => {
         onLongPress();
         // Haptic feedback for mobile devices
-        if ('vibrate' in navigator) {
+        if ('vibrate' in navigator && navigator.vibrate) {
           navigator.vibrate(50);
         }
       }, longPressDelay);
@@ -140,8 +140,8 @@ export function GestureHandler({
     const deltaTime = endTime - startPos.time;
 
     // Detect swipe gestures
-    const absX = Math.abs(_deltaX);
-    const absY = Math.abs(_deltaY);
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
     const velocity = Math.sqrt(absX * absX + absY * absY) / deltaTime;
 
     // Only trigger swipe if movement exceeds threshold and velocity is sufficient
@@ -170,7 +170,7 @@ export function GestureHandler({
       if (timeSinceLastTap < 300) {
         onDoubleTap();
         // Haptic feedback
-        if ('vibrate' in navigator) {
+        if ('vibrate' in navigator && navigator.vibrate) {
           navigator.vibrate([30, 30]);
         }
         lastTapRef.current = 0;

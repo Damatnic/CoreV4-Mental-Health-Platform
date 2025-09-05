@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell,
   Clock,
-  _Calendar,
+  Calendar,
   Smartphone,
   Watch,
   Volume2,
-  _VolumeX,
+  VolumeX,
   Settings,
   BrainCircuit,
   TrendingUp,
@@ -15,27 +15,27 @@ import {
   CheckCircle,
   XCircle,
   Pill,
-  _Coffee,
-  _Sun,
-  _Moon,
+  Coffee,
+  Sun,
+  Moon,
   Activity,
   Target,
   Zap,
   ChevronRight,
   Play,
-  _Pause,
-  _RotateCcw,
+  Pause,
+  RotateCcw,
   MapPin,
   User,
-  _HeartPulse,
+  HeartPulse,
   FileText,
   Lightbulb
 } from 'lucide-react';
 
 interface SmartReminderProps {
-  _userId: string;
-  medications: unknown[];
-  _onUpdateReminders: (reminders: SmartReminder[]) => void;
+  userId: string;
+  medications: any[];
+  onUpdateReminders: (reminders: SmartReminder[]) => void;
 }
 
 interface SmartReminder {
@@ -153,30 +153,30 @@ interface AIInsight {
 }
 
 export function MedicationSmartReminders({ 
-  _userId, 
+  userId, 
   medications, 
-  _onUpdateReminders 
+  onUpdateReminders 
 }: SmartReminderProps) {
-  const [reminders, _setReminders] = useState<SmartReminder[]>([]);
-  const [activeTab, _setActiveTab] = useState<'overview' | 'configure' | 'insights' | 'history'>('overview');
-  const [__selectedMedication, _setSelectedMedication] = useState<string | null>(null);
-  const [isLearningMode, _setIsLearningMode] = useState(true);
-  const [aiInsights, _setAiInsights] = useState<AIInsight[]>([]);
-  const [reminderTest, _setReminderTest] = useState<{ active: boolean; _type: string } | null>(null);
+  const [reminders, setReminders] = useState<SmartReminder[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'configure' | 'insights' | 'history'>('overview');
+  const [selectedMedication, setSelectedMedication] = useState<string | null>(null);
+  const [isLearningMode, setIsLearningMode] = useState(true);
+  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
+  const [reminderTest, setReminderTest] = useState<{ active: boolean; type: string } | null>(null);
 
   useEffect(() => {
     generateInitialReminders();
     generateAIInsights();
-  }, [medications, generateInitialReminders]);
+  }, [medications]);
 
   const generateInitialReminders = () => {
-    const initialReminders: SmartReminder[] = medications.map((med, index) => ({
+    const initialReminders: SmartReminder[] = medications.map((med: any, index: number) => ({
       id: `reminder-${med.id}`,
       medicationId: med.id,
       _type: 'adaptive',
       enabled: true,
       settings: {
-        times: med.schedule?.map((s: unknown) => s.time) || ['08:00'],
+        times: med.schedule?.map((s: any) => s.time) || ['08:00'],
         advanceNotice: 15,
         snoozeOptions: [5, 10, 30],
         adaptToRoutine: true,
@@ -189,7 +189,7 @@ export function MedicationSmartReminders({
         escalationDelay: 60
       },
       intelligence: {
-        optimalTimes: med.schedule?.map((s: unknown) => s.time) || ['08:00'],
+        optimalTimes: med.schedule?.map((s: any) => s.time) || ['08:00'],
         adherencePatterns: [
           {
             pattern: `Better adherence when taken with ${index % 2 === 0 ? 'breakfast' : 'dinner'}`,
@@ -249,8 +249,8 @@ export function MedicationSmartReminders({
     setAiInsights(insights);
   };
 
-  const testReminder = (_type: string) => {
-    setReminderTest({ active: true, _type });
+  const testReminder = (type: string) => {
+    setReminderTest({ active: true, type });
     
     // Simulate reminder
     if ('Notification' in window) {
@@ -267,14 +267,14 @@ export function MedicationSmartReminders({
     }, 5000);
   };
 
-  const getReminderTypeIcon = (_type: string) => {
-    switch (_type) {
-      case 'time': return <Clock className="w-5 _h-5" />;
-      case 'location': return <MapPin className="w-5 _h-5" />;
-      case 'context': return <Activity className="w-5 _h-5" />;
-      case 'adaptive': return <BrainCircuit className="w-5 _h-5" />;
-      case 'emergency': return <AlertTriangle className="w-5 _h-5" />;
-      default: return <Bell className="w-5 _h-5" />;
+  const getReminderTypeIcon = (type: string) => {
+    switch (type) {
+      case 'time': return <Clock className="w-5 h-5" />;
+      case 'location': return <MapPin className="w-5 h-5" />;
+      case 'context': return <Activity className="w-5 h-5" />;
+      case 'adaptive': return <BrainCircuit className="w-5 h-5" />;
+      case 'emergency': return <AlertTriangle className="w-5 h-5" />;
+      default: return <Bell className="w-5 h-5" />;
     }
   };
 
@@ -284,13 +284,13 @@ export function MedicationSmartReminders({
     return 'text-red-600';
   };
 
-  const getInsightIcon = (_type: string) => {
-    switch (_type) {
-      case 'pattern': return <TrendingUp className="w-5 _h-5 text-blue-500" />;
-      case 'optimization': return <Target className="w-5 _h-5 text-purple-500" />;
-      case 'warning': return <AlertTriangle className="w-5 _h-5 text-red-500" />;
-      case 'success': return <CheckCircle className="w-5 _h-5 text-green-500" />;
-      default: return <Lightbulb className="w-5 _h-5 text-yellow-500" />;
+  const getInsightIcon = (type: string) => {
+    switch (type) {
+      case 'pattern': return <TrendingUp className="w-5 h-5 text-blue-500" />;
+      case 'optimization': return <Target className="w-5 h-5 text-purple-500" />;
+      case 'warning': return <AlertTriangle className="w-5 h-5 text-red-500" />;
+      case 'success': return <CheckCircle className="w-5 h-5 text-green-500" />;
+      default: return <Lightbulb className="w-5 h-5 text-yellow-500" />;
     }
   };
 
@@ -311,7 +311,7 @@ export function MedicationSmartReminders({
           
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
-              <div className={`w-3 _h-3 rounded-full ${isLearningMode ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${isLearningMode ? 'bg-green-500' : 'bg-gray-300'}`}></div>
               <span className="text-sm font-medium">Learning Mode</span>
               <button
                 onClick={() => setIsLearningMode(!isLearningMode)}
@@ -383,7 +383,7 @@ export function MedicationSmartReminders({
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as unknown)}
+              onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-blue-600 text-white'
@@ -418,7 +418,7 @@ export function MedicationSmartReminders({
               <h2 className="text-xl font-semibold mb-4">Active Reminders</h2>
               <div className="space-y-4">
                 {reminders.filter(r => r.enabled).map(reminder => {
-                  const medication = medications.find(m => m.id === reminder.medicationId);
+                  const medication = medications.find((m: any) => m.id === reminder.medicationId);
                   return (
                     <motion.div
                       key={reminder.id}
@@ -472,22 +472,22 @@ export function MedicationSmartReminders({
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-semibold mb-4">Today&apos;s Schedule</h2>
               <div className="space-y-3">
-                {medications.flatMap(med => 
-                  med.schedule?.map((sched: unknown, idx: number) => {
+                {medications.flatMap((med: any) => 
+                  med.schedule?.map((sched: any, idx: number) => {
                     const now = new Date();
-                    const [_hours, _minutes] = sched.time.split(':');
+                    const [hours, minutes] = sched.time.split(':');
                     const schedTime = new Date();
-                    schedTime.setHours(parseInt(_hours), parseInt(_minutes), 0, 0);
+                    schedTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
                     const isPast = schedTime < now;
-                    const isNext = !isPast && schedTime.getTime() === Math._min(
-                      ...medications.flatMap((m: unknown) => 
-                        m.schedule?.map((s: unknown) => {
-                          const [_h, _min] = s.time.split(':');
+                    const isNext = !isPast && schedTime.getTime() === Math.min(
+                      ...medications.flatMap((m: any) => 
+                        m.schedule?.map((s: any) => {
+                          const [h, min] = s.time.split(':');
                           const t = new Date();
-                          t.setHours(parseInt(_h), parseInt(_min), 0, 0);
+                          t.setHours(parseInt(h), parseInt(min), 0, 0);
                           return t > now ? t.getTime() : Infinity;
                         }) || []
-                      ).filter(t => t !== Infinity)
+                      ).filter((t: number) => t !== Infinity)
                     );
 
                     return (
@@ -501,9 +501,9 @@ export function MedicationSmartReminders({
                           isPast ? 'bg-gray-200' : isNext ? 'bg-blue-100' : 'bg-green-100'
                         }`}>
                           {isPast ? (
-                            sched.taken ? <CheckCircle className="w-5 _h-5 text-green-600" /> : <XCircle className="w-5 _h-5 text-red-600" />
+                            sched.taken ? <CheckCircle className="w-5 h-5 text-green-600" /> : <XCircle className="w-5 h-5 text-red-600" />
                           ) : (
-                            <Pill className={`w-5 _h-5 ${isNext ? 'text-blue-600' : 'text-green-600'}`} />
+                            <Pill className={`w-5 h-5 ${isNext ? 'text-blue-600' : 'text-green-600'}`} />
                           )}
                         </div>
                         <div className="flex-1">
@@ -512,7 +512,7 @@ export function MedicationSmartReminders({
                         </div>
                         {isNext && (
                           <div className="flex items-center gap-1 text-blue-600 text-sm font-medium">
-                            <Clock className="w-4 _h-4" />
+                            <Clock className="w-4 h-4" />
                             Next
                           </div>
                         )}
@@ -544,24 +544,24 @@ export function MedicationSmartReminders({
               <h2 className="text-xl font-semibold mb-4">Test Reminders</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { _type: 'push', label: 'Push Notification', icon: Smartphone },
-                  { _type: 'sound', label: 'Sound Alert', icon: Volume2 },
-                  { _type: 'vibration', label: 'Vibration', icon: Watch },
-                  { _type: 'voice', label: 'Voice Reminder', icon: User }
+                  { type: 'push', label: 'Push Notification', icon: Smartphone },
+                  { type: 'sound', label: 'Sound Alert', icon: Volume2 },
+                  { type: 'vibration', label: 'Vibration', icon: Watch },
+                  { type: 'voice', label: 'Voice Reminder', icon: User }
                 ].map(test => {
                   const Icon = test.icon;
                   return (
                     <button
-                      key={test._type}
-                      onClick={() => testReminder(test._type)}
-                      disabled={reminderTest?.active && reminderTest._type === test._type}
+                      key={test.type}
+                      onClick={() => testReminder(test.type)}
+                      disabled={reminderTest?.active && reminderTest.type === test.type}
                       className={`p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${
-                        reminderTest?.active && reminderTest._type === test._type ? 'bg-blue-50 border-blue-300' : ''
+                        reminderTest?.active && reminderTest.type === test.type ? 'bg-blue-50 border-blue-300' : ''
                       }`}
                     >
                       <Icon className="w-6 h-6 mx-auto mb-2 text-gray-600" />
                       <p className="text-sm font-medium text-gray-900">{test.label}</p>
-                      {reminderTest?.active && reminderTest._type === test._type && (
+                      {reminderTest?.active && reminderTest.type === test.type && (
                         <p className="text-xs text-blue-600 mt-1">Testing...</p>
                       )}
                     </button>
@@ -706,11 +706,11 @@ export function MedicationSmartReminders({
                   <div key={index} className="flex items-center gap-4 p-3 border-l-4 border-blue-200 bg-blue-50 rounded-r-lg">
                     <div className="flex-shrink-0">
                       {index % 3 === 0 ? (
-                        <CheckCircle className="w-5 _h-5 text-green-600" />
+                        <CheckCircle className="w-5 h-5 text-green-600" />
                       ) : index % 3 === 1 ? (
-                        <Clock className="w-5 _h-5 text-yellow-600" />
+                        <Clock className="w-5 h-5 text-yellow-600" />
                       ) : (
-                        <XCircle className="w-5 _h-5 text-red-600" />
+                        <XCircle className="w-5 h-5 text-red-600" />
                       )}
                     </div>
                     <div className="flex-1">

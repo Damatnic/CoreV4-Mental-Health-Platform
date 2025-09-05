@@ -232,11 +232,11 @@ export const __getComponentStyles = (
   let styles = comp.base || '';
   
   if (variant && 'variants' in comp) {
-    styles += ` ${  (comp.variants as unknown)[variant]}`;
+    styles += ` ${  (comp.variants as Record<string, string>)[variant]}`;
   }
   
   if (size && 'sizes' in comp) {
-    styles += ` ${  (comp.sizes as unknown)[size]}`;
+    styles += ` ${  (comp.sizes as Record<string, string>)[size]}`;
   }
   
   return styles;

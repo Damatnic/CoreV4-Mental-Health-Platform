@@ -7,8 +7,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface GroupCardProps {
   group: SupportGroup;
-  onJoin: (_groupId: string) => void;
-  onLeave: (_groupId: string) => void;
+  onJoin: (groupId: string) => void;
+  onLeave: (groupId: string) => void;
   onManage: (group: SupportGroup) => void;
 }
 
@@ -186,7 +186,7 @@ function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const removeGuideline = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      guidelines: prev.guidelines?.filter((_: any, i: number) => i !== index),
+      guidelines: prev.guidelines?.filter((guideline: any, i: number) => i !== index),
     }));
   };
 

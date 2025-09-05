@@ -250,7 +250,7 @@ export const EmergencyServicesInterface: React.FC<EmergencyServicesInterfaceProp
                     
                     {/* Specialties */}
                     <div className="flex flex-wrap gap-2">
-                      {service.specialties.slice(0, 3).map(specialty => (
+                      {service.specialties.slice(0, 3).map((specialty: string) => (
                         <span
                           key={specialty}
                           className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"

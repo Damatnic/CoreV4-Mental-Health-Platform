@@ -66,9 +66,9 @@ class GamePerformanceOptimizer {
   }
   
   private detectDeviceCapabilities(): void {
-    const memory = (navigator as unknown).deviceMemory;
+    const memory = (navigator as any).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    const connection = (navigator as unknown).connection;
+    const connection = (navigator as any).connection;
     
     // Determine performance level based on device capabilities
     if (memory <= 4 || cores <= 2 || connection?.effectiveType === '2g') {
@@ -95,7 +95,7 @@ class GamePerformanceOptimizer {
     // Long task monitoring for detecting blocking operations
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
       const longTaskObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           const longTask = entry as PerformanceEntry;
           if (longTask.duration > 16.67) { // Longer than one frame at 60fps
             this.handleLongTask(longTask);
@@ -110,7 +110,7 @@ class GamePerformanceOptimizer {
     // Layout shift monitoring
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('layout-shift')) {
       const layoutShiftObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           const layoutShift = entry as PerformanceEntry & { value?: number };
           if (layoutShift.value && layoutShift.value > 0.1) { // Significant layout shift
             this.optimizeLayoutStability();
@@ -125,7 +125,7 @@ class GamePerformanceOptimizer {
     // Resource timing for bundle optimization
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('resource')) {
       const resourceObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           this.analyzeResourceTiming(entry as PerformanceResourceTiming);
         }
       });
@@ -172,7 +172,6 @@ class GamePerformanceOptimizer {
     });
     
     // Monitor for new elements
-// @ts-expect-error - MutationObserver is a global API
     const observer = new MutationObserver((mutations) => {
       let _shouldOptimize = false;
       mutations.forEach(mutation => {
@@ -181,7 +180,6 @@ class GamePerformanceOptimizer {
         }
       });
       
-// @ts-expect-error - requestIdleCallback is a global API
       if (_shouldOptimize) {
         requestIdleCallback(applyGPUAcceleration, { timeout: 1000 });
       }
@@ -341,7 +339,7 @@ class GamePerformanceOptimizer {
     // Monitor memory usage
     const checkMemory = () => {
       if ('memory' in performance) {
-        const memory = (performance as unknown).memory;
+        const memory = (performance as any).memory;
         const usedMB = memory.usedJSHeapSize / 1048576;
         this.metrics.memoryUsage = usedMB;
         
@@ -367,7 +365,7 @@ class GamePerformanceOptimizer {
     
     // Force garbage collection if available (development only)
     if ('gc' in window && process.env.NODE_ENV === 'development') {
-      (window as unknown).gc();
+      (window as any).gc();
     }
     
     // Clean up performance entries

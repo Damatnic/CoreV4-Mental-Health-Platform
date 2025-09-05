@@ -1,0 +1,65 @@
+/* Accessibility CSS for WCAG 2.1 AA compliance */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    --bg-red-600: #ff0000;
+    --text-white: #ffffff;
+    --border-color: #000000;
+  }
+  
+  .bg-red-600 {
+    background-color: var(--bg-red-600) !important;
+  }
+  
+  .text-white {
+    color: var(--text-white) !important;
+  }
+  
+  button, .btn {
+    border: 2px solid var(--border-color) !important;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .transition-all,
+  .transition-colors,
+  .transition-opacity {
+    transition: none !important;
+  }
+  
+  .animate-spin {
+    animation: none !important;
+  }
+}
+
+/* Ensure minimum touch targets */
+.touch-target {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* High contrast border utilities */
+.contrast-border {
+  border: 1px solid currentColor;
+}
+
+/* Focus indicators for high contrast */
+@media (prefers-contrast: high) {
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 3px solid #000000 !important;
+    outline-offset: 2px !important;
+  }
+}

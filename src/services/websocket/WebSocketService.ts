@@ -173,8 +173,8 @@ export class WebSocketService {
       this.emit(WSEventType.CONNECT, { timestamp: new Date() });
       
       // Rejoin rooms after reconnection
-      this.activeRooms.forEach(_room => {
-        this.joinRoom(_room);
+      this.activeRooms.forEach(room => {
+        this.joinRoom(room);
       });
     });
 
@@ -215,41 +215,47 @@ export class WebSocketService {
   private setupCrisisEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.CRISIS_ALERT, (data: CrisisWebSocketEvent) => {
-      logger.crisis('Crisis alert received', 'high', 'WebSocketService', data);
-      this.emit(WSEventType.CRISIS_ALERT, data);
+    this.socket.on(WSEventType.CRISIS_ALERT, (data: unknown) => {
+      const crisisData = data as CrisisWebSocketEvent;
+      logger.crisis('Crisis alert received', 'high', 'WebSocketService', crisisData);
+      this.emit(WSEventType.CRISIS_ALERT, crisisData);
       
-      // Auto-join crisis _room if it's for current user
-      if (data.userId === this.currentUser?.id) {
-        this.joinCrisisSession(data.sessionId);
+      // Auto-join crisis room if it's for current user
+      if (crisisData.userId === this.currentUser?.id) {
+        this.joinCrisisSession(crisisData.sessionId);
       }
     });
 
-    this.socket.on(WSEventType.CRISIS_COUNSELOR_ASSIGNED, (data: CrisisWebSocketEvent) => {
-      logger.crisis('Counselor assigned to crisis session', 'medium', 'WebSocketService', data);
-      this.emit(WSEventType.CRISIS_COUNSELOR_ASSIGNED, data);
+    this.socket.on(WSEventType.CRISIS_COUNSELOR_ASSIGNED, (data: unknown) => {
+      const crisisData = data as CrisisWebSocketEvent;
+      logger.crisis('Counselor assigned to crisis session', 'medium', 'WebSocketService', crisisData);
+      this.emit(WSEventType.CRISIS_COUNSELOR_ASSIGNED, crisisData);
     });
 
-    this.socket.on(WSEventType.CRISIS_MESSAGE, (data: CrisisWebSocketEvent) => {
-      this.emit(WSEventType.CRISIS_MESSAGE, data);
+    this.socket.on(WSEventType.CRISIS_MESSAGE, (data: unknown) => {
+      const crisisData = data as CrisisWebSocketEvent;
+      this.emit(WSEventType.CRISIS_MESSAGE, crisisData);
     });
 
-    this.socket.on(WSEventType.CRISIS_SESSION_ENDED, (data: CrisisWebSocketEvent) => {
-      logger.info('Crisis session ended', 'WebSocketService', data);
-      this.emit(WSEventType.CRISIS_SESSION_ENDED, data);
-      this.leaveCrisisSession(data.sessionId);
+    this.socket.on(WSEventType.CRISIS_SESSION_ENDED, (data: unknown) => {
+      const crisisData = data as CrisisWebSocketEvent;
+      logger.info('Crisis session ended', 'WebSocketService', crisisData);
+      this.emit(WSEventType.CRISIS_SESSION_ENDED, crisisData);
+      this.leaveCrisisSession(crisisData.sessionId);
     });
 
-    this.socket.on(WSEventType.CRISIS_ESCALATION, (data: CrisisWebSocketEvent) => {
-      logger.crisis('Crisis escalated', 'critical', 'WebSocketService', data);
-      this.emit(WSEventType.CRISIS_ESCALATION, data);
+    this.socket.on(WSEventType.CRISIS_ESCALATION, (data: unknown) => {
+      const crisisData = data as CrisisWebSocketEvent;
+      logger.crisis('Crisis escalated', 'critical', 'WebSocketService', crisisData);
+      this.emit(WSEventType.CRISIS_ESCALATION, crisisData);
       
       // Trigger emergency protocols
-      this.handleCrisisEscalation(data);
+      this.handleCrisisEscalation(crisisData);
     });
 
-    this.socket.on(WSEventType.CRISIS_TYPING, (data: { sessionId: string; userId: string; isTyping: boolean }) => {
-      this.handleTypingIndicator(data.sessionId, data.userId, data.isTyping);
+    this.socket.on(WSEventType.CRISIS_TYPING, (data: unknown) => {
+      const typingData = data as { sessionId: string; userId: string; isTyping: boolean };
+      this.handleTypingIndicator(typingData.sessionId, typingData.userId, typingData.isTyping);
     });
   }
 
@@ -257,24 +263,29 @@ export class WebSocketService {
   private setupCommunityEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.COMMUNITY_POST_NEW, (data: CommunityWebSocketEvent) => {
-      this.emit(WSEventType.COMMUNITY_POST_NEW, data);
+    this.socket.on(WSEventType.COMMUNITY_POST_NEW, (data: unknown) => {
+      const communityData = data as CommunityWebSocketEvent;
+      this.emit(WSEventType.COMMUNITY_POST_NEW, communityData);
     });
 
-    this.socket.on(WSEventType.COMMUNITY_COMMENT_NEW, (data: CommunityWebSocketEvent) => {
-      this.emit(WSEventType.COMMUNITY_COMMENT_NEW, data);
+    this.socket.on(WSEventType.COMMUNITY_COMMENT_NEW, (data: unknown) => {
+      const communityData = data as CommunityWebSocketEvent;
+      this.emit(WSEventType.COMMUNITY_COMMENT_NEW, communityData);
     });
 
-    this.socket.on(WSEventType.COMMUNITY_USER_TYPING, (data: { groupId: string; user: TypingUser }) => {
-      this.handleTypingIndicator(data.groupId, data.user.userId, true, data.user.username);
+    this.socket.on(WSEventType.COMMUNITY_USER_TYPING, (data: unknown) => {
+      const typingData = data as { groupId: string; user: TypingUser };
+      this.handleTypingIndicator(typingData.groupId, typingData.user.userId, true, typingData.user.username);
     });
 
-    this.socket.on(WSEventType.COMMUNITY_USER_ONLINE, (data: CommunityWebSocketEvent) => {
-      this.emit(WSEventType.COMMUNITY_USER_ONLINE, data);
+    this.socket.on(WSEventType.COMMUNITY_USER_ONLINE, (data: unknown) => {
+      const communityData = data as CommunityWebSocketEvent;
+      this.emit(WSEventType.COMMUNITY_USER_ONLINE, communityData);
     });
 
-    this.socket.on(WSEventType.COMMUNITY_USER_OFFLINE, (data: CommunityWebSocketEvent) => {
-      this.emit(WSEventType.COMMUNITY_USER_OFFLINE, data);
+    this.socket.on(WSEventType.COMMUNITY_USER_OFFLINE, (data: unknown) => {
+      const communityData = data as CommunityWebSocketEvent;
+      this.emit(WSEventType.COMMUNITY_USER_OFFLINE, communityData);
     });
   }
 
@@ -282,25 +293,33 @@ export class WebSocketService {
   private setupNotificationEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.NOTIFICATION_APPOINTMENT, (data: NotificationWebSocketEvent) => {
-      this.emit(WSEventType.NOTIFICATION_APPOINTMENT, data);
-      this.showNotification('Appointment Reminder', data.payload.message);
+    this.socket.on(WSEventType.NOTIFICATION_APPOINTMENT, (data: unknown) => {
+      const notificationData = data as NotificationWebSocketEvent;
+      this.emit(WSEventType.NOTIFICATION_APPOINTMENT, notificationData);
+      const payload = notificationData.payload as { message: string };
+      this.showNotification('Appointment Reminder', payload.message);
     });
 
-    this.socket.on(WSEventType.NOTIFICATION_MEDICATION, (data: NotificationWebSocketEvent) => {
-      this.emit(WSEventType.NOTIFICATION_MEDICATION, data);
-      this.showNotification('Medication Reminder', data.payload.message);
+    this.socket.on(WSEventType.NOTIFICATION_MEDICATION, (data: unknown) => {
+      const notificationData = data as NotificationWebSocketEvent;
+      this.emit(WSEventType.NOTIFICATION_MEDICATION, notificationData);
+      const payload = notificationData.payload as { message: string };
+      this.showNotification('Medication Reminder', payload.message);
     });
 
-    this.socket.on(WSEventType.NOTIFICATION_CRISIS_CHECK, (data: NotificationWebSocketEvent) => {
-      this.emit(WSEventType.NOTIFICATION_CRISIS_CHECK, data);
-      this.showNotification('Wellness Check-In', data.payload.message);
+    this.socket.on(WSEventType.NOTIFICATION_CRISIS_CHECK, (data: unknown) => {
+      const notificationData = data as NotificationWebSocketEvent;
+      this.emit(WSEventType.NOTIFICATION_CRISIS_CHECK, notificationData);
+      const payload = notificationData.payload as { message: string };
+      this.showNotification('Wellness Check-In', payload.message);
     });
 
-    this.socket.on(WSEventType.NOTIFICATION_SYSTEM, (data: NotificationWebSocketEvent) => {
-      this.emit(WSEventType.NOTIFICATION_SYSTEM, data);
-      if (data.priority === 'critical') {
-        this.showNotification('System Alert', data.payload.message, 'critical');
+    this.socket.on(WSEventType.NOTIFICATION_SYSTEM, (data: unknown) => {
+      const notificationData = data as NotificationWebSocketEvent;
+      this.emit(WSEventType.NOTIFICATION_SYSTEM, notificationData);
+      if (notificationData.priority === 'critical') {
+        const payload = notificationData.payload as { message: string };
+        this.showNotification('System Alert', payload.message, 'critical');
       }
     });
   }
@@ -309,8 +328,9 @@ export class WebSocketService {
   private setupPresenceEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.PRESENCE_UPDATE, (data: { userId: string; status: string; lastSeen: Date }) => {
-      this.emit(WSEventType.PRESENCE_UPDATE, data);
+    this.socket.on(WSEventType.PRESENCE_UPDATE, (data: unknown) => {
+      const presenceData = data as { userId: string; status: string; lastSeen: Date };
+      this.emit(WSEventType.PRESENCE_UPDATE, presenceData);
     });
   }
 
@@ -318,12 +338,14 @@ export class WebSocketService {
   private setupTherapistEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.THERAPIST_AVAILABLE, (data: { therapistId: string; available: boolean }) => {
-      this.emit(WSEventType.THERAPIST_AVAILABLE, data);
+    this.socket.on(WSEventType.THERAPIST_AVAILABLE, (data: unknown) => {
+      const therapistData = data as { therapistId: string; available: boolean };
+      this.emit(WSEventType.THERAPIST_AVAILABLE, therapistData);
     });
 
-    this.socket.on(WSEventType.THERAPIST_MESSAGE, (data: { therapistId: string; message: Message }) => {
-      this.emit(WSEventType.THERAPIST_MESSAGE, data);
+    this.socket.on(WSEventType.THERAPIST_MESSAGE, (data: unknown) => {
+      const therapistData = data as { therapistId: string; message: Message };
+      this.emit(WSEventType.THERAPIST_MESSAGE, therapistData);
     });
   }
 
@@ -331,18 +353,21 @@ export class WebSocketService {
   private setupGroupEventListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on(WSEventType.GROUP_SESSION_START, (data: { groupId: string; sessionId: string }) => {
-      this.emit(WSEventType.GROUP_SESSION_START, data);
-      this.joinGroupSession(data.groupId, data.sessionId);
+    this.socket.on(WSEventType.GROUP_SESSION_START, (data: unknown) => {
+      const groupData = data as { groupId: string; sessionId: string };
+      this.emit(WSEventType.GROUP_SESSION_START, groupData);
+      this.joinGroupSession(groupData.groupId, groupData.sessionId);
     });
 
-    this.socket.on(WSEventType.GROUP_SESSION_END, (data: { groupId: string; sessionId: string }) => {
-      this.emit(WSEventType.GROUP_SESSION_END, data);
-      this.leaveGroupSession(data.groupId, data.sessionId);
+    this.socket.on(WSEventType.GROUP_SESSION_END, (data: unknown) => {
+      const groupData = data as { groupId: string; sessionId: string };
+      this.emit(WSEventType.GROUP_SESSION_END, groupData);
+      this.leaveGroupSession(groupData.groupId, groupData.sessionId);
     });
 
-    this.socket.on(WSEventType.GROUP_MESSAGE, (data: { groupId: string; message: Message }) => {
-      this.emit(WSEventType.GROUP_MESSAGE, data);
+    this.socket.on(WSEventType.GROUP_MESSAGE, (data: unknown) => {
+      const groupData = data as { groupId: string; message: Message };
+      this.emit(WSEventType.GROUP_MESSAGE, groupData);
     });
   }
 
@@ -366,31 +391,31 @@ export class WebSocketService {
   }
 
   // Room management
-  public joinRoom(_room: string): void {
+  public joinRoom(room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('join:_room', { _room });
-      this.activeRooms.add(_room);
+      this.socket.emit('join:room', { room });
+      this.activeRooms.add(room);
     }
   }
 
-  public leaveRoom(_room: string): void {
+  public leaveRoom(room: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('leave:_room', { _room });
-      this.activeRooms.delete(_room);
+      this.socket.emit('leave:room', { room });
+      this.activeRooms.delete(room);
     }
   }
 
   // Crisis session management
   public joinCrisisSession(sessionId: string): void {
-    const _room = `crisis:${sessionId}`;
-    this.joinRoom(_room);
+    const room = `crisis:${sessionId}`;
+    this.joinRoom(room);
     this.emit('crisis:joined', { sessionId });
   }
 
   public leaveCrisisSession(sessionId: string): void {
-    const _room = `crisis:${sessionId}`;
-    this.leaveRoom(_room);
-    this.typingUsers.delete(_room);
+    const room = `crisis:${sessionId}`;
+    this.leaveRoom(room);
+    this.typingUsers.delete(room);
   }
 
   public sendCrisisMessage(sessionId: string, message: string): void {
@@ -413,20 +438,20 @@ export class WebSocketService {
 
   // Group session management
   public joinGroupSession(groupId: string, sessionId: string): void {
-    const _room = `group:${groupId}:${sessionId}`;
-    this.joinRoom(_room);
+    const room = `group:${groupId}:${sessionId}`;
+    this.joinRoom(room);
   }
 
   public leaveGroupSession(groupId: string, sessionId: string): void {
-    const _room = `group:${groupId}:${sessionId}`;
-    this.leaveRoom(_room);
+    const room = `group:${groupId}:${sessionId}`;
+    this.leaveRoom(room);
   }
 
   // Typing indicators
-  public sendTypingIndicator(_room: string, isTyping: boolean): void {
+  public sendTypingIndicator(room: string, isTyping: boolean): void {
     if (this.socket?.connected) {
       this.socket.emit('typing', {
-        _room,
+        room,
         userId: this.currentUser?.id,
         username: this.currentUser?.username,
         isTyping
@@ -434,15 +459,15 @@ export class WebSocketService {
     }
   }
 
-  private handleTypingIndicator(_room: string, userId: string, isTyping: boolean, username?: string): void {
+  private handleTypingIndicator(room: string, userId: string, isTyping: boolean, username?: string): void {
     if (isTyping && userId !== this.currentUser?.id) {
-      this.typingUsers.set(`${_room}:${userId}`, {
+      this.typingUsers.set(`${room}:${userId}`, {
         userId,
         username: username || 'User',
         timestamp: Date.now()
       });
     } else {
-      this.typingUsers.delete(`${_room}:${userId}`);
+      this.typingUsers.delete(`${room}:${userId}`);
     }
 
     // Clean up old typing indicators (> 5 seconds)
@@ -454,8 +479,8 @@ export class WebSocketService {
     });
 
     this.emit('typing:update', {
-      _room,
-      typingUsers: Array.from(this.typingUsers.values()).filter(u => 
+      room,
+      typingUsers: Array.from(this.typingUsers.values()).filter(u =>
         u.userId !== this.currentUser?.id
       )
     });
@@ -482,14 +507,14 @@ export class WebSocketService {
 
   // Message queue management for offline support
   private queueMessage(event: string, data: unknown): void {
-    const _queuedMessage: QueuedMessage = {
+    const queuedMessage: QueuedMessage = {
       event,
       data,
       timestamp: Date.now(),
       retries: 0
     };
 
-    this.messageQueue.push(_queuedMessage);
+    this.messageQueue.push(queuedMessage);
     this.saveQueuedMessages();
   }
 
@@ -526,9 +551,9 @@ export class WebSocketService {
 
   private loadQueuedMessages(): void {
     try {
-      const _saved = secureStorage.getItem('wsmessage_queue');
-      if (_saved) {
-        this.messageQueue = JSON.parse(_saved);
+      const saved = secureStorage.getItem('wsmessage_queue');
+      if (saved) {
+        this.messageQueue = JSON.parse(saved);
       }
     } catch (error) {
       logger.error('Failed to load message queue:');
@@ -602,10 +627,10 @@ export class WebSocketService {
     return { ...this.connectionState };
   }
 
-  public getTypingUsers(_room: string): TypingUser[] {
+  public getTypingUsers(room: string): TypingUser[] {
     const users: TypingUser[] = [];
     this.typingUsers.forEach((user, key) => {
-      if (key.startsWith(`${_room}:`)) {
+      if (key.startsWith(`${room}:`)) {
         users.push(user);
       }
     });

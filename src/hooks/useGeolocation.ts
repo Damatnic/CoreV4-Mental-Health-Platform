@@ -15,7 +15,7 @@ interface GeolocationOptions {
 }
 
 export function useGeolocation(options: GeolocationOptions = {}): GeolocationState {
-  const [___state, _setState] = useState<GeolocationState>({
+  const [state, setState] = useState<GeolocationState>({
     location: null,
     error: null,
     loading: true
@@ -54,7 +54,7 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
       // Log location acquisition for crisis services
       logger.info('Location acquired for crisis services', {
         category: LogCategory.CRISIS,
-        metadata: {
+        _metadata: {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy
@@ -72,7 +72,7 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
       // Log error for debugging
       logger.error('Failed to get location', new Error(error.message), {
         category: LogCategory.CRISIS,
-        metadata: { errorCode: error.code }
+        _metadata: { errorCode: error.code }
       });
     };
 
@@ -97,7 +97,7 @@ export function useGeolocation(options: GeolocationOptions = {}): GeolocationSta
     // Cleanup function
     return () => {
       if (watchId !== null) {
-        navigator.geolocation.clearWatch(_watchId);
+        navigator.geolocation.clearWatch(watchId);
       }
     };
   }, [

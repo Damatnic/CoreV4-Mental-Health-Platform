@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Trophy, TrendingUp, Calendar, _ChevronRight } from 'lucide-react';
+import { Target, Trophy, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -130,7 +130,7 @@ export function GoalsProgressWidget({ goals, error }: GoalsProgressWidgetProps) 
             {goal.milestones.length > 0 && (
               <div className="mt-2 flex items-center text-xs text-gray-600">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {goal.milestones.filter((m: unknown) => m.completed).length}/{goal.milestones.length} milestones
+                {goal.milestones.filter((m: any) => (m as any).completed).length}/{goal.milestones.length} milestones
               </div>
             )}
           </motion.div>

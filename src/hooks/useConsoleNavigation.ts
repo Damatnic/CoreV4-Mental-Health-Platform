@@ -1,4 +1,4 @@
-import _React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConsoleSound } from '../services/console/ConsoleSoundSystem';
 import { performanceMonitor } from '../utils/performance/performanceMonitor';
@@ -26,19 +26,19 @@ interface ConsoleNavigationState {
 export function useConsoleNavigation() {
   const navigate = useNavigate();
   const { onFocus, onSelect, onBack } = useConsoleSound();
-  const __frameRateMonitorRef   = useRef<number>(60);
+  const frameRateMonitorRef   = useRef<number>(60);
   const lastCleanupRef = useRef<number>(0);
   const interactionTimeoutRef = useRef<number | null>(null);
   const boundsCacheRef = useRef<Map<string, DOMRect>>(new Map());
   
   // Detect device performance capabilities
   const isLowEndDevice = useMemo(() => {
-    const memory = (navigator as unknown).deviceMemory;
+    const memory = (navigator as any).deviceMemory;
     const cores = navigator.hardwareConcurrency;
     return (memory && memory <= 4) || (cores && cores <= 2);
   }, []);
   
-  const [state, _setState] = useState<ConsoleNavigationState>({
+  const [state, setState] = useState<ConsoleNavigationState>({
     currentFocusId: null,
     currentGroup: 'dashboard-tiles',
     navigationMode: 'mouse',
@@ -85,7 +85,7 @@ export function useConsoleNavigation() {
   }, [isLowEndDevice, state.navigationMode]);
 
   // Register a focusable element with performance optimizations
-  const __registerFocusable   = useCallback((focusable: ConsoleFocusable) => {
+  const registerFocusable   = useCallback((focusable: ConsoleFocusable) => {
     const startTime = performance.now();
     
     // Cache element bounds for faster lookups
@@ -118,7 +118,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Unregister a focusable element with cleanup
-  const __unregisterFocusable   = useCallback((id: string) => {
+  const unregisterFocusable   = useCallback((id: string) => {
     // Clean up cached bounds
     boundsCacheRef.current.delete(id);
     
@@ -130,7 +130,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Get focusables in current group with memoization
-  const ____getCurrentGroupFocusables   = useCallback(() => {
+  const _getCurrentGroupFocusables   = useCallback(() => {
     return state.focusables.filter(f => f.group === state.currentGroup);
   }, [state.focusables, state.currentGroup]);
   
@@ -194,7 +194,7 @@ export function useConsoleNavigation() {
         }
       } catch (error  ) {
         logger.warn('Error setting focus on element:');
-        performanceMonitor.recordMetric('focuserror', 1, { focusableId: id, undefined: String(_undefined) });
+        performanceMonitor.recordMetric('focuserror', 1, { focusableId: id, error: String(error) });
       }
     }
   }, [state.focusables, state.isPerformanceMode, onFocus]);
@@ -257,22 +257,22 @@ export function useConsoleNavigation() {
       let isValidDirection = false;
       let alignment = 0;
       
-      switch (_direction) {
+      switch (direction) {
         case 'up':
           isValidDirection = deltaY < -10; // Must be significantly above
-          alignment = 1 - Math.abs(_deltaX) / window.innerWidth; // Prefer aligned horizontally
+          alignment = 1 - Math.abs(deltaX) / window.innerWidth; // Prefer aligned horizontally
           break;
         case 'down':
           isValidDirection = deltaY > 10; // Must be significantly below
-          alignment = 1 - Math.abs(_deltaX) / window.innerWidth;
+          alignment = 1 - Math.abs(deltaX) / window.innerWidth;
           break;
         case 'left':
           isValidDirection = deltaX < -10; // Must be significantly to the left
-          alignment = 1 - Math.abs(_deltaY) / window.innerHeight; // Prefer aligned vertically
+          alignment = 1 - Math.abs(deltaY) / window.innerHeight; // Prefer aligned vertically
           break;
         case 'right':
           isValidDirection = deltaX > 10; // Must be significantly to the right
-          alignment = 1 - Math.abs(_deltaY) / window.innerHeight;
+          alignment = 1 - Math.abs(deltaY) / window.innerHeight;
           break;
       }
       
@@ -543,8 +543,8 @@ export function useConsoleNavigation() {
           
           // Ensure axis values are defined before processing
           if (rawVertical !== undefined && rawHorizontal !== undefined) {
-            const verticalAxis = Math.abs(_rawVertical) > deadzone ? rawVertical : 0;
-            const horizontalAxis = Math.abs(_rawHorizontal) > deadzone ? rawHorizontal : 0;
+            const verticalAxis = Math.abs(rawVertical) > deadzone ? rawVertical : 0;
+            const horizontalAxis = Math.abs(rawHorizontal) > deadzone ? rawHorizontal : 0;
             
             // Only process if axis state changed significantly
             const _axisChanged = (
@@ -630,7 +630,7 @@ export function useConsoleNavigation() {
   }, []);
 
   // Performance metrics for the hook
-  const __getPerformanceMetrics   = useCallback(() => {
+  const getPerformanceMetrics   = useCallback(() => {
     return {
       frameRate: state.frameRate,
       isPerformanceMode: state.isPerformanceMode,

@@ -10,7 +10,7 @@ interface CrisisPanelProps {
 }
 
 export function CrisisPanel({ data, onEmergencyCall, onOpenSafetyPlan }: CrisisPanelProps) {
-  const [showFullPlan, _setShowFullPlan] = useState(false);
+  const [showFullPlan, setShowFullPlan] = useState(false);
 
   // Default crisis resources if no data provided
   const defaultHotlines = [

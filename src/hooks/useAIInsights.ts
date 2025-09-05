@@ -2,7 +2,7 @@
 // Manages AI-powered mental health insights, pattern recognition, and predictions
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useCallback, useMemo, _useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import {
   AIInsightsDashboard,
@@ -13,22 +13,22 @@ import {
   TherapeuticIntelligence,
   EnvironmentalInsight,
   ProgressMetrics,
-  _InsightType,
+  InsightType,
   InsightCategory,
   ModelType,
   RecommendationType,
   PatternType,
-  _Prediction,
-  _CBTAnalysis,
-  _DBTSkillsAnalysis,
-  _TherapyProgressAnalysis,
-  _WellnessMetric,
+  Prediction,
+  CBTAnalysis,
+  DBTSkillsAnalysis,
+  TherapyProgressAnalysis,
+  WellnessMetric,
   CrisisProfile,
 } from '../types/ai-insights';
 
 // Enhanced AI types for crisis prediction and mood analysis
 interface CrisisRiskPrediction {
-  _riskLevel: 'low' | 'moderate' | 'high' | 'critical';
+  riskLevel: 'low' | 'moderate' | 'high' | 'critical';
   riskScore: number; // 0-100
   _timeToRisk: number; // hours until potential crisis
   confidence: number; // 0-1
@@ -222,8 +222,8 @@ const defineEscalationTriggers = (_overallRisk: unknown) => [
   'Cancels therapy appointments'
 ];
 
-const getReassessmentInterval = (_riskLevel: string) => {
-  switch (_riskLevel) {
+const getReassessmentInterval = (riskLevel: string) => {
+  switch (riskLevel) {
     case 'critical': return 1;
     case 'high': return 6;
     case 'moderate': return 24;
@@ -231,19 +231,19 @@ const getReassessmentInterval = (_riskLevel: string) => {
   }
 };
 
-const matchInterventionsToPatterns = (_patterns: PatternAnalysis[], _userProfile: unknown): PersonalizedIntervention[] => [];
+const matchInterventionsToPatterns = (patterns: PatternAnalysis[], _userProfile: unknown): PersonalizedIntervention[] => [];
 const adjustForCrisisRisk = (interventions: PersonalizedIntervention[], _crisisRisk: CrisisRiskAssessment): PersonalizedIntervention[] => interventions;
 const personalizeInterventions = (interventions: PersonalizedIntervention[], _userProfile: unknown): PersonalizedIntervention[] => interventions;
 
-const matchCBTContent = (_patterns: PatternAnalysis[], _userProgress: unknown): TherapeuticContentRecommendation[] => [];
-const matchDBTContent = (_patterns: PatternAnalysis[], _userProgress: unknown): TherapeuticContentRecommendation[] => [];
-const matchMindfulnessContent = (_patterns: PatternAnalysis[], _preferences: unknown): TherapeuticContentRecommendation[] => [];
+const matchCBTContent = (patterns: PatternAnalysis[], _userProgress: unknown): TherapeuticContentRecommendation[] => [];
+const matchDBTContent = (patterns: PatternAnalysis[], _userProgress: unknown): TherapeuticContentRecommendation[] => [];
+const matchMindfulnessContent = (patterns: PatternAnalysis[], _preferences: unknown): TherapeuticContentRecommendation[] => [];
 
-const identifyRiskIndicators = (_patterns: PatternAnalysis[], _moodData: unknown[]): RiskFactor[] => [];
-const identifyProtectiveFactors = (_patterns: PatternAnalysis[], _moodData: unknown[]): ProtectiveFactor[] => [];
+const identifyRiskIndicators = (patterns: PatternAnalysis[], _moodData: unknown[]): RiskFactor[] => [];
+const identifyProtectiveFactors = (patterns: PatternAnalysis[], _moodData: unknown[]): ProtectiveFactor[] => [];
 const calculateCrisisRiskScore = (_riskIndicators: RiskFactor[], _protectiveFactors: ProtectiveFactor[]) => 45;
-const estimateTimeToRisk = (_riskIndicators: RiskFactor[], _patterns: PatternAnalysis[]) => 72;
-const calculatePredictionConfidence = (_riskIndicators: RiskFactor[], _patterns: PatternAnalysis[]) => 0.78;
+const estimateTimeToRisk = (_riskIndicators: RiskFactor[], patterns: PatternAnalysis[]) => 72;
+const calculatePredictionConfidence = (_riskIndicators: RiskFactor[], patterns: PatternAnalysis[]) => 0.78;
 const categorizeRiskLevel = (riskScore: number) => riskScore > 70 ? 'high' : riskScore > 40 ? 'moderate' : 'low';
 const generateImmediateActions = (_riskScore: number): string[] => ['Monitor mood closely', 'Engage support system'];
 const generatePreventiveStrategies = (_riskIndicators: RiskFactor[], _protectiveFactors: ProtectiveFactor[]): string[] => [];
@@ -272,12 +272,12 @@ const generateMoodRecommendations = (_moodHistory: unknown[], _contextData: unkn
 
 // Mood pattern recognition using machine learning algorithms
 const analyzeMoodPatterns = (_moodData: unknown[], _contextData: unknown[]): PatternAnalysis[] => {
-  const _patterns: PatternAnalysis[] = [];
+  const patterns: PatternAnalysis[] = [];
   
   // Circadian rhythm analysis
   const timeBasedMood = analyzeMoodByTime(_moodData);
   if (timeBasedMood.significance > 0.7) {
-    _patterns.push({
+    patterns.push({
       id: 'circadian-pattern',
       patternType: 'circadian_rhythm',
       description: `Your mood follows a ${timeBasedMood.pattern} pattern, with ${timeBasedMood.peak} being your optimal time`,
@@ -325,7 +325,7 @@ const analyzeMoodPatterns = (_moodData: unknown[], _contextData: unknown[]): Pat
   // Weather and mood correlation
   const weatherPattern = analyzeWeatherCorrelation(_moodData, _contextData);
   if (weatherPattern.correlation > 0.4) {
-    _patterns.push({
+    patterns.push({
       id: 'weather-mood-pattern',
       patternType: 'environmental_correlation',
       description: `Weather significantly impacts your mood - ${weatherPattern.strongestFactor} shows ${Math.abs(weatherPattern.correlation * 100).toFixed(0)}% correlation`,
@@ -389,11 +389,11 @@ const assessCrisisRisk = (_userData: unknown, _moodData: unknown[], _behaviorDat
 };
 
 // Personalized intervention recommendation engine
-const generatePersonalizedInterventions = (_patterns: PatternAnalysis[], _crisisRisk: CrisisRiskAssessment, _userProfile: unknown): PersonalizedIntervention[] => {
+const generatePersonalizedInterventions = (patterns: PatternAnalysis[], _crisisRisk: CrisisRiskAssessment, _userProfile: unknown): PersonalizedIntervention[] => {
   const interventions: PersonalizedIntervention[] = [];
   
   // Evidence-based intervention matching
-  const matchedInterventions = matchInterventionsToPatterns(_patterns, _userProfile);
+  const matchedInterventions = matchInterventionsToPatterns(patterns, _userProfile);
   
   // Crisis-informed adjustments
   const adjustedInterventions = adjustForCrisisRisk(matchedInterventions, _crisisRisk);
@@ -405,19 +405,19 @@ const generatePersonalizedInterventions = (_patterns: PatternAnalysis[], _crisis
 };
 
 // Therapeutic content recommendation system
-const recommendTherapeuticContent = (_patterns: PatternAnalysis[], _userProgress: unknown, _preferences: unknown): TherapeuticContentRecommendation[] => {
+const recommendTherapeuticContent = (patterns: PatternAnalysis[], _userProgress: unknown, _preferences: unknown): TherapeuticContentRecommendation[] => {
   const recommendations: TherapeuticContentRecommendation[] = [];
   
   // CBT content matching
-  const cbtRecommendations = matchCBTContent(_patterns, _userProgress);
+  const cbtRecommendations = matchCBTContent(patterns, _userProgress);
   recommendations.push(...cbtRecommendations);
   
   // DBT skills recommendations
-  const dbtRecommendations = matchDBTContent(_patterns, _userProgress);
+  const dbtRecommendations = matchDBTContent(patterns, _userProgress);
   recommendations.push(...dbtRecommendations);
   
   // Mindfulness content
-  const mindfulnessRecommendations = matchMindfulnessContent(_patterns, _preferences);
+  const mindfulnessRecommendations = matchMindfulnessContent(patterns, _preferences);
   recommendations.push(...mindfulnessRecommendations);
   
   return recommendations.sort((a, b) => b.relevanceScore - a.relevanceScore);
@@ -426,7 +426,7 @@ const recommendTherapeuticContent = (_patterns: PatternAnalysis[], _userProgress
 // Simulated AI processing functions (would be ML models in production)
 const analyzePatterns = (_userData: unknown): PatternAnalysis[] => {
   // Simulate pattern detection algorithm
-  const _patterns: PatternAnalysis[] = [
+  const patterns: PatternAnalysis[] = [
     {
       id: 'pattern-1',
       patternType: 'mood_cycle',
@@ -565,14 +565,14 @@ const analyzePatterns = (_userData: unknown): PatternAnalysis[] => {
   return patterns;
 };
 
-const generatePredictions = (_patterns: PatternAnalysis[]): PredictiveModel[] => {
+const generatePredictions = (patterns: PatternAnalysis[]): PredictiveModel[] => {
   // Simulate predictive modeling
   const models: PredictiveModel[] = [
     {
       id: 'model-1',
       modelType: 'mood_forecast',
       targetVariable: 'mood_score',
-      _predictions: [
+      predictions: [
         {
           timeframe: {
             start: new Date(),
@@ -649,7 +649,7 @@ const generatePredictions = (_patterns: PatternAnalysis[]): PredictiveModel[] =>
       id: 'model-2',
       modelType: 'crisis_risk',
       targetVariable: 'crisis_probability',
-      _predictions: [
+      predictions: [
         {
           timeframe: {
             start: new Date(),
@@ -715,7 +715,7 @@ const generatePredictions = (_patterns: PatternAnalysis[]): PredictiveModel[] =>
 };
 
 const generateRecommendations = (
-  _patterns: PatternAnalysis[],
+  patterns: PatternAnalysis[],
   _predictions: PredictiveModel[]
 ): PersonalizedRecommendation[] => {
   // Generate personalized recommendations based on _patterns and _predictions
@@ -778,7 +778,7 @@ const generateRecommendations = (
         successCriteria: ['Complete 4 out of 5 Sundays', 'Mood improvement on Monday mornings'],
       },
       personalizedFor: {
-        _preferences: [
+        preferences: [
           { category: 'activity', preference: 'quiet_activities', weight: 0.8 },
           { category: 'timing', preference: 'evening', weight: 0.7 },
         ],
@@ -862,7 +862,7 @@ const generateRecommendations = (
         successCriteria: ['Two interactions per week', 'Mood boost after interactions'],
       },
       personalizedFor: {
-        _preferences: [
+        preferences: [
           { category: 'social', preference: 'small_groups', weight: 0.75 },
           { category: 'communication', preference: 'in_person', weight: 0.6 },
         ],
@@ -1070,16 +1070,16 @@ const generateProgressMetrics = (): ProgressMetrics => {
 };
 
 // Enhanced crisis risk prediction
-const predictCrisisRisk = (_patterns: PatternAnalysis[], recentMoodData: unknown[]): CrisisRiskPrediction => {
-  const _riskIndicators = identifyRiskIndicators(_patterns, recentMoodData);
-  const _protectiveFactors = identifyProtectiveFactors(_patterns, recentMoodData);
+const predictCrisisRisk = (patterns: PatternAnalysis[], recentMoodData: unknown[]): CrisisRiskPrediction => {
+  const _riskIndicators = identifyRiskIndicators(patterns, recentMoodData);
+  const _protectiveFactors = identifyProtectiveFactors(patterns, recentMoodData);
   
   const riskScore = calculateCrisisRiskScore(_riskIndicators, _protectiveFactors);
-  const _timeToRisk = estimateTimeToRisk(_riskIndicators, _patterns);
-  const confidence = calculatePredictionConfidence(_riskIndicators, _patterns);
+  const _timeToRisk = estimateTimeToRisk(_riskIndicators, patterns);
+  const confidence = calculatePredictionConfidence(_riskIndicators, patterns);
   
   return {
-    _riskLevel: categorizeRiskLevel(riskScore),
+    riskLevel: categorizeRiskLevel(riskScore),
     riskScore,
     _timeToRisk,
     confidence,
@@ -1298,7 +1298,7 @@ export function useAIInsights() {
       
       // Advanced mood pattern analysis
       const moodPatterns = analyzeMoodPatterns(_moodHistory, contextDataArray);
-      patterns.push(...moodPatterns);
+      _patterns.push(...moodPatterns);
       
       // Crisis risk assessment
       const _crisisRisk = assessCrisisRisk(user, _moodHistory, contextDataArray);
@@ -1356,23 +1356,23 @@ export function useAIInsights() {
         userId: user?.id || '',
         lastUpdated: new Date(),
         insights,
-        patterns,
-        _predictions,
+        patterns: _patterns,
+        predictions: _predictions,
         recommendations,
         therapeuticIntelligence,
         environmentalCorrelations: environmentalInsights,
         progressMetrics,
         aiConfidence: 0.82,
-        _crisisRiskPrediction: {
+        crisisRiskPrediction: {
           userId: user?.id || '',
-          _riskLevel: _crisisRiskPrediction._riskLevel === 'low' ? 'stable' : 
-                    _crisisRiskPrediction._riskLevel === 'moderate' ? 'elevated' : _crisisRiskPrediction._riskLevel,
+          riskLevel: _crisisRiskPrediction.riskLevel === 'low' ? 'stable' : 
+                    _crisisRiskPrediction.riskLevel === 'moderate' ? 'elevated' : _crisisRiskPrediction.riskLevel,
           indicators: _crisisRiskPrediction.primaryRiskFactors.map(factor => factor.description),
-          _patterns: _crisisRiskPrediction.preventiveStrategies,
+          patterns: _crisisRiskPrediction.preventiveStrategies,
           recommendations: _crisisRiskPrediction.immediateActions,
           lastUpdated: _crisisRiskPrediction.lastPrediction
         } as CrisisProfile,
-        _moodAnalysis: moodAnalysisData,
+        moodAnalysis: moodAnalysisData,
         personalizedInterventions,
         therapeuticContent
       };
@@ -1433,24 +1433,24 @@ export function useAIInsights() {
       actionableInsights,
       highPriorityInsights,
       averageConfidence,
-      patternCount: insightsDashboard._patterns.length,
-      activeModels: insightsDashboard._predictions.length,
+      patternCount: insightsDashboard.patterns.length,
+      activeModels: insightsDashboard.predictions.length,
       recommendationCount: insightsDashboard.recommendations.length,
     };
   }, [insightsDashboard]);
 
   return {
     insightsDashboard,
-    filteredInsights,
+    filteredInsights: insightsDashboard?.insights || [],
     isLoading,
     error,
     selectedInsightCategory,
-    setSelectedInsightCategory,
+    setSelectedInsightCategory: _setSelectedInsightCategory,
     insightTimeRange,
-    setInsightTimeRange,
+    setInsightTimeRange: _setInsightTimeRange,
     markInsightActioned: markInsightActioned.mutate,
     dismissInsight: dismissInsight.mutate,
-    requestRefresh,
+    requestRefresh: refetch,
     insightStats,
     isMarkingActioned: markInsightActioned.isPending,
     isDismissing: dismissInsight.isPending,
@@ -1467,7 +1467,7 @@ export function usePatternAnalysis(patternType?: PatternType) {
       await new Promise(resolve => setTimeout(resolve, 600));
       const _patterns = analyzePatterns(user);
       return patternType 
-        ? patterns.filter(p => p.patternType === patternType)
+        ? _patterns.filter(p => p.patternType === patternType)
         : _patterns;
     },
     enabled: !!user?.id,

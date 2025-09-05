@@ -1,37 +1,37 @@
-import React, { useState, _useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
-  _MapPin,
+  MapPin,
   Phone,
   Globe,
-  _Calendar,
+  Calendar,
   Clock,
   Heart,
   Shield,
-  _Users,
-  _Video,
+  Users,
+  Video,
   MessageSquare,
   CheckCircle,
-  _Info,
+  Info,
   ExternalLink,
-  _Mail,
+  Mail,
   Languages,
-  _GraduationCap,
-  _Building,
+  GraduationCap,
+  Building,
   Sparkles,
   HandHeart,
-  _Star,
-  _DollarSign,
-  _UserCheck,
-  _Filter,
-  _SortAsc,
-  _BookOpen,
-  _Briefcase,
-  _Award,
-  _Zap
+  Star,
+  DollarSign,
+  UserCheck,
+  Filter,
+  SortAsc,
+  BookOpen,
+  Briefcase,
+  Award,
+  Zap
 } from 'lucide-react';
-import { _therapistService } from '../../services/professional/TherapistService';
+import { therapistService } from '../../services/professional/TherapistService';
 
 /**
  * Professional Support - Enhanced Therapist Matching & Free Resources
@@ -322,9 +322,9 @@ const FREE_RESOURCES: FreeResource[] = [
 ];
 
 export function ProfessionalSupport() {
-  const [searchTerm, _setSearchTerm] = useState('');
-  const [selectedCategory, _setSelectedCategory] = useState<string>('all');
-  const [showOnlyEmergency, _setShowOnlyEmergency] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showOnlyEmergency, setShowOnlyEmergency] = useState(false);
 
   // _Filter resources based on search and category
   const filteredResources = FREE_RESOURCES.filter(resource => {
@@ -333,7 +333,7 @@ export function ProfessionalSupport() {
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === 'all' || 
-      resource.categories.includes(_selectedCategory);
+      resource.categories.includes(selectedCategory);
     
     const matchesEmergency = !showOnlyEmergency || resource.isEmergency;
     
@@ -421,7 +421,7 @@ export function ProfessionalSupport() {
               {RESOURCE_CATEGORIES.map(category => (
                 <button
                   key={category}
-                  onClick={() => setSelectedCategory(_category)}
+                  onClick={() => setSelectedCategory(category)}
                   className={`px-4 py-2 rounded-full transition-all duration-300 ${
                     selectedCategory === category
                       ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-console-glow'

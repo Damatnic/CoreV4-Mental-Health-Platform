@@ -5,7 +5,6 @@
  * Prevents XSS attacks from accessing plain text mental health data
  */
 
-// @ts-expect-error - CryptoJS types compatibility
 import CryptoJS from 'crypto-js';
 import { logger } from '../../utils/logger';
 
@@ -44,7 +43,7 @@ class SecureLocalStorage {
       this.encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || this.generateTempKey();
       this.isInitialized = true;
     } catch (error) {
-      logger.error('🔒 SecureLocalStorage initialization failed:', error);
+      logger.error('🔒 SecureLocalStorage initialization failed:', String(error));
       // Fallback to a simple key to prevent app crashes
       this.encryptionKey = `fallback_emergency_key_${  Date.now()}`;
       this.isInitialized = false;
@@ -104,16 +103,13 @@ class SecureLocalStorage {
         return data; // Store unencrypted but warn about it
       }
 
-      // @ts-expect-error - CryptoJS method access
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey, {
-        // @ts-expect-error - CryptoJS mode property access
-        mode: CryptoJS.mode.CBC,
-        // @ts-expect-error - CryptoJS padding property access
-        padding: CryptoJS.pad.Pkcs7
+        mode: (CryptoJS as any).mode.CBC,
+        padding: (CryptoJS as any).pad.Pkcs7
       });
       return encrypted.toString();
     } catch (error) {
-      logger.error('🔒 Encryption failed:', error);
+      logger.error('🔒 Encryption failed:', String(error));
       logger.warn('🔒 Storing data unencrypted due to encryption failure');
       return data; // Fallback to unencrypted to prevent app crashes
     }
@@ -136,15 +132,11 @@ class SecureLocalStorage {
         return encryptedData; // Return unencrypted data
       }
       
-      // @ts-expect-error - CryptoJS method access
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey, {
-        // @ts-expect-error - CryptoJS mode property access
-        mode: CryptoJS.mode.CBC,
-        // @ts-expect-error - CryptoJS padding property access
-        padding: CryptoJS.pad.Pkcs7
+        mode: (CryptoJS as any).mode.CBC,
+        padding: (CryptoJS as any).pad.Pkcs7
       });
       
-      // @ts-expect-error - CryptoJS encoding access
       const result = decrypted.toString(CryptoJS.enc.Utf8);
       
       if (!result) {
@@ -154,7 +146,7 @@ class SecureLocalStorage {
       
       return result;
     } catch (error) {
-      logger.error('🔒 Decryption failed:', error);
+      logger.error('🔒 Decryption failed:', String(error));
       // Return original data instead of throwing to prevent app crashes
       logger.warn('🔒 Returning data unencrypted due to decryption failure');
       return encryptedData;
@@ -178,7 +170,7 @@ class SecureLocalStorage {
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      logger.error('🔒 SecureLocalStorage.setItem failed:', error);
+      logger.error('🔒 SecureLocalStorage.setItem failed:', String(error));
       throw undefined;
     }
   }
@@ -224,7 +216,7 @@ class SecureLocalStorage {
         return localStorage.getItem(key);
       }
     } catch (error) {
-      logger.error('🔒 SecureLocalStorage.getItem failed:', error);
+      logger.error('🔒 SecureLocalStorage.getItem failed:', String(error));
       return null;
     }
   }
@@ -242,7 +234,7 @@ class SecureLocalStorage {
         localStorage.removeItem(key);
       }
     } catch (error) {
-      logger.error('🔒 SecureLocalStorage.removeItem failed:', error);
+      logger.error('🔒 SecureLocalStorage.removeItem failed:', String(error));
     }
   }
 
@@ -254,7 +246,7 @@ class SecureLocalStorage {
       localStorage.clear();
       logger.info('Cleared all localStorage data', 'SecureLocalStorage');
     } catch (error) {
-      logger.error('🔒 SecureLocalStorage.clear failed:', error);
+      logger.error('🔒 SecureLocalStorage.clear failed:', String(error));
     }
   }
 
@@ -279,7 +271,7 @@ class SecureLocalStorage {
         percentage: Math.round((used / total) * 100)
       };
     } catch (error) {
-      logger.error('🔒 Failed to get storage info:', error);
+      logger.error('🔒 Failed to get storage info:', String(error));
       return { used: 0, total: 0, percentage: 0 };
     }
   }
@@ -306,7 +298,7 @@ class SecureLocalStorage {
         }
       }
     } catch (error) {
-      logger.error('🔒 Failed to audit stored data:', error);
+      logger.error('🔒 Failed to audit stored data:', String(error));
     }
 
     return { encrypted, plainText, sensitive };
@@ -329,7 +321,7 @@ class SecureLocalStorage {
           this.setItem(key, value); // This will encrypt it
           migrated++;
         } catch (error) {
-          logger.error(`🔒 Failed to migrate ${key}:`, error);
+          logger.error(`🔒 Failed to migrate ${key}:`, String(error));
         }
       }
     });

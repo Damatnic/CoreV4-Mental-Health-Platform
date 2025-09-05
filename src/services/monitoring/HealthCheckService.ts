@@ -110,7 +110,7 @@ export class HealthCheckService {
   private initializePerformanceObserver(): void {
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       this.performanceObserver = new PerformanceObserver((list) => {
-        for (const _entry of list.getEntries()) {
+        for (const _entry of (list as any).getEntries()) {
           this.recordPerformanceMetric(_entry);
         }
       });
@@ -191,7 +191,7 @@ export class HealthCheckService {
     services.push(await this.checkIntegrationsHealth());
     
     // Determine overall health
-    const overall = this.calculateOverallHealth(_services);
+    const overall = this.calculateOverallHealth(services);
     
     // Collect system _metrics
     const _metrics = await this.collectSystemMetrics();
@@ -205,10 +205,10 @@ export class HealthCheckService {
     };
     
     // Store in history
-    this.storeHealthHistory(_systemHealth);
+    this.storeHealthHistory(systemHealth);
     
     // Send to monitoring service
-    this.reportHealthStatus(_systemHealth);
+    this.reportHealthStatus(systemHealth);
     
     return systemHealth;
   }
@@ -598,7 +598,7 @@ export class HealthCheckService {
       }
       
       const history = this.healthHistory.get(service.name)!;
-      history.push(_service);
+      history.push(service);
       
       // Limit history size
       if (history.length > this.maxHistorySize) {
@@ -611,17 +611,17 @@ export class HealthCheckService {
   private reportHealthStatus(health: SystemHealth): void {
     // Send to monitoring endpoint
     if (health.overall !== HealthStatus.HEALTHY) {
-      logger.warn('System health degraded:', health);
+      logger.warn('System health degraded', JSON.stringify(health));
     }
     
     // Send metrics to Prometheus/Grafana
-    this.sendMetricsToMonitoring(_health);
+    this.sendMetricsToMonitoring(health);
   }
 
   // Report performance metrics
   private reportPerformanceMetrics(_metrics: PerformanceMetrics): void {
     // Send to analytics service
-    logger.info('Performance _metrics:', _metrics);
+    logger.info('Performance _metrics', JSON.stringify(_metrics));
   }
 
   // Send metrics to monitoring service

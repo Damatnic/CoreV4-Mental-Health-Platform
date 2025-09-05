@@ -16,13 +16,13 @@ interface CommunityNotification {
 export function CommunityPage() {
   const { user } = useAnonymousAuth();
   const location = useLocation();
-  const [activeTab, _setActiveTab] = useState('posts');
-  const [_onlineCount, _setOnlineCount] = useState(0);
-  const [notifications, _setNotifications] = useState<CommunityNotification[]>([]);
+  const [activeTab, setActiveTab] = useState('posts');
+  const [onlineCount, setOnlineCount] = useState(0);
+  const [notifications, setNotifications] = useState<CommunityNotification[]>([]);
 
   // Initialize community connection (simplified for stability)
   useEffect(() => {
-    if (_user) {
+    if (user) {
       // Set mock online count for now
       setOnlineCount(Math.floor(Math.random() * 50) + 10);
     }
@@ -97,7 +97,7 @@ export function CommunityPage() {
           transition={{ delay: 0.2 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8"
         >
-          {stats.map((stat, index) => {
+          {__stats.map((stat: any, index: number) => {
             const Icon = stat.icon;
             return (
               <motion.div

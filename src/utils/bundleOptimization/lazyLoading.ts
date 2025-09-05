@@ -35,7 +35,7 @@ export function createLazyComponent<T extends ComponentType<unknown>>(
       
       return module;
     } catch (error) {
-      logger.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, error);
+      logger.error(`Failed to load lazy component ${chunkName || 'unknown'}:`, String(error));
       
       // Record error
       performanceMonitor.recordMetric('lazy_loaderror', 1, {
@@ -48,7 +48,7 @@ export function createLazyComponent<T extends ComponentType<unknown>>(
   });
 
   // Add display name for debugging (cast to any to avoid type error)
-  (LazyComponent as unknown).displayName = chunkName ? `Lazy(${chunkName})` : 'LazyComponent';
+  (LazyComponent as any).displayName = chunkName ? `Lazy(${chunkName})` : 'LazyComponent';
   
   return LazyComponent as unknown as T;
 }
@@ -59,45 +59,45 @@ export const __CrisisInterventionLazy = createLazyComponent(
   'CrisisInterventionSystem'
 );
 
-export const _SafetyPlanLazy = createLazyComponent(
+export const SafetyPlanLazy = createLazyComponent(
   () => import('../../components/crisis/SafetyPlan').then(m => ({ default: m.SafetyPlan })),
   'SafetyPlan'
 );
 
-export const _EmergencyContactsLazy = createLazyComponent(
+export const EmergencyContactsLazy = createLazyComponent(
   () => import('../../components/crisis/EmergencyContacts').then(m => ({ default: m.EmergencyContacts })),
   'EmergencyContacts'
 );
 
-export const _CrisisChatLazy = createLazyComponent(
+export const CrisisChatLazy = createLazyComponent(
   () => import('../../components/crisis/CrisisChat').then(m => ({ default: m.CrisisChat })),
   'CrisisChat'
 );
 
 // Wellness components (medium priority)
 export const __MoodTrackerLazy = createLazyComponent(
-  () => import('../../components/wellness/MoodTracker'),
+  () => import('../../components/wellness/MoodTracker') as Promise<{ default: ComponentType<unknown> }>,
   'MoodTracker'
 );
 
 export const __BreathingExerciseLazy = createLazyComponent(
-  () => import('../../components/wellness/BreathingExercises').then(m => ({ default: m.BreathingExercises })),
+  () => import('../../components/wellness/BreathingExercises').then(m => ({ default: m.BreathingExercises })) as Promise<{ default: ComponentType<unknown> }>,
   'BreathingExercises'
 );
 
 export const __MeditationLazy = createLazyComponent(
-  () => import('../../components/wellness/MeditationTimer').then(m => ({ default: m.MeditationTimer })),
+  () => import('../../components/wellness/MeditationTimer').then(m => ({ default: m.MeditationTimer })) as Promise<{ default: ComponentType<unknown> }>,
   'MeditationTimer'
 );
 
 export const __JournalLazy = createLazyComponent(
-  () => import('../../components/wellness/TherapeuticJournal').then(m => ({ default: m.TherapeuticJournal })),
+  () => import('../../components/wellness/TherapeuticJournal').then(m => ({ default: m.TherapeuticJournal })) as Promise<{ default: ComponentType<unknown> }>,
   'TherapeuticJournal'
 );
 
 // Community components (lower priority)
 export const __CommunityFeedLazy = createLazyComponent(
-  () => import('../../components/community/CommunityFeed'),
+  () => import('../../components/community/CommunityFeed').then(m => ({ default: m.default || m.CommunityFeed })) as Promise<{ default: ComponentType<unknown> }>,
   'CommunityFeed'
 );
 
@@ -107,29 +107,29 @@ export const __SupportGroupsLazy = createLazyComponent(
 );
 
 export const __ForumsLazy = createLazyComponent(
-  () => import('../../components/community/Forums'),
+  () => import('../../components/community/Forums').then(m => ({ default: m.default || m.Forums })) as Promise<{ default: ComponentType<unknown> }>,
   'Forums'
 );
 
 // Professional components
 export const __TherapistFinderLazy = createLazyComponent(
-  () => import('../../components/professional/TherapistFinder'),
+  () => import('../../components/professional/TherapistFinder').then(m => ({ default: m.default || m.TherapistFinder })) as Promise<{ default: ComponentType<unknown> }>,
   'TherapistFinder'
 );
 
 export const __AppointmentBookingLazy = createLazyComponent(
-  () => import('../../components/professional/AppointmentBooking').then(m => ({ default: m.AppointmentBooking })),
+  () => import('../../components/professional/AppointmentBooking').then(m => ({ default: m.AppointmentBooking })) as Promise<{ default: ComponentType<unknown> }>,
   'AppointmentBooking'
 );
 
 // Settings and administrative components (lowest priority)
 export const __SettingsLazy = createLazyComponent(
-  () => import('../../components/settings/Settings'),
+  () => import('../../components/settings/Settings').then(m => ({ default: m.default || m.Settings })) as Promise<{ default: ComponentType<unknown> }>,
   'Settings'
 );
 
 export const __ProfileLazy = createLazyComponent(
-  () => import('../../components/profile/Profile'),
+  () => import('../../components/profile/Profile').then(m => ({ default: m.default || m.Profile })) as Promise<{ default: ComponentType<unknown> }>,
   'Profile'
 );
 
@@ -172,7 +172,7 @@ export class ComponentPreloader {
       );
     }
 
-    await Promise.allSettled(_promises);
+    await Promise.allSettled(promises);
   }
 
   /**
@@ -199,7 +199,7 @@ export class ComponentPreloader {
       }
     }
 
-    await Promise.allSettled(_promises);
+    await Promise.allSettled(promises);
   }
 
   /**
@@ -207,7 +207,6 @@ export class ComponentPreloader {
    */
   static preloadDuringIdle(): void {
     if ('requestIdleCallback' in window) {
-// @ts-expect-error - requestIdleCallback is a global API
       requestIdleCallback(() => {
         this.preloadLowPriorityComponents();
       }, { timeout: 5000 });
@@ -247,7 +246,7 @@ export class ComponentPreloader {
       
       this.preloadedComponents.add(name);
     } catch (error) {
-    logger.warn(`Failed to preload component ${name}:`, error);
+    logger.warn(`Failed to preload component ${name}:`, String(error));
       performanceMonitor.recordMetric('preloaderror', 1, { componentName: name });
     }
   }
@@ -290,7 +289,7 @@ export class ComponentPreloader {
 }
 
 // Route-based code splitting
-export const _RouteComponents = {
+export const RouteComponents = {
   // Core routes (always loaded)
   Dashboard: createLazyComponent(
     () => import('../../pages/HomePage'),
@@ -334,7 +333,7 @@ export class BundleAnalyzer {
     if (process.env.NODE_ENV === 'development') {
       // Log chunk loading information
       const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           if (entry.name.includes('chunk') || entry.name.includes('lazy')) {
             const resourceEntry = entry as PerformanceResourceTiming;
             logger.info(`Chunk loaded: ${entry.name}, Size: ${resourceEntry.transferSize || 0} bytes, Time: ${entry.duration}ms`);
@@ -412,7 +411,7 @@ export function initializeBundleOptimization(): void {
     // Generate initial bundle report after page load
     setTimeout(() => {
       const report = BundleAnalyzer.generateBundleReport();
-      logger.info('Bundle Performance Report:', report);
+      logger.info('Bundle Performance Report:', JSON.stringify(report));
       
       performanceMonitor.recordMetric('bundle_analysis', 1, report);
     }, 1000);

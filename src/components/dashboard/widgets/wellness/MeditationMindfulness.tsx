@@ -1,32 +1,32 @@
-import { useState, _useEffect, useMemo } from 'react';
-import { motion, _AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
   Wind,
   Heart,
-  _Play,
-  _Pause,
+  Play,
+  Pause,
   Clock,
-  _Calendar,
+  Calendar,
   Flame,
   TrendingUp,
-  _Award,
-  _Volume2,
+  Award,
+  Volume2,
   Headphones,
   Sun,
   Moon,
-  _Cloud,
-  _Zap,
+  Cloud,
+  Zap,
   Target,
   ChevronRight,
-  _BarChart,
-  _PieChart
+  BarChart,
+  PieChart
 } from 'lucide-react';
-import { format, _startOfWeek, _endOfWeek, _eachDayOfInterval, isToday } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 import {
-  _LineChart,
-  _Line,
-  _BarChart as RechartsBarChart,
+  LineChart,
+  Line,
+  BarChart as RechartsBarChart,
   Bar,
   XAxis,
   YAxis,
@@ -34,8 +34,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  _PieChart as _RechartsPieChart,
-  _Pie
+  PieChart as RechartsPieChart,
+  Pie
 } from 'recharts';
 
 interface MeditationSession {
@@ -67,9 +67,9 @@ export function MeditationMindfulness({
   onViewHistory,
   onSetGoal
 }: MeditationMindfulnessProps) {
-  const [selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [__showRecommendations, _setShowRecommendations] = useState(true);
-  const [__activeSession, _setActiveSession] = useState<string | null>(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [showRecommendations, setShowRecommendations] = useState(true);
+  const [activeSession, setActiveSession] = useState<string | null>(null);
 
   // Mock data if no sessions provided
   const mockSessions: MeditationSession[] = [
@@ -84,7 +84,7 @@ export function MeditationMindfulness({
     },
     {
       id: '2',
-      timestamp: new Date(Date._now() - 86400000),
+      timestamp: new Date(Date.now() - 86400000),
       duration: 10,
       type: 'breathing',
       moodBefore: 6,
@@ -93,7 +93,7 @@ export function MeditationMindfulness({
     },
     {
       id: '3',
-      timestamp: new Date(Date._now() - 172800000),
+      timestamp: new Date(Date.now() - 172800000),
       duration: 20,
       type: 'guided',
       moodBefore: 4,
@@ -105,7 +105,7 @@ export function MeditationMindfulness({
   const meditationSessions = sessions.length > 0 ? sessions : mockSessions;
 
   // Calculate statistics
-  const ___stats   = useMemo(() => {
+  const stats = useMemo(() => {
     const _now = new Date();
     const _weekAgo = new Date(_now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const _monthAgo = new Date(_now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -150,7 +150,7 @@ export function MeditationMindfulness({
         currentStreak: currentStreak || calculateCurrentStreak()
       }
     };
-  }, [meditationSessions, selectedTimeRange, totalMinutes, currentStreak, calculateCurrentStreak]);
+  }, [meditationSessions, selectedTimeRange, totalMinutes, currentStreak]);
 
   // Calculate current streak
   function calculateCurrentStreak(): number {
@@ -159,7 +159,7 @@ export function MeditationMindfulness({
     today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < 365; i++) {
-      const date = new Date(_today);
+      const date = new Date(today);
       date.setDate(date.getDate() - i);
       
       const _hasSession = meditationSessions.some(s => {
@@ -183,7 +183,7 @@ export function MeditationMindfulness({
     const _now = new Date();
     let days = 7;
     
-    switch (_selectedTimeRange) {
+    switch (selectedTimeRange) {
       case 'month': days = 30; break;
       case 'year': days = 365; break;
     }
@@ -294,7 +294,7 @@ export function MeditationMindfulness({
     }
 
     return recs.slice(0, 3);
-  }, [meditationSessions, _stats, selectedTimeRange]);
+  }, [meditationSessions, stats, selectedTimeRange]);
 
   // Quick meditation options
   const quickMeditations = [
@@ -416,7 +416,7 @@ export function MeditationMindfulness({
             {(['week', 'month', 'year'] as const).map(range => (
               <button
                 key={range}
-                onClick={() => setSelectedTimeRange(_range)}
+                onClick={() => setSelectedTimeRange(range)}
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedTimeRange === range
                     ? 'bg-purple-100 text-purple-700'

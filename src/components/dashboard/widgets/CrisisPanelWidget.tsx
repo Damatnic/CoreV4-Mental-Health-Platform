@@ -11,7 +11,7 @@ interface CrisisPanelWidgetProps {
 
 export function CrisisPanelWidget({ data, error }: CrisisPanelWidgetProps) {
   const navigate = useNavigate();
-  const [showAllContacts, _setShowAllContacts] = useState(false);
+  const [showAllContacts, setShowAllContacts] = useState(false);
 
   if (error) {
     return (

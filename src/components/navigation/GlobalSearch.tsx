@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, Star, TrendingUp, Command, ArrowRight, Heart, Users, Brain, Calendar, FileText, HelpCircle, AlertTriangle } from 'lucide-react';
 import { useNavigation } from './NavigationContext';
-import { _useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
+import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 
 interface SearchResult {
   id: string;
@@ -55,10 +55,10 @@ const searchDatabase: SearchResult[] = [
 export function GlobalSearch() {
   const navigate = useNavigate();
   const { isSearchOpen, setSearchOpen, preferences, addToRecent } = useNavigation();
-  const [query, _setQuery] = useState('');
-  const [results, _setResults] = useState<SearchResult[]>([]);
-  const [selectedIndex, _setSelectedIndex] = useState(0);
-  const [recentSearches, _setRecentSearches] = useState<string[]>([]);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Load recent searches from localStorage
@@ -133,6 +133,21 @@ export function GlobalSearch() {
     setSelectedIndex(0);
   }, []);
 
+  // Handle result click
+  const handleResultClick = useCallback((result: SearchResult) => {
+    saveRecentSearch(query);
+    addToRecent(result.path);
+    
+    if (result.path.startsWith('tel:') || result.path.startsWith('sms:')) {
+      window.location.href = result.path;
+    } else {
+      navigate(result.path);
+    }
+    
+    setSearchOpen(false);
+    setQuery('');
+  }, [query, addToRecent, navigate, setSearchOpen, saveRecentSearch]);
+
   // Handle search input change
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -150,11 +165,11 @@ export function GlobalSearch() {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev => (prev + 1) % Math.max(1, results.length));
+          setSelectedIndex((prev: number) => (prev + 1) % Math.max(1, results.length));
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex(prev => (prev - 1 + Math.max(1, results.length)) % Math.max(1, results.length));
+          setSelectedIndex((prev: number) => (prev - 1 + Math.max(1, results.length)) % Math.max(1, results.length));
           break;
         case 'Enter':
           e.preventDefault();
@@ -178,21 +193,6 @@ export function GlobalSearch() {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
-
-  // Handle result click
-  const handleResultClick = (result: SearchResult) => {
-    saveRecentSearch(query);
-    addToRecent(result.path);
-    
-    if (result.path.startsWith('tel:') || result.path.startsWith('sms:')) {
-      window.location.href = result.path;
-    } else {
-      navigate(result.path);
-    }
-    
-    setSearchOpen(false);
-    setQuery('');
-  };
 
   // Quick search suggestions based on context
   const getQuickSuggestions = () => {

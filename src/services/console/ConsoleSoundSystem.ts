@@ -191,7 +191,7 @@ export class ConsoleSoundSystem {
 
   private initializeAudio() {
     try {
-      this.audioContext = new (window.AudioContext || (window as unknown).webkitAudioContext)();
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     } catch (error) {
       logger.warn('Audio context not supported:');
       this.soundEnabled = false;
@@ -205,15 +205,15 @@ export class ConsoleSoundSystem {
     const volumePref = localStorage.getItem('console-master-volume');
 
     if (soundPref !== null) {
-      this.soundEnabled = JSON.parse(_soundPref);
+      this.soundEnabled = JSON.parse(soundPref);
     }
     
     if (hapticPref !== null) {
-      this.hapticEnabled = JSON.parse(_hapticPref);
+      this.hapticEnabled = JSON.parse(hapticPref);
     }
     
     if (volumePref !== null) {
-      this.masterVolume = Math.max(0, Math.min(1, parseFloat(_volumePref)));
+      this.masterVolume = Math.max(0, Math.min(1, parseFloat(volumePref)));
     }
   }
 
@@ -270,7 +270,7 @@ export class ConsoleSoundSystem {
       }
 
     } catch (error) {
-      logger.warn(`Failed to play console sound "${String(_soundName)}":`, error);
+      logger.warn(`Failed to play console sound "${String(_soundName)}":`, String(error));
     }
   }
 
@@ -356,7 +356,7 @@ export class ConsoleSoundSystem {
     }
 
     // Start and stop
-    oscillator.start(_now);
+    oscillator.start(now);
     oscillator.stop(now + safeConfig.duration);
   }
 
@@ -380,7 +380,7 @@ export class ConsoleSoundSystem {
         .map(duration => Math.round(Math.max(10, Math.min(1000, duration * intensityMultiplier))));
 
       if (scaledPattern.length > 0) {
-        navigator.vibrate(_scaledPattern);
+        navigator.vibrate(scaledPattern);
       }
     } catch (error) {
       logger.warn('Haptic feedback failed:');
@@ -441,12 +441,12 @@ export class ConsoleSoundSystem {
   // Settings management
   setSoundEnabled(enabled: boolean) {
     this.soundEnabled = enabled;
-    localStorage.setItem('console-sound-enabled', JSON.stringify(_enabled));
+    localStorage.setItem('console-sound-enabled', JSON.stringify(enabled));
   }
 
   setHapticEnabled(enabled: boolean) {
     this.hapticEnabled = enabled;
-    localStorage.setItem('console-haptic-enabled', JSON.stringify(_enabled));
+    localStorage.setItem('console-haptic-enabled', JSON.stringify(enabled));
   }
 
   setMasterVolume(volume: number) {
@@ -495,9 +495,9 @@ export class ConsoleSoundSystem {
   
   // New performance optimization methods
   private detectPerformanceMode(): void {
-    const memory = (navigator as unknown).deviceMemory;
+    const memory = (navigator as any).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    const connection = (navigator as unknown).connection;
+    const connection = (navigator as any).connection;
     
     if (memory <= 4 || cores <= 2 || connection?.effectiveType === '2g') {
       this.performanceMode = 'low';
@@ -545,13 +545,12 @@ export class ConsoleSoundSystem {
           // Store the buffer for instant playback
           this.soundCache.set(String(_soundName), soundConfig);
         } catch (error) {
-          logger.warn(`Failed to pre-generate sound: ${String(_soundName)}`, error);
+          logger.warn(`Failed to pre-generate sound: ${String(_soundName)}`, String(error));
         }
       }
     }
   }
   
-// @ts-expect-error - AudioBuffer is a global API
   private async createAudioBuffer(_config: SoundConfig): Promise<AudioBuffer | null> {
     if (!this.audioContext) return null;
     

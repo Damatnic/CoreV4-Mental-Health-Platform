@@ -78,15 +78,15 @@ export function OptimizedChart({
   onDataProcessed,
   className = '',
 }: OptimizedChartProps) {
-  const chartRef = useRef<unknown>(null);
-  const ____canvasRef   = useRef<HTMLCanvasElement>(null);
-  const [processedData, _setProcessedData] = useState<ChartData | null>(null);
-  const [_isProcessing, _setIsProcessing] = useState(false);
-  const [error, _setError] = useState<string | null>(null);
+  const chartRef = useRef<any>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [processedData, setProcessedData] = useState<ChartData | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Use deferred value for non-critical updates
-  const deferredData = useDeferredValue(_data);
-  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(_priority);
+  const deferredData = useDeferredValue(data);
+  const [isPending, startPrioritizedTransition] = usePrioritizedTransition(priority);
 
   // Performance monitoring
   useEffect(() => {
@@ -110,10 +110,10 @@ export function OptimizedChart({
 
       // Format for Chart.js
       const chartData: ChartData = {
-        labels: processedPoints.map(p => p.label || p.date || p.x),
+        labels: processedPoints.map((p: any) => p.label || p.date || p.x),
         datasets: [{
           label: 'Wellness Data',
-          data: processedPoints.map(p => p.value || p.y),
+          data: processedPoints.map((p: any) => p.value || p.y),
           borderColor: 'rgb(59, 130, 246)',
           backgroundColor: type === 'line' 
             ? 'rgba(59, 130, 246, 0.1)'
@@ -134,12 +134,12 @@ export function OptimizedChart({
   // Process data with web worker
   const processDataWithWorker = useCallback(async (rawData: unknown[]) => {
     if (!chartWorker || !enableWebWorker) {
-      return processDataOnMainThread(_rawData);
+      return processDataOnMainThread(rawData);
     }
 
     return new Promise((resolve, reject) => {
       const messageHandler = (event: MessageEvent) => {
-        const { _type, result, error } = event.data;
+        const { type: messageType, result, error } = event.data;
         
         if (error) {
           reject(new Error(error));
@@ -183,16 +183,16 @@ export function OptimizedChart({
 
     const processData = async () => {
       try {
-        const result = await processDataWithWorker(_deferredData) as { processed?: Array<{ date: string, value: number }> };
+        const result = await processDataWithWorker(deferredData) as any;
         
         startPrioritizedTransition(() => {
           if (result.processed) {
             // Web worker result
-            const _chartData: ChartData = {
-              labels: result.processed.map(p => p.date),
+            const chartData: ChartData = {
+              labels: result.processed.map((p: any) => p.date),
               datasets: [{
                 label: 'Mood Trend',
-                data: result.processed.map(p => p.value),
+                data: result.processed.map((p: any) => p.value),
                 borderColor: 'rgb(59, 130, 246)',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
@@ -200,9 +200,9 @@ export function OptimizedChart({
               }],
             };
             
-            setProcessedData(_chartData);
+            setProcessedData(chartData);
             
-            if (_onDataProcessed) {
+            if (onDataProcessed) {
               onDataProcessed(result);
             }
           } else {
@@ -219,8 +219,8 @@ export function OptimizedChart({
         
         // Fallback to main thread
         try {
-          const _fallbackData = processDataOnMainThread(_deferredData);
-          setProcessedData(_fallbackData);
+          const fallbackData = processDataOnMainThread(deferredData);
+          setProcessedData(fallbackData);
         } catch (error) {
     logger.error('Fallback processing failed');
         }
@@ -231,7 +231,7 @@ export function OptimizedChart({
   }, [deferredData, processDataWithWorker, processDataOnMainThread, startPrioritizedTransition, type, onDataProcessed]);
 
   // Optimized chart options
-  const __optimizedOptions   = useMemo<ChartOptions>(() => ({
+  const optimizedOptions = useMemo<ChartOptions>(() => ({
     ...options,
     responsive: true,
     maintainAspectRatio: false,
@@ -243,7 +243,7 @@ export function OptimizedChart({
       intersect: false,
     },
     plugins: {
-      ...options.plugins,
+      ...(options.plugins || {}),
       decimation: {
         enabled: true,
         algorithm: 'lttb',
@@ -288,7 +288,7 @@ export function OptimizedChart({
   // Handle chart instance
   useEffect(() => {
     if (chartRef.current) {
-      const chart = chartRef.current;
+      const chart = chartRef.current as any;
       
       // Optimize canvas rendering
       if (chart.canvas) {
@@ -301,14 +301,16 @@ export function OptimizedChart({
 
       // Cleanup on unmount
       return () => {
-        chart.destroy();
+        if (chart.destroy) {
+          chart.destroy();
+        }
       };
     }
   }, []);
 
   // Render appropriate chart component
   const ChartComponent = useMemo(() => {
-    switch (_type) {
+    switch (type) {
       case 'bar':
         return Bar;
       case 'doughnut':
@@ -358,16 +360,23 @@ export function OptimizedChart({
 /**
  * Specialized mood chart with mental health features
  */
+interface MoodChartProps {
+  moodData: unknown[];
+  showTrends?: boolean;
+  showInsights?: boolean;
+  [key: string]: any;
+}
+
 export function MoodChart({ 
   moodData, 
-  _showTrends = true,
+  showTrends = true,
   showInsights = true,
-  ...props 
-}: unknown) {
-  const [insights, _setInsights] = useState<string[]>([]);
-  const [wellnessScore, _setWellnessScore] = useState<number | null>(null);
+  ...props
+}: MoodChartProps) {
+  const [insights, setInsights] = useState<string[]>([]);
+  const [wellnessScore, setWellnessScore] = useState<number | null>(null);
 
-  const __handleDataProcessed   = useCallback((result: unknown) => {
+  const handleDataProcessed = useCallback((result: any) => {
     if (result.insights) {
       setInsights(result.insights);
     }

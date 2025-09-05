@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageSquare, Send, Users, _Clock, Phone, Video,
-  _FileText, Paperclip, Image, _AlertTriangle, _CheckCircle,
-  _Plus, Search, _Filter, Bell, _BellOff, Settings,
-  UserPlus, _UserMinus, MoreHorizontal, _Star, _Flag,
-  _Calendar, _MapPin, _Stethoscope, _Briefcase, Heart,
-  _Shield, _Zap, _Upload, _Download, _Eye, _EyeOff,
-  _Edit2, _Trash2, _Copy, _Share, _Archive, _RefreshCw
+import {
+  MessageSquare, Send, Users, Clock, Phone, Video,
+  FileText, Paperclip, Image, AlertTriangle, CheckCircle,
+  Plus, Search, Filter, Bell, BellOff, Settings,
+  UserPlus, UserMinus, MoreHorizontal, Star, Flag,
+  Calendar, MapPin, Stethoscope, Briefcase, Heart,
+  Shield, Zap, Upload, Download, Eye, EyeOff,
+  Edit2, Trash2, Copy, Share, Archive, RefreshCw
 } from 'lucide-react';
 
 interface CareTeamMember {
   id: string;
   name: string;
-  _role: 'primary_therapist' | 'psychiatrist' | 'case_manager' | 'nurse' | 'social_worker' | 'peer_support' | 'family_member' | 'medical_provider' | 'other';
+  role: 'primary_therapist' | 'psychiatrist' | 'case_manager' | 'nurse' | 'social_worker' | 'peer_support' | 'family_member' | 'medical_provider' | 'other';
   credentials?: string;
   specialty?: string;
   organization?: string;
@@ -41,7 +41,7 @@ interface Message {
   timestamp: Date;
   type: 'text' | 'file' | 'image' | 'voice' | 'video_call' | 'phone_call' | 'system';
   attachments?: Attachment[];
-  _priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'normal' | 'high' | 'urgent';
   status: 'sent' | 'delivered' | 'read';
   readBy: { userId: string; timestamp: Date }[];
   tags?: string[];
@@ -79,7 +79,7 @@ interface Thread {
   isMuted: boolean;
   tags?: string[];
   relatedPatientId?: string;
-  _priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'normal' | 'high' | 'urgent';
   unreadCount: number;
 }
 
@@ -92,7 +92,7 @@ interface Notification {
   isRead: boolean;
   actionUrl?: string;
   senderId?: string;
-  _priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'normal' | 'high' | 'urgent';
 }
 
 interface CareTeamCommunicationProps {
@@ -101,10 +101,10 @@ interface CareTeamCommunicationProps {
   careTeam: CareTeamMember[];
   threads?: Thread[];
   onSendMessage?: (threadId: string, message: Partial<Message>) => void;
-  _onCreateThread?: (thread: Partial<Thread>) => void;
-  _onAddMember?: (member: CareTeamMember) => void;
-  _onRemoveMember?: (memberId: string) => void;
-  _onUpdatePermissions?: (memberId: string, permissions: Permission[]) => void;
+  onCreateThread?: (thread: Partial<Thread>) => void;
+  onAddMember?: (member: CareTeamMember) => void;
+  onRemoveMember?: (memberId: string) => void;
+  onUpdatePermissions?: (memberId: string, permissions: Permission[]) => void;
   isProvider?: boolean;
 }
 
@@ -114,21 +114,21 @@ export function CareTeamCommunication({
   careTeam,
   threads = [],
   onSendMessage,
-  _onCreateThread,
-  _onAddMember,
-  _onRemoveMember,
-  _onUpdatePermissions,
+  onCreateThread,
+  onAddMember,
+  onRemoveMember,
+  onUpdatePermissions,
   isProvider = false
 }: CareTeamCommunicationProps) {
-  const [activeTab, _setActiveTab] = useState<'messages' | 'team' | 'notifications'>('messages');
-  const [selectedThread, _setSelectedThread] = useState<Thread | null>(null);
-  const [newMessage, _setNewMessage] = useState('');
-  const [___showNewThread, _setShowNewThread] = useState(false);
-  const [___showMemberForm, _setShowMemberForm] = useState(false);
-  const [searchTerm, _setSearchTerm] = useState('');
-  const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
-  const [notifications, _setNotifications] = useState<Notification[]>([]);
-  const [_isTyping, _setIsTyping] = useState<Record<string, boolean>>({});
+  const [activeTab, setActiveTab] = useState<'messages' | 'team' | 'notifications'>('messages');
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [showNewThread, setShowNewThread] = useState(false);
+  const [showMemberForm, setShowMemberForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'normal' | 'high' | 'urgent'>('all');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isTyping, setIsTyping] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom of messages
@@ -140,8 +140,8 @@ export function CareTeamCommunication({
   const currentUser = careTeam.find(member => member.id === currentUserId);
 
   // Get role color
-  const getRoleColor = (_role: string) => {
-    switch (_role) {
+  const getRoleColor = (role: string) => {
+    switch (role) {
       case 'primary_therapist': return 'text-blue-700 bg-blue-100';
       case 'psychiatrist': return 'text-purple-700 bg-purple-100';
       case 'case_manager': return 'text-green-700 bg-green-100';
@@ -155,8 +155,8 @@ export function CareTeamCommunication({
   };
 
   // Get priority color
-  const getPriorityColor = (_priority: string) => {
-    switch (_priority) {
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100 border-red-200';
       case 'high': return 'text-orange-600 bg-orange-100 border-orange-200';
       case 'normal': return 'text-blue-600 bg-blue-100 border-blue-200';
@@ -172,7 +172,7 @@ export function CareTeamCommunication({
     const message: Partial<Message> = {
       content: newMessage.trim(),
       type: 'text',
-      _priority: 'normal',
+      priority: 'normal',
       recipientIds: selectedThread.participantIds.filter(id => id !== currentUserId),
       relatedTo: patientId ? {
         type: 'patient',
@@ -189,7 +189,7 @@ export function CareTeamCommunication({
   const filteredThreads = threads.filter(thread => {
     const matchesSearch = thread.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       thread.lastMessage?.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPriority = filterPriority === 'all' || thread._priority === filterPriority;
+    const matchesPriority = filterPriority === 'all' || thread.priority === filterPriority;
     return matchesSearch && matchesPriority;
   });
 
@@ -248,7 +248,7 @@ export function CareTeamCommunication({
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => setActiveTab(id as unknown)}
+                onClick={() => setActiveTab(id as any)}
                 className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center space-x-1 ${
                   activeTab === id
                     ? 'bg-primary-100 text-primary-700'
@@ -285,7 +285,7 @@ export function CareTeamCommunication({
                 </div>
                 <select
                   value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value as unknown)}
+                  onChange={(e) => setFilterPriority(e.target.value as any)}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="all">All Priorities</option>
@@ -313,9 +313,9 @@ export function CareTeamCommunication({
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex items-center space-x-2">
                           <h4 className="font-medium text-gray-900 text-sm">{thread.name}</h4>
-                          {thread._priority !== 'normal' && (
-                            <span className={`px-1.5 py-0.5 text-xs rounded-full ${getPriorityColor(thread._priority)}`}>
-                              {thread._priority}
+                          {thread.priority !== 'normal' && (
+                            <span className={`px-1.5 py-0.5 text-xs rounded-full ${getPriorityColor(thread.priority)}`}>
+                              {thread.priority}
                             </span>
                           )}
                         </div>
@@ -378,7 +378,7 @@ export function CareTeamCommunication({
               {careTeam
                 .filter(member => 
                   member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  member._role.toLowerCase().includes(searchTerm.toLowerCase())
+                  member.role.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .map((member) => (
                   <motion.div
@@ -405,8 +405,8 @@ export function CareTeamCommunication({
                         <div>
                           <h4 className="font-medium text-gray-900">{member.name}</h4>
                           <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getRoleColor(member._role)}`}>
-                              {member._role.replace('_', ' ')}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getRoleColor(member.role)}`}>
+                              {member.role.replace('_', ' ')}
                             </span>
                             {member.credentials && (
                               <span className="text-xs text-gray-600">{member.credentials}</span>
@@ -471,8 +471,8 @@ export function CareTeamCommunication({
                     <div className="flex items-start justify-between mb-1">
                       <h4 className="font-medium text-gray-900 text-sm">{notification.title}</h4>
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(notification._priority)}`}>
-                          {notification._priority}
+                        <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(notification.priority)}`}>
+                          {notification.priority}
                         </span>
                         <span className="text-xs text-gray-500">
                           {formatTimestamp(notification.timestamp)}
@@ -692,8 +692,8 @@ export function CareTeamCommunication({
                         />
                         <div className="ml-3 flex items-center space-x-2">
                           <span className="font-medium text-gray-900">{member.name}</span>
-                          <span className={`px-2 py-1 text-xs rounded-full ${getRoleColor(member._role)}`}>
-                            {member._role.replace('_', ' ')}
+                          <span className={`px-2 py-1 text-xs rounded-full ${getRoleColor(member.role)}`}>
+                            {member.role.replace('_', ' ')}
                           </span>
                         </div>
                       </label>

@@ -202,7 +202,7 @@ export class ActionRecommendationEngine {
         // Check if rule applies to this action
         if (this.doesRuleApply(ruleName, action)) {
           score += ruleScore * 0.3;
-          reasons.push(this.getRuleReason(_ruleName));
+          reasons.push(this.getRuleReason(ruleName));
         }
       }
     }

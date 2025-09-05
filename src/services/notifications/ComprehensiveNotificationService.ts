@@ -157,7 +157,7 @@ export class ComprehensiveNotificationService {
           const permission = await Notification.requestPermission();
           logger.info(`Notification permission: ${permission}`, {
             category: LogCategory.NOTIFICATIONS,
-            metadata: { permission }
+            _metadata: { permission }
           });
         }
       }
@@ -172,8 +172,8 @@ export class ComprehensiveNotificationService {
     try {
       const preferences = await secureStorage.getItem('notification_preferences');
       
-      if (_preferences) {
-        this.preferences = preferences;
+      if (preferences) {
+        this.preferences = preferences as NotificationPreferences;
       } else {
         // Create default preferences
         this.preferences = {
@@ -215,7 +215,7 @@ export class ComprehensiveNotificationService {
 
   private async loadNotificationRules(): Promise<void> {
     try {
-      const rules = await secureStorage.getItem('notification_rules') || [];
+      const rules = (await secureStorage.getItem('notification_rules') || []) as NotificationRule[];
       
       rules.forEach((rule: NotificationRule) => {
         this.rules.set(rule.id, rule);
@@ -462,12 +462,12 @@ export class ComprehensiveNotificationService {
       
       // Process time-based notifications
       for (const rule of this.rules.values()) {
-        if (!rule.isActive || !this.isRuleEnabled(_rule)) continue;
+        if (!rule.isActive || !this.isRuleEnabled(rule)) continue;
 
         if (rule.trigger.type === 'time_based') {
           const _shouldTrigger = await this.shouldTriggerTimeBasedRule(rule, now);
           if (_shouldTrigger) {
-            await this.createAndScheduleNotification(_rule);
+            await this.createAndScheduleNotification(rule);
           }
         }
       }
@@ -497,7 +497,7 @@ export class ComprehensiveNotificationService {
       // Check if rule was already triggered today (for daily rules)
       if (rule.schedule.frequency === 'daily' && rule.lastTriggered) {
         const lastTriggeredDate = new Date(rule.lastTriggered);
-        const currentDate = new Date(_now);
+        const currentDate = new Date(now);
         
         if (lastTriggeredDate.toDateString() === currentDate.toDateString()) {
           return false;
@@ -506,7 +506,7 @@ export class ComprehensiveNotificationService {
 
       // Parse time pattern (simplified cron-like)
       const timePattern = rule.trigger.parameters.timePattern;
-      if (_timePattern) {
+      if (timePattern) {
         return this.matchesTimePattern(timePattern, now);
       }
 
@@ -530,8 +530,8 @@ export class ComprehensiveNotificationService {
     const currentHour = date.getHours();
     
     // Simple pattern matching (full cron implementation would be more complex)
-    const minuteMatch = minute === '*' || parseInt(_minute) === currentMinute;
-    const hourMatch = hour === '*' || parseInt(_hour) === currentHour;
+    const minuteMatch = minute === '*' || parseInt(minute) === currentMinute;
+    const hourMatch = hour === '*' || parseInt(hour) === currentHour;
     
     return minuteMatch && hourMatch;
   }
@@ -608,7 +608,7 @@ export class ComprehensiveNotificationService {
       
       logger.info(`Notification created and scheduled: ${notification.id}`, {
         category: LogCategory.NOTIFICATIONS,
-        metadata: { notificationId: notification.id }
+        _metadata: { notificationId: notification.id }
       });
       return notification.id;
 
@@ -641,7 +641,7 @@ export class ComprehensiveNotificationService {
       // Add user name if requested
       if (content.personalizedElements?.userName) {
         const userName = await this.getUserName();
-        if (_userName) {
+        if (userName) {
           personalizedTitle = personalizedTitle.replace(/Good morning!/g, `Good morning, ${userName}!`);
           personalizedData.userName = userName;
         }
@@ -650,7 +650,7 @@ export class ComprehensiveNotificationService {
       // Add mood context if requested
       if (content.personalizedElements?.moodContext) {
         const moodContext = await this.getMoodContext();
-        if (_moodContext) {
+        if (moodContext) {
           personalizedData.moodContext = moodContext;
         }
       }
@@ -681,7 +681,7 @@ export class ComprehensiveNotificationService {
 
   private async getUserName(): Promise<string | null> {
     try {
-      const userProfile = await secureStorage.getItem('user_profile');
+      const userProfile = await secureStorage.getItem('user_profile') as { name?: string } | null;
       return userProfile?.name || null;
     } catch (error) {
       return null;
@@ -690,10 +690,10 @@ export class ComprehensiveNotificationService {
 
   private async getMoodContext(): Promise<string | null> {
     try {
-      const recentMood = await secureStorage.getItem('recent_mood_data');
+      const recentMood = await secureStorage.getItem('recent_mood_data') as Array<{ mood: string; energy: number }> | null;
       if (recentMood && recentMood.length > 0) {
         const latest = recentMood[recentMood.length - 1];
-        return `Last mood: ${latest.mood} (${latest.energy}/10 energy)`;
+        return `Last mood: ${latest?.mood || 'unknown'} (${latest?.energy || 0}/10 energy)`;
       }
       return null;
     } catch (error) {
@@ -758,14 +758,14 @@ export class ComprehensiveNotificationService {
 
       // Update notification status
       notification.status = 'sent';
-      notification.timestamp = Date.now();
+      notification._timestamp = Date.now();
       this.notifications.set(notification.id, notification);
 
       await this.saveNotifications();
 
       logger.info(`Notification sent: ${notification.id}`, {
         category: LogCategory.NOTIFICATIONS,
-        metadata: { notificationId: notification.id }
+        _metadata: { notificationId: notification.id }
       });
 
     } catch (error) {
@@ -792,7 +792,7 @@ export class ComprehensiveNotificationService {
 
   public async handleNotificationClick(notificationId: string, actionId: string): Promise<void> {
     try {
-      const notification = this.notifications.get(_notificationId);
+      const notification = this.notifications.get(notificationId);
       if (!notification) return;
 
       // Update notification status
@@ -857,7 +857,7 @@ export class ComprehensiveNotificationService {
 
       logger.info(`Notification action executed: ${action.action}`, {
         category: LogCategory.NOTIFICATIONS,
-        metadata: { action: action.action }
+        _metadata: { action: action.action }
       });
 
     } catch (error) {
@@ -957,7 +957,7 @@ export class ComprehensiveNotificationService {
 
   public async removeRule(_ruleId: string): Promise<boolean> {
     const deleted = this.rules.delete(_ruleId);
-    if (_deleted) {
+    if (deleted) {
       await this.saveNotificationRules();
     }
     return deleted;
@@ -995,4 +995,4 @@ export class ComprehensiveNotificationService {
   }
 }
 
-export const _comprehensiveNotificationService = new ComprehensiveNotificationService();
+export const comprehensiveNotificationService = new ComprehensiveNotificationService();

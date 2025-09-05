@@ -4,11 +4,11 @@
  */
 
 import { securityHeaders } from '../security/securityHeaders';
-import { _rateLimiter } from '../security/rateLimiter';
-import { _sessionManager } from '../security/sessionManager';
-import { _fieldEncryption } from '../security/fieldEncryption';
+import { rateLimiter } from '../security/rateLimiter';
+import { sessionManager } from '../security/sessionManager';
+import { fieldEncryption } from '../security/fieldEncryption';
 import { auditLogger } from '../security/auditLogger';
-import { _securityMonitor } from '../security/securityMonitor';
+import { securityMonitor } from '../security/securityMonitor';
 import { secureStorage as _secureStorage } from '../security/SecureLocalStorage';
 import { logger } from '../../utils/logger';
 
@@ -72,14 +72,14 @@ class SecureAPIService {
           throw new Error('Authentication required');
         }
         
-        const validation = await _sessionManager.validateSession(sessionId);
+        const validation = await sessionManager.validateSession(sessionId);
         if (!validation.isValid) {
           throw new Error('Invalid session');
         }
       }
       
       // Check rate limits
-      const rateLimitCheck = await _rateLimiter.checkRateLimit({
+      const rateLimitCheck = await rateLimiter.checkRateLimit({
         endpoint: config.url,
         ip: await this.getClientIP(),
         userId: this.getCurrentUserId(),
@@ -217,7 +217,7 @@ class SecureAPIService {
         const base64 = btoa(String.fromCharCode(...uint8Array));
         
         // Encrypt file content
-        const encrypted = await _fieldEncryption.encryptField('file_content', base64);
+        const encrypted = await fieldEncryption.encryptField('file_content', base64);
         
         // Create encrypted blob
         data = new Blob([JSON.stringify(encrypted)], { type: 'application/octet-stream' });
@@ -240,9 +240,9 @@ class SecureAPIService {
       }
       
       return await response.json();
-    } catch (_error) {
-      logger.error('Secure upload failed:');
-      throw undefined;
+    } catch (error) {
+      logger.error('Secure upload failed:', (error as Error).message || 'Unknown error');
+      throw error;
     }
   }
 
@@ -268,7 +268,7 @@ class SecureAPIService {
         const encrypted = JSON.parse(text);
         
         // Decrypt content
-        const decrypted = await _fieldEncryption.decryptField('file_content', encrypted);
+        const decrypted = await fieldEncryption.decryptField('file_content', encrypted);
         
         // Convert base64 back to blob
         const binaryString = atob(decrypted as string);
@@ -283,9 +283,9 @@ class SecureAPIService {
       }
       
       return data;
-    } catch (_error) {
-      logger.error('Secure download failed:');
-      throw undefined;
+    } catch (error) {
+      logger.error('Secure download failed:', (error as Error).message || 'Unknown error');
+      throw error;
     }
   }
 
@@ -310,7 +310,7 @@ class SecureAPIService {
     // Add session token
     const sessionId = this.getSessionId();
     if (sessionId) {
-      const session = await _sessionManager.validateSession(sessionId);
+      const session = await sessionManager.validateSession(sessionId);
       if (session.isValid) {
         headers.set('Authorization', `Bearer ${sessionId}`);
       }
@@ -443,7 +443,7 @@ class SecureAPIService {
     
     for (const field of fields) {
       if (field in encrypted) {
-        encrypted[field] = await _fieldEncryption.encryptField(field, encrypted[field]);
+        encrypted[field] = await fieldEncryption.encryptField(field, encrypted[field]);
       }
     }
     
@@ -461,7 +461,7 @@ class SecureAPIService {
       for (const [key, value] of Object.entries(data)) {
         if (typeof value === 'object' && value !== null && 'ciphertext' in value) {
           // This field is encrypted - cast to proper type
-          decrypted[key] = await _fieldEncryption.decryptField(key, value as any);
+          decrypted[key] = await fieldEncryption.decryptField(key, value as any);
         } else {
           decrypted[key] = value;
         }
@@ -491,7 +491,7 @@ class SecureAPIService {
     });
     
     // Report to security monitor
-    await _securityMonitor.reportEvent({
+    await securityMonitor.reportEvent({
       type: 'api_abuse',
       severity: 'low',
       source: 'api_client',
@@ -525,7 +525,7 @@ class SecureAPIService {
     // Clear session
     const sessionId = this.getSessionId();
     if (sessionId) {
-      await _sessionManager.terminateSession(sessionId, 'Unauthorized');
+      await sessionManager.terminateSession(sessionId, 'Unauthorized');
     }
     
     // Redirect to login
@@ -534,7 +534,7 @@ class SecureAPIService {
 
   private async handleForbidden(requestId: string): Promise<void> {
     // Report security event
-    await _securityMonitor.reportEvent({
+    await securityMonitor.reportEvent({
       type: 'unauthorized_access',
       severity: 'medium',
       source: 'api_client',
@@ -546,7 +546,7 @@ class SecureAPIService {
 
   private async handleServerError(response: Response, requestId: string): Promise<void> {
     // Report server error
-    await _securityMonitor.reportEvent({
+    await securityMonitor.reportEvent({
       type: 'suspicious_activity',
       severity: 'low',
       source: 'api_client',
@@ -569,8 +569,8 @@ class SecureAPIService {
         const data = await response.json();
         this.csrfToken = data.token;
       }
-    } catch (_error) {
-      logger.error('Failed to get CSRF token:');
+    } catch (error) {
+      logger.error('Failed to get CSRF token:', (error as Error).message || 'Unknown error');
     }
   }
 
@@ -627,4 +627,4 @@ class SecureAPIService {
   }
 }
 
-export const __secureAPI = SecureAPIService.getInstance();
+export const secureAPI = SecureAPIService.getInstance();

@@ -229,9 +229,10 @@ class PrivacyService {
       const key = `privacy_settings_${userId}`;
       const stored = await secureStorage.getItem(key);
 
-      if (stored) {
-        this.privacyCache.set(userId, stored);
-        return stored;
+      if (stored && typeof stored === 'object' && 'userId' in stored) {
+        const settings = stored as PrivacySettings;
+        this.privacyCache.set(userId, settings);
+        return settings;
       }
 
       // Return defaults
@@ -564,7 +565,7 @@ class PrivacyService {
   async getUserConsents(userId: string): Promise<ConsentRecord[]> {
     const key = `consents_${userId}`;
     const stored = await secureStorage.getItem(key);
-    return stored || [];
+    return (stored || []) as ConsentRecord[];
   }
 
   /**
@@ -602,7 +603,7 @@ class PrivacyService {
    */
   private async storeConsentRecord(consent: ConsentRecord): Promise<void> {
     const key = `consents_${consent.userId}`;
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as ConsentRecord[];
     
     // Update or add consent
     const index = existing.findIndex((c: ConsentRecord) => c.id === consent.id);
@@ -621,7 +622,7 @@ class PrivacyService {
     const consentKeys = allKeys.filter(k => k.startsWith('consents_'));
     
     for (const key of consentKeys) {
-      const consents = await secureStorage.getItem(key) || [];
+      const consents = (await secureStorage.getItem(key) || []) as ConsentRecord[];
       const consent = consents.find((c: ConsentRecord) => c.id === consentId);
       if (consent) return consent;
     }
@@ -631,14 +632,14 @@ class PrivacyService {
 
   private async storeDataRequest(request: DataAccessRequest): Promise<void> {
     const key = `data_requests_${request.userId}`;
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as DataAccessRequest[];
     existing.push(request);
     await secureStorage.setItem(key, existing);
   }
 
   private async storeDataSharingAgreement(agreement: DataSharingAgreement): Promise<void> {
     const key = `sharing_agreements_${agreement.userId}`;
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as DataSharingAgreement[];
     
     const index = existing.findIndex((a: DataSharingAgreement) => a.id === agreement.id);
     if (index >= 0) {
@@ -656,7 +657,7 @@ class PrivacyService {
     const agreementKeys = allKeys.filter(k => k.startsWith('sharing_agreements_'));
     
     for (const key of agreementKeys) {
-      const agreements = await secureStorage.getItem(key) || [];
+      const agreements = (await secureStorage.getItem(key) || []) as DataSharingAgreement[];
       const agreement = agreements.find((a: DataSharingAgreement) => a.id === agreementId);
       if (agreement) return agreement;
     }
@@ -772,10 +773,10 @@ class PrivacyService {
       return allData;
     }
 
-    const filtered: unknown = {};
+    const filtered: any = {};
     for (const category of categories) {
-      if (allData[category]) {
-        filtered[category] = allData[category];
+      if ((allData as any)[category]) {
+        filtered[category] = (allData as any)[category];
       }
     }
     
@@ -787,7 +788,7 @@ class PrivacyService {
     categories?: DataCategory[]
   ): Promise<void> {
     // In production, actually delete user data
-    logger.info(`Deleting user data for ${userId}:`, categories);
+    logger.info(`Deleting user data for ${userId}:`, JSON.stringify(categories));
     
     // Clear from all storage
     if (!categories || categories.length === 0) {
@@ -850,7 +851,7 @@ class PrivacyService {
         const consents = await secureStorage.getItem(key) || [];
         const userId = key.replace('consents_', '');
         
-        for (const consent of consents) {
+        for (const consent of (consents as ConsentRecord[])) {
           if (consent.expiresAt && new Date() > new Date(consent.expiresAt)) {
             // Notify user to renew consent
             logger.info(`Consent expired for user ${userId}:`, consent.type);
@@ -897,4 +898,4 @@ class PrivacyService {
   }
 }
 
-export const _privacyService = PrivacyService.getInstance();
+export const privacyService = PrivacyService.getInstance();

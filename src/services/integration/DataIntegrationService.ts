@@ -3,13 +3,13 @@
  * Manages data flow and synchronization between all components
  */
 
-import { _create } from 'zustand';
-import { _subscribeWithSelector } from 'zustand/middleware';
-import { _useWellnessStore } from '../../stores/wellnessStore';
-import { __useActivityStore } from '../../stores/activityStore';
-import { __useAccessibilityStore } from '../../stores/accessibilityStore';
+import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
+import { useWellnessStore } from '../../stores/wellnessStore';
+import { useActivityStore } from '../../stores/activityStore';
+import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { WebSocketService } from '../websocket/WebSocketService';
-import { _User } from '../api/types';
+import { User } from '../api/types';
 import { EventEmitter } from 'events';
 import { logger } from '../../utils/logger';
 
@@ -116,19 +116,19 @@ class DataIntegrationService extends EventEmitter {
       {
         source: 'wellness.mood',
         target: 'crisis.riskAssessment',
-        transform: (moodData) => ({
+        transform: (moodData: any) => ({
           riskLevel: this.calculateRiskFromMood(moodData),
           timestamp: new Date(),
           factors: moodData.triggers || []
         }),
-        filter: (moodData) => moodData.moodScore <= 3
+        filter: (moodData: any) => moodData.moodScore <= 3
       },
       
       // Activity to Wellness mapping
       {
         source: 'activity.completed',
         target: 'wellness.metrics',
-        transform: (activity) => ({
+        transform: (activity: any) => ({
           activityType: activity.type,
           moodImpact: activity.actualMoodImpact,
           completedAt: activity.completedAt
@@ -140,7 +140,7 @@ class DataIntegrationService extends EventEmitter {
       {
         source: 'therapy.homework',
         target: 'activity.tasks',
-        transform: (homework) => ({
+        transform: (homework: any) => ({
           title: homework.title,
           type: 'therapy',
           therapyHomework: true,
@@ -153,7 +153,7 @@ class DataIntegrationService extends EventEmitter {
       {
         source: 'community.interaction',
         target: 'wellness.socialMetrics',
-        transform: (interaction) => ({
+        transform: (interaction: any) => ({
           type: interaction.type,
           timestamp: interaction.timestamp,
           positiveImpact: interaction.sentiment > 0
@@ -164,12 +164,12 @@ class DataIntegrationService extends EventEmitter {
       {
         source: 'crisis.event',
         target: 'professional.alerts',
-        transform: (crisisEvent) => ({
+        transform: (crisisEvent: any) => ({
           severity: crisisEvent.severity,
           timestamp: crisisEvent.timestamp,
           requiresImmediate: crisisEvent.severity === 'critical'
         }),
-        filter: (crisisEvent) => crisisEvent.severity !== 'low'
+        filter: (crisisEvent: any) => crisisEvent.severity !== 'low'
       }
     ];
   }
@@ -179,22 +179,22 @@ class DataIntegrationService extends EventEmitter {
    */
   private setupStoreSubscriptions() {
     // Subscribe to wellness store changes
-    _useWellnessStore.subscribe((state) => {
+    useWellnessStore.subscribe((state) => {
       if (state.moodEntries.length > 0) {
         this.handleDataChange('wellness.mood', state.moodEntries[state.moodEntries.length - 1]);
       }
     });
     
     // Subscribe to activity store changes
-    __useActivityStore.subscribe((state) => {
-      const completed = state.activities.filter((a: unknown) => a.completed && !a.synced);
-      completed.forEach((activity: unknown) => {
+    useActivityStore.subscribe((state) => {
+      const completed = state.activities.filter((a: any) => a.completed && !a.synced);
+      completed.forEach((activity: any) => {
         this.handleDataChange('activity.completed', activity);
       });
     });
     
     // Subscribe to accessibility store for user preferences
-    __useAccessibilityStore.subscribe((state) => {
+    useAccessibilityStore.subscribe((state) => {
       this.updateDataFlowConfig({
         enableRealtime: !state.settings.reducedMotion
       });
@@ -326,7 +326,7 @@ class DataIntegrationService extends EventEmitter {
       return;
     }
     
-    switch (_store) {
+    switch (store) {
       case 'wellness':
         this.updateWellnessStore(property, data);
         break;
@@ -351,14 +351,14 @@ class DataIntegrationService extends EventEmitter {
    * Update wellness store with integrated data
    */
   private updateWellnessStore(property: string, data: unknown) {
-    const store = _useWellnessStore.getState();
+    const store = useWellnessStore.getState();
     
-    switch (_property) {
+    switch (property) {
       case 'metrics':
-        store.addWellnessMetric(data);
+        store.addWellnessMetric(data as any);
         break;
       case 'mood':
-        store.addMoodEntry(data);
+        store.addMoodEntry(data as any);
         break;
       case 'insights':
         // Insights are generated, not directly added
@@ -371,17 +371,17 @@ class DataIntegrationService extends EventEmitter {
    * Update activity store with integrated data
    */
   private updateActivityStore(property: string, data: unknown) {
-    const store = __useActivityStore.getState();
+    const store = useActivityStore.getState();
     
-    switch (_property) {
+    switch (property) {
       case 'tasks':
-        store.addActivity(data);
+        store.addActivity(data as any);
         break;
       case 'goals':
-        if (data.id) {
-          store.updateGoal(data.id, data);
+        if ((data as any).id) {
+          store.updateGoal((data as any).id, data as any);
         } else {
-          store.addGoal(data);
+          store.addGoal(data as any);
         }
         break;
     }
@@ -426,7 +426,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Handle real-time updates from WebSocket
    */
-  private handleRealtimeUpdate(update: unknown) {
+  private handleRealtimeUpdate(update: any) {
     const { source, data, timestamp } = update;
     
     // Check if update is newer than local data
@@ -440,7 +440,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Handle crisis alerts
    */
-  private handleCrisisAlert(_alert: unknown) {
+  private handleCrisisAlert(_alert: any) {
     // Immediate routing to crisis components
     this.emit(IntegrationEvent.CRISIS_TRIGGERED, _alert);
     
@@ -449,7 +449,7 @@ class DataIntegrationService extends EventEmitter {
     this.routeDataToTarget('wellness.crisisEvent', _alert);
     
     // Notify professional care if needed
-    if (_alert.severity === 'critical') {
+    if ((_alert as any).severity === 'critical') {
       this.routeDataToTarget('professional.emergencyAlert', _alert);
     }
   }
@@ -465,7 +465,7 @@ class DataIntegrationService extends EventEmitter {
   /**
    * Calculate risk level from mood data
    */
-  private calculateRiskFromMood(moodData: unknown): string {
+  private calculateRiskFromMood(moodData: any): string {
     if (!moodData) return 'unknown';
     
     const { moodScore, triggers, stressLevel, anxietyLevel } = moodData;
@@ -522,7 +522,7 @@ class DataIntegrationService extends EventEmitter {
    * Check if update is newer than local data
    */
   private isNewerData(source: string, timestamp: Date): boolean {
-    const lastUpdate = this.state.pendingChanges.get(_source);
+    const lastUpdate = this.state.pendingChanges.get(source);
     if (!lastUpdate) return true;
     
     return timestamp > lastUpdate.timestamp;
@@ -541,7 +541,7 @@ class DataIntegrationService extends EventEmitter {
     };
     
     const event = eventMap[source];
-    if (_event) {
+    if (event) {
       this.emit(event, data);
     }
   }
@@ -580,7 +580,7 @@ class DataIntegrationService extends EventEmitter {
     } catch (error) {
       logger.error('Sync failed:');
       this.state.syncErrors.push(error as Error);
-      this.emit(IntegrationEvent.STORE_SYNC_FAILED, undefined);
+      this.emit(IntegrationEvent.STORE_SYNC_FAILED, error);
       
     } finally {
       this.state.isSyncing = false;
@@ -628,7 +628,7 @@ class DataIntegrationService extends EventEmitter {
         this.routeDataToTarget(`${store}.${property}`, data);
         this.offlineQueue.delete(key);
       } catch (error) {
-        logger.error(`Failed to sync offline item ${key}:`, error);
+        logger.error(`Failed to sync offline item ${key}:`, (error as Error).message);
       }
     }
   }
@@ -696,7 +696,7 @@ class DataIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const __dataIntegrationService = DataIntegrationService.getInstance();
+export const dataIntegrationService = DataIntegrationService.getInstance();
 
 // Export hook for React components
 export function useDataIntegration() {

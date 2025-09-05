@@ -4,7 +4,7 @@ import { Shield, AlertTriangle, Flag, CheckCircle, XCircle, Clock, TrendingUp, U
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { _communityService } from '../../services/community/communityService';
-import { _websocketService } from '../../services/realtime/websocketService';
+import { websocketService } from '../../services/realtime/websocketService';
 import { useAuth } from '../../hooks/useAuth';
 
 interface ModerationItem {
@@ -243,12 +243,12 @@ export function ModerationDashboard() {
       });
     };
 
-    _websocketService.on('moderation:alert', handleModerationAlert);
-    _websocketService.on('crisis:detected', handleCrisisAlert);
+    websocketService.on('moderation:alert', handleModerationAlert);
+    websocketService.on('crisis:detected', handleCrisisAlert);
 
     return () => {
-      _websocketService.off('moderation:alert', handleModerationAlert);
-      _websocketService.off('crisis:detected', handleCrisisAlert);
+      websocketService.off('moderation:alert', handleModerationAlert);
+      websocketService.off('crisis:detected', handleCrisisAlert);
     };
   }, [queryClient]);
 
@@ -261,7 +261,7 @@ export function ModerationDashboard() {
       
       // If crisis escalation, send immediate alert
       if (action === 'escalate-crisis') {
-        _websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
+        websocketService.getSocket()?.emit('crisis:escalate', { itemId, notes });
       }
     } catch (error) {
       // Error is caught but not needed for logging

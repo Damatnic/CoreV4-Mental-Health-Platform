@@ -32,10 +32,10 @@ import {
   Wind,
   Zap
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useQuickActionsContext } from '../../../../hooks/useQuickActionsContext';
 import { useUserPreferences } from '../../../../hooks/useUserPreferences';
-import { __useAccessibilityStore } from '../../../../stores/accessibilityStore';
+import { useAccessibilityStore } from '../../../../stores/accessibilityStore';
 import { QuickAction } from '../../../../types/dashboard';
 import { IconMap } from '../../../../types/ui';
 import { ActionRecommendationEngine } from './ActionRecommendationEngine';
@@ -63,9 +63,10 @@ export function SmartQuickActionsWidget({
   onActionExecute
 }: SmartQuickActionsWidgetProps) {
   const { actions, executeAction, getFrequentActions } = useQuickActionsContext();
-  const { settings: accessibilitySettings } = __useAccessibilityStore();
+  const { settings: accessibilitySettings } = useAccessibilityStore();
   const { preferences: _preferences, updatePreference: _updatePreference } = useUserPreferences(userId);
   
+  const containerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, _setSearchQuery] = useState('');
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');
   const [voiceCommandActive, _setVoiceCommandActive] = useState(false);
@@ -182,7 +183,9 @@ export function SmartQuickActionsWidget({
   };
 
   return (
-    <div className={`
+    <div 
+      ref={containerRef}
+      className={`
       relative rounded-xl shadow-lg overflow-hidden
       ${crisisMode ? 'bg-red-50 border-2 border-red-500' : 'bg-white'}
       ${accessibilitySettings.highContrast ? 'border-4 border-black' : ''}
@@ -478,6 +481,7 @@ export function SmartQuickActionsWidget({
         onActionSelect={handleActionClick}
         onKeyPress={handleKeyboardNavigation}
         isActive={!voiceCommandActive}
+        containerRef={containerRef}
       />
 
       {/* Gesture Handler for mobile */}

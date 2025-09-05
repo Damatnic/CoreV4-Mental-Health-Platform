@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '../utils/logger';
 import { secureStorage } from '../services/security/SecureLocalStorage';
 
 interface UserPreferences {
@@ -114,9 +115,9 @@ const defaultPreferences: UserPreferences = {
 };
 
 export function useUserPreferences(userId: string) {
-  const [preferences, _setPreferences] = useState<UserPreferences>(_defaultPreferences);
-  const [loading, _setLoading] = useState(true);
-  const [error, _setError] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Load preferences from localStorage or API
   useEffect(() => {
@@ -138,7 +139,7 @@ export function useUserPreferences(userId: string) {
           // setPreferences(_data);
         }
       } catch (error) {
-        logger.error('Error loading preferences:', err);
+        console.error('Error loading preferences:', error);
         setError('Failed to load preferences');
       } finally {
         setLoading(false);
@@ -149,10 +150,10 @@ export function useUserPreferences(userId: string) {
   }, [userId]);
 
   // Save preferences to localStorage (and optionally to API)
-  const savePreferences = useCallback(async (_newPreferences: UserPreferences) => {
+  const savePreferences = useCallback(async (newPreferences: UserPreferences) => {
     try {
       const _localKey = `userPreferences_${userId}`;
-      secureStorage.setItem(_localKey, JSON.stringify(_newPreferences));
+      secureStorage.setItem(_localKey, JSON.stringify(newPreferences));
       
       // Optionally save to API
       // await fetch(`/api/users/${userId}/preferences`, {
@@ -163,14 +164,14 @@ export function useUserPreferences(userId: string) {
       
       return true;
     } catch (error) {
-      logger.error('Error saving preferences:', err);
+      console.error('Error saving preferences:', error);
       setError('Failed to save preferences');
       return false;
     }
   }, [userId]);
 
   // Update a specific preference
-  const __updatePreference   = useCallback(async <K extends keyof UserPreferences>(
+  const updatePreference   = useCallback(async <K extends keyof UserPreferences>(
     key: K,
     value: UserPreferences[K]
   ) => {
@@ -180,7 +181,7 @@ export function useUserPreferences(userId: string) {
   }, [preferences, savePreferences]);
 
   // Update nested preference
-  const __updateNestedPreference   = useCallback(async <
+  const updateNestedPreference   = useCallback(async <
     K extends keyof UserPreferences,
     NK extends keyof UserPreferences[K]
   >(
@@ -200,13 +201,13 @@ export function useUserPreferences(userId: string) {
   }, [preferences, savePreferences]);
 
   // Reset to defaults
-  const __resetToDefaults   = useCallback(async () => {
-    setPreferences(_defaultPreferences);
-    await savePreferences(_defaultPreferences);
+  const resetToDefaults   = useCallback(async () => {
+    setPreferences(defaultPreferences);
+    await savePreferences(defaultPreferences);
   }, [savePreferences]);
 
   // Export preferences
-  const __exportPreferences   = useCallback(() => {
+  const exportPreferences   = useCallback(() => {
     const _dataStr = JSON.stringify(preferences, null, 2);
     const dataUri = `data:application/json;charset=utf-8,${ encodeURIComponent(_dataStr)}`;
     
@@ -221,7 +222,7 @@ export function useUserPreferences(userId: string) {
   // Import preferences
   const importPreferences   = useCallback(async (file: File): Promise<boolean> => {
     try {
-      const _text = await file._text();
+      const _text = await file.text();
       const imported = JSON.parse(_text);
       
       // Validate imported preferences
@@ -235,9 +236,8 @@ export function useUserPreferences(userId: string) {
       
       return true;
     } catch (error) {
-      logger.error('Error importing preferences:', err);
+      console.error('Error importing preferences:', error);
       setError('Failed to import preferences');
-import { logger } from '../utils/logger';
       return false;
     }
   }, [savePreferences]);

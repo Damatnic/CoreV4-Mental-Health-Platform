@@ -7,13 +7,13 @@ import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield, Heart, Phone, _MessageSquare, _MapPin, Activity,
-  Brain, _Users, _Home, _Sun, _Moon, _Coffee, _Book, _Music,
-  _Zap, AlertTriangle, CheckCircle, Edit, Save, Download,
-  Plus, X, _ChevronRight, _Lock, _Unlock
+  Shield, Heart, Phone, MessageSquare, MapPin, Activity,
+  Brain, Users, Home, Sun, Moon, Coffee, Book, Music,
+  Zap, AlertTriangle, CheckCircle, Edit, Save, Download,
+  Plus, X, ChevronRight, Lock, Unlock
 } from 'lucide-react';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
-import { _detectCrisisLevel } from '../../utils/crisis';
+import { detectCrisisLevel } from '../../utils/crisis';
 
 interface _SafetyPlanSection {
   id: string;
@@ -141,7 +141,7 @@ export const SafetyPlanGenerator: React.FC = () => {
   const [safetyPlan, setSafetyPlan] = useState<PersonalizedSafetyPlan>(_DEFAULT_SAFETY_PLAN);
   const [isEditing, setIsEditing] = useState(false);
   const [__activeSection, _setActiveSection] = useState<string | null>(null);
-  const [__showSuccess, setShowSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Load saved safety plan on mount
@@ -202,7 +202,7 @@ export const SafetyPlanGenerator: React.FC = () => {
     a.href = url;
     a.download = `safety-plan-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
-    URL.revokeObjectURL(_url);
+    URL.revokeObjectURL(url);
   };
 
   const generatePlanText = () => {

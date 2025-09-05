@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  _BookOpen, 
+  BookOpen, 
   Edit3, 
   Heart, 
   Brain, 
-  _Shield, 
+  Shield, 
   Download,
-  _Upload,
-  _Calendar,
-  _Tag,
+  Upload,
+  Calendar,
+  Tag,
   Lock,
   Unlock,
   Search,
-  _Filter,
+  Filter,
   ChevronRight,
   Sparkles,
   Sun,
@@ -23,11 +23,11 @@ import {
   Moon,
   Star,
   TrendingUp,
-  _AlertCircle,
+  AlertCircle,
   Save,
-  _Trash2,
-  _Share2,
-  _FileText
+  Trash2,
+  Share2,
+  FileText
 } from 'lucide-react';
 import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
@@ -61,10 +61,10 @@ const JOURNAL_TYPES = {
       situation: 'What happened?',
       thoughts: 'What thoughts went through your mind?',
       emotions: 'What emotions did you feel? (Rate 0-100)',
-      evidence_for: 'Evidence supporting the thought',
-      evidence_against: 'Evidence against the thought',
-      balanced_thought: 'More balanced perspective',
-      outcome: 'How do you feel _now? (Rate 0-100)'
+      evidencefor: 'Evidence supporting the thought',
+      evidenceagainst: 'Evidence against the thought',
+      balancedthought: 'More balanced perspective',
+      outcome: 'How do you feel now? (Rate 0-100)'
     }
   },
   emotion: {
@@ -126,30 +126,30 @@ interface JournalPrompt {
   id: string;
   category: string;
   prompt: string;
-  therapeutic_approach: string;
+  therapeuticapproach: string;
 }
 
 // Therapeutic prompts database
 const THERAPEUTIC_PROMPTS: JournalPrompt[] = [
   // CBT Prompts
-  { id: '1', category: 'CBT', prompt: 'Identify three negative thoughts you had today. How can you reframe them more realistically?', therapeutic_approach: 'Cognitive Restructuring' },
-  { id: '2', category: 'CBT', prompt: 'What evidence do you have for and against your biggest worry right _now?', therapeutic_approach: 'Evidence Examination' },
-  { id: '3', category: 'CBT', prompt: 'Describe a situation where your thoughts influenced your emotions and behaviors.', therapeutic_approach: 'Thought-Emotion-Behavior Connection' },
+  { id: '1', category: 'CBT', prompt: 'Identify three negative thoughts you had today. How can you reframe them more realistically?', therapeuticapproach: 'Cognitive Restructuring' },
+  { id: '2', category: 'CBT', prompt: 'What evidence do you have for and against your biggest worry right now?', therapeuticapproach: 'Evidence Examination' },
+  { id: '3', category: 'CBT', prompt: 'Describe a situation where your thoughts influenced your emotions and behaviors.', therapeuticapproach: 'Thought-Emotion-Behavior Connection' },
   
   // DBT Prompts
-  { id: '4', category: 'DBT', prompt: 'Practice radical acceptance: What situation do you need to accept right _now?', therapeutic_approach: 'Radical Acceptance' },
-  { id: '5', category: 'DBT', prompt: 'Describe a time today when you used wise mind (balancing emotion and logic).', therapeutic_approach: 'Wise Mind' },
-  { id: '6', category: 'DBT', prompt: 'What opposite action could you take to change an unhelpful emotion?', therapeutic_approach: 'Opposite Action' },
+  { id: '4', category: 'DBT', prompt: 'Practice radical acceptance: What situation do you need to accept right now?', therapeuticapproach: 'Radical Acceptance' },
+  { id: '5', category: 'DBT', prompt: 'Describe a time today when you used wise mind (balancing emotion and logic).', therapeuticapproach: 'Wise Mind' },
+  { id: '6', category: 'DBT', prompt: 'What opposite action could you take to change an unhelpful emotion?', therapeuticapproach: 'Opposite Action' },
   
   // Mindfulness Prompts
-  { id: '7', category: 'Mindfulness', prompt: 'Describe your current moment using all five senses.', therapeutic_approach: 'Present Moment Awareness' },
-  { id: '8', category: 'Mindfulness', prompt: 'What thoughts are passing through your mind like clouds in the sky?', therapeutic_approach: 'Thought Observation' },
-  { id: '9', category: 'Mindfulness', prompt: 'Body scan: What sensations do you notice from head to toe?', therapeutic_approach: 'Body Awareness' },
+  { id: '7', category: 'Mindfulness', prompt: 'Describe your current moment using all five senses.', therapeuticapproach: 'Present Moment Awareness' },
+  { id: '8', category: 'Mindfulness', prompt: 'What thoughts are passing through your mind like clouds in the sky?', therapeuticapproach: 'Thought Observation' },
+  { id: '9', category: 'Mindfulness', prompt: 'Body scan: What sensations do you notice from head to toe?', therapeuticapproach: 'Body Awareness' },
   
   // Self-Compassion Prompts
-  { id: '10', category: 'Self-Compassion', prompt: 'Write a letter to yourself as you would to a good friend facing your situation.', therapeutic_approach: 'Self-Kindness' },
-  { id: '11', category: 'Self-Compassion', prompt: 'What would you say to comfort your younger self?', therapeutic_approach: 'Inner Child Work' },
-  { id: '12', category: 'Self-Compassion', prompt: 'List three ways you can be kinder to yourself today.', therapeutic_approach: 'Self-Care Planning' }
+  { id: '10', category: 'Self-Compassion', prompt: 'Write a letter to yourself as you would to a good friend facing your situation.', therapeuticapproach: 'Self-Kindness' },
+  { id: '11', category: 'Self-Compassion', prompt: 'What would you say to comfort your younger self?', therapeuticapproach: 'Inner Child Work' },
+  { id: '12', category: 'Self-Compassion', prompt: 'List three ways you can be kinder to yourself today.', therapeuticapproach: 'Self-Care Planning' }
 ];
 
 export const TherapeuticJournal: React.FC = () => {
@@ -164,17 +164,17 @@ export const TherapeuticJournal: React.FC = () => {
   const [selectedType, setSelectedType] = useState<keyof typeof JOURNAL_TYPES>('freeform');
   const [isWriting, setIsWriting] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-  const [searchQuery, _setSearchQuery] = useState('');
-  const [filterMood, _setFilterMood] = useState<string | null>(null);
-  const [filterType, _setFilterType] = useState<keyof typeof JOURNAL_TYPES | null>(null);
-  const [showPrompts, _setShowPrompts] = useState(false);
-  const [selectedPromptCategory, _setSelectedPromptCategory] = useState<string | null>(null);
-  const [isEncrypted, _setIsEncrypted] = useState(false);
-  const [_password, _setPassword] = useState('');
-  const [showStats, _setShowStats] = useState(false);
-  const [autoSaveEnabled, _setAutoSaveEnabled] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterMood, setFilterMood] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<keyof typeof JOURNAL_TYPES | null>(null);
+  const [showPrompts, setShowPrompts] = useState(false);
+  const [selectedPromptCategory, setSelectedPromptCategory] = useState<string | null>(null);
+  const [isEncrypted, setIsEncrypted] = useState(false);
+  const [_password, setPassword] = useState('');
+  const [showStats, setShowStats] = useState(false);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   
-  const _editorRef  = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Load entries from localStorage
@@ -182,7 +182,7 @@ export const TherapeuticJournal: React.FC = () => {
     const _savedEntries = secureStorage.getItem('journalEntries');
     if (_savedEntries) {
       const parsed = JSON.parse(_savedEntries);
-      setEntries(parsed.map((e: unknown) => ({
+      setEntries(parsed.map((e: any) => ({
         ...e,
         timestamp: new Date(e.timestamp),
         edited: e.edited ? new Date(e.edited) : undefined
@@ -209,7 +209,7 @@ export const TherapeuticJournal: React.FC = () => {
         clearTimeout(autoSaveTimer.current);
       }
     };
-  }, [currentEntry, autoSaveEnabled, isWriting, saveDraft]);
+  }, [currentEntry, autoSaveEnabled, isWriting]);
 
   // Save draft
   const saveDraft = useCallback(() => {
@@ -227,7 +227,7 @@ export const TherapeuticJournal: React.FC = () => {
     if (typeof content === 'string') {
       text = content;
     } else {
-      text = Object.values(_content).join(' ');
+      text = Object.values(content).join(' ');
     }
     
     const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
@@ -242,9 +242,9 @@ export const TherapeuticJournal: React.FC = () => {
       return;
     }
     
-    const __stats = calculateStats(currentEntry.content);
+    const stats = calculateStats(currentEntry.content);
     const newEntry: JournalEntry = {
-      id: Date._now().toString(),
+      id: Date.now().toString(),
       type: currentEntry.type || 'freeform',
       title: currentEntry.title || `${JOURNAL_TYPES[currentEntry.type || 'freeform'].name} - ${formatDate(new Date(), 'MMM d, yyyy')}`,
       content: currentEntry.content,
@@ -371,11 +371,11 @@ export const TherapeuticJournal: React.FC = () => {
       );
     }
     
-    if (_filterMood) {
+    if (filterMood) {
       matches = matches && entry.mood === filterMood;
     }
     
-    if (_filterType) {
+    if (filterType) {
       matches = matches && entry.type === filterType;
     }
     
@@ -398,7 +398,7 @@ export const TherapeuticJournal: React.FC = () => {
         date: day,
         count: dayEntries.length,
         words: dayEntries.reduce((sum, e) => sum + e.wordCount, 0),
-        isToday: isToday(_day)
+        isToday: isToday(day)
       };
     });
   };
@@ -485,7 +485,7 @@ export const TherapeuticJournal: React.FC = () => {
                   Choose Journal Type
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {Object.entries(_JOURNAL_TYPES).map(([key, type]) => {
+                  {Object.entries(JOURNAL_TYPES).map(([key, type]) => {
                     const Icon = type.icon;
                     return (
                       <motion.button
@@ -553,8 +553,8 @@ export const TherapeuticJournal: React.FC = () => {
                       </div>
                       
                       {THERAPEUTIC_PROMPTS
-                        .filter(p => !selectedPromptCategory || p.category === selectedPromptCategory)
-                        .map(prompt => (
+                        .filter((p: JournalPrompt) => !selectedPromptCategory || p.category === selectedPromptCategory)
+                        .map((prompt: JournalPrompt) => (
                           <motion.div
                             key={prompt.id}
                             whileHover={{ x: 5 }}
@@ -562,7 +562,7 @@ export const TherapeuticJournal: React.FC = () => {
                               setCurrentEntry(prev => ({
                                 ...prev,
                                 content: prompt.prompt,
-                                title: `${prompt.category}: ${prompt.therapeutic_approach}`
+                                title: `${prompt.category}: ${prompt.therapeuticapproach}`
                               }));
                               setIsWriting(true);
                             }}
@@ -579,7 +579,7 @@ export const TherapeuticJournal: React.FC = () => {
                                     {prompt.category}
                                   </span>
                                   <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
-                                    {prompt.therapeutic_approach}
+                                    {prompt.therapeuticapproach}
                                   </span>
                                 </div>
                               </div>
@@ -845,7 +845,7 @@ export const TherapeuticJournal: React.FC = () => {
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
-                {Object.entries(_JOURNAL_TYPES).map(([key, type]) => (
+                {Object.entries(JOURNAL_TYPES).map(([key, type]) => (
                   <option key={key} value={key}>{type.name}</option>
                 ))}
               </select>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertCircle, Heart, Users, Activity, MapPin, _Save, Download, Share2, CheckCircle } from 'lucide-react';
+import { Shield, AlertCircle, Heart, Users, Activity, MapPin, Save, Download, Share2, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
 import { logger } from '../../utils/logger';
@@ -54,7 +54,7 @@ export function SafetyPlan() {
   useEffect(() => {
     const _savedPlan = secureStorage.getItem('safetyPlan');
     if (_savedPlan) {
-      setSafetyPlan(JSON.parse(_savedPlan));
+      _setSafetyPlan(JSON.parse(_savedPlan));
     }
   }, []);
 
@@ -62,9 +62,9 @@ export function SafetyPlan() {
   useEffect(() => {
     const _saveTimer = setTimeout(() => {
       if (isEditing) {
-        setAutoSaveStatus('saving');
-        secureStorage.setItem('safetyPlan', JSON.stringify(_safetyPlan));
-        setTimeout(() => setAutoSaveStatus('saved'), 1000);
+        _setAutoSaveStatus('saving');
+        secureStorage.setItem('safetyPlan', JSON.stringify(safetyPlan));
+        setTimeout(() => _setAutoSaveStatus('saved'), 1000);
       }
     }, 2000);
 
@@ -72,7 +72,7 @@ export function SafetyPlan() {
   }, [safetyPlan, isEditing]);
 
   const handleUpdateSection = <T extends SafetyPlanSection>(section: T, value: SafetyPlanData[T]) => {
-    setSafetyPlan({
+    _setSafetyPlan({
       ...safetyPlan,
       [section]: value,
       lastUpdated: new Date().toISOString()
@@ -215,12 +215,12 @@ export function SafetyPlan() {
     };
 
     if (templates[templateType]) {
-      setSafetyPlan({
+      _setSafetyPlan({
         ...safetyPlan,
         ...templates[templateType],
         lastUpdated: new Date().toISOString()
       });
-      setShowTemplates(false);
+      _setShowTemplates(false);
     }
   };
 
@@ -268,7 +268,7 @@ export function SafetyPlan() {
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
         <button
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={() => _setIsEditing(!isEditing)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             isEditing
               ? 'bg-green-600 text-white hover:bg-green-700'
@@ -278,7 +278,7 @@ export function SafetyPlan() {
           {isEditing ? 'Save Changes' : 'Edit Plan'}
         </button>
         <button
-          onClick={() => setShowTemplates(!showTemplates)}
+          onClick={() => _setShowTemplates(!showTemplates)}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
         >
           Use Template
@@ -333,7 +333,7 @@ export function SafetyPlan() {
             {sections.map((section) => (
               <button
                 key={section.id}
-                onClick={() => setActiveSection(section.id)}
+                onClick={() => _setActiveSection(section.id)}
                 className={`py-3 px-4 flex items-center space-x-2 font-medium text-sm transition-colors border-b-2 ${
                   activeSection === section.id
                     ? 'border-blue-500 text-blue-600'
@@ -477,7 +477,7 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
   const handleAdd = () => {
     if (newItem.trim()) {
       onUpdate([...items, newItem.trim()]);
-      setNewItem('');
+      _setNewItem('');
     }
   };
 
@@ -511,7 +511,7 @@ function SectionEditor({ title, description, items, onUpdate, isEditing, placeho
           <input
             type="text"
             value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
+            onChange={(e) => _setNewItem(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
             placeholder={placeholder}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -541,7 +541,7 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: SupportPeopleEdito
   const handleAdd = () => {
     if (newPerson.name && newPerson.phone) {
       onUpdate([...people, newPerson]);
-      setNewPerson({ name: '', phone: '', available: '' });
+      _setNewPerson({ name: '', phone: '', available: '' });
     }
   };
 
@@ -583,21 +583,21 @@ function SupportPeopleEditor({ people, onUpdate, isEditing }: SupportPeopleEdito
           <input
             type="text"
             value={newPerson.name}
-            onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
+            onChange={(e) => _setNewPerson({ ...newPerson, name: e.target.value })}
             placeholder="Name"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="tel"
             value={newPerson.phone}
-            onChange={(e) => setNewPerson({ ...newPerson, phone: e.target.value })}
+            onChange={(e) => _setNewPerson({ ...newPerson, phone: e.target.value })}
             placeholder="Phone number"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             value={newPerson.available}
-            onChange={(e) => setNewPerson({ ...newPerson, available: e.target.value })}
+            onChange={(e) => _setNewPerson({ ...newPerson, available: e.target.value })}
             placeholder="When available (_optional)"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
@@ -626,7 +626,7 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: Professio
   const handleAdd = () => {
     if (newContact.name && newContact.phone) {
       onUpdate([...contacts, newContact]);
-      setNewContact({ name: '', role: '', phone: '' });
+      _setNewContact({ name: '', role: '', phone: '' });
     }
   };
 
@@ -666,21 +666,21 @@ function ProfessionalContactsEditor({ contacts, onUpdate, isEditing }: Professio
           <input
             type="text"
             value={newContact.name}
-            onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+            onChange={(e) => _setNewContact({ ...newContact, name: e.target.value })}
             placeholder="Name"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             value={newContact.role}
-            onChange={(e) => setNewContact({ ...newContact, role: e.target.value })}
+            onChange={(e) => _setNewContact({ ...newContact, role: e.target.value })}
             placeholder="Role (e.g., Therapist, Psychiatrist)"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="tel"
             value={newContact.phone}
-            onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+            onChange={(e) => _setNewContact({ ...newContact, phone: e.target.value })}
             placeholder="Phone number"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />

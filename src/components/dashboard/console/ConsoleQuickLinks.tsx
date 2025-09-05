@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Wind, 
-  Timer, 
-  BookOpen, 
-  MessageSquare, 
-  _Calendar, 
+import {
+  Wind,
+  Timer,
+  BookOpen,
+  MessageSquare,
+  Calendar,
   Settings,
   Phone,
-  _Shield,
+  Shield,
   BarChart3,
   Users,
   Zap,
@@ -29,7 +29,7 @@ interface QuickLink {
 }
 
 export function ConsoleQuickLinks() {
-  const __navigate   = useNavigate();
+  const navigate = useNavigate();
   const quickLinks: QuickLink[] = [
     // Emergency (Highest Priority)
     {

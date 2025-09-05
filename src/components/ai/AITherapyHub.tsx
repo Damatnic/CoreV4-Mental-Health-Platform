@@ -12,8 +12,8 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
   const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
   const [currentView, setCurrentView] = useState<'selector' | 'chat'>('selector');
 
-  const handleTherapistSelect = (_therapist: Therapist) => {
-    setSelectedTherapist(_therapist);
+  const handleTherapistSelect = (therapist: Therapist) => {
+    setSelectedTherapist(therapist);
     setCurrentView('chat');
   };
 

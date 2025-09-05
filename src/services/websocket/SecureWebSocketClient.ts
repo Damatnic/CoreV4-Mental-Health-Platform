@@ -105,7 +105,7 @@ export class SecureWebSocketClient {
         });
 
         this.socket.on('connecterror', (error: unknown) => {
-          logger.error('❌ WebSocket connection failed:', error);
+          logger.error('❌ WebSocket connection failed:', String(error));
           this.isConnected = false;
           this.onConnectionChange?.(false);
           this.onError?.(error);
@@ -130,7 +130,7 @@ export class SecureWebSocketClient {
 
     // Connection events
     this.socket.on('disconnect', (reason: unknown) => {
-      logger.warn('🔌 WebSocket disconnected:', reason);
+      logger.warn('🔌 WebSocket disconnected:', String(reason));
       this.isConnected = false;
       this.onConnectionChange?.(false);
       
@@ -144,14 +144,15 @@ export class SecureWebSocketClient {
     });
 
     this.socket.on('error', (error: unknown) => {
-      logger.error('❌ WebSocket error:', error);
+      logger.error('❌ WebSocket error:', String(error));
       this.onError?.(error);
     });
 
     // Crisis intervention messages
-    this.socket.on('crisis:message', (data: CrisisMessage) => {
-      logger.crisis('Crisis message received', data.urgency as 'low' | 'medium' | 'high' | 'critical', 'SecureWebSocketClient', data);
-      this.onCrisisMessage?.(data);
+    this.socket.on('crisis:message', (data: unknown) => {
+      const crisisData = data as CrisisMessage;
+      logger.crisis('Crisis message received', crisisData.urgency as 'low' | 'medium' | 'high' | 'critical', 'SecureWebSocketClient', crisisData);
+      this.onCrisisMessage?.(crisisData);
     });
 
     this.socket.on('crisis:response', (_data: unknown) => {
@@ -160,14 +161,15 @@ export class SecureWebSocketClient {
     });
 
     this.socket.on('crisis:escalation', (data: unknown) => {
-      logger.warn('🚨 Crisis escalation:', data);
+      logger.warn('🚨 Crisis escalation:', JSON.stringify(data));
       // Handle crisis escalation (emergency services, etc.)
     });
 
     // Wellness updates
-    this.socket.on('wellness:update', (data: WellnessUpdate) => {
-      logger.info('Wellness update received', 'SecureWebSocketClient', { type: data.type });
-      this.onWellnessUpdate?.(data);
+    this.socket.on('wellness:update', (data: unknown) => {
+      const wellnessData = data as WellnessUpdate;
+      logger.info('Wellness update received', 'SecureWebSocketClient', { type: wellnessData.type });
+      this.onWellnessUpdate?.(wellnessData);
     });
 
     // Community events
@@ -184,7 +186,7 @@ export class SecureWebSocketClient {
 
     // Authentication errors
     this.socket.on('auth:error', (error: unknown) => {
-      logger.error('🔐 Authentication error:', error);
+      logger.error('🔐 Authentication error:', String(error));
       this.onError?.(error);
       
       // Token might be expired, try to refresh
@@ -207,7 +209,7 @@ export class SecureWebSocketClient {
       await this.connect();
     } catch (error) {
       logger.error('❌ Failed to handle auth error: ');
-      this.onError?.(_undefined);
+      this.onError?.(error as Error);
     }
   }
 

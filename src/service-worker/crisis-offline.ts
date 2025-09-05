@@ -390,16 +390,16 @@ export async function handleOfflineCrisis(request: Request): Promise<Response> {
   const cache = await caches.open('crisis-v1');
   
   // Try cache first
-  const cachedResponse = await cache.match(_request);
-  if (_cachedResponse) {
-    return cachedResponse;
+  const cachedResponse = await cache.match(request);
+  if (cachedResponse) {
+    return cachedResponse as Response;
   }
   
   // Return offline crisis page for navigation requests
   if (request.mode === 'navigate') {
     const offlinePage = await cache.match('/offline-crisis.html');
-    if (_offlinePage) {
-      return offlinePage;
+    if (offlinePage) {
+      return offlinePage as Response;
     }
   }
   
@@ -419,7 +419,7 @@ export async function syncOfflineData() {
   
   // Get unsynced crisis logs - using getAll instead of index for now
   const allLogs = await db.getAll('crisisLogs');
-  const unsyncedLogs = allLogs.filter(log => !log.synced);
+  const unsyncedLogs = allLogs.filter((log: any) => !log.synced);
   
   if (unsyncedLogs.length > 0) {
     try {
@@ -429,7 +429,7 @@ export async function syncOfflineData() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(_unsyncedLogs),
+        body: JSON.stringify(unsyncedLogs),
       });
       
       if (response.ok) {
@@ -437,7 +437,7 @@ export async function syncOfflineData() {
         const tx = db.transaction('crisisLogs', 'readwrite');
         const store = tx.objectStore('crisisLogs');
         for (const log of unsyncedLogs) {
-          await store.put({ ...log, synced: true });
+          await store.put({ ...(log as object), synced: true });
         }
         await tx.done;
       }
@@ -448,13 +448,13 @@ export async function syncOfflineData() {
 }
 
 // Log crisis interaction for offline sync
-export async function logCrisisInteraction(data: unknown) {
+export async function logCrisisInteraction(data: any) {
   const db = await initCrisisDB();
   
   const log = {
     id: crypto.randomUUID(),
     timestamp: new Date().toISOString(),
-    ...data,
+    ...(typeof data === 'object' && data !== null ? data : {}),
     synced: false,
   };
   

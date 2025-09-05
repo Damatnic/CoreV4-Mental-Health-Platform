@@ -240,7 +240,7 @@ interface ActivityStore {
 }
 
 // Create the store with persistence
-export const __useActivityStore = create<ActivityStore>()(
+export const useActivityStore = create<ActivityStore>()(
   persist(
     (set, get) => ({
       // Initialize state

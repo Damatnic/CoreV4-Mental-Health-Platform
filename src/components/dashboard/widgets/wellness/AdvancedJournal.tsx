@@ -1,4 +1,4 @@
-import { useState, _useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -6,7 +6,7 @@ import {
   Search,
   Filter,
   Tag,
-  _Calendar,
+  Calendar,
   Heart,
   Smile,
   Frown,
@@ -67,12 +67,12 @@ export function AdvancedJournal({
   onExport,
   _onSearch 
 }: AdvancedJournalProps) {
-  const [searchQuery, _setSearchQuery] = useState('');
-  const [selectedTags, _setSelectedTags] = useState<string[]>([]);
-  const [selectedEmotions, _setSelectedEmotions] = useState<string[]>([]);
-  const [dateFilter, _setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-  const [showFilters, _setShowFilters] = useState(false);
-  const [selectedEntry, _setSelectedEntry] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
 
   // Mock journal entries if none provided
   const mockEntries: JournalEntry[] = [
@@ -131,7 +131,7 @@ export function AdvancedJournal({
     let filtered = [...journalEntries];
 
     // Search filter
-    if (_searchQuery) {
+    if (searchQuery) {
       filtered = filtered.filter(entry =>
         entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -155,7 +155,7 @@ export function AdvancedJournal({
 
     // Date filter
     const now = new Date();
-    switch (_dateFilter) {
+    switch (dateFilter) {
       case 'today':
         filtered = filtered.filter(entry => isToday(new Date(entry.timestamp)));
         break;
@@ -182,7 +182,7 @@ export function AdvancedJournal({
     journalEntries.forEach(entry => {
       entry.tags?.forEach(tag => tags.add(tag));
     });
-    return Array.from(_tags);
+    return Array.from(tags);
   }, [journalEntries]);
 
   const allEmotions = useMemo(() => {
@@ -190,7 +190,7 @@ export function AdvancedJournal({
     journalEntries.forEach(entry => {
       entry.emotions?.forEach(emotion => emotions.add(emotion));
     });
-    return Array.from(_emotions);
+    return Array.from(emotions);
   }, [journalEntries]);
 
   // Calculate sentiment statistics
@@ -219,7 +219,7 @@ export function AdvancedJournal({
   }, [filteredEntries]);
 
   // Get writing prompts based on current mood and patterns
-  const __writingPrompts   = useMemo(() => {
+  const writingPrompts = useMemo(() => {
     const prompts = [
       {
         category: 'reflection',
@@ -266,10 +266,10 @@ export function AdvancedJournal({
   }, [sentimentStats]);
 
   // Format date for display
-  const formatEntryDate = (_date: Date) => {
-    const entryDate = new Date(_date);
-    if (isToday(_entryDate)) return 'Today';
-    if (isYesterday(_entryDate)) return 'Yesterday';
+  const formatEntryDate = (date: Date) => {
+    const entryDate = new Date(date);
+    if (isToday(entryDate)) return 'Today';
+    if (isYesterday(entryDate)) return 'Yesterday';
     return format(entryDate, 'MMM d, yyyy');
   };
 
@@ -292,8 +292,8 @@ export function AdvancedJournal({
 
   // Handle export
   const handleExport = () => {
-    if (_onExport) {
-      onExport(filteredEntries);
+    if (onExport) {
+      onExport?.(filteredEntries);
     } else {
       // Create markdown export
       const markdown = filteredEntries.map(entry => `
@@ -308,13 +308,13 @@ ${entry.gratitude ? `**Gratitude:** ${entry.gratitude.join(', ')}` : ''}
 ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''}
       `).join('\n---\n');
 
-      const _blob = new Blob([markdown], { type: 'text/markdown' });
-      const url = window.URL.createObjectURL(_blob);
+      const blob = new Blob([markdown], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `journal-export-${format(new Date(), 'yyyy-MM-dd')}.md`;
       a.click();
-      window.URL.revokeObjectURL(_url);
+      window.URL.revokeObjectURL(url);
     }
   };
 
@@ -412,7 +412,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                     {(['all', 'today', 'week', 'month'] as const).map(period => (
                       <button
                         key={period}
-                        onClick={() => setDateFilter(_period)}
+                        onClick={() => setDateFilter(period)}
                         className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                           dateFilter === period
                             ? 'bg-purple-500 text-white'
@@ -430,13 +430,13 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                   <div>
                     <label htmlFor="input_3sny0mu0n" className="text-sm font-medium text-gray-700 mb-2 block">Tags</label>
                     <div className="flex flex-wrap gap-2">
-                      {allTags.map(tag => (
+                      {allTags.map((tag: string) => (
                         <button
                           key={tag}
                           onClick={() => {
-                            setSelectedTags(prev =>
+                            setSelectedTags((prev: string[]) =>
                               prev.includes(tag)
-                                ? prev.filter(t => t !== tag)
+                                ? prev.filter((t: string) => t !== tag)
                                 : [...prev, tag]
                             );
                           }}
@@ -459,13 +459,13 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
                   <div>
                     <label htmlFor="input_8c2r6d1vh" className="text-sm font-medium text-gray-700 mb-2 block">Emotions</label>
                     <div className="flex flex-wrap gap-2">
-                      {allEmotions.map(emotion => (
+                      {allEmotions.map((emotion: string) => (
                         <button
                           key={emotion}
                           onClick={() => {
-                            setSelectedEmotions(prev =>
+                            setSelectedEmotions((prev: string[]) =>
                               prev.includes(emotion)
-                                ? prev.filter(e => e !== emotion)
+                                ? prev.filter((e: string) => e !== emotion)
                                 : [...prev, emotion]
                             );
                           }}
@@ -495,7 +495,7 @@ ${entry.achievements ? `**Achievements:** ${entry.achievements.join(', ')}` : ''
           Today&apos;s Writing Prompts
         </h4>
         <div className="space-y-2">
-          {writingPrompts.map((prompt, idx) => (
+          {writingPrompts.map((prompt: any, idx: number) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, x: -20 }}

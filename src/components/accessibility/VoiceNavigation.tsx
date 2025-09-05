@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { __useAccessibilityStore } from '../../stores/accessibilityStore';
+import { useAccessibilityStore } from '../../stores/accessibilityStore';
 import { logger } from '../../utils/logger';
 
 interface VoiceCommand {
@@ -18,7 +18,7 @@ interface VoiceCommand {
 
 export const VoiceNavigation: React.FC = () => {
   const navigate = useNavigate();
-  const { settings } = __useAccessibilityStore();
+  const { settings } = useAccessibilityStore();
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
   const [confidence, setConfidence] = useState(0);
@@ -97,19 +97,19 @@ export const VoiceNavigation: React.FC = () => {
     // ACCESSIBILITY COMMANDS
     {
       phrase: 'high contrast',
-      action: () => __useAccessibilityStore.getState().toggleHighContrast(),
+      action: () => useAccessibilityStore.getState().toggleHighContrast(),
       priority: 'low',
       description: 'Toggle high contrast mode'
     },
     {
       phrase: 'larger text',
-      action: () => __useAccessibilityStore.getState().increaseFontSize(),
+      action: () => useAccessibilityStore.getState().increaseFontSize(),
       priority: 'low',
       description: 'Increase text size'
     },
     {
       phrase: 'smaller text',
-      action: () => __useAccessibilityStore.getState().decreaseFontSize(),
+      action: () => useAccessibilityStore.getState().decreaseFontSize(),
       priority: 'low',
       description: 'Decrease text size'
     },

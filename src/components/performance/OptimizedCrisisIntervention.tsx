@@ -54,8 +54,8 @@ export function OptimizedCrisisIntervention({
   onActivate,
   preloadResources = true,
 }: OptimizedCrisisInterventionProps) {
-  const [_isActive, _setIsActive] = useState(false);
-  const [responseTime, _setResponseTime] = useState<number | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [responseTime, setResponseTime] = useState<number | null>(null);
   const activationTime = useRef<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
   
@@ -79,7 +79,7 @@ export function OptimizedCrisisIntervention({
     
     // Measure response time
     requestAnimationFrame(() => {
-      const _time = performance.now() - activationTime.current;
+      const time = performance.now() - activationTime.current;
       setResponseTime(time);
       performanceMonitor.measureEnd('crisis-intervention-activate');
       
@@ -89,14 +89,13 @@ export function OptimizedCrisisIntervention({
     });
     
     // Notify parent
-    if (_onActivate) {
+    if (onActivate) {
       onActivate();
     }
     
     // Log to analytics (non-blocking)
-// @ts-expect-error - requestIdleCallback is a global API
     requestIdleCallback(() => {
-      logCrisisActivation(_userId);
+      logCrisisActivation(userId);
     });
   }, [userId, onActivate]);
 
@@ -106,7 +105,7 @@ export function OptimizedCrisisIntervention({
     window.addEventListener('crisis-activate', listener);
     
     // Preload resources if enabled
-    if (_preloadResources) {
+    if (preloadResources) {
       preloadCrisisResources();
     }
     
@@ -129,7 +128,7 @@ export function OptimizedCrisisIntervention({
   }, [handleActivation]);
 
   // Close handler
-  const __handleClose   = useCallback(() => {
+  const handleClose = useCallback(() => {
     setIsActive(false);
     if (modalRef.current) {
       modalRef.current.style.display = 'none';
@@ -138,7 +137,7 @@ export function OptimizedCrisisIntervention({
   }, []);
 
   // Call hotline (immediate action)
-  const __callHotline   = useCallback((number: string) => {
+  const callHotline = useCallback((number: string) => {
     performanceMonitor.measureStart('crisis-call-initiate');
     
     if (number === '988' || number.includes('800')) {
@@ -338,7 +337,7 @@ async function cacheOfflineCrisisData() {
       data: CRISIS_RESOURCES,
       timestamp: Date.now(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to cache crisis data:');
   }
 }
@@ -354,7 +353,7 @@ function openCrisisDatabase(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
     
     request.onupgradeneeded = (event) => {
-      const db = (event.target as unknown).result;
+      const db = (event.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains('resources')) {
         db.createObjectStore('resources', { keyPath: 'id' });
       }

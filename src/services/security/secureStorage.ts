@@ -76,16 +76,16 @@ class SecureStorageService {
 
       // Compress if requested and beneficial
       if (compress && serialized.length > 1024) {
-        serialized = await this.compress(_serialized);
+        serialized = await this.compress(serialized);
       }
 
       // Encrypt if requested
-      if (_encrypted) {
-        serialized = await cryptoService.encrypt(_serialized);
+      if (encrypted) {
+        serialized = await cryptoService.encrypt(serialized);
       }
 
       // Calculate checksum for integrity verification
-      const checksum = await this.calculateChecksum(_serialized);
+      const checksum = await this.calculateChecksum(serialized);
 
       // Create storage item
       const storageItem: StorageItem = {
@@ -104,7 +104,7 @@ class SecureStorageService {
       this.memoryCache.set(key, storageItem);
 
       // Store persistently if requested
-      if (_persistent) {
+      if (persistent) {
         const _storageKey = this.getStorageKey(key);
         
         try {
@@ -118,7 +118,7 @@ class SecureStorageService {
       // Log storage event for audit
       this.logStorageEvent('SET', key, { encrypted, persistent });
     } catch (error) {
-      logger.error(`Failed to store item ${key}:`, error);
+      logger.error(`Failed to store item ${key}:`, String(error));
       throw new Error(`Storage failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -162,7 +162,7 @@ class SecureStorageService {
       }
 
       // Verify integrity
-      const checksum = await this.calculateChecksum(storageItem.value);
+      const checksum = await this.calculateChecksum(String(storageItem.value));
       if (checksum !== storageItem.metadata.checksum) {
         logger.error(`Integrity check failed for ${key}`);
         await this.removeItem(key);
@@ -173,18 +173,18 @@ class SecureStorageService {
 
       // Decrypt if encrypted
       if (storageItem.metadata.encrypted) {
-        value = await cryptoService.decrypt(value);
+        value = await cryptoService.decrypt(String(value));
       }
 
       // Decompress if compressed
-      if (storageItem.metadata.compressed) {
-        value = await this.decompress(value);
+      if (storageItem.metadata._compressed) {
+        value = await this.decompress(String(value));
       }
 
       // Deserialize
-      return JSON.parse(value);
+      return JSON.parse(String(value));
     } catch (error) {
-      logger.error(`Failed to retrieve item ${key}:`, error);
+      logger.error(`Failed to retrieve item ${key}:`, String(error));
       return null;
     }
   }
@@ -207,7 +207,7 @@ class SecureStorageService {
       // Log removal event
       this.logStorageEvent('REMOVE', key);
     } catch (error) {
-      logger.error(`Failed to remove item ${key}:`, error);
+      logger.error(`Failed to remove item ${key}:`, String(error));
     }
   }
 
@@ -261,7 +261,7 @@ class SecureStorageService {
     const idbKeys = await this.getKeysFromIndexedDB();
     idbKeys.forEach(key => keys.add(key.replace(this.STORAGE_PREFIX, '')));
 
-    return Array.from(_keys);
+    return Array.from(keys);
   }
 
   /**
@@ -272,7 +272,7 @@ class SecureStorageService {
     available: number;
     quota: number;
   }> {
-    if ('storage' in navigator && 'estimate' in navigator.storage) {
+    if ('storage' in navigator && navigator.storage && 'estimate' in navigator.storage) {
       const estimate = await navigator.storage.estimate();
       return {
         used: estimate.usage || 0,
@@ -319,7 +319,7 @@ class SecureStorageService {
       const stream = new Response(
         new Blob([encoder.encode(data)])
           .stream()
-          .pipeThrough(new (window as unknown).CompressionStream('gzip'))
+          .pipeThrough(new (window as any).CompressionStream('gzip'))
       );
       const _compressed = await stream.arrayBuffer();
       return btoa(String.fromCharCode(...new Uint8Array(_compressed)));
@@ -346,7 +346,7 @@ class SecureStorageService {
         const stream = new Response(
           new Blob([_compressed])
             .stream()
-            .pipeThrough(new (window as unknown).DecompressionStream('gzip'))
+            .pipeThrough(new (window as any).DecompressionStream('gzip'))
         );
         const decompressed = await stream.text();
         return decompressed;
@@ -361,7 +361,7 @@ class SecureStorageService {
   private isBase64(str: string): boolean {
     try {
       // Basic base64 validation
-      return btoa(atob(_str)) === str;
+      return btoa(atob(str)) === str;
     } catch (error) {
       return false;
     }

@@ -11,8 +11,8 @@ import { useAuth } from '../../hooks/useAuth';
 interface PostCardProps {
   post: Post;
   onEdit: (post: Post) => void;
-  onDelete: (_postId: string) => void;
-  onReport: (_postId: string) => void;
+  onDelete: (postId: string) => void;
+  onReport: (postId: string) => void;
 }
 
 function PostCard({ post, onEdit, onDelete, onReport }: PostCardProps) {
@@ -389,7 +389,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
 
             {/* Trigger Warning */}
             <div className="space-y-2">
-              <label htmlFor="input_6vjog663e" className="flex items-center space-x-2">
+              <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={formData.triggerWarning}
@@ -406,7 +406,7 @@ function CreatePostModal({ isOpen, onClose, editPost, groupId }: CreatePostModal
                   <p className="text-xs text-gray-600">Select content types:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {triggerWarningTypes.map((type) => (
-                      <label htmlFor="input_8vrkuvscw" key={type} className="flex items-center space-x-2">
+                      <label key={type} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
                           checked={formData.triggerWarningType?.includes(type) || false}
@@ -496,16 +496,16 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
 
   // Set up WebSocket listeners for real-time updates
   useEffect(() => {
-    const handleNewPost = (_post: Post) => {
+    const handleNewPost = (post: Post) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('New post in the community!');
     };
 
-    const handlePostUpdate = (_post: Post) => {
+    const handlePostUpdate = (post: Post) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     };
 
-    const handlePostDelete = (_postId: string) => {
+    const handlePostDelete = (postId: string) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     };
 
@@ -526,16 +526,16 @@ export function CommunityPosts({ groupId }: { groupId?: string }) {
     setShowCreateModal(true);
   };
 
-  const handleDelete = (_postId: string) => {
+  const handleDelete = (postId: string) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      deleteMutation.mutate(_postId);
+      deleteMutation.mutate(postId);
     }
   };
 
-  const handleReport = (_postId: string) => {
+  const handleReport = (postId: string) => {
     const reason = prompt('Please provide a reason for reporting this post:');
     if (reason) {
-      reportMutation.mutate({ postId: _postId, reason });
+      reportMutation.mutate({ postId: postId, reason });
     }
   };
 

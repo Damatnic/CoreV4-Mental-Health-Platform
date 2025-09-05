@@ -231,7 +231,7 @@ class TouchOptimizationManager {
       const velocity = distance / duration;
       let direction: 'up' | 'down' | 'left' | 'right';
 
-      if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
         direction = deltaX > 0 ? 'right' : 'left';
       } else {
         direction = deltaY > 0 ? 'down' : 'up';
@@ -298,7 +298,7 @@ class TouchOptimizationManager {
     }
 
     // Trigger rotation gesture if rotation threshold is exceeded
-    if (this.options.enableRotation && Math.abs(_rotation) > this.options.rotationThreshold) {
+    if (this.options.enableRotation && Math.abs(rotation) > this.options.rotationThreshold) {
       this.triggerGesture({ ...pinchGesture, type: 'rotate' });
     }
   }
@@ -412,11 +412,11 @@ class TouchOptimizationManager {
   private triggerGesture(gesture: TouchGesture): void {
     const listeners = this.gestureListeners.get(gesture.type);
     if (listeners) {
-      listeners.forEach(_callback => {
+      listeners.forEach(callback => {
         try {
-          _callback(_gesture);
+          callback(gesture);
         } catch (error) {
-          logger.error(`Error in gesture listener for ${gesture.type}:`, error);
+          logger.error(`Error in gesture listener for ${gesture.type}:`, String(error));
         }
       });
     }
@@ -426,7 +426,7 @@ class TouchOptimizationManager {
     if (genericListeners) {
       genericListeners.forEach(_callback => {
         try {
-          _callback(_gesture);
+          _callback(gesture);
         } catch (error) {
           logger.error('Error in generic gesture listener:');
         }
@@ -441,7 +441,7 @@ class TouchOptimizationManager {
   private vibrate(_pattern: number | number[]): void {
     if ('vibrate' in navigator) {
       try {
-        navigator.vibrate(_pattern);
+        navigator.vibrate?.(_pattern);
       } catch (error) {
     logger.warn('Vibration not supported or failed:');
       }
@@ -475,7 +475,7 @@ class TouchOptimizationManager {
   private optimizeScrolling(): void {
     // Enable smooth scrolling and optimize scroll performance
     this.element.style.scrollBehavior = 'smooth';
-    (this.element.style as unknown).webkitOverflowScrolling = 'touch';
+    (this.element.style as any).webkitOverflowScrolling = 'touch';
     
     // Optimize scroll handling
     this.element.addEventListener('scroll', this.throttleScroll(this.handleScroll.bind(this), 16), { passive: true });
@@ -484,8 +484,8 @@ class TouchOptimizationManager {
   private implementMomentumScrolling(): void {
     // Fix iOS momentum scrolling issues
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      (this.element.style as unknown).webkitOverflowScrolling = 'touch';
-      (this.element.style as unknown).overflowScrolling = 'touch';
+      (this.element.style as any).webkitOverflowScrolling = 'touch';
+      (this.element.style as any).overflowScrolling = 'touch';
     }
   }
 

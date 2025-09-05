@@ -4,6 +4,15 @@
 import { RealtimeMessage } from '../realtime/websocketService';
 import { logger } from '../../utils/logger';
 
+// Crisis Analysis Result interface
+interface CrisisAnalysis {
+  crisisLevel: 'low' | 'medium' | 'high' | 'critical';
+  emergencyLevel: 'none' | 'moderate' | 'high' | 'critical';
+  indicators: string[];
+  _emotions: string[];
+  riskFactors: string[];
+}
+
 // Crisis Counselor Personas with Different Specializations
 export interface MockCounselor {
   id: string;
@@ -218,7 +227,7 @@ export class MockCrisisServer {
   }
 
   private initializeServer(): void {
-    logger.info('🟢 Mock Crisis Server initialized with', this.counselorPool.length, 'counselors');
+    logger.info(`🟢 Mock Crisis Server initialized with ${this.counselorPool.length} counselors`);
   }
 
   // Register emergency callback for auto-dial functionality
@@ -288,7 +297,7 @@ export class MockCrisisServer {
     // Execute emergency callbacks
     this.emergencyCallbacks.forEach(callback => {
       try {
-        callback(action, { ...data, protocol });
+        callback(action, { ...(data as object), protocol });
       } catch (error) {
         logger.error('Emergency callback failed:');
       }
@@ -393,7 +402,7 @@ export class MockCrisisSession {
 
     const _userMessage: RealtimeMessage = {
       id: `msg-${Date.now()}`,
-      roomId: this.sessionId,
+      roomId: this._sessionId,
       userId: this.userId,
       username: 'You',
       content,
@@ -404,7 +413,7 @@ export class MockCrisisSession {
     this.messages.push(_userMessage);
 
     // Analyze message for crisis indicators
-    const analysis = this.responseAnalyzer.analyzeMessage(_content);
+    const analysis = this.responseAnalyzer.analyzeMessage(content);
     
     // Trigger emergency protocols if needed
     if (analysis.emergencyLevel === 'critical') {
@@ -415,7 +424,7 @@ export class MockCrisisSession {
     this.generateCounselorResponse(content, analysis);
   }
 
-  private generateCounselorResponse(_userMessage: string, analysis: unknown): void {
+  private generateCounselorResponse(_userMessage: string, analysis: CrisisAnalysis): void {
     // Show typing indicator
     this.startTyping();
 
@@ -451,7 +460,7 @@ export class MockCrisisSession {
   private sendCounselorMessage(content: string): void {
     const _counselorMessage: RealtimeMessage = {
       id: `msg-${Date.now()}`,
-      roomId: this.sessionId,
+      roomId: this._sessionId,
       userId: this.counselor.id,
       username: this.counselor.name,
       content,
@@ -489,8 +498,8 @@ export class MockCrisisSession {
     this.typingCallbacks.forEach(callback => callback(false));
   }
 
-  private triggerEmergency(analysis: unknown): void {
-    logger.error('🚨 EMERGENCY TRIGGERED:', analysis);
+  private triggerEmergency(analysis: CrisisAnalysis): void {
+    logger.error('🚨 EMERGENCY TRIGGERED', JSON.stringify(analysis));
     
     this.emergencyCallbacks.forEach(callback => {
       callback('crisis_escalation', {
@@ -549,13 +558,7 @@ export class MockCrisisSession {
 
 // Crisis Message Analyzer - AI-like response generation
 class CrisisMessageAnalyzer {
-  public analyzeMessage(content: string): {
-    crisisLevel: 'low' | 'medium' | 'high' | 'critical';
-    emergencyLevel: 'none' | 'moderate' | 'high' | 'critical';
-    indicators: string[];
-    _emotions: string[];
-    riskFactors: string[];
-  } {
+  public analyzeMessage(content: string): CrisisAnalysis {
     const lowerContent = content.toLowerCase();
     const indicators: string[] = [];
     const _emotions: string[] = [];
@@ -654,7 +657,7 @@ class CrisisMessageAnalyzer {
 
   public generateResponse(
     _userMessage: string,
-    analysis: unknown,
+    analysis: CrisisAnalysis,
     counselor: MockCounselor,
     messageHistory: RealtimeMessage[]
   ): string {
@@ -671,15 +674,15 @@ class CrisisMessageAnalyzer {
     if (counselor.personality === 'empathetic') {
       baseResponse = this.addEmpathy(baseResponse, analysis._emotions ?? []);
     } else if (counselor.personality === 'solution-focused') {
-      baseResponse = this.addSolutionFocus(_baseResponse);
+      baseResponse = this.addSolutionFocus(baseResponse);
     } else if (counselor.personality === 'trauma-informed') {
-      baseResponse = this.addTraumaAwareness(_baseResponse);
+      baseResponse = this.addTraumaAwareness(baseResponse);
     }
 
     return baseResponse || 'I understand you are going through a difficult time. Can you tell me more about what you are experiencing?';
   }
 
-  public generateFollowUp(analysis: unknown, _counselor: MockCounselor): string | null {
+  public generateFollowUp(analysis: CrisisAnalysis, _counselor: MockCounselor): string | null {
     const templates = CRISIS_RESPONSE_TEMPLATES.find(t => t.level === analysis.crisisLevel);
     if (!templates || templates.followUpQuestions.length === 0) return null;
 

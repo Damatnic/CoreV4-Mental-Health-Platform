@@ -36,7 +36,6 @@ export class SecurityValidationService {
     ];
 
     exposedSecrets.forEach(secret => {
-      // @ts-expect-error - checking for dangerous environment variables
       if (import.meta.env[secret]) {
         // In production, only fail for truly critical secrets
         if (import.meta.env.PROD && ['VITE_JWT_SECRET', 'VITE_DATABASE_URL', 'VITE_STRIPE_SECRET_KEY'].includes(secret)) {
@@ -87,14 +86,12 @@ export class SecurityValidationService {
     ];
 
     criticalVars.forEach(varName => {
-      // @ts-expect-error - checking for critical environment variables
       if (!import.meta.env[varName]) {
         result.warnings.push(`⚠️ WARNING: Missing critical environment variable: ${varName}`);
       }
     });
 
     recommendedVars.forEach(varName => {
-      // @ts-expect-error - checking for recommended environment variables
       if (!import.meta.env[varName]) {
         result.recommendations.push(`💡 RECOMMENDATION: Set environment variable: ${varName}`);
       }

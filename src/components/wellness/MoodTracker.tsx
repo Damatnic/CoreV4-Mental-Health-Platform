@@ -1,24 +1,23 @@
-import React, { useState, useCallback, _useEffect, useMemo } from 'react';
-import { _Slider } from '@radix-ui/react-slider';
-import { TrendingUp, TrendingDown, AlertCircle, Heart } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Line } from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
   CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
+  Chart as ChartJS,
+  ChartOptions,
   Legend,
-  ChartOptions
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
 } from 'chart.js';
-import { logger } from '../../utils/logger';
+import { AlertCircle, Heart, TrendingDown, TrendingUp } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Line } from 'react-chartjs-2';
 import { useDebounce } from 'react-use';
-import CrisisButton from '../crisis/CrisisButton';
 import { secureStorage } from '../../services/security/SecureLocalStorage';
+import { logger } from '../../utils/logger';
+import CrisisButton from '../crisis/CrisisButton';
 
 // Register ChartJS components
 ChartJS.register(
@@ -58,56 +57,56 @@ const MOOD_LABELS = [
 ];
 
 const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodChange }) => {
-  const [mood, _setMood] = useState(5);
-  const [notes, _setNotes] = useState('');
-  const [_showCrisisSupport, _setShowCrisisSupport] = useState(false);
-  const [successMessage, _setSuccessMessage] = useState('');
-  const [errorMessage, _setErrorMessage] = useState('');
-  const [__debouncedMood, _setDebouncedMood] = useState(_mood);
+  const [mood, setMood] = useState(5);
+  const [notes, setNotes] = useState('');
+  const [showCrisisSupport, setShowCrisisSupport] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [debouncedMood, setDebouncedMood] = useState(mood);
 
   // Debounce mood changes for performance
   useDebounce(
     () => {
-      setDebouncedMood(_mood);
-      if (_onMoodChange) {
-        onMoodChange(_mood);
+      setDebouncedMood(mood);
+      if (onMoodChange) {
+        onMoodChange(mood);
       }
     },
     300
   );
 
   // Fetch mood history
-  const { _data: history, isLoading: historyLoading } = useQuery({
+  const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: ['moodHistory'],
     queryFn: async () => {
       const response = await axios.get('/api/wellness/history');
-      return response._data;
+      return response.data;
     },
     enabled: showHistory
   });
 
   // Submit mood mutation
   const submitMood = useMutation({
-    mutationFn: async (_data: { mood: number; score: number; notes: string }) => {
-      // Encrypt sensitive _data before sending
-      const encryptedData = await encryptMoodData(_data);
+    mutationFn: async (data: { mood: number; score: number; notes: string }) => {
+      // Encrypt sensitive data before sending
+      const encryptedData = await encryptMoodData(data);
       
       const response = await axios.post('/api/wellness/mood', {
-        mood: MOOD_LABELS[_data.mood - 1],
-        score: _data.mood,
-        notes: _data.notes,
-        _encrypted: encryptedData,
+        mood: MOOD_LABELS[data.mood - 1],
+        score: data.mood,
+        notes: data.notes,
+        encrypted: encryptedData,
         timestamp: Date.now()
       });
       
       return response.data;
     },
-    onSuccess: (_data) => {
+    onSuccess: (data) => {
       setSuccessMessage('Mood logged successfully!');
       setErrorMessage('');
       
-      // Store _encrypted _data locally for offline access
-      storeMoodLocally(_data);
+      // Store encrypted data locally for offline access
+      storeMoodLocally(data);
       
       // Check for crisis indicators
       if (mood <= 2) {
@@ -118,17 +117,17 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       setTimeout(() => setSuccessMessage(''), 3000);
     },
     onError: () => {
-      setErrorMessage('Failed to log mood. Please try again.');
+      setErrorMessage('Mood logging failed. Please try again.');
       setSuccessMessage('');
       setTimeout(() => setErrorMessage(''), 3000);
     }
   });
 
   // Encrypt mood data for privacy
-  const encryptMoodData = async (_data: unknown) => {
+  const encryptMoodData = async (data: unknown) => {
     try {
       const encoder = new TextEncoder();
-      const dataBuffer = encoder.encode(JSON.stringify(_data));
+      const dataBuffer = encoder.encode(JSON.stringify(data));
       
       // Generate a random key for this session
       const key = await window.crypto.subtle.generateKey(
@@ -138,39 +137,39 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       );
       
       const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      const _encrypted = await window.crypto.subtle.encrypt(
+      const encrypted = await window.crypto.subtle.encrypt(
         { name: 'AES-GCM', iv },
         key,
         dataBuffer
       );
       
-      return btoa(String.fromCharCode(...new Uint8Array(_encrypted)));
+      return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
     } catch (error) {
       logger.error('Encryption failed:');
       return null;
     }
   };
 
-  // Store mood data locally (_encrypted)
-  const storeMoodLocally = (_data: unknown) => {
+  // Store mood data locally (encrypted)
+  const storeMoodLocally = (data: unknown) => {
     try {
       const existingData = secureStorage.getItem('mood_data');
-      const moodHistory = existingData ? JSON.parse(atob(_existingData)) : [];
-      moodHistory.push(_data);
+      const moodHistory = existingData ? JSON.parse(atob(existingData)) : [];
+      moodHistory.push(data);
       
       // Keep only last 30 entries
       if (moodHistory.length > 30) {
         moodHistory.shift();
       }
       
-      secureStorage.setItem('mood_data', btoa(JSON.stringify(_moodHistory)));
+      secureStorage.setItem('mood_data', btoa(JSON.stringify(moodHistory)));
     } catch (error) {
       logger.error('Failed to store mood locally:');
     }
   };
 
   // Handle mood submission
-  const __handleSubmit   = useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (!submitMood.isPending) {
       submitMood.mutate({
         mood,
@@ -211,7 +210,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
       ),
       datasets: [{
         label: 'Mood Score',
-        _data: history.moodHistory.map((m: MoodEntry) => m.score),
+        data: history.moodHistory.map((m: MoodEntry) => m.score),
         borderColor: 'rgb(147, 51, 234)',
         backgroundColor: 'rgba(147, 51, 234, 0.1)',
         tension: 0.3
@@ -265,19 +264,27 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
           <span>😊</span>
         </div>
         
-        {/* Mood _Slider */}
+        {/* Mood Slider */}
         <input
           id="mood-slider"
           type="range"
-                    min="1"
+          min="1"
           max="10"
           value={mood}
           onChange={(e) => setMood(parseInt(e.target.value))}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight' && mood < 10) {
+              setMood(mood + 1);
+            } else if (e.key === 'ArrowLeft' && mood > 1) {
+              setMood(mood - 1);
+            }
+          }}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
           aria-label="Mood rating from 1 to 10"
           aria-valuemin={1}
           aria-valuemax={10}
           aria-valuenow={mood}
+          aria-valuetext={`${mood} out of 10 - ${MOOD_LABELS[mood - 1]}`}
         />
         
         {/* Current Mood Display */}
@@ -296,7 +303,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
         {/* Notes Input */}
         <div className="mt-4">
           <textarea
-            placeholder="Add notes about how You&apos;re feeling (_optional)"
+            placeholder="Add notes about how you're feeling (optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg resize-none"
@@ -401,7 +408,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ showHistory = false, onMoodCh
           {/* Mood Chart */}
           {chartData && (
             <div data-testid="mood-history-chart" className="bg-gray-50 p-4 rounded-lg">
-              <Line _data={chartData} options={chartOptions} />
+              <Line data={chartData} options={chartOptions} />
             </div>
           )}
           

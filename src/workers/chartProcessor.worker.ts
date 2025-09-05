@@ -4,7 +4,6 @@
  * Offloads intensive data processing from main thread
  */
 
-// @ts-expect-error - DedicatedWorkerGlobalScope is a global API
 declare const self: DedicatedWorkerGlobalScope;
 
 interface ChartDataPoint {
@@ -94,9 +93,9 @@ const dataProcessors = {
     
     return {
       aggregated: rollingAvg,
-      patterns,
+      patterns: _patterns,
       wellnessScore,
-      insights: this.generateInsights(patterns, wellnessScore),
+      insights: this.generateInsights(_patterns, wellnessScore),
       processingTime: performance.now() - startTime,
     };
   },
@@ -268,7 +267,7 @@ const dataProcessors = {
       troughs: this.findTroughs(data),
     };
     
-    return patterns;
+    return _patterns;
   },
 
   findWeeklyPattern(data: ChartDataPoint[]) {

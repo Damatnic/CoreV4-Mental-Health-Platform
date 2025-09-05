@@ -5,7 +5,7 @@ import {
   BellOff,
   Settings,
   Clock,
-  _CheckCircle,
+  CheckCircle,
   AlertCircle,
   Info,
   X,
@@ -13,14 +13,14 @@ import {
   Zap,
   Heart,
   MessageCircle,
-  _Phone,
+  Phone,
   Plus,
-  _Filter,
+  Filter,
   Search,
   MoreHorizontal
 } from 'lucide-react';
 import {
-  _comprehensiveNotificationService as comprehensiveNotificationService,
+  comprehensiveNotificationService,
   NotificationPreferences,
   NotificationRule,
   SmartNotification
@@ -38,14 +38,14 @@ interface InAppNotification extends SmartNotification {
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   className = ''
 }) => {
-  const [preferences, _setPreferences] = useState<NotificationPreferences | null>(null);
-  const [rules, _setRules] = useState<NotificationRule[]>([]);
-  const [notifications, _setNotifications] = useState<SmartNotification[]>([]);
-  const [__isLoading, _setIsLoading] = useState(true);
-  const [activeTab, _setActiveTab] = useState<'notifications' | 'rules' | 'settings'>('notifications');
-  const [filterPriority, _setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
-  const [searchQuery, _setSearchQuery] = useState('');
-  const [_inAppNotifications, _setInAppNotifications] = useState<InAppNotification[]>([]);
+  const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
+  const [rules, setRules] = useState<NotificationRule[]>([]);
+  const [notifications, setNotifications] = useState<SmartNotification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'notifications' | 'rules' | 'settings'>('notifications');
+  const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [inAppNotifications, setInAppNotifications] = useState<InAppNotification[]>([]);
 
   useEffect(() => {
     initializeNotificationCenter();
@@ -75,7 +75,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const setupInAppNotificationListener = () => {
     const handleInAppNotification = (event: CustomEvent) => {
       const notification = event.detail;
-      setInAppNotifications(prev => [...prev, {
+      setInAppNotifications((prev: InAppNotification[]) => [...prev, {
         ...notification,
         timestamp: Date.now(),
         show: true
@@ -84,8 +84,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       // Auto-hide after 8 seconds for non-critical notifications
       if (notification.priority !== 'critical') {
         setTimeout(() => {
-          setInAppNotifications(prev => 
-            prev.map(n => n.id === notification.id ? { ...n, show: false } : n)
+          setInAppNotifications((prev: InAppNotification[]) => 
+            prev.map((n: InAppNotification) => n.id === notification.id ? { ...n, show: false } : n)
           );
         }, 8000);
       }
@@ -113,7 +113,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       const rule = rules.find(r => r.id === ruleId);
       if (rule) {
         rule.isActive = !rule.isActive;
-        setRules(prev => prev.map(r => r.id === ruleId ? rule : r));
+        setRules((prev: NotificationRule[]) => prev.map((r: NotificationRule) => r.id === ruleId ? rule : r));
         
         // In a real implementation, this would update the rule in the service
         // For now, we&apos;ll just update the local state
@@ -124,15 +124,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   };
 
   const dismissInAppNotification = (notificationId: string) => {
-    setInAppNotifications(prev => 
-      prev.map(n => n.id === notificationId ? { ...n, show: false } : n)
+    setInAppNotifications((prev: InAppNotification[]) => 
+      prev.map((n: InAppNotification) => n.id === notificationId ? { ...n, show: false } : n)
     );
   };
 
   const handleNotificationAction = async (notificationId: string, actionId: string) => {
     try {
       await comprehensiveNotificationService.handleNotificationClick(notificationId, actionId);
-      dismissInAppNotification(_notificationId);
+      dismissInAppNotification(notificationId);
     } catch (error) {
       logger.error('Failed to handle notification action:');
     }
@@ -161,7 +161,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   };
 
   const filteredNotifications = notifications.filter(notification => {
-    const matchesPriority = filterPriority === 'all' || notification._priority === filterPriority;
+    const matchesPriority = filterPriority === 'all' || notification.priority === filterPriority;
     const matchesSearch = searchQuery === '' || 
       notification.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       notification.body.toLowerCase().includes(searchQuery.toLowerCase());
@@ -192,7 +192,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             exit={{ opacity: 0, y: -100 }}
             className="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4"
           >
-            <div className={`rounded-lg shadow-lg p-4 border ${getPriorityColor(notification._priority)} bg-white`}>
+            <div className={`rounded-lg shadow-lg p-4 border ${getPriorityColor(notification.priority)} bg-white`}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900">{notification.title}</h4>
@@ -200,7 +200,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   
                   {notification.actions && notification.actions.length > 0 && (
                     <div className="flex space-x-2 mt-3">
-                      {notification.actions.slice(0, 2).map((action: unknown) => (
+                      {notification.actions.slice(0, 2).map((action) => (
                         <button
                           key={action.id}
                           onClick={() => handleNotificationAction(notification.id, action.id)}
@@ -266,7 +266,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => setActiveTab(id as unknown)}
+                onClick={() => setActiveTab(id as 'notifications' | 'rules' | 'settings')}
                 className={`flex items-center space-x-2 py-4 px-2 border-b-2 transition-colors ${
                   activeTab === id
                     ? 'border-purple-500 text-purple-600'
@@ -301,7 +301,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   
                   <select
                     value={filterPriority}
-                    onChange={(e) => setFilterPriority(e.target.value as unknown)}
+                    onChange={(e) => setFilterPriority(e.target.value as 'all' | 'low' | 'medium' | 'high' | 'critical')}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   >
                     <option value="all">All Priorities</option>
@@ -327,21 +327,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       key={notification.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`border rounded-lg p-4 ${getPriorityColor(notification._priority)}`}
+                      className={`border rounded-lg p-4 ${getPriorityColor(notification.priority)}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <h3 className="font-semibold">{notification.title}</h3>
-                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(notification._priority)}`}>
-                              {notification._priority}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(notification.priority)}`}>
+                              {notification.priority}
                             </span>
                           </div>
                           
                           <p className="text-sm mb-3">{notification.body}</p>
                           
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
-                            <span>{new Date(notification.timestamp).toLocaleString()}</span>
+                            <span>{new Date(notification._timestamp).toLocaleString()}</span>
                             <span className="capitalize">{notification.status}</span>
                           </div>
                           
@@ -380,7 +380,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
               <div className="space-y-4">
                 {rules.map((rule) => {
-                  const IconComponent = getNotificationIcon(rule._type);
+                  const IconComponent = getNotificationIcon(rule.type);
                   
                   return (
                     <motion.div
@@ -397,9 +397,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                           
                           <div>
                             <h4 className="font-semibold text-gray-900">{rule.name}</h4>
-                            <p className="text-sm text-gray-600 capitalize">{rule._type.replace('_', ' ')}</p>
+                            <p className="text-sm text-gray-600 capitalize">{rule.type.replace('_', ' ')}</p>
                             <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-                              <span className="capitalize">{rule._priority} priority</span>
+                              <span className="capitalize">{rule.priority} priority</span>
                               <span className="capitalize">{rule.schedule.frequency}</span>
                               {rule.lastTriggered && (
                                 <span>Last: {new Date(rule.lastTriggered).toLocaleDateString()}</span>

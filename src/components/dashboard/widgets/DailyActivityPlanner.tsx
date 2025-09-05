@@ -24,7 +24,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { format, addMinutes, isSameDay, isToday, isTomorrow } from 'date-fns';
-import { __useActivityStore } from '../../../stores/activityStore';
+import { useActivityStore } from '../../../stores/activityStore';
 import { useWellnessStore } from '../../../stores/wellnessStore';
 
 interface TimeSlot {
@@ -62,7 +62,7 @@ const CATEGORY_COLORS = {
 };
 
 export const DailyActivityPlanner: React.FC = () => {
-  const { activities, dailySchedule, addActivity, updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = __useActivityStore();
+  const { activities, dailySchedule, addActivity, updateActivity, deleteActivity, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
   
   const { moodEntries } = useWellnessStore();
   
@@ -74,24 +74,6 @@ export const DailyActivityPlanner: React.FC = () => {
   const [showRecommendations, _setShowRecommendations] = useState(false);
   const [___adaptiveMode, _setAdaptiveMode] = useState(false);
   const [timeSlots, _setTimeSlots] = useState<TimeSlot[]>([]);
-  
-  // Initialize time slots and load schedule
-  useEffect(() => {
-    generateDailySchedule(selectedDate);
-    initializeTimeSlots();
-    
-    // Get current mood from recent entries
-    const todayMood = moodEntries.find(entry => 
-      isSameDay(new Date(entry.timestamp), new Date())
-    );
-    if (todayMood) {
-      _setCurrentMood(todayMood.moodScore);
-      // Determine energy level based on mood
-      if (todayMood.moodScore <= 3) _setCurrentEnergyLevel('low');
-      else if (todayMood.moodScore <= 7) _setCurrentEnergyLevel('medium');
-      else _setCurrentEnergyLevel('high');
-    }
-  }, [selectedDate, moodEntries, generateDailySchedule, initializeTimeSlots]);
   
   // Initialize time slots for the day
   const initializeTimeSlots = () => {
@@ -107,7 +89,7 @@ export const DailyActivityPlanner: React.FC = () => {
     }
     
     // Map activities to time slots
-    const dayActivities = activities.filter(activity => 
+    const dayActivities = activities.filter(activity =>
       activity.scheduledTime && isSameDay(new Date(activity.scheduledTime), selectedDate)
     );
     
@@ -131,6 +113,24 @@ export const DailyActivityPlanner: React.FC = () => {
     
     _setTimeSlots(slots);
   };
+  
+  // Initialize time slots and load schedule
+  useEffect(() => {
+    generateDailySchedule(selectedDate);
+    initializeTimeSlots();
+    
+    // Get current mood from recent entries
+    const todayMood = moodEntries.find(entry =>
+      isSameDay(new Date(entry.timestamp), new Date())
+    );
+    if (todayMood) {
+      _setCurrentMood(todayMood.moodScore);
+      // Determine energy level based on mood
+      if (todayMood.moodScore <= 3) _setCurrentEnergyLevel('low');
+      else if (todayMood.moodScore <= 7) _setCurrentEnergyLevel('medium');
+      else _setCurrentEnergyLevel('high');
+    }
+  }, [selectedDate, moodEntries, generateDailySchedule]);
   
   // Handle bad mental health day adaptation
   const handleBadDayAdaptation = () => {

@@ -1,12 +1,12 @@
-import { useState, _useEffect, useMemo } from 'react';
-import { 
-  TrendingUp, TrendingDown, AlertTriangle, Activity, 
+import { useState, useEffect, useMemo } from 'react';
+import {
+  TrendingUp, TrendingDown, AlertTriangle, Activity,
   Calendar, Clock, Target, Shield, Brain, Heart,
-  Zap, _AlertCircle, CheckCircle, _Info, ChevronRight,
-  _BarChart3, _LineChart, _PieChart, Eye, EyeOff, Users
+  Zap, AlertCircle, CheckCircle, Info, ChevronRight,
+  BarChart3, LineChart, PieChart, Eye, EyeOff, Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { _Line, _Bar, _Radar, _Area } from 'recharts';
+import { Line, Bar, Radar, Area } from 'recharts';
 import { useAuth } from '../../../hooks/useAuth';
 import { logger, LogCategory } from '../../../services/logging/logger';
 
@@ -32,7 +32,7 @@ interface WarningSign {
   actionRequired: boolean;
 }
 
-interface _CrisisTimeline {
+interface CrisisTimeline {
   timestamp: Date;
   event: string;
   type: 'trigger' | 'warning' | 'intervention' | 'resolution';
@@ -57,13 +57,13 @@ interface PatternRecognition {
 }
 
 export function CrisisPreventionDashboard() {
-  const { _user } = useAuth();
-  const [activeView, _setActiveView] = useState<'overview' | 'patterns' | 'timeline' | 'prevention'>('overview');
-  const [showSensitiveData, _setShowSensitiveData] = useState(true);
-  const [_selectedTimeRange, _setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const { user } = useAuth();
+  const [activeView, setActiveView] = useState<'overview' | 'patterns' | 'timeline' | 'prevention'>('overview');
+  const [showSensitiveData, setShowSensitiveData] = useState(true);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   
   // State for pattern recognition data
-  const [triggers, _setTriggers] = useState<TriggerPattern[]>([
+  const [triggers, setTriggers] = useState<TriggerPattern[]>([
     {
       id: '1',
       name: 'Work Stress',
@@ -99,7 +99,7 @@ export function CrisisPreventionDashboard() {
     }
   ]);
 
-  const [warningSignsChecklist, _setWarningSignsChecklist] = useState<WarningSign[]>([
+  const [warningSignsChecklist, setWarningSignsChecklist] = useState<WarningSign[]>([
     {
       id: '1',
       sign: 'Increased irritability or mood swings',
@@ -283,7 +283,7 @@ export function CrisisPreventionDashboard() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold">{Math.round(_overallRiskScore)}%</span>
+                <span className="text-2xl font-bold">{Math.round(overallRiskScore)}%</span>
               </div>
             </div>
             <p className="text-sm text-gray-600 mt-2">Risk Level</p>
@@ -343,7 +343,7 @@ export function CrisisPreventionDashboard() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveView(tab.id as unknown)}
+                onClick={() => setActiveView(tab.id as any)}
                 className={`flex-1 py-3 px-4 flex items-center justify-center space-x-2 font-medium text-sm transition-colors ${
                   activeView === tab.id
                     ? 'border-b-2 border-primary-500 text-primary-700 bg-primary-50'
@@ -642,7 +642,7 @@ export function CrisisPreventionDashboard() {
                   <h3 className="text-lg font-semibold text-gray-900">Crisis Timeline</h3>
                   <select
                     value={selectedTimeRange}
-                    onChange={(e) => setSelectedTimeRange(e.target.value as unknown)}
+                    onChange={(e) => setSelectedTimeRange(e.target.value as any)}
                     className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
                   >
                     <option value="week">Past Week</option>

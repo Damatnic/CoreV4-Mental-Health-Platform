@@ -1,17 +1,17 @@
-import React, { useState, _useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  _Calendar, 
-  _TrendingUp, 
-  Heart, 
-  _Target, 
-  Award, 
-  Flame, 
-  _Star, 
-  _Clock,
+import {
+  Calendar,
+  TrendingUp,
+  Heart,
+  Target,
+  Award,
+  Flame,
+  Star,
+  Clock,
   Activity,
-  _Zap,
-  _Shield,
+  Zap,
+  Shield,
   Sunrise,
   Brain,
   Smile
@@ -43,8 +43,8 @@ interface Achievement {
 
 export function ConsoleUserStats() {
   const { user } = useAuth();
-  const [_currentStreak, _setCurrentStreak] = useState(7);
-  const [_totalSessions, _setTotalSessions] = useState(42);
+  const [currentStreak, _setCurrentStreak] = useState(7);
+  const [totalSessions, _setTotalSessions] = useState(42);
   const [wellnessLevel, _setWellnessLevel] = useState(15);
   
   // Mock user stats (in real app, this would come from user data)

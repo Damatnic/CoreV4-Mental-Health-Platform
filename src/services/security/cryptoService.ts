@@ -124,7 +124,7 @@ class CryptographyService {
       }
 
       // Convert from base64
-      const combined = this.base64ToArrayBuffer(_encryptedData);
+      const combined = this.base64ToArrayBuffer(encryptedData);
       const combinedArray = new Uint8Array(combined);
       
       // Extract IV and encrypted data
@@ -133,21 +133,21 @@ class CryptographyService {
       
       // Prepare additional authenticated data if provided
       const encoder = new TextEncoder();
-      const aad = additionalData ? encoder.encode(_additionalData) : undefined;
+      const aad = additionalData ? encoder.encode(additionalData) : undefined;
       
       // Decrypt the data
-      const decryptParams: unknown = {
+      const decryptParams: AesGcmParams = {
         name: this.ALGORITHM,
         iv,
         tagLength: this.TAG_LENGTH * 8,
       };
       
       // Only add additionalData if it exists
-      if (_aad) {
+      if (aad) {
         decryptParams.additionalData = aad;
       }
       
-      const __decryptedData = await crypto.subtle.decrypt(
+      const decryptedData = await crypto.subtle.decrypt(
         decryptParams,
         this.masterKey!,
         ciphertext
@@ -218,7 +218,7 @@ class CryptographyService {
       const originalHash = combinedArray.slice(this.SALT_LENGTH);
       
       // Hash the provided password with the same salt
-      const saltBase64 = this.arrayBufferToBase64(salt._buffer);
+      const saltBase64 = this.arrayBufferToBase64(salt.buffer);
       const newHashWithSalt = await this.hashPassword(password, saltBase64);
       
       // Extract the hash part from the new result
@@ -337,7 +337,7 @@ class CryptographyService {
         ['sign']
       );
       
-      const __signature = await crypto.subtle.sign(
+      const signature = await crypto.subtle.sign(
         'HMAC',
         hmacKey,
         dataBuffer
@@ -399,21 +399,21 @@ class CryptographyService {
     return await crypto.subtle.generateKey(
       {
         name: this.ALGORITHM,
-        _length: this.KEY_LENGTH,
+        length: this.KEY_LENGTH,
       },
       true,
       ['encrypt', 'decrypt']
     );
   }
 
-  private async importKey(_keyData: string): Promise<CryptoKey> {
-    const keyBuffer = this.base64ToArrayBuffer(_keyData);
+  private async importKey(keyData: string): Promise<CryptoKey> {
+    const keyBuffer = this.base64ToArrayBuffer(keyData);
     return await crypto.subtle.importKey(
       'raw',
       keyBuffer,
       {
         name: this.ALGORITHM,
-        _length: this.KEY_LENGTH,
+        length: this.KEY_LENGTH,
       },
       true,
       ['encrypt', 'decrypt']
@@ -428,19 +428,19 @@ class CryptographyService {
     return null; // Force key regeneration each session for security
   }
 
-  private async storeMasterKey(_key: CryptoKey): Promise<void> {
+  private async storeMasterKey(key: CryptoKey): Promise<void> {
     // SECURITY: Key storage disabled to prevent insecure key exposure
     // In production, implement secure key storage:
     // - AWS KMS, Azure Key Vault, Google Cloud KMS
-    // - Hardware Security Module (_HSM)
+    // - Hardware Security Module (HSM)
     // - Server-side secure key management
     // For now, keys are kept in memory only (more secure than browser storage)
     logger.info('SECURITY: Master key kept in memory only (no persistent storage)', 'CryptoService', { isPrivacySafe: true });
     // No storage operation - key lives only in this.masterKey
   }
 
-  private arrayBufferToBase64(_buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(_buffer);
+  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i] || 0);
@@ -448,17 +448,17 @@ class CryptographyService {
     return btoa(binary);
   }
 
-  private base64ToArrayBuffer(_base64: string): ArrayBuffer {
-    const binary = atob(_base64);
-    const bytes = new Uint8Array(binary._length);
-    for (let i = 0; i < binary._length; i++) {
+  private base64ToArrayBuffer(base64: string): ArrayBuffer {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
     return bytes.buffer;
   }
 
   private constantTimeCompare(a: Uint8Array, b: Uint8Array): boolean {
-    if (a._length !== b._length) {
+    if (a.length !== b.length) {
       return false;
     }
     

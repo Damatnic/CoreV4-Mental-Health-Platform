@@ -5,8 +5,8 @@
  */
 
 import { auditLogger } from './auditLogger';
-import { _rateLimiter } from './rateLimiter';
-import { _hipaaService } from '../compliance/hipaaService';
+import { rateLimiter } from './rateLimiter';
+import { hipaaService } from '../compliance/hipaaService';
 import { cryptoService } from './cryptoService';
 import { logger } from '../../utils/logger';
 
@@ -204,7 +204,7 @@ class SecurityMonitorService {
       const baseline = this.baselineMetrics.get(metric);
       if (!baseline) continue;
 
-      const deviation = Math.abs(value - baseline) / baseline;
+      const deviation = Math.abs((value as number) - (baseline as number)) / (baseline as number);
       const threshold = this.anomalyThresholds.get(metric) || 0.5;
 
       if (deviation > threshold) {
@@ -234,7 +234,7 @@ class SecurityMonitorService {
     }
 
     return {
-      anomalies,
+      anomalies: anomalies as any[],
       overallRisk: Math.min(100, totalRisk * 10),
     };
   }
@@ -312,7 +312,7 @@ class SecurityMonitorService {
         // Execute action based on type
         switch (action.type) {
           case 'blockip':
-            await _rateLimiter.blockIP(action.target, 'Security incident', action.duration);
+            await rateLimiter.blockIP(action.target, 'Security incident', action.duration);
             break;
             
           case 'disable_account':
@@ -349,7 +349,7 @@ class SecurityMonitorService {
       } catch (error) {
         responseAction.status = 'failed';
         responseAction.error = error instanceof Error ? error.message : '[Error details unavailable]';
-        logger.error(`Failed to execute response action: ${action.type}`, error);
+        logger.error(`Failed to execute response action: ${action.type}`, String(error));
       }
     }
   }
@@ -625,14 +625,14 @@ class SecurityMonitorService {
     switch (event.type) {
       case 'brute_force_attack':
         if (event.ipAddress) {
-          await _rateLimiter.requireCaptcha(event.ipAddress);
+          await rateLimiter.requireCaptcha(event.ipAddress);
         }
         break;
         
       case 'sqlinjection':
       case 'xss_attack':
         if (event.ipAddress) {
-          await _rateLimiter.blockIP(event.ipAddress, 'Attack detected', 3600000);
+          await rateLimiter.blockIP(event.ipAddress, 'Attack detected', 3600000);
         }
         break;
         
@@ -661,7 +661,7 @@ class SecurityMonitorService {
   }
 
   private async initiateBreachNotification(incident: IncidentResponse): Promise<void> {
-    await _hipaaService.reportBreach({
+    await hipaaService.reportBreach({
       discoveredBy: 'security_monitor',
       affectedUsers: incident.affectedUsers,
       dataCompromised: ['potential_phi_exposure'],
@@ -796,4 +796,4 @@ class SecurityMonitorService {
   }
 }
 
-export const _securityMonitor = SecurityMonitorService.getInstance();
+export const securityMonitor = SecurityMonitorService.getInstance();

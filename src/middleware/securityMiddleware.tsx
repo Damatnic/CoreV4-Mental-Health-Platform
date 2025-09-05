@@ -5,11 +5,11 @@
 
 import React, { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { securityHeaders } from '../services/security/securityHeaders';
-import { _rateLimiter } from '../services/security/rateLimiter';
-import { _sessionManager } from '../services/security/sessionManager';
-import { _authService } from '../services/auth/authService';
-import { _securityMonitor } from '../services/security/securityMonitor';
-import { _fieldEncryption } from '../services/security/fieldEncryption';
+import { rateLimiter } from '../services/security/rateLimiter';
+import { sessionManager } from '../services/security/sessionManager';
+import { authService } from '../services/auth/authService';
+import { securityMonitor } from '../services/security/securityMonitor';
+import { fieldEncryption } from '../services/security/fieldEncryption';
 import { auditLogger } from '../services/security/auditLogger';
 import { logger } from '../utils/logger';
 
@@ -20,10 +20,10 @@ interface SecurityContextType {
   threatLevel: 'low' | 'medium' | 'high' | 'critical';
   requiresCaptcha: boolean;
   requiresMFA: boolean;
-  encryptField: (fieldName: string, value: unknown) => Promise<unknown>;
-  decryptField: (fieldName: string, encryptedValue: unknown) => Promise<unknown>;
+  encryptField: (fieldName: string, value: any) => Promise<any>;
+  decryptField: (fieldName: string, encryptedValue: any) => Promise<any>;
   validateRequest: (endpoint: string) => Promise<boolean>;
-  reportSecurityEvent: (event: unknown) => Promise<void>;
+  reportSecurityEvent: (event: any) => Promise<void>;
 }
 
 const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
@@ -51,14 +51,14 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   useEffect(() => {
     initializeSecurity();
     return () => cleanupSecurity();
-  }, [initializeSecurity]);
+  }, []);
   
   // Check authentication status from authService
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
-        const isAuthenticated = _authService.isAuthenticated();
-        const session = _authService.getCurrentSession();
+        const isAuthenticated = authService.isAuthenticated();
+        const session = authService.getCurrentSession();
         
         // For development/demo mode, allow basic access without full session
         if (isAuthenticated && session) {
@@ -70,7 +70,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
           setSecurityLevel('basic');
         }
       } catch (error) {
-        logger.debug('Auth check in security middleware:', error);
+        logger.debug('Auth check in security middleware:', String(error));
         // Allow demo mode even if auth check fails
         setSessionValid(true);
         setSecurityLevel('basic');
@@ -90,13 +90,13 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       securityHeaders.applyCSPToDocument();
       
       // Set up security monitoring
-      const unsubscribe = _securityMonitor.subscribe(handleSecurityEvent);
+      const unsubscribe = securityMonitor.subscribe(handleSecurityEvent);
       
       // Validate current session if exists
       const sessionId = getSessionId();
       if (sessionId) {
         try {
-          const validation = await _sessionManager.validateSession(sessionId, {
+          const validation = await sessionManager.validateSession(sessionId, {
             ipAddress: await getClientIP(),
             userAgent: navigator.userAgent,
             fingerprint: await generateFingerprint(),
@@ -107,7 +107,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
             setRequiresMFA(true);
           }
         } catch (error) {
-          logger.debug('Session validation error:', error);
+          logger.debug('Session validation error:', String(error));
           // For demo/development, allow access
           setSessionValid(true);
         }
@@ -117,7 +117,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       }
       
       // Check security metrics
-      const metrics = _securityMonitor.getMetrics();
+      const metrics = securityMonitor.getMetrics();
       updateThreatLevel(metrics.threatScore);
       
       // Set up CSP violation listener
@@ -136,7 +136,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     // Cleanup tasks
   };
 
-  const handleSecurityEvent = async (event: unknown) => {
+  const handleSecurityEvent = async (event: any) => {
     // Update threat level based on events
     if (event.severity === 'critical') {
       setThreatLevel('critical');
@@ -173,7 +173,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   const validateRequest = async (endpoint: string): Promise<boolean> => {
     try {
       const ip = await getClientIP();
-      const result = await _rateLimiter.checkRateLimit({
+      const result = await rateLimiter.checkRateLimit({
         endpoint,
         ip,
         userId: getCurrentUserId(),
@@ -204,27 +204,27 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     }
   };
 
-  const encryptField = async (fieldName: string, value: unknown): Promise<unknown> => {
+  const encryptField = async (fieldName: string, value: any): Promise<any> => {
     try {
-      return await _fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
+      return await fieldEncryption.encryptField(fieldName, value, getCurrentUserId());
     } catch (error) {
-      logger.error(`Failed to encrypt field ${fieldName}:`, error);
+      logger.error(`Failed to encrypt field ${fieldName}:`, String(error));
       throw error;
     }
   };
 
-  const decryptField = async (fieldName: string, encryptedValue: unknown): Promise<unknown> => {
+  const decryptField = async (fieldName: string, encryptedValue: any): Promise<any> => {
     try {
-      return await _fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
+      return await fieldEncryption.decryptField(fieldName, encryptedValue, getCurrentUserId());
     } catch (error) {
-      logger.error(`Failed to decrypt field ${fieldName}:`, error);
+      logger.error(`Failed to decrypt field ${fieldName}:`, String(error));
       throw error;
     }
   };
 
-  const reportSecurityEvent = async (event: unknown): Promise<void> => {
+  const reportSecurityEvent = async (event: any): Promise<void> => {
     try {
-      await _securityMonitor.reportEvent(event);
+      await securityMonitor.reportEvent(event);
     } catch (error) {
       logger.error('Failed to report security event:');
     }
@@ -409,12 +409,12 @@ const ElevateSecurityLevel: React.FC<{ required: string }> = ({ required }) => (
 const getSessionId = (): string | null => {
   // Try to get session from authService first
   try {
-    const session = _authService.getCurrentSession();
+    const session = authService.getCurrentSession();
     if (session?.sessionId) {
       return session.sessionId;
     }
   } catch (error) {
-    logger.debug('Could not get session from authService:', error);
+    logger.debug('Could not get session from authService:', String(error));
   }
   
   // Fallback to localStorage
@@ -424,12 +424,12 @@ const getSessionId = (): string | null => {
 const getCurrentUserId = (): string | undefined => {
   // Try to get user from authService first
   try {
-    const user = _authService.getCurrentUser();
+    const user = authService.getCurrentUser();
     if (user?.id) {
       return user.id;
     }
   } catch (error) {
-    logger.debug('Could not get user from authService:', error);
+    logger.debug('Could not get user from authService:', String(error));
   }
   
   // Fallback to localStorage
@@ -471,8 +471,8 @@ const getSecurityLevelValue = (level: string): number => {
 };
 
 const setupCSPViolationListener = () => {
-  document.addEventListener('securitypolicyviolation', async (e) => {
-    await _securityMonitor.reportEvent({
+  document.addEventListener('securitypolicyviolation', async (e: SecurityPolicyViolationEvent) => {
+    await securityMonitor.reportEvent({
       type: 'policy_violation',
       severity: 'medium',
       source: 'csp',
@@ -490,7 +490,11 @@ const startHeartbeat = () => {
   setInterval(async () => {
     const sessionId = getSessionId();
     if (sessionId) {
-      await _sessionManager.validateSession(sessionId);
+      await sessionManager.validateSession(sessionId, {
+        ipAddress: await getClientIP(),
+        userAgent: navigator.userAgent,
+        fingerprint: await generateFingerprint(),
+      });
     }
   }, 5 * 60 * 1000); // Every 5 minutes
 };

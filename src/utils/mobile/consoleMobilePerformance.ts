@@ -37,7 +37,7 @@ class ConsoleMobilePerformance {
   }
 
   private detectDeviceCapabilities(): DeviceCapabilities {
-    const deviceMemory = (navigator as unknown).deviceMemory || 4;
+    const deviceMemory = (navigator as any).deviceMemory || 4;
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
     
     return {
@@ -66,7 +66,7 @@ class ConsoleMobilePerformance {
 
   private getOptimalSettings(): MobilePerformanceSettings {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isLowBattery = (navigator as unknown).getBattery?.()?.then?.((battery: unknown) => battery.level < 0.2);
+    const isLowBattery = (navigator as any).getBattery?.()?.then?.((battery: any) => battery.level < 0.2);
     
     return {
       reduceMotion: prefersReducedMotion || this.deviceCapabilities.isLowEndDevice,
@@ -83,11 +83,11 @@ class ConsoleMobilePerformance {
 
     // Monitor battery if available
     if ('getBattery' in navigator) {
-      (navigator as unknown).getBattery().then((battery: unknown) => {
+      (navigator as any).getBattery().then((battery: any) => {
         this.settings.batterySavingMode = battery.level < 0.2;
         
-        battery.addEventListener('levelchange', () => {
-          this.settings.batterySavingMode = battery.level < 0.2;
+        (battery as any).addEventListener('levelchange', () => {
+          this.settings.batterySavingMode = (battery as any).level < 0.2;
           this.updatePerformanceMode();
         });
       });
@@ -97,8 +97,8 @@ class ConsoleMobilePerformance {
     if ('PerformanceObserver' in window) {
       try {
         this.performanceObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          entries.forEach((entry) => {
+          const entries = (list as any).getEntries();
+          entries.forEach((entry: any) => {
             if (entry.entryType === 'measure' && entry.duration > 16.67) {
               // Frame took longer than 60fps threshold
               this.handleSlowFrame(entry.duration);
@@ -229,7 +229,7 @@ class ConsoleMobilePerformance {
       ` : ''}
     `;
     
-    document.head.appendChild(_style);
+    document.head.appendChild(style);
   }
 
   public enablePerformanceMode(): void {
@@ -306,7 +306,7 @@ class ConsoleMobilePerformance {
   public getOptimizedAnimationConfig(baseConfig: unknown): unknown {
     if (this.settings.reduceMotion) {
       return {
-        ...baseConfig,
+        ...(baseConfig as any),
         duration: 0.01,
         ease: 'linear',
       };
@@ -314,8 +314,8 @@ class ConsoleMobilePerformance {
     
     if (this.settings.optimizeAnimations) {
       return {
-        ...baseConfig,
-        duration: (baseConfig.duration || 0.3) * 0.5,
+        ...(baseConfig as any),
+        duration: ((baseConfig as any).duration || 0.3) * 0.5,
         ease: 'easeOut',
       };
     }

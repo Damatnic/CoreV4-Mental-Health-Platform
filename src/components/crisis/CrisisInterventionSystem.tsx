@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { AlertTriangle, Phone, MessageSquare, MapPin, Heart, Shield, Clock, Users } from 'lucide-react';
-import { _EmergencyContactsLazy, _SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { EmergencyContactsLazy, SafetyPlanLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { CrisisResources } from './CrisisResources';
-import { _CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
+import { CrisisChatLazy } from '../../utils/bundleOptimization/lazyLoading';
 import { logger, LogLevel } from '../../utils/logger';
 
 interface CrisisLevel {
@@ -62,7 +62,7 @@ export function CrisisInterventionSystem() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (_position) => setUserLocation(_position),
-        (error) => logger.error('Location access denied', new Error(error.message), { category: LogLevel.CRISIS }),
+        (error) => logger.error('Location access denied', 'CrisisInterventionSystem', error),
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
@@ -71,7 +71,7 @@ export function CrisisInterventionSystem() {
   // Track crisis interactions for improvement
   const trackCrisisInteraction = useCallback((action: string, data: Record<string, unknown>) => {
     // In production, this would send to analytics service
-    logger.logCrisisIntervention(action, undefined, {
+    logger.crisis(action, 'critical', 'CrisisInterventionSystem', {
       ...data,
       responseTime,
       timestamp: new Date().toISOString()
@@ -82,7 +82,7 @@ export function CrisisInterventionSystem() {
   const handleEmergencyCall = useCallback((number: string, service: string) => {
     // Log the emergency call attempt for safety tracking
     const timestamp = new Date().toISOString();
-    logger.logCrisisIntervention('emergency_callinitiated', undefined, {
+    logger.crisis('emergency_call_initiated', 'critical', 'CrisisInterventionSystem', {
       service,
       timestamp,
       responseTime
@@ -224,12 +224,12 @@ export function CrisisInterventionSystem() {
             )}
             {activeTab === 'safety' && (
               <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
-                <_SafetyPlanLazy />
+                <SafetyPlanLazy />
               </Suspense>
             )}
             {activeTab === 'chat' && (
               <Suspense fallback={<div className="animate-pulse bg-gray-200 h-32 rounded"></div>}>
-                <_CrisisChatLazy />
+                <CrisisChatLazy />
               </Suspense>
             )}
           </div>
@@ -237,7 +237,7 @@ export function CrisisInterventionSystem() {
 
         {/* Emergency Contacts Widget */}
         <Suspense fallback={<div className="animate-pulse bg-gray-200 h-24 rounded"></div>}>
-          <_EmergencyContactsLazy />
+          <EmergencyContactsLazy />
         </Suspense>
 
         {/* Quick Access Tools */}

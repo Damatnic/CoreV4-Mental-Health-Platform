@@ -126,7 +126,7 @@ class ConsoleHapticFeedbackSystem {
 
     // Listen for battery status changes
     if ('getBattery' in navigator) {
-      (navigator as unknown).getBattery().then((battery: unknown) => {
+      (navigator as any).getBattery().then((battery: any) => {
         const updateBatteryMode = () => {
           if (battery.level < 0.2) {
             this.settings.masterIntensity = Math.min(this.settings.masterIntensity, 0.3);
@@ -134,7 +134,7 @@ class ConsoleHapticFeedbackSystem {
         };
         
         updateBatteryMode();
-        battery.addEventListener('levelchange', updateBatteryMode);
+        (battery as any).addEventListener('levelchange', updateBatteryMode);
       });
     }
   }
@@ -185,8 +185,8 @@ class ConsoleHapticFeedbackSystem {
 
     let pattern: number | number[];
     
-    if (_customPattern) {
-      pattern = customPattern;
+    if (customPattern) {
+      pattern = customPattern!
     } else {
       const _consolePatterns = this.hapticPatterns[this.settings.consoleType];
       pattern = _consolePatterns[actionType]?.pattern || _consolePatterns.tap.pattern;
@@ -201,7 +201,7 @@ class ConsoleHapticFeedbackSystem {
 
   private executeHaptic(pattern: number[]): void {
     try {
-      navigator.vibrate(pattern);
+      navigator.vibrate?.(pattern);
     } catch (error) {
       logger.warn('Haptic feedback failed:');
     }
@@ -300,18 +300,18 @@ class ConsoleHapticFeedbackSystem {
 
   public getAvailablePatterns(): Record<ActionType, string> {
     const _consolePatterns = this.hapticPatterns[this.settings.consoleType];
-    const result: Record<ActionType, string> = {} as unknown;
+    const result: Record<ActionType, string> = {} as Record<ActionType, string>;
     
     Object.entries(_consolePatterns).forEach(([action, _pattern]) => {
-      result[action as ActionType] = pattern.description;
+      result[action as ActionType] = _pattern.description;
     });
     
     return result;
   }
 
   public testHaptic(_pattern?: number | number[]): void {
-    if (pattern) {
-      this.executeHaptic(Array.isArray(pattern) ? pattern : [pattern]);
+    if (_pattern) {
+      this.executeHaptic(Array.isArray(_pattern) ? _pattern : [_pattern]);
     } else {
       this.triggerHaptic('tap');
     }
@@ -327,7 +327,7 @@ class ConsoleHapticFeedbackSystem {
 
   public destroy(): void {
     // Clear any pending haptics
-    navigator.vibrate(0);
+    navigator.vibrate?.(0);
     this.hapticQueue = [];
     this.isProcessingQueue = false;
   }
@@ -375,7 +375,7 @@ export function useConsoleHaptic() {
     accessibility: (type: 'focus' | 'error' | 'success' | 'navigation') => 
       consoleHapticFeedback.triggerAccessibilityFeedback(type),
     
-    test: (_pattern?: number | number[]) => consoleHapticFeedback.testHaptic(pattern)
+    test: (_pattern?: number | number[]) => consoleHapticFeedback.testHaptic(_pattern)
   }), []);
 
   return {

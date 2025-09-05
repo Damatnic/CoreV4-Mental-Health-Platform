@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Target, TrendingUp, CheckCircle, Circle, _AlertCircle,
+import {
+  Target, TrendingUp, CheckCircle, Circle, AlertCircle,
   Brain, Heart, Activity, Book, Users, Award, Calendar,
-  ChevronRight, Edit2, Plus, Zap, Flag, Clock, _BarChart3,
-  FileText, MessageSquare, _Star, Shield, _Sparkles
+  ChevronRight, Edit2, Plus, Zap, Flag, Clock, BarChart3,
+  FileText, MessageSquare, Star, Shield, Sparkles
 } from 'lucide-react';
 
 interface TreatmentGoal {
   id: string;
-  _category: 'symptom_reduction' | 'behavioral' | 'cognitive' | 'social' | 'lifestyle' | 'medication';
+  category: 'symptom_reduction' | 'behavioral' | 'cognitive' | 'social' | 'lifestyle' | 'medication';
   title: string;
   description: string;
   targetDate?: Date;
@@ -41,7 +41,7 @@ interface SkillPractice {
   id: string;
   type: 'CBT' | 'DBT' | 'ACT' | 'Mindfulness' | 'EMDR' | 'Other';
   skillName: string;
-  _category: string;
+  category: string;
   practiceFrequency: 'daily' | 'weekly' | 'as_needed';
   lastPracticed?: Date;
   totalPractices: number;
@@ -77,12 +77,12 @@ interface TreatmentPlanProgressProps {
   skills?: SkillPractice[];
   homework?: TherapeuticHomework[];
   updates?: TreatmentUpdate[];
-  _onUpdateGoal?: (goal: TreatmentGoal) => void;
-  _onAddMilestone?: (goalId: string, milestone: Milestone) => void;
+  onUpdateGoal?: (goal: TreatmentGoal) => void;
+  onAddMilestone?: (goalId: string, milestone: Milestone) => void;
   onCompleteHomework?: (homework: TherapeuticHomework) => void;
   onPracticeSkill?: (skill: SkillPractice) => void;
   onAddGoal?: () => void;
-  _onViewDetails?: (goalId: string) => void;
+  onViewDetails?: (goalId: string) => void;
 }
 
 export function TreatmentPlanProgress({
@@ -90,17 +90,17 @@ export function TreatmentPlanProgress({
   skills = [],
   homework = [],
   updates = [],
-  _onUpdateGoal,
-  _onAddMilestone,
+  onUpdateGoal,
+  onAddMilestone,
   onCompleteHomework,
   onPracticeSkill,
   onAddGoal,
-  _onViewDetails
+  onViewDetails
 }: TreatmentPlanProgressProps) {
-  const [activeTab, _setActiveTab] = useState<'goals' | 'skills' | 'homework' | 'timeline'>('goals');
-  const [selectedGoal, _setSelectedGoal] = useState<TreatmentGoal | null>(null);
-  const [___showGoalDetails, _setShowGoalDetails] = useState(false);
-  const [expandedSkillType, _setExpandedSkillType] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'goals' | 'skills' | 'homework' | 'timeline'>('goals');
+  const [selectedGoal, setSelectedGoal] = useState<TreatmentGoal | null>(null);
+  const [showGoalDetails, setShowGoalDetails] = useState(false);
+  const [expandedSkillType, setExpandedSkillType] = useState<string | null>(null);
 
   // Calculate overall treatment progress
   const calculateOverallProgress = () => {
@@ -117,17 +117,17 @@ export function TreatmentPlanProgress({
   const pendingHomeworkCount = homework.filter(h => !h.completed).length;
 
   // Group skills by type
-  const _groupedSkills = skills.reduce((acc, skill) => {
+  const groupedSkills = skills.reduce((acc, skill) => {
     if (!acc[skill.type]) {
       acc[skill.type] = [];
     }
-    acc[skill.type]!.push(_skill);
+    acc[skill.type]!.push(skill);
     return acc;
   }, {} as Record<string, SkillPractice[]>);
 
   // Get goal category icon
-  const getGoalIcon = (_category: string) => {
-    switch (_category) {
+  const getGoalIcon = (category: string) => {
+    switch (category) {
       case 'symptom_reduction': return <Activity className="h-5 w-5" />;
       case 'behavioral': return <Target className="h-5 w-5" />;
       case 'cognitive': return <Brain className="h-5 w-5" />;
@@ -139,8 +139,8 @@ export function TreatmentPlanProgress({
   };
 
   // Get goal category color
-  const getGoalColor = (_category: string) => {
-    switch (_category) {
+  const getGoalColor = (category: string) => {
+    switch (category) {
       case 'symptom_reduction': return 'text-red-600 bg-red-50';
       case 'behavioral': return 'text-blue-600 bg-blue-50';
       case 'cognitive': return 'text-purple-600 bg-purple-50';
@@ -215,7 +215,7 @@ export function TreatmentPlanProgress({
         {(['goals', 'skills', 'homework', 'timeline'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(_tab)}
+            onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium transition-all capitalize ${
               activeTab === tab
                 ? 'text-primary-600 border-b-2 border-primary-600'
@@ -258,8 +258,8 @@ export function TreatmentPlanProgress({
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-lg ${getGoalColor(goal._category)}`}>
-                      {getGoalIcon(goal._category)}
+                    <div className={`p-2 rounded-lg ${getGoalColor(goal.category)}`}>
+                      {getGoalIcon(goal.category)}
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900">{goal.title}</h4>
@@ -281,7 +281,7 @@ export function TreatmentPlanProgress({
                   </div>
                   <button
                     onClick={() => {
-                      setSelectedGoal(_goal);
+                      setSelectedGoal(goal);
                       setShowGoalDetails(true);
                     }}
                     className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -334,7 +334,7 @@ export function TreatmentPlanProgress({
 
         {activeTab === 'skills' && (
           <div className="space-y-4">
-            {Object.entries(_groupedSkills).map(([type, typeSkills]) => (
+            {Object.entries(groupedSkills).map(([type, typeSkills]) => (
               <div key={type} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setExpandedSkillType(expandedSkillType === type ? null : type)}
@@ -367,7 +367,7 @@ export function TreatmentPlanProgress({
                             <div className="flex-1">
                               <h5 className="font-medium text-gray-900">{skill.skillName}</h5>
                               <div className="flex items-center space-x-3 mt-1 text-xs text-gray-600">
-                                <span>{skill._category}</span>
+                                <span>{skill.category}</span>
                                 <span>•</span>
                                 <span>{skill.practiceFrequency.replace('_', ' ')}</span>
                                 <span>•</span>
@@ -388,7 +388,7 @@ export function TreatmentPlanProgress({
                               </div>
                             </div>
                             <button
-                              onClick={() => onPracticeSkill?.(_skill)}
+                              onClick={() => onPracticeSkill?.(skill)}
                               className="px-3 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors flex items-center"
                             >
                               <Zap className="h-4 w-4 mr-1" />
@@ -403,7 +403,7 @@ export function TreatmentPlanProgress({
               </div>
             ))}
 
-            {Object.keys(_groupedSkills).length === 0 && (
+            {Object.keys(groupedSkills).length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <Brain className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                 <p>No skills tracked yet</p>

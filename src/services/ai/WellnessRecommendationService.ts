@@ -9,7 +9,9 @@
  */
 
 import { logger, LogCategory } from '../logging/logger';
-import { crisisDetectionService, CrisisProfile } from './CrisisDetectionService';
+import { CrisisDetectionService, CrisisProfile } from './CrisisDetectionService';
+
+const crisisDetectionService = CrisisDetectionService.getInstance();
 
 export interface WellnessRecommendation {
   id: string;
@@ -130,7 +132,7 @@ export class WellnessRecommendationService {
       logger.info('Wellness recommendations generated', {
         category: LogCategory.AI,
         userId,
-        metadata: {
+        _metadata: {
           recommendationCount: recommendations.length,
           crisisRisk: crisisProfile.riskLevel
         }

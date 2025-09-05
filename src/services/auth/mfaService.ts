@@ -81,7 +81,7 @@ class MultiFactorAuthService {
         createdAt: new Date(),
         metadata: {
           secret: await cryptoService.encrypt(secret),
-          backupCodes: await cryptoService.encrypt(JSON.stringify(_backupCodes)),
+          backupCodes: await cryptoService.encrypt(JSON.stringify(backupCodes)),
           usedBackupCodes: [],
         },
       });
@@ -246,7 +246,7 @@ class MultiFactorAuthService {
         enabled: true,
         verified: true,
         createdAt: new Date(),
-        metadata: credentialOptions,
+        metadata: credentialOptions as Record<string, any>,
       });
 
       await auditLogger.log({
@@ -326,7 +326,7 @@ class MultiFactorAuthService {
     code: string
   ): Promise<boolean> {
     try {
-      const challenge = this.activeChallenges.get(_challengeId);
+      const challenge = this.activeChallenges.get(challengeId);
       
       if (!challenge) {
         throw new Error('Invalid or expired challenge');
@@ -334,14 +334,14 @@ class MultiFactorAuthService {
 
       // Check expiry
       if (new Date() > challenge.expiresAt) {
-        this.activeChallenges.delete(_challengeId);
+        this.activeChallenges.delete(challengeId);
         throw new Error('Challenge expired');
       }
 
       // Check attempts
       challenge.attempts++;
       if (challenge.attempts > challenge.maxAttempts) {
-        this.activeChallenges.delete(_challengeId);
+        this.activeChallenges.delete(challengeId);
         
         await auditLogger.log({
           event: 'SECURITY_ALERT',
@@ -374,7 +374,7 @@ class MultiFactorAuthService {
 
       if (isValid) {
         // Remove challenge
-        this.activeChallenges.delete(_challengeId);
+        this.activeChallenges.delete(challengeId);
         
         // Update last used
         await this.updateLastUsed(userId, challenge.method);
@@ -439,7 +439,7 @@ class MultiFactorAuthService {
    */
   async getUserMFAMethods(userId: string): Promise<MFASetup[]> {
     const key = `mfa_${userId}`;
-    const stored = await secureStorage.getItem(key);
+    const stored = await secureStorage.getItem(key) as { methods?: MFASetup[] } | null;
     
     if (!stored || !stored.methods) {
       return [];
@@ -466,7 +466,7 @@ class MultiFactorAuthService {
       // Store encrypted codes
       const key = `mfa_recovery_${userId}`;
       await secureStorage.setItem(key, {
-        codes: await cryptoService.encrypt(JSON.stringify(_codes)),
+        codes: await cryptoService.encrypt(JSON.stringify(codes)),
         generated: new Date(),
         used: [],
       });
@@ -515,7 +515,7 @@ class MultiFactorAuthService {
     
     // Check current and adjacent time windows
     for (let i = -1; i <= 1; i++) {
-      const testTime = time + i;
+      const testTime = _time + i;
       const expectedCode = await this.generateTOTPCode(secret, testTime);
       if (expectedCode === code) {
         return true;
@@ -596,9 +596,11 @@ class MultiFactorAuthService {
 
   private async verifyTemporaryCode(userId: string, code: string): Promise<boolean> {
     const key = `mfa_temp_${userId}`;
-    const stored = await secureStorage.getItem(key);
+    const stored = await secureStorage.getItem(key) as { expiresAt?: string; code?: string } | null;
     
     if (!stored) return false;
+    
+    if (!stored.expiresAt || !stored.code) return false;
     
     if (new Date() > new Date(stored.expiresAt)) {
       await secureStorage.removeItem(key);
@@ -666,7 +668,7 @@ class MultiFactorAuthService {
 
   private async storeMFASetup(userId: string, setup: MFASetup): Promise<void> {
     const key = `mfa_${userId}`;
-    const existing = await secureStorage.getItem(key) || { methods: [] };
+    const existing = (await secureStorage.getItem(key) || { methods: [] }) as { methods: MFASetup[] };
     
     // Update or add method
     const index = existing.methods.findIndex((m: MFASetup) => m.method === setup.method);
@@ -681,7 +683,7 @@ class MultiFactorAuthService {
 
   private async getMFASetup(userId: string, method: MFAMethod): Promise<MFASetup | null> {
     const key = `mfa_${userId}`;
-    const stored = await secureStorage.getItem(key);
+    const stored = await secureStorage.getItem(key) as { methods?: MFASetup[] } | null;
     
     if (!stored || !stored.methods) {
       return null;
@@ -692,7 +694,7 @@ class MultiFactorAuthService {
 
   private async removeMFASetup(userId: string, method: MFAMethod): Promise<void> {
     const key = `mfa_${userId}`;
-    const existing = await secureStorage.getItem(key);
+    const existing = await secureStorage.getItem(key) as { methods?: MFASetup[] } | null;
     
     if (existing && existing.methods) {
       existing.methods = existing.methods.filter((m: MFASetup) => m.method !== method);
@@ -753,4 +755,4 @@ class MultiFactorAuthService {
   }
 }
 
-export const __mfaService = MultiFactorAuthService.getInstance();
+export const mfaService = MultiFactorAuthService.getInstance();

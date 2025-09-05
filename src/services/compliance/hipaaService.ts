@@ -7,7 +7,7 @@
 import { auditLogger, AuditLogEntry } from '../security/auditLogger';
 import { cryptoService } from '../security/cryptoService';
 import { secureStorage } from '../security/secureStorage';
-import { _privacyService } from '../privacy/privacyService';
+import { privacyService } from '../privacy/privacyService';
 import { logger } from '../../utils/logger';
 
 export interface PHIAccessControl {
@@ -162,7 +162,7 @@ class HIPAAComplianceService {
       }
 
       // Check patient consent
-      const hasConsent = await _privacyService.hasConsent(
+      const hasConsent = await privacyService.hasConsent(
         params.userId,
         'health_data',
         ['health_records']
@@ -317,7 +317,7 @@ class HIPAAComplianceService {
       }
 
       // Check consent
-      const hasConsent = await _privacyService.hasConsent(
+      const hasConsent = await privacyService.hasConsent(
         params.userId,
         'health_data'
       );
@@ -426,7 +426,12 @@ class HIPAAComplianceService {
     }>;
     recommendations: string[];
   }> {
-    const findings: unknown[] = [];
+    const findings: Array<{
+      area: string;
+      risk: string;
+      severity: string;
+      mitigation: string;
+    }> = [];
     const recommendations: string[] = [];
 
     try {
@@ -595,7 +600,7 @@ class HIPAAComplianceService {
 
   private async storePHIAccess(access: PHIAccessControl): Promise<void> {
     const key = `phi_access_${access.userId}`;
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as PHIAccessControl[];
     existing.push(access);
     
     // Keep only recent access records
@@ -615,7 +620,7 @@ class HIPAAComplianceService {
     // Check if user has valid PHI access
     const key = `phi_access_${userId}`;
     const accesses = this.phiAccessCache.get(userId) || 
-                     await secureStorage.getItem(key) || [];
+                     (await secureStorage.getItem(key) || []) as PHIAccessControl[];
     
     const now = new Date();
     return accesses.some((a: PHIAccessControl) => 
@@ -626,7 +631,7 @@ class HIPAAComplianceService {
 
   private async storeDisclosure(disclosure: PHIDisclosure): Promise<void> {
     const key = `phi_disclosures_${disclosure.patientId}`;
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as PHIDisclosure[];
     existing.push(disclosure);
     await secureStorage.setItem(key, existing, { encrypted: true });
   }
@@ -637,7 +642,7 @@ class HIPAAComplianceService {
     endDate?: Date
   ): Promise<PHIDisclosure[]> {
     const key = `phi_disclosures_${patientId}`;
-    const all = await secureStorage.getItem(key) || [];
+    const all = (await secureStorage.getItem(key) || []) as PHIDisclosure[];
     
     return all.filter((d: PHIDisclosure) => {
       const disclosedAt = new Date(d.disclosedAt);
@@ -648,14 +653,14 @@ class HIPAAComplianceService {
 
   private async storeBreachNotification(breach: BreachNotification): Promise<void> {
     const key = 'hipaa_breaches';
-    const existing = await secureStorage.getItem(key) || [];
+    const existing = (await secureStorage.getItem(key) || []) as BreachNotification[];
     existing.push(breach);
     await secureStorage.setItem(key, existing, { encrypted: true });
   }
 
   private async initiateBreachResponse(breach: BreachNotification): Promise<void> {
     // In production, implement full breach response protocol
-    logger.error('BREACH DETECTED:', breach);
+    logger.error('BREACH DETECTED', JSON.stringify(breach));
     
     // 1. Contain the breach
     // 2. Assess the scope
@@ -672,7 +677,7 @@ class HIPAAComplianceService {
 
   private async getBreachHistory(): Promise<BreachNotification[]> {
     const key = 'hipaa_breaches';
-    return await secureStorage.getItem(key) || [];
+    return (await secureStorage.getItem(key) || []) as BreachNotification[];
   }
 
   private isDataEncrypted(data: unknown): boolean {
@@ -736,4 +741,4 @@ class HIPAAComplianceService {
   }
 }
 
-export const _hipaaService = HIPAAComplianceService.getInstance();
+export const hipaaService = HIPAAComplianceService.getInstance();

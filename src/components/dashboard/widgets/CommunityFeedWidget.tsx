@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, MessageCircle, Heart, UserPlus, _Globe, Lock } from 'lucide-react';
+import { Users, MessageCircle, Heart, UserPlus, Globe, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRealtimeSync, RealtimeEvent } from '../../../services/integration/RealtimeSyncService';
@@ -22,23 +22,24 @@ interface CommunityFeedWidgetProps {
 export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetProps) {
   const navigate = useNavigate();
   const realtimeSync = useRealtimeSync();
-  const [posts, _setPosts] = useState<CommunityPost[]>([]);
-  const [___onlineUsers, _setOnlineUsers] = useState(0);
-  const [typingUsers, _setTypingUsers] = useState<string[]>([]);
-  const [__loading, _setLoading] = useState(true);
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState(0);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Load initial posts
     loadPosts();
 
     // Subscribe to real-time updates
-    const unsubPost = realtimeSync.on(RealtimeEvent.COMMUNITY_POST_CREATED, (_post) => {
-      setPosts(prev => [post, ...prev].slice(0, 5));
+    const unsubPost = realtimeSync.on(RealtimeEvent.COMMUNITY_POST_CREATED, (post) => {
+      setPosts(prev => [(post as CommunityPost), ...prev].slice(0, 5));
     });
 
     const unsubComment = realtimeSync.on(RealtimeEvent.COMMUNITY_COMMENT_ADDED, (data) => {
-      setPosts(prev => prev.map(post => 
-        post.id === data.postId 
+      const commentData = data as { postId: string };
+      setPosts(prev => prev.map(post =>
+        post.id === commentData.postId
           ? { ...post, comments: post.comments + 1 }
           : post
       ));
@@ -53,7 +54,8 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
     });
 
     const unsubTyping = realtimeSync.on(RealtimeEvent.COMMUNITY_TYPING, (data) => {
-      setTypingUsers(data.users);
+      const typingData = data as { users: string[] };
+      setTypingUsers(typingData.users);
     });
 
     return () => {
@@ -110,7 +112,7 @@ export function CommunityFeedWidget({ isConnected, error }: CommunityFeedWidgetP
     );
   }
 
-  if (_loading) {
+  if (loading) {
     return (
       <div className="animate-pulse space-y-3">
         <div className="h-16 bg-gray-200 rounded-lg"></div>

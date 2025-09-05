@@ -6,8 +6,8 @@
 
 import { EventEmitter } from 'events';
 import { secureStorage } from '../security/SecureLocalStorage';
-import { _useWellnessStore } from '../../stores/wellnessStore';
-import { __useActivityStore } from '../../stores/activityStore';
+import { useWellnessStore } from '../../stores/wellnessStore';
+import { useActivityStore } from '../../stores/activityStore';
 import { realtimeSyncService } from './RealtimeSyncService';
 import { dataIntegrationService } from './DataIntegrationService';
 import { logger } from '../../utils/logger';
@@ -167,14 +167,14 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private initializeMonitoring() {
     // Monitor wellness store for crisis indicators
-    _useWellnessStore.subscribe((state) => {
+    useWellnessStore.subscribe((state) => {
       if (state.moodEntries.length > 0) {
         this.analyzeMoodForCrisis(state.moodEntries[state.moodEntries.length - 1]);
       }
     });
     
     // Monitor activity patterns
-    __useActivityStore.subscribe((state) => {
+    useActivityStore.subscribe((state) => {
       this.analyzeActivityPatterns(state.activities);
     });
     
@@ -193,7 +193,7 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Analyze mood entries for crisis indicators
    */
-  private analyzeMoodForCrisis(moodEntry: unknown) {
+  private analyzeMoodForCrisis(moodEntry: any) {
     const triggers: CrisisTrigger[] = [];
     
     // Check mood score threshold
@@ -233,7 +233,7 @@ class CrisisIntegrationService extends EventEmitter {
     const emotions = moodEntry.emotions || [];
     
     for (const trigger of this.RISK_THRESHOLDS.negativeTriggers) {
-      if (notes.includes(_trigger) || emotions.includes(_trigger)) {
+      if (notes.includes(trigger) || emotions.includes(trigger)) {
         triggers.push({
           _type: 'crisis_keyword',
           source: 'mood_tracker',
@@ -246,14 +246,14 @@ class CrisisIntegrationService extends EventEmitter {
     
     // Assess combined risk
     if (triggers.length > 0) {
-      this.assessCrisisRisk(_triggers);
+      this.assessCrisisRisk(triggers);
     }
   }
   
   /**
    * Analyze activity patterns for crisis indicators
    */
-  private analyzeActivityPatterns(activities: unknown[]) {
+  private analyzeActivityPatterns(activities: any[]) {
     const now = new Date();
     const recentActivities = activities.filter(a => {
       const activityDate = new Date(a.completedAt || a.scheduledTime);
@@ -321,10 +321,10 @@ class CrisisIntegrationService extends EventEmitter {
       userId: 'current-user', // Get from auth context
       timestamp: new Date(),
       _severity,
-      riskFactors: triggers.map(t => t.type),
+      riskFactors: triggers.map(t => t._type),
       protectiveFactors: this.identifyProtectiveFactors(),
-      suicidalIdeation: triggers.some(t => t.data?.keyword?.includes('suicidal')),
-      selfHarmRisk: triggers.some(t => t.data?.keyword?.includes('self-harm')),
+      suicidalIdeation: triggers.some(t => (t.data as any)?.keyword?.includes('suicidal')),
+      selfHarmRisk: triggers.some(t => (t.data as any)?.keyword?.includes('self-harm')),
       hasplan: false, // Would need direct assessment
       hasIntent: false, // Would need direct assessment
       hasMeans: false, // Would need direct assessment
@@ -335,13 +335,13 @@ class CrisisIntegrationService extends EventEmitter {
     };
     
     // Queue assessment
-    this.assessmentQueue.push(_assessment);
+    this.assessmentQueue.push(assessment);
     
     // Emit event
     this.emit(CrisisEventType.RISK_DETECTED, assessment);
     
     // Take action based on severity
-    this.handleCrisisDetection(_assessment);
+    this.handleCrisisDetection(assessment);
   }
   
   /**
@@ -351,8 +351,8 @@ class CrisisIntegrationService extends EventEmitter {
     const factors: string[] = [];
     
     // Check recent positive activities
-    const wellnessStore = _useWellnessStore.getState();
-    const activityStore = __useActivityStore.getState();
+    const wellnessStore = useWellnessStore.getState();
+    const activityStore = useActivityStore.getState();
     
     if (wellnessStore.moodEntries.some(e => e.moodScore >= 4)) {
       factors.push('recent_positive_moods');
@@ -408,11 +408,11 @@ class CrisisIntegrationService extends EventEmitter {
     }
     
     // Add trigger-specific recommendations
-    if (triggers.some(t => t.type === 'high_stress')) {
+    if (triggers.some(t => t._type === 'high_stress')) {
       recommendations.push('Try stress reduction techniques');
     }
     
-    if (triggers.some(t => t.type === 'inactivity')) {
+    if (triggers.some(t => t._type === 'inactivity')) {
       recommendations.push('Engage in gentle activities');
     }
     
@@ -424,11 +424,11 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private async handleCrisisDetection(assessment: CrisisAssessment) {
     // Log crisis event
-    logger.info('Crisis detected:', assessment);
+    logger.info('Crisis detected:', JSON.stringify({ severity: assessment._severity, timestamp: assessment.timestamp }));
     
     // Update stores
-    _useWellnessStore.getState().recordCrisisEvent({
-      _severity: assessment._severity === CrisisSeverity.CRITICAL ? 'critical' : 
+    useWellnessStore.getState().recordCrisisEvent({
+      severity: assessment._severity === CrisisSeverity.CRITICAL ? 'critical' : 
                 assessment._severity === CrisisSeverity.HIGH ? 'high' : 
                 assessment._severity === CrisisSeverity.MEDIUM ? 'medium' : 'low',
       triggers: [],
@@ -441,14 +441,14 @@ class CrisisIntegrationService extends EventEmitter {
     });
     
     // Send real-time alert
-    if (assessment.severity === CrisisSeverity.CRITICAL || assessment.severity === CrisisSeverity.HIGH) {
+    if (assessment._severity === CrisisSeverity.CRITICAL || assessment._severity === CrisisSeverity.HIGH) {
       realtimeSyncService.send('crisis', 'alert', {
         assessment,
         requiresImmediate: true
       });
       
       // Auto-activate safety plan for critical severity
-      if (assessment.severity === CrisisSeverity.CRITICAL && this.safetyPlan) {
+      if (assessment._severity === CrisisSeverity.CRITICAL && this.safetyPlan) {
         this.activateSafetyPlan();
       }
     }
@@ -589,7 +589,7 @@ class CrisisIntegrationService extends EventEmitter {
     });
     
     // In real implementation, would trigger actual contact
-    logger.info('Contacting emergency services:', contact);
+    logger.info('Contacting emergency services:', JSON.stringify({ name: contact.name, type: contact._type }));
   }
   
   /**
@@ -633,7 +633,7 @@ class CrisisIntegrationService extends EventEmitter {
     // Store in secure storage (encrypted for sensitive crisis data)
     const history = JSON.parse(secureStorage.getItem('crisis_sessions') || '[]');
     history.push(_session);
-    secureStorage.setItem('crisis_sessions', JSON.stringify(_history));
+    secureStorage.setItem('crisis_sessions', JSON.stringify(history));
   }
   
   /**
@@ -678,8 +678,8 @@ class CrisisIntegrationService extends EventEmitter {
    */
   private runPeriodicAssessment() {
     // Gather recent data
-    const wellnessStore = _useWellnessStore.getState();
-    const activityStore = __useActivityStore.getState();
+    const wellnessStore = useWellnessStore.getState();
+    const activityStore = useActivityStore.getState();
     
     // Analyze patterns
     const recentMoods = wellnessStore.moodEntries.slice(-10);
@@ -694,7 +694,7 @@ class CrisisIntegrationService extends EventEmitter {
     
     // Declining mood pattern
     if (recentMoods.length >= 3) {
-      const trend = this.calculateMoodTrend(_recentMoods);
+      const trend = this.calculateMoodTrend(recentMoods);
       if (trend < -0.5) {
         triggers.push({
           _type: 'declining_mood_trend',
@@ -719,14 +719,14 @@ class CrisisIntegrationService extends EventEmitter {
     }
     
     if (triggers.length > 0) {
-      this.assessCrisisRisk(_triggers);
+      this.assessCrisisRisk(triggers);
     }
   }
   
   /**
    * Calculate mood trend
    */
-  private calculateMoodTrend(moods: unknown[]): number {
+  private calculateMoodTrend(moods: any[]): number {
     if (moods.length < 2) return 0;
     
     const scores = moods.map(m => m.moodScore);
@@ -742,7 +742,7 @@ class CrisisIntegrationService extends EventEmitter {
   /**
    * Handle real-time crisis event
    */
-  private handleRealtimeCrisisEvent(data: unknown) {
+  private handleRealtimeCrisisEvent(data: any) {
     const { _type, payload } = data;
     
     switch (_type) {
@@ -800,7 +800,7 @@ class CrisisIntegrationService extends EventEmitter {
 }
 
 // Export singleton instance
-export const __crisisIntegrationService = CrisisIntegrationService.getInstance();
+export const crisisIntegrationService = CrisisIntegrationService.getInstance();
 
 // Export React hook
 export function useCrisisIntegration() {

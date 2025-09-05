@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
   TrendingUp,
-  _Award,
+  Award,
   Activity,
   Droplets,
   Moon,
@@ -11,7 +11,7 @@ import {
   Heart,
   Brain,
   Zap,
-  _Calendar,
+  Calendar,
   ChevronRight,
   Plus,
   Edit2,
@@ -23,12 +23,12 @@ import {
   Flame
 } from 'lucide-react';
 import {
-  _CircularProgressbar,
+  CircularProgressbar,
   CircularProgressbarWithChildren,
   buildStyles
 } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { _useWellnessStore } from '../../../../stores/wellnessStore';
+import { useWellnessStore } from '../../../../stores/wellnessStore';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 
 interface WellnessMetricsDashboardProps {
@@ -61,12 +61,12 @@ interface Recommendation {
 }
 
 export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessMetricsDashboardProps) {
-  const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, _calculateWellnessScores } = _useWellnessStore();
+  const { wellnessMetrics, wellnessGoals, moodEntries, weeklyScore, monthlyScore, calculateWellnessScores } = useWellnessStore();
   
-  const [selectedCategory, _setSelectedCategory] = useState<string | null>(null);
-  const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
-  const [_showGoalModal, _setShowGoalModal] = useState(false);
-  const [_editingGoal, _setEditingGoal] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<string | null>(null);
 
   // Calculate today&apos;s metrics
   const todayMetrics = useMemo(() => {
@@ -206,7 +206,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
 
     if (!yesterdayData) return 0;
 
-    const yesterdayValue = (yesterdayData as unknown)[metricId] || 0;
+    const yesterdayValue = (yesterdayData as Record<string, any>)[metricId] || 0;
     if (yesterdayValue === 0) return currentValue > 0 ? 100 : 0;
     
     return ((currentValue - yesterdayValue) / yesterdayValue) * 100;
@@ -249,7 +249,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
 
   // Calculate wellness score
   const wellnessScore = useMemo(() => {
-    const scores = todayMetrics.map(_metric => {
+    const scores = todayMetrics.map(metric => {
       const percentage = Math.min((metric.value / metric.target) * 100, 100);
       return percentage;
     });
@@ -446,7 +446,7 @@ export function WellnessMetricsDashboard({ onSetGoal, onViewDetails }: WellnessM
           {['physical', 'mental', 'emotional', 'social', 'spiritual'].map(category => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(_category)}
+              onClick={() => setSelectedCategory(category)}
               className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category 
                   ? 'bg-purple-100 text-purple-700' 

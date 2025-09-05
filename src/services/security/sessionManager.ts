@@ -7,8 +7,8 @@
 import { cryptoService } from './cryptoService';
 import { secureStorage } from './secureStorage';
 import { auditLogger } from './auditLogger';
-import { _rateLimiter } from './rateLimiter';
-import { _fieldEncryption } from './fieldEncryption';
+import { rateLimiter } from './rateLimiter';
+import { fieldEncryption } from './fieldEncryption';
 import { logger } from '../../utils/logger';
 
 interface Session {
@@ -156,7 +156,7 @@ class SessionManagerService {
       const metadata = this.parseUserAgent(params.userAgent);
       
       // Determine security level based on context
-      const securityLevel = this.determineSecurityLevel(_params);
+      const securityLevel = this.determineSecurityLevel(params);
       
       // Get configuration
       const config = SESSION_CONFIGS[securityLevel];
@@ -175,7 +175,7 @@ class SessionManagerService {
         userAgent: params.userAgent,
         fingerprint,
         deviceId: params.deviceId,
-        location: params.location,
+        location: params.location as Session['location'],
         securityLevel,
         mfaVerified: params.mfaVerified || false,
         permissions: await this.getUserPermissions(params._userId),
@@ -201,7 +201,7 @@ class SessionManagerService {
       // Log session creation
       await auditLogger.log({
         event: 'USER_LOGIN',
-        _userId: params._userId,
+        userId: params._userId,
         details: {
           sessionId,
           loginMethod: params.loginMethod,
@@ -216,7 +216,7 @@ class SessionManagerService {
     } catch (error) {
       await auditLogger.log({
         event: 'LOGIN_FAILED',
-        _userId: params._userId,
+        userId: params._userId,
         details: {
           error: error instanceof Error ? error.message : String(error),
         },
@@ -404,7 +404,7 @@ class SessionManagerService {
     // Log renewal
     await auditLogger.log({
       event: 'DATA_MODIFICATION',
-      _userId: session._userId,
+      userId: session._userId,
       details: {
         sessionId,
         action: 'session_renewed',
@@ -430,7 +430,7 @@ class SessionManagerService {
     // Remove from maps
     this.sessions.delete(sessionId);
     const userSessions = this.userSessions.get(session._userId);
-    if (_userSessions) {
+    if (userSessions) {
       userSessions.delete(sessionId);
     }
     
@@ -440,7 +440,7 @@ class SessionManagerService {
     // Log termination
     await auditLogger.log({
       event: 'USER_LOGOUT',
-      _userId: session._userId,
+      userId: session._userId,
       details: {
         sessionId,
         reason,
@@ -504,7 +504,7 @@ class SessionManagerService {
     // Log elevation
     await auditLogger.log({
       event: 'PERMISSION_GRANTED',
-      _userId: session._userId,
+      userId: session._userId,
       details: {
         sessionId,
         action: 'session_elevated',
@@ -531,7 +531,7 @@ class SessionManagerService {
         const sanitized = { ...session };
         delete sanitized.accessToken;
         delete sanitized.refreshToken;
-        sessions.push(_sanitized);
+        sessions.push(sanitized);
       }
     }
     
@@ -592,7 +592,7 @@ class SessionManagerService {
     return await cryptoService.sha256(_data);
   }
 
-  private parseUserAgent(userAgent: string): unknown {
+  private parseUserAgent(userAgent: string): Session['metadata'] {
     // Simple user agent parsing
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const browser = userAgent.match(/(chrome|firefox|safari|edge|opera)/i)?.[0] || 'unknown';
@@ -600,6 +600,7 @@ class SessionManagerService {
     const platform = isMobile ? 'mobile' : 'desktop';
     
     return {
+      loginMethod: 'standard',
       platform,
       browser: browser.toLowerCase(),
       os: os.toLowerCase(),
@@ -608,7 +609,7 @@ class SessionManagerService {
     };
   }
 
-  private determineSecurityLevel(params: unknown): 'basic' | 'elevated' | 'maximum' {
+  private determineSecurityLevel(params: any): 'basic' | 'elevated' | 'maximum' {
     // Determine based on context
     if (params.loginMethod === 'emergency') {
       return 'basic'; // Allow quick access in emergencies
@@ -655,7 +656,7 @@ class SessionManagerService {
     return { accessToken, refreshToken };
   }
 
-  private async encodeToken(_payload: unknown): Promise<string> {
+  private async encodeToken(_payload: any): Promise<string> {
     const _header = { alg: 'HS256', typ: 'JWT' };
     const encodedHeader = btoa(JSON.stringify(_header));
     const encodedPayload = btoa(JSON.stringify(_payload));
@@ -667,12 +668,12 @@ class SessionManagerService {
     const userSessions = this.userSessions.get(_userId) || new Set();
     
     // Get maximum allowed sessions for any user
-    const maxSessions = Math.max(...Object.values(_SESSION_CONFIGS).map(c => c.maxConcurrentSessions));
+    const maxSessions = Math.max(...Object.values(SESSION_CONFIGS).map(c => c.maxConcurrentSessions));
     
     if (userSessions.size >= maxSessions) {
       // Terminate oldest session
-      const sessions = Array.from(_userSessions)
-        .map(id => this.sessions.get(id))
+      const sessions = Array.from(userSessions)
+        .map(id => this.sessions.get(String(id)))
         .filter(s => s !== undefined)
         .sort((a, b) => a!.createdAt.getTime() - b!.createdAt.getTime());
       
@@ -701,7 +702,7 @@ class SessionManagerService {
     if (!this.userSessions.has(session._userId)) {
       this.userSessions.set(session._userId, new Set());
     }
-    this.userSessions.get(session.userId)!.add(session.sessionId);
+    this.userSessions.get(session._userId)!.add(session.sessionId);
     
     // Store fingerprint
     this.sessionFingerprints.set(session.sessionId, session.fingerprint);
@@ -713,7 +714,7 @@ class SessionManagerService {
   private async loadSessions(): Promise<void> {
     try {
       const stored = await secureStorage.getItem(this.SESSION_STORAGE_KEY);
-      if (stored && Array.isArray(_stored)) {
+      if (stored && Array.isArray(stored)) {
         // Restore sessions
         for (const sessionData of stored) {
           const session = {
@@ -731,7 +732,7 @@ class SessionManagerService {
             if (!this.userSessions.has(session._userId)) {
               this.userSessions.set(session._userId, new Set());
             }
-            this.userSessions.get(session.userId)!.add(session.sessionId);
+            this.userSessions.get(session._userId)!.add(session.sessionId);
           }
         }
       }
@@ -804,4 +805,4 @@ class SessionManagerService {
   }
 }
 
-export const _sessionManager = SessionManagerService.getInstance();
+export const sessionManager = SessionManagerService.getInstance();

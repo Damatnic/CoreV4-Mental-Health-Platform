@@ -46,6 +46,38 @@ interface SessionData {
   expiresAt: Date;
 }
 
+// API Response Types
+interface RegisterResponse {
+  data: {
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      role: 'user' | 'professional' | 'admin' | 'moderator';
+      createdAt: Date;
+      updatedAt: Date;
+    };
+    tokens?: AuthTokens;
+  };
+}
+
+interface LoginResponse {
+  data: SessionData;
+}
+
+interface TokenRefreshResponse {
+  data: {
+    tokens: AuthTokens;
+  };
+}
+
+interface PasswordResetResponse {
+  data: {
+    message: string;
+    resetToken?: string;
+  };
+}
+
 interface PasswordResetRequest {
   email: string;
   securityQuestionAnswers?: Record<string, string>;
@@ -112,7 +144,7 @@ class AuthenticationService {
         password: hashedPassword,
         registrationIp: await this.getClientIp(),
         registrationDevice: this.getDeviceFingerprint(),
-      });
+      }) as RegisterResponse;
 
       // Log registration event
       await auditLogger.log({
@@ -175,7 +207,7 @@ class AuthenticationService {
           password: hashedPassword,
           mfaCode: credentials.mfaCode,
           deviceId: this.getDeviceFingerprint(),
-        });
+        }) as LoginResponse;
 
         _sessionData = response.data;
       }
@@ -263,7 +295,7 @@ class AuthenticationService {
       // Call refresh endpoint (API call would go here)
       const response = await this.mockApiCall('/auth/refresh', {
         refreshToken: this.currentSession.tokens.refreshToken,
-      });
+      }) as TokenRefreshResponse;
 
       const newTokens = response.data.tokens;
       
@@ -324,7 +356,7 @@ class AuthenticationService {
       // API call to update profile
       const response = await this.mockApiCall('/auth/profile', {
         ...updates,
-      });
+      }) as { data: Partial<User> };
 
       // Update session with new user data
       this.currentSession.user = { ...this.currentSession.user, ...response.data };
@@ -334,7 +366,7 @@ class AuthenticationService {
       await auditLogger.log({
         event: 'PROFILE_UPDATED',
         userId: this.currentSession.user.id,
-        details: { updatedFields: Object.keys(_updates) },
+        details: { updatedFields: Object.keys(updates) },
         severity: 'info',
       });
 
@@ -454,7 +486,7 @@ class AuthenticationService {
     this.currentSession = session;
     
     // Encrypt session data
-    const _encryptedSession = await cryptoService.encrypt(JSON.stringify(_session));
+    const _encryptedSession = await cryptoService.encrypt(JSON.stringify(session));
     
     // Store in secure storage
     secureStorage.setItem('session', _encryptedSession);
@@ -584,10 +616,10 @@ class AuthenticationService {
     if (password.length < 8) feedback.push('Password should be at least 8 characters');
 
     // Complexity checks
-    if (/[a-z]/.test(_password)) score++;
-    if (/[A-Z]/.test(_password)) score++;
-    if (/[0-9]/.test(_password)) score++;
-    if (/[^a-zA-Z0-9]/.test(_password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^a-zA-Z0-9]/.test(password)) score++;
 
     // Common patterns check
     const commonPatterns = ['password', '12345', 'qwerty', 'admin', 'letmein'];
@@ -597,10 +629,10 @@ class AuthenticationService {
     }
 
     // Provide feedback
-    if (!/[a-z]/.test(_password)) feedback.push('Add lowercase letters');
-    if (!/[A-Z]/.test(_password)) feedback.push('Add uppercase letters');
-    if (!/[0-9]/.test(_password)) feedback.push('Add numbers');
-    if (!/[^a-zA-Z0-9]/.test(_password)) feedback.push('Add special characters');
+    if (!/[a-z]/.test(password)) feedback.push('Add lowercase letters');
+    if (!/[A-Z]/.test(password)) feedback.push('Add uppercase letters');
+    if (!/[0-9]/.test(password)) feedback.push('Add numbers');
+    if (!/[^a-zA-Z0-9]/.test(password)) feedback.push('Add special characters');
 
     return { score: Math.min(5, score), feedback };
   }
@@ -648,10 +680,13 @@ class AuthenticationService {
 
   private async mockApiCall(endpoint: string, data: unknown): Promise<unknown> {
     // Simulate API call - in production, this would be a real API call
-    logger.info(`API Call to ${endpoint}:`, data);
+    logger.info(`API Call to ${endpoint}:`, JSON.stringify(data));
     
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Type assertion for data to access properties safely
+    const requestData = data as Record<string, any>;
     
     // Return mock response based on endpoint
     if (endpoint === '/auth/register') {
@@ -659,9 +694,9 @@ class AuthenticationService {
         data: {
           user: {
             id: `user_${Date.now()}`,
-            email: data.email,
-            name: data.name || data.email.split('@')[0],
-            role: 'user',
+            email: requestData.email,
+            name: requestData.name || requestData.email?.split('@')[0],
+            role: 'user' as const,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -672,9 +707,9 @@ class AuthenticationService {
         data: {
           user: {
             id: `user_${Date.now()}`,
-            email: data.email,
-            name: data.email.split('@')[0],
-            role: 'user',
+            email: requestData.email,
+            name: requestData.email?.split('@')[0],
+            role: 'user' as const,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -685,7 +720,7 @@ class AuthenticationService {
             tokenType: 'Bearer' as const,
           },
           sessionId: this.generateSessionId(),
-          deviceId: data.deviceId,
+          deviceId: requestData.deviceId,
           createdAt: new Date(),
           lastActivity: new Date(),
           expiresAt: new Date(Date.now() + 3600 * 1000),
@@ -708,4 +743,4 @@ class AuthenticationService {
   }
 }
 
-export const _authService = AuthenticationService.getInstance();
+export const authService = AuthenticationService.getInstance();

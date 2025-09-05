@@ -2,7 +2,9 @@
 // Provides realistic demo functionality without requiring backend services
 
 import { RealtimeMessage } from '../realtime/websocketService';
-import { mockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
+import { MockCrisisServer, MockCrisisSession, MockCounselor } from './MockCrisisServer';
+
+const mockCrisisServer = MockCrisisServer.getInstance();
 import { toast } from 'react-hot-toast';
 import { logger } from '../../utils/logger';
 
@@ -98,7 +100,7 @@ export class MockWebSocketAdapter {
 
     // Create crisis session through mock server
     const session = mockCrisisServer.createCrisisSession(this.currentUserId, priority);
-    this.activeSessions.set(session.sessionId, session);
+    this.activeSessions.set(session._sessionId, session);
 
     // Setup session event handlers
     session.onMessage((message: RealtimeMessage) => {
@@ -126,7 +128,7 @@ export class MockWebSocketAdapter {
     });
 
     // Join the room
-    await this.joinRoom(session.sessionId);
+    await this.joinRoom(session._sessionId);
 
     // Simulate counselor assignment process
     setTimeout(() => {
@@ -140,7 +142,7 @@ export class MockWebSocketAdapter {
     }, 2000);
 
     // Simulate queue position updates
-    this.simulateQueueUpdates(session.sessionId);
+    this.simulateQueueUpdates(session._sessionId);
 
     return {
       _sessionId: session._sessionId,
@@ -182,7 +184,7 @@ export class MockWebSocketAdapter {
     }
 
     // Send message to mock crisis session
-    session.sendMessage(_content);
+    session.sendMessage(content);
   }
 
   // Send typing indicator
@@ -218,7 +220,7 @@ export class MockWebSocketAdapter {
     // Show immediate emergency modal
     const emergencyMessage = {
       id: `emergency-${Date.now()}`,
-      _roomId: data.sessionId || 'system',
+      _roomId: (data as any).sessionId || 'system',
       userId: 'system',
       username: 'Emergency System',
       content: `🚨 EMERGENCY PROTOCOL ACTIVATED\n\nI'm initiating an emergency call to ${service} (${number}) based on your situation. This is for your immediate safety.\n\nIf you're in immediate danger, please call ${number} directly or go to your nearest emergency room.`,
@@ -242,14 +244,14 @@ export class MockWebSocketAdapter {
     }, 2000);
 
     // Log emergency event
-    logger.error(`📞 EMERGENCY CALL: ${service} (${number}) - Session: ${data._sessionId}`);
+    logger.error(`📞 EMERGENCY CALL: ${service} (${number}) - Session: ${(data as any)._sessionId}`);
   }
 
   // Handle crisis escalation
   private handleCrisisEscalation(data: unknown): void {
     const escalationMessage = {
       id: `escalation-${Date.now()}`,
-      _roomId: data.sessionId || 'system',
+      _roomId: (data as any).sessionId || 'system',
       userId: 'system',
       username: 'Crisis Team',
       content: '🆘 CRISIS ESCALATION: Your situation has been escalated to our emergency response team. A crisis specialist is being notified immediately. Please stay on the line.',
@@ -263,7 +265,7 @@ export class MockWebSocketAdapter {
     setTimeout(() => {
       const specialistMessage = {
         id: `specialist-${Date.now()}`,
-        _roomId: data.sessionId || 'system',
+        _roomId: (data as any).sessionId || 'system',
         userId: 'crisis-specialist',
         username: 'Dr. Crisis Specialist',
         content: 'Hello, I\'m Dr. Martinez, a crisis intervention specialist. I\'ve been notified of your situation and I\'m here to help. Your safety is our absolute priority. Can you tell me your current location?',

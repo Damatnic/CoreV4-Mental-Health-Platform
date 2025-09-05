@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, ChevronRight, ChevronLeft, Check, 
-  Shield, Brain, _Heart, _Users, _Target, 
-  Sparkles, _Bell, _MapPin, Phone, Settings,
-  _HelpCircle, Award, TrendingUp
+import {
+  X, ChevronRight, ChevronLeft, Check,
+  Shield, Brain, Heart, Users, Target,
+  Sparkles, Bell, MapPin, Phone, Settings,
+  HelpCircle, Award, TrendingUp
 } from 'lucide-react';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useAuth } from '../../hooks/useAuth';
@@ -13,7 +13,7 @@ interface OnboardingStep {
   id: string;
   title: string;
   description: string;
-  icon: React.ComponentType<unknown>;
+  icon: React.ComponentType<{ className?: string }>;
   content: React.ReactNode;
   action?: () => void;
   actionLabel?: string;
@@ -27,9 +27,9 @@ interface DashboardOnboardingProps {
 export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingProps) {
   const { user } = useAuth();
   const { trackEvent } = useAnalytics();
-  const [currentStep, _setCurrentStep] = useState(0);
-  const [_completedSteps, _setCompletedSteps] = useState<Set<string>>(new Set());
-  const [_showWelcome, _setShowWelcome] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const steps: OnboardingStep[] = [
     {
@@ -238,7 +238,7 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
     const step = steps[currentStep];
     if (!step) return;
     
-    setCompletedSteps(_prev => new Set(_prev).add(step.id));
+    setCompletedSteps(prev => new Set(prev).add(step.id));
     
     trackEvent('onboarding_step_completed', {
       stepId: step.id,
@@ -262,7 +262,7 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
     localStorage.setItem('dashboard_onboarding_completed', 'true');
     trackEvent('onboarding_completed', {
       userId: user?.id,
-      _completedSteps: Array.from(_completedSteps)
+      completedSteps: Array.from(completedSteps)
     });
     onComplete();
   };
@@ -272,7 +272,7 @@ export function DashboardOnboarding({ onComplete, onSkip }: DashboardOnboardingP
       userId: user?.id,
       skippedAtStep: currentStep
     });
-    if (_onSkip) {
+    if (onSkip) {
       onSkip();
     } else {
       handleComplete();

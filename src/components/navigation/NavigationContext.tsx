@@ -59,17 +59,17 @@ const NavigationContext = createContext<NavigationContextState | undefined>(unde
 // Provider component
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const [mode, _setMode] = useState<NavigationMode>('normal');
-  const [preferences, _setPreferences] = useState<NavigationPreferences>(() => {
+  const [mode, setMode] = useState<NavigationMode>('normal');
+  const [preferences, setPreferences] = useState<NavigationPreferences>(() => {
     // Load preferences from localStorage if available
     const saved = localStorage.getItem('navigationPreferences');
     return saved ? { ...defaultPreferences, ...JSON.parse(saved) } : defaultPreferences;
   });
-  const [isSearchOpen, _setSearchOpen] = useState(false);
-  const [isMobileMenuOpen, _setMobileMenuOpen] = useState(false);
-  const [crisisDetected, _setCrisisDetected] = useState(false);
-  const [userRole, _setUserRole] = useState<'patient' | 'caregiver' | 'professional' | 'guest'>('guest');
-  const [breadcrumbs, _setBreadcrumbs] = useState<Array<{ label: string; path: string }>>([]);
+  const [isSearchOpen, setSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [crisisDetected, setCrisisDetected] = useState(false);
+  const [userRole, setUserRole] = useState<'patient' | 'caregiver' | 'professional' | 'guest'>('guest');
+  const [breadcrumbs, setBreadcrumbs] = useState<Array<{ label: string; path: string }>>([]);
 
   // Update breadcrumbs based on current path
   useEffect(() => {
@@ -93,13 +93,39 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('navigationPreferences', JSON.stringify(preferences));
   }, [preferences]);
 
+  // Define functions first
+  const updatePreferences = React.useCallback((prefs: Partial<NavigationPreferences>) => {
+    setPreferences((prev: NavigationPreferences) => ({ ...prev, ...prefs }));
+  }, []);
+
+  const addToFavorites = React.useCallback((route: string) => {
+    setPreferences((prev: NavigationPreferences) => ({
+      ...prev,
+      favoriteRoutes: [...new Set([...prev.favoriteRoutes, route])],
+    }));
+  }, []);
+
+  const removeFromFavorites = React.useCallback((route: string) => {
+    setPreferences((prev: NavigationPreferences) => ({
+      ...prev,
+      favoriteRoutes: prev.favoriteRoutes.filter((r: string) => r !== route),
+    }));
+  }, []);
+
+  const addToRecent = React.useCallback((route: string) => {
+    setPreferences((prev: NavigationPreferences) => {
+      const recent = [route, ...prev.recentRoutes.filter((r: string) => r !== route)].slice(0, 10);
+      return { ...prev, recentRoutes: recent };
+    });
+  }, []);
+
   // Check for reduced motion preference
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPreferences(prev => ({ ...prev, reducedMotion: mediaQuery.matches }));
+    setPreferences((prev: NavigationPreferences) => ({ ...prev, reducedMotion: mediaQuery.matches }));
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setPreferences(prev => ({ ...prev, reducedMotion: e.matches }));
+      setPreferences((prev: NavigationPreferences) => ({ ...prev, reducedMotion: e.matches }));
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -109,10 +135,10 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   // Check for high contrast preference
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-contrast: high)');
-    setPreferences(prev => ({ ...prev, highContrast: mediaQuery.matches }));
+    setPreferences((prev: NavigationPreferences) => ({ ...prev, highContrast: mediaQuery.matches }));
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setPreferences(prev => ({ ...prev, highContrast: e.matches }));
+      setPreferences((prev: NavigationPreferences) => ({ ...prev, highContrast: e.matches }));
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -137,32 +163,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   // Update recent routes
   useEffect(() => {
     addToRecent(location.pathname);
-  }, [location]);
-
-  const updatePreferences = (prefs: Partial<NavigationPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...prefs }));
-  };
-
-  const addToFavorites = (route: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      favoriteRoutes: [...new Set([...prev.favoriteRoutes, route])],
-    }));
-  };
-
-  const removeFromFavorites = (route: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      favoriteRoutes: prev.favoriteRoutes.filter(r => r !== route),
-    }));
-  };
-
-  const addToRecent = (route: string) => {
-    setPreferences(prev => {
-      const recent = [route, ...prev.recentRoutes.filter(r => r !== route)].slice(0, 10);
-      return { ...prev, recentRoutes: recent };
-    });
-  };
+  }, [location, addToRecent]);
 
   // Quick actions based on current context
   const quickActions = React.useMemo(() => {

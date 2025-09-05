@@ -54,17 +54,17 @@ export const WellnessThemeProvider: React.FC<WellnessThemeProviderProps> = ({
   };
 
   const getGradient = (type: string) => {
-    const gradients = wellnessTheme.gradients as unknown;
+    const gradients = wellnessTheme.gradients as unknown as Record<string, string>;
     return `bg-gradient-to-r ${gradients[type] || gradients.primary}`;
   };
 
   const getToolGradient = (tool: string) => {
-    const tools = wellnessTheme.gradients.tools as unknown;
+    const tools = wellnessTheme.gradients.tools as unknown as Record<string, string>;
     return `bg-gradient-to-r ${tools[tool] || wellnessTheme.gradients.primary}`;
   };
 
   const applyComponentStyles = (component: string, variant?: string, size?: string) => {
-    const comp = (wellnessTheme.components as unknown)[component];
+    const comp = (wellnessTheme.components as Record<string, any>)[component];
     if (!comp) return '';
     
     let styles = comp.base || '';

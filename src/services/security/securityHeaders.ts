@@ -386,7 +386,7 @@ class SecurityHeadersService {
   async reportViolation(violation: unknown): Promise<void> {
     try {
       // Log violation for analysis
-      logger.warn('CSP Violation:', violation);
+      logger.warn('CSP Violation:', JSON.stringify(violation));
       
       // Send to reporting endpoint
       if (this.config.csp.reportUri) {
@@ -396,7 +396,7 @@ class SecurityHeadersService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ...violation,
+            ...(violation as object),
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent,
             url: window.location.href,

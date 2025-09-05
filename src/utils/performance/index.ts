@@ -133,11 +133,11 @@ function preloadCriticalResources() {
     import.meta.env.VITE_API_URL,
   ];
   
-  domains.forEach(_url => {
-    if (_url) {
+  domains.forEach(url => {
+    if (url) {
       const link = document.createElement('link');
       link.rel = 'preconnect';
-      link.href = new URL(_url).origin;
+      link.href = new URL(url).origin;
       document.head.appendChild(link);
     }
   });
@@ -199,7 +199,7 @@ function setupPerformanceBudget() {
 /**
  * Performance optimization presets for different scenarios
  */
-export const __PerformancePresets = {
+export const PerformancePresets = {
   // For crisis intervention - maximum performance
   crisis: {
     priority: UpdatePriority.CRISIS,

@@ -1,3 +1,0 @@
-H:\Astral Core\CoreV4\src\components\console\ConsoleBootSequence.tsx
-H:\Astral Core\CoreV4\src\hooks\useAITherapist.ts
-H:\Astral Core\CoreV4\src\hooks\useToast.tsx

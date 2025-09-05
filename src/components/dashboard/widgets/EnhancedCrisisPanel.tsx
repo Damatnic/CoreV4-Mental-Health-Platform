@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  Phone, MessageCircle, AlertTriangle, Heart, Shield, MapPin, 
-  Activity, Users, _Clock, ChevronRight, _Bell, Wifi, WifiOff,
-  Brain, _TrendingUp, _TrendingDown, AlertCircle, CheckCircle,
+import {
+  Phone, MessageCircle, AlertTriangle, Heart, Shield, MapPin,
+  Activity, Users, Clock, ChevronRight, Bell, Wifi, WifiOff,
+  Brain, TrendingUp, TrendingDown, AlertCircle, CheckCircle,
   Navigation, Zap, HelpCircle, MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -103,14 +103,14 @@ export function EnhancedCrisisPanel({
   onStartCrisisChat,
   onLocationShare 
 }: EnhancedCrisisPanelProps) {
-  const { _user } = useAuth();
-  const { location, error: _locationError } = useGeolocation();
-  const { assessmentData, _updateAssessment } = useCrisisAssessment();
+  const { user } = useAuth();
+  const { location, error: locationError } = useGeolocation();
+  const { assessmentData, updateAssessment } = useCrisisAssessment();
   
-  const [_isOnline, _setIsOnline] = useState(navigator.onLine);
-  const [_showFullPlan, _setShowFullPlan] = useState(false);
-  const [activeTab, _setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
-  const [riskFactors, _setRiskFactors] = useState<RiskFactors>({
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [showFullPlan, setShowFullPlan] = useState(false);
+  const [activeTab, setActiveTab] = useState<'emergency' | 'safety' | 'network' | 'resources'>('emergency');
+  const [riskFactors, setRiskFactors] = useState<RiskFactors>({
     moodPattern: 0,
     behaviorChanges: 0,
     socialWithdrawal: 0,
@@ -119,12 +119,12 @@ export function EnhancedCrisisPanel({
     thoughtPatterns: 0,
     physicalSymptoms: 0
   });
-  const [crisisLevel, _setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
-  const [_pulseAnimation, _setPulseAnimation] = useState(false);
+  const [crisisLevel, setCrisisLevel] = useState<CrisisLevel>(() => CRISIS_LEVELS.safe);
+  const [pulseAnimation, setPulseAnimation] = useState(false);
 
   // Calculate real-time risk assessment
   const calculateRiskLevel = useCallback((): CrisisLevel => {
-    const factors = Object.values(_riskFactors);
+    const factors = Object.values(riskFactors);
     const avgScore = factors.reduce((sum, val) => sum + val, 0) / factors.length;
     
     // Add weight for critical factors
@@ -166,11 +166,7 @@ export function EnhancedCrisisPanel({
     if (newLevel.urgency === 'high' || newLevel.urgency === 'immediate') {
       setPulseAnimation(true);
       // Log critical event
-      logger.logCrisisIntervention('risk_level_elevated', undefined, {
-        level: newLevel.level,
-        score: newLevel.score,
-        factors: riskFactors
-      });
+      logger.info('Crisis risk level elevated', 'CRISIS');
     }
   }, [riskFactors, calculateRiskLevel]);
 
@@ -194,16 +190,10 @@ export function EnhancedCrisisPanel({
   const handleEmergencyCallWithLocation = useCallback((contact: string, service: string) => {
     // Share location if available
     if (location && onLocationShare) {
-      onLocationShare(_location);
+      onLocationShare(location);
     }
-    
     // Log emergency call
-    logger.logCrisisIntervention('emergency_call_with_location', undefined, {
-      service,
-      contact,
-      hasLocation: !!location,
-      timestamp: new Date().toISOString()
-    });
+    logger.info('Emergency call initiated with location', 'CRISIS');
     
     // Make the call
     onEmergencyCall?.(contact, service);
@@ -241,7 +231,7 @@ export function EnhancedCrisisPanel({
   ], []);
 
   // Personalized coping strategies based on risk level
-  const __copingStrategies   = useMemo(() => {
+  const copingStrategies = useMemo(() => {
     const baseStrategies = data?.safetyPlan?.copingStrategiesText ? [data.safetyPlan.copingStrategiesText] : [];
     const additionalStrategies = crisisLevel.recommendations;
     return [...baseStrategies, ...additionalStrategies];
@@ -292,7 +282,7 @@ export function EnhancedCrisisPanel({
             
             {/* Risk Factor Indicators */}
             <div className="grid grid-cols-3 gap-2 mt-3">
-              {Object.entries(_riskFactors).slice(0, 3).map(([factor, value]) => (
+              {Object.entries(riskFactors).slice(0, 3).map(([factor, value]) => (
                 <div key={factor} className="flex items-center space-x-1">
                   <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <motion.div 
@@ -376,7 +366,7 @@ export function EnhancedCrisisPanel({
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as unknown)}
+              onClick={() => setActiveTab(tab.id as 'emergency' | 'safety' | 'network' | 'resources')}
               className={`flex-1 py-2 px-3 flex items-center justify-center space-x-1 text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-500'

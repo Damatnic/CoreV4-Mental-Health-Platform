@@ -121,11 +121,11 @@ export function InsightsWidget({ insights, error }: InsightsWidgetProps) {
                         key={actionIndex}
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(action.route);
+                          navigate((action as any).route);
                         }}
                         className="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-xs hover:bg-primary-200 transition-colors"
                       >
-                        {action.label}
+                        {(action as any).label}
                         <ChevronRight className="h-3 w-3 ml-1" />
                       </button>
                     ))}

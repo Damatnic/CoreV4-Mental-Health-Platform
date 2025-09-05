@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
-  _Target,
-  _TrendingUp,
-  _Award,
-  _ChevronRight,
-  _Plus,
+  Target,
+  TrendingUp,
+  Award,
+  ChevronRight,
+  Plus,
   RefreshCw,
   Calendar,
   Clock,
@@ -25,13 +25,13 @@ import {
   ShoppingBag,
   Utensils,
   TreePine,
-  _Star,
+  Star,
   Info,
-  _CheckCircle,
+  CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { __useActivityStore } from '../../../stores/activityStore';
-import { _format, addDays } from 'date-fns';
+import { useActivityStore } from '../../../stores/activityStore';
+import { format, addDays } from 'date-fns';
 
 interface BehavioralActivationProps {
   currentMood?: number;
@@ -57,7 +57,7 @@ export function BehavioralActivation({
   onScheduleActivity,
   onStartExperiment
 }: BehavioralActivationProps) {
-  const { _activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = __useActivityStore();
+  const { activities, addActivity, getActivityRecommendations, adaptScheduleForBadDay } = useActivityStore();
 
   const [selectedDifficulty, _setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [selectedCategory, _setSelectedCategory] = useState<string>('all');
@@ -149,18 +149,24 @@ export function BehavioralActivation({
     };
     
     onStartExperiment?.(_experiment);
-    setShowExperiment(false);
-    setSelectedActivities([]);
-    setExperimentNotes('');
+    _setShowExperiment(false);
+    _setSelectedActivities([]);
+    _setExperimentNotes('');
   };
 
   // Schedule activity
-  const scheduleActivity = (activity: unknown) => {
+  const scheduleActivity = (activity: any) => {
     const _newActivity = {
-      ...activity,
+      title: activity.title,
+      type: 'practice' as const, // Use valid activity type
+      category: activity.category,
+      completed: false,
       scheduledTime: addDays(new Date(), 0), // Today
-      flexibility: 'flexible',
-      behavioralActivation: true
+      flexibility: 'flexible' as const,
+      behavioralActivation: true,
+      duration: activity.duration,
+      moodImpact: activity.moodImpact,
+      difficulty: activity._difficulty
     };
     
     addActivity(_newActivity);
@@ -168,8 +174,8 @@ export function BehavioralActivation({
   };
 
   // Toggle activity selection for experiment
-  const toggleActivitySelection = (activity: unknown) => {
-    setSelectedActivities(prev => {
+  const toggleActivitySelection = (activity: any) => {
+    _setSelectedActivities(prev => {
       const _exists = prev.find(a => a.id === activity.id);
       if (_exists) {
         return prev.filter(a => a.id !== activity.id);
@@ -208,7 +214,7 @@ export function BehavioralActivation({
           </div>
           
           <button
-            onClick={() => setShowExperiment(!showExperiment)}
+            onClick={() => _setShowExperiment(!showExperiment)}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Start experiment"
           >
@@ -233,7 +239,7 @@ export function BehavioralActivation({
         {/* Difficulty Selection */}
         <div className="flex space-x-2 mb-3">
           <button
-            onClick={() => setSelectedDifficulty('easy')}
+            onClick={() => _setSelectedDifficulty('easy')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedDifficulty === 'easy'
                 ? 'bg-green-100 text-green-700'
@@ -243,7 +249,7 @@ export function BehavioralActivation({
             Easy Start
           </button>
           <button
-            onClick={() => setSelectedDifficulty('medium')}
+            onClick={() => _setSelectedDifficulty('medium')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedDifficulty === 'medium'
                 ? 'bg-yellow-100 text-yellow-700'
@@ -253,7 +259,7 @@ export function BehavioralActivation({
             Moderate
           </button>
           <button
-            onClick={() => setSelectedDifficulty('hard')}
+            onClick={() => _setSelectedDifficulty('hard')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedDifficulty === 'hard'
                 ? 'bg-red-100 text-red-700'
@@ -267,7 +273,7 @@ export function BehavioralActivation({
         {/* Category Filters */}
         <div className="flex space-x-2 overflow-x-auto pb-2">
           <button
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => _setSelectedCategory('all')}
             className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-primary-100 text-primary-700'
@@ -279,7 +285,7 @@ export function BehavioralActivation({
           {['physical', 'creative', 'social', 'self-care', 'productive'].map(category => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(_category)}
+              onClick={() => _setSelectedCategory(category)}
               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === category
                   ? 'bg-primary-100 text-primary-700'
@@ -310,7 +316,7 @@ export function BehavioralActivation({
               <label htmlFor="input_jxp6xsdof" className="text-sm font-medium text-blue-800">Hypothesis/Notes</label>
               <textarea
                 value={experimentNotes}
-                onChange={(e) => setExperimentNotes(e.target.value)}
+                onChange={(e) => _setExperimentNotes(e.target.value)}
                 className="w-full mt-1 px-3 py-2 border border-blue-300 rounded-lg text-sm resize-none"
                 rows={2}
                 placeholder="What do you expect to happen?"
@@ -324,9 +330,9 @@ export function BehavioralActivation({
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
-                    setShowExperiment(false);
-                    setSelectedActivities([]);
-                    setExperimentNotes('');
+                    _setShowExperiment(false);
+                    _setSelectedActivities([]);
+                    _setExperimentNotes('');
                   }}
                   className="px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
                 >
@@ -372,10 +378,10 @@ export function BehavioralActivation({
                     ${isSelected ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-500' : 'bg-white border-gray-200 hover:border-primary-300'}
                   `}
                   onClick={() => {
-                    if (_showExperiment) {
-                      toggleActivitySelection(_activity);
+                    if (showExperiment) {
+                      toggleActivitySelection(activity);
                     } else {
-                      scheduleActivity(_activity);
+                      scheduleActivity(activity);
                     }
                   }}
                 >
@@ -443,7 +449,7 @@ export function BehavioralActivation({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            scheduleActivity(_activity);
+                            scheduleActivity(activity);
                           }}
                           className="mt-2 text-xs text-primary-600 hover:text-primary-700 font-medium"
                         >

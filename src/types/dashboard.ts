@@ -387,14 +387,17 @@ export interface DashboardError {
 
 // Type guards
 export function isDashboardWidget(obj: unknown): obj is DashboardWidget {
-  return obj && typeof obj.id === 'string' && typeof obj.type === 'string';
+  const typed = obj as any;
+  return typed && typeof typed.id === 'string' && typeof typed.type === 'string';
 }
 
 export function isEmergencyContact(obj: unknown): obj is EmergencyContact {
-  return obj && typeof obj.name === 'string' && typeof obj.phone === 'string';
+  const typed = obj as any;
+  return typed && typeof typed.name === 'string' && typeof typed.phone === 'string';
 }
 
 export function isCrisisHotline(obj: unknown): obj is CrisisHotline {
-  return obj && typeof obj.name === 'string' && typeof obj.contact === 'string';
+  const typed = obj as any;
+  return typed && typeof typed.name === 'string' && typeof typed.contact === 'string';
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Users, Stethoscope, AlertTriangle, _Clock, _Shield } from 'lucide-react';
+import { Heart, Users, Stethoscope, AlertTriangle, Clock, Shield } from 'lucide-react';
 import { ConsoleWelcomeBar } from './ConsoleWelcomeBar';
 import { ConsoleGrid } from './ConsoleGrid';
 import { ConsoleTile } from './ConsoleTile';

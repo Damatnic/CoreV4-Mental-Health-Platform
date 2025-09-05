@@ -64,15 +64,15 @@ interface CrisisProtocol {
 }
 
 export function RealTimeCrisisChat() {
-  const [___currentRoom, _setCurrentRoom] = useState<ChatRoom | null>(null);
-  const [messages, _setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, _setNewMessage] = useState('');
-  const [isConnected, _setIsConnected] = useState(false);
-  const [availableSupport, _setAvailableSupport] = useState<ChatParticipant[]>([]);
-  const [___chatType, _setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
-  const [isTyping, _setIsTyping] = useState(false);
-  const [soundEnabled, _setSoundEnabled] = useState(true);
-  const [___chatSettings, _setChatSettings] = useState({
+  const [_currentRoom, _setCurrentRoom] = useState<ChatRoom | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [availableSupport, setAvailableSupport] = useState<ChatParticipant[]>([]);
+  const [_chatType, _setChatType] = useState<'crisis' | 'peer' | 'professional'>('crisis');
+  const [isTyping, setIsTyping] = useState(false);
+  const [_soundEnabled, setSoundEnabled] = useState(true);
+  const [_chatSettings, _setChatSettings] = useState({
     notifications: true,
     readReceipts: true,
     autoConnect: true,
@@ -80,8 +80,8 @@ export function RealTimeCrisisChat() {
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef   = useRef<HTMLInputElement>(null);
-  const __chatContainerRef   = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize crisis chat connection
   useEffect(() => {
@@ -90,7 +90,7 @@ export function RealTimeCrisisChat() {
       disconnectFromChat();
     };
      
-  }, [initializeCrisisChat]);
+  }, []);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -98,7 +98,7 @@ export function RealTimeCrisisChat() {
   }, [messages]);
 
   // Handle typing indicators
-  const __handleTyping   = useCallback(() => {
+  const handleTyping = useCallback(() => {
     if (!isTyping) {
       setIsTyping(true);
       // Send typing indicator to other participants
@@ -287,7 +287,7 @@ export function RealTimeCrisisChat() {
 
   const connectToProfessional = async () => {
     const professional = availableSupport.find(p => p.role === 'professional');
-    if (_professional) {
+    if (professional) {
       // Simulate professional joining chat
       setTimeout(() => {
         const welcomeMessage: ChatMessage = {
@@ -295,7 +295,7 @@ export function RealTimeCrisisChat() {
           senderId: professional.id,
           senderName: professional.name,
           senderRole: 'professional',
-          content: `Hi, I&apos;m ${professional.name}, a ${professional.credentials}. I&apos;m here to help and support you through this difficult time. You&apos;re not alone.`,
+          content: `Hi, I'm ${professional.name}, a ${professional.credentials}. I'm here to help and support you through this difficult time. You're not alone.`,
           timestamp: new Date(),
           type: 'text',
           encrypted: true,
@@ -334,7 +334,7 @@ export function RealTimeCrisisChat() {
   };
 
   const playNotificationSound = (type: 'send' | 'receive' | 'professional' | 'alert') => {
-    if (!soundEnabled) return;
+    if (!_soundEnabled) return;
     
     // In production, would play appropriate notification sounds
     logger.info(`Playing ${type} notification sound`, 'RealTimeCrisisChat');
@@ -428,10 +428,10 @@ Professional counselors are joining this chat now. You matter and help is here.`
             
             {/* Sound Toggle */}
             <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
+              onClick={() => setSoundEnabled(!_soundEnabled)}
               className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              {_soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
             </button>
           </div>
         </div>

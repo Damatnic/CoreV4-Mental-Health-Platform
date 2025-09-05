@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion, _AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Target, _Calendar, _Clock, CheckCircle, AlertCircle,
-  Plus, _Minus, Edit2, Save, _Trash2, Users, Brain,
-  TrendingUp, _TrendingDown, BarChart3, FileText,
-  Star, _Award, _Settings, _Filter, _Search, Download,
-  _Upload, _RefreshCw, _Eye, _EyeOff, _Flag, _MessageSquare,
-  Lightbulb, Activity, _Heart, Shield, _Zap, _Globe
+  Target, Calendar, Clock, CheckCircle, AlertCircle,
+  Plus, Minus, Edit2, Save, Trash2, Users, Brain,
+  TrendingUp, TrendingDown, BarChart3, FileText,
+  Star, Award, Settings, Filter, Search, Download,
+  Upload, RefreshCw, Eye, EyeOff, Flag, MessageSquare,
+  Lightbulb, Activity, Heart, Shield, Zap, Globe
 } from 'lucide-react';
 
 interface TreatmentPlan {
@@ -163,14 +163,14 @@ export function TreatmentPlanManager({
   readOnly = false,
   isProvider = false
 }: TreatmentPlanManagerProps) {
-  const [activeTab, _setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
-  const [currentPlan, _setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
-  const [____editingGoal, _setEditingGoal] = useState<string | null>(null);
-  const [__showGoalForm, _setShowGoalForm] = useState(false);
-  const [__showInterventionForm, _setShowInterventionForm] = useState(false);
-  const [filterPriority, _setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [___searchTerm, _setSearchTerm] = useState('');
-  const [___showPrivateNotes, _setShowPrivateNotes] = useState(isProvider);
+  const [activeTab, setActiveTab] = useState<'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis'>('overview');
+  const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(treatmentPlan || null);
+  const [editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [showInterventionForm, setShowInterventionForm] = useState(false);
+  const [filterPriority, setFilterPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPrivateNotes, setShowPrivateNotes] = useState(isProvider);
 
   // Create new treatment plan if none provided
   useEffect(() => {
@@ -189,7 +189,7 @@ export function TreatmentPlanManager({
     createdDate: new Date(),
     lastUpdated: new Date(),
     reviewDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
-    status: 'active',
+    _status: 'active',
     _priority: 'medium',
     treatmentModalities: [],
     shortTermGoals: [],
@@ -212,7 +212,7 @@ export function TreatmentPlanManager({
   };
 
   // Get goals by status
-  const getGoalsByStatus = (_status: TreatmentGoal['status']) => {
+  const getGoalsByStatus = (_status: TreatmentGoal['_status']) => {
     if (!currentPlan) return [];
     const allGoals = [...currentPlan.shortTermGoals, ...currentPlan.longTermGoals];
     return allGoals.filter(goal => goal._status === _status);
@@ -365,7 +365,7 @@ export function TreatmentPlanManager({
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as unknown)}
+              onClick={() => setActiveTab(id as 'overview' | 'goals' | 'interventions' | 'progress' | 'barriers' | 'crisis')}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-all flex items-center space-x-2 ${
                 activeTab === id
                   ? 'text-primary-600 border-primary-600'
@@ -557,7 +557,7 @@ export function TreatmentPlanManager({
                 <h3 className="text-lg font-semibold text-gray-900">Treatment Goals</h3>
                 <select
                   value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value as unknown)}
+                  onChange={(e) => setFilterPriority(e.target.value as 'all' | 'high' | 'medium' | 'low')}
                   className="text-sm border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="all">All Priorities</option>

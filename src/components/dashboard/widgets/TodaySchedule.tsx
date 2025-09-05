@@ -30,7 +30,7 @@ export function TodaySchedule({
       const itemTime = new Date(item.time);
       const diffMinutes = (itemTime.getTime() - now.getTime()) / (1000 * 60);
       
-      if (item._status === 'completed') {
+      if (item.status === 'completed') {
         // Skip completed items or show them separately
       } else if (item.status === 'missed' || diffMinutes < -30) {
         groups.overdue!.push(item);
@@ -72,8 +72,8 @@ export function TodaySchedule({
   };
 
   // Get status icon
-  const StatusIcon = ({ _status }: { _status: ScheduleItem['_status'] }) => {
-    switch (_status) {
+  const StatusIcon = ({ status }: { status: ScheduleItem['status'] }) => {
+    switch (status) {
       case 'completed':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'missed':
@@ -230,13 +230,13 @@ export function TodaySchedule({
           </div>
           <div>
             <p className="text-2xl font-bold text-green-600">
-              {scheduleItems.filter(i => i._status === 'completed').length}
+              {scheduleItems.filter(i => i.status === 'completed').length}
             </p>
             <p className="text-xs text-gray-500">Completed</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-orange-600">
-              {scheduleItems.filter(i => i._status === 'upcoming').length}
+              {scheduleItems.filter(i => i.status === 'upcoming').length}
             </p>
             <p className="text-xs text-gray-500">Remaining</p>
           </div>
@@ -252,10 +252,10 @@ interface ScheduleItemCardProps {
   onClick?: (item: ScheduleItem) => void;
   onReschedule?: (item: ScheduleItem) => void;
   onMarkComplete?: (item: ScheduleItem) => void;
-  getItemIcon: (_type: ScheduleItem['_type']) => any;
+  getItemIcon: (_type: ScheduleItem['type']) => any;
   formatTime: (_date: Date) => string;
-  getStatusColor: (_status: ScheduleItem['_status'], priority: ScheduleItem['priority']) => string;
-  StatusIcon: ({ _status }: { _status: ScheduleItem['_status'] }) => JSX.Element | null;
+  getStatusColor: (_status: ScheduleItem['status'], priority: ScheduleItem['priority']) => string;
+  StatusIcon: ({ status }: { status: ScheduleItem['status'] }) => JSX.Element | null;
   compact?: boolean;
   showTimeUntil?: boolean;
   getTimeUntil?: (_date: Date) => string;
@@ -274,7 +274,7 @@ function ScheduleItemCard({
   showTimeUntil = false,
   getTimeUntil,
 }: ScheduleItemCardProps) {
-  const Icon = getItemIcon(item._type);
+  const Icon = getItemIcon(item.type);
 
   return (
     <motion.div
@@ -282,7 +282,7 @@ function ScheduleItemCard({
       whileTap={{ scale: 0.98 }}
       className={`
         p-3 rounded-lg border-l-4 cursor-pointer transition-all
-        ${getStatusColor(item._status, item.priority)}
+        ${getStatusColor(item.status, item.priority)}
         ${compact ? 'py-2' : ''}
       `}
       onClick={() => onClick?.(item)}
@@ -295,7 +295,7 @@ function ScheduleItemCard({
               <p className={`font-medium text-gray-900 ${compact ? 'text-sm' : ''}`}>
                 {item.title}
               </p>
-              <StatusIcon status={item._status} />
+              <StatusIcon status={item.status} />
             </div>
             {!compact && (
               <>
@@ -328,7 +328,7 @@ function ScheduleItemCard({
           </div>
         </div>
         
-        {!compact && item._status === 'upcoming' && (
+        {!compact && item.status === 'upcoming' && (
           <div className="flex flex-col space-y-1 ml-2">
             {onMarkComplete && (
               <button

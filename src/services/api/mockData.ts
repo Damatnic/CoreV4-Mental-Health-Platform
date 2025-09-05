@@ -10,8 +10,8 @@ import {
   SafetyPlan,
   CommunityPost,
   SupportGroup,
-  _Message,
-  _Comment
+  Message,
+  Comment
 } from './types';
 
 // Helper function to generate random dates
@@ -668,7 +668,7 @@ export class MockDataService {
       ...entry,
       id: `mood-${Date.now()}`
     };
-    mockMoodEntries.push(_newEntry);
+    mockMoodEntries.push(newEntry);
     return newEntry;
   }
   
@@ -677,14 +677,19 @@ export class MockDataService {
     await this.delay(500);
     let therapists = [...mockTherapists];
     
-    if (filters?.specializations?.length) {
+    const typedFilters = filters as {
+      specializations?: string[];
+      acceptingNewClients?: boolean;
+    } | undefined;
+    
+    if (typedFilters?.specializations?.length) {
       therapists = therapists.filter(t => 
-        filters.specializations.some((s: string) => t.specializations.includes(s))
+        typedFilters.specializations!.some((s: string) => t.specializations.includes(s))
       );
     }
     
-    if (filters?.acceptingNewClients !== undefined) {
-      therapists = therapists.filter(t => t.acceptingNewClients === filters.acceptingNewClients);
+    if (typedFilters?.acceptingNewClients !== undefined) {
+      therapists = therapists.filter(t => t.acceptingNewClients === typedFilters.acceptingNewClients);
     }
     
     return therapists;
@@ -709,7 +714,7 @@ export class MockDataService {
       ...appointment,
       id: `appt-${Date.now()}`
     };
-    mockAppointments.push(_newAppointment);
+    mockAppointments.push(newAppointment);
     return newAppointment;
   }
   
@@ -775,7 +780,7 @@ export class MockDataService {
       moderated: false,
       pinned: false
     };
-    mockCommunityPosts.unshift(_newPost);
+    mockCommunityPosts.unshift(newPost);
     return newPost;
   }
   

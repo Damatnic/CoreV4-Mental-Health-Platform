@@ -1,10 +1,10 @@
 // Comprehensive Crisis Scenario Testing - Ensures all crisis systems work flawlessly
 // CRITICAL: These tests validate life-safety systems
 
-import { MockCrisisServer, _MockCrisisSession } from '../../services/crisis/MockCrisisServer';
-import { mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
-import { assessCrisisSeverity, _CRISIS_ASSESSMENT_QUESTIONS } from '../../services/crisis/emergencyServices';
-import { offlineCrisisResources } from '../../services/crisis/OfflineCrisisResources';
+import { MockCrisisServer, MockCrisisSession } from '../../services/crisis/MockCrisisServer';
+import { __mockWebSocketAdapter as mockWebSocketAdapter } from '../../services/crisis/MockWebSocketAdapter';
+import { assessCrisisSeverity, CRISIS_ASSESSMENT_QUESTIONS } from '../../services/crisis/emergencyServices';
+import { __offlineCrisisResources as offlineCrisisResources } from '../../services/crisis/OfflineCrisisResources';
 import { logger } from '../../utils/logger';
 
 // Test scenario types
@@ -260,16 +260,16 @@ export class CrisisScenarioTester {
       result.details.assessmentResult = assessmentResult;
 
       // Validate assessment results
-      if (assessmentResult.severity !== scenario.expectedOutcome.severity) {
-        result.errors.push(`Expected severity ${scenario.expectedOutcome.severity}, got ${assessmentResult.severity}`);
+      if ((assessmentResult as any).severity !== scenario.expectedOutcome.severity) {
+        result.errors.push(`Expected severity ${scenario.expectedOutcome.severity}, got ${(assessmentResult as any).severity}`);
       }
 
-      if (assessmentResult.requiresImmediate !== scenario.expectedOutcome.requiresImmediate) {
-        result.errors.push(`Expected requiresImmediate ${scenario.expectedOutcome.requiresImmediate}, got ${assessmentResult.requiresImmediate}`);
+      if ((assessmentResult as any).requiresImmediate !== scenario.expectedOutcome.requiresImmediate) {
+        result.errors.push(`Expected requiresImmediate ${scenario.expectedOutcome.requiresImmediate}, got ${(assessmentResult as any).requiresImmediate}`);
       }
 
-      if (assessmentResult.riskFactors.length < scenario.expectedOutcome.minimumRiskFactors) {
-        result.warnings.push(`Expected at least ${scenario.expectedOutcome.minimumRiskFactors} risk factors, got ${assessmentResult.riskFactors.length}`);
+      if ((assessmentResult as any).riskFactors.length < scenario.expectedOutcome.minimumRiskFactors) {
+        result.warnings.push(`Expected at least ${scenario.expectedOutcome.minimumRiskFactors} risk factors, got ${(assessmentResult as any).riskFactors.length}`);
       }
 
       // Test crisis chat simulation
@@ -330,7 +330,7 @@ export class CrisisScenarioTester {
       const session = this.mockServer.createCrisisSession('test-user', scenario.severity);
       const sessionCreated = session !== null;
       
-      if (_sessionCreated) {
+      if (sessionCreated) {
         // Test message response
         session.sendMessage('I need help right now');
         
@@ -338,7 +338,7 @@ export class CrisisScenarioTester {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Clean up
-        this.mockServer.endSession(session.sessionId);
+        this.mockServer.endSession((session as any)._sessionId);
       }
       
       const responseTime = performance.now() - startTime;
@@ -386,7 +386,7 @@ export class CrisisScenarioTester {
       // Wait for emergency response
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      this.mockServer.endSession(session.sessionId);
+      this.mockServer.endSession((session as any)._sessionId);
     } catch (error) {
       logger.error('Emergency protocol test failed:');
     }
@@ -538,7 +538,7 @@ export class CrisisScenarioTester {
           const startTime = performance.now();
           const session = this.mockServer.createCrisisSession('test-user', 'critical');
           session.sendMessage('emergency test');
-          this.mockServer.endSession(session.sessionId);
+          this.mockServer.endSession((session as any)._sessionId);
           return performance.now() - startTime;
         }
       },

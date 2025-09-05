@@ -15,13 +15,13 @@ import {
   AlertCircle,
   ChevronRight,
   Plus,
-  _Edit2,
-  _X,
+  Edit2,
+  X,
   Star,
   Award
 } from 'lucide-react';
-import { __useActivityStore } from '../../../stores/activityStore';
-import { format, isToday, isPast, isFuture, _differenceInMinutes, addDays } from 'date-fns';
+import { useActivityStore } from '../../../stores/activityStore';
+import { format, isToday, isPast, isFuture, differenceInMinutes, addDays } from 'date-fns';
 
 interface ActivityTrackerProps {
   onActivityClick?: (activity: unknown) => void;
@@ -36,18 +36,18 @@ export function ActivityTracker({
   energyLevel = 'medium',
   currentMood = 5 
 }: ActivityTrackerProps) {
-  const { activities, _dailySchedule, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = __useActivityStore();
+  const { activities, dailySchedule, completeActivity, rescheduleActivity, getActivityRecommendations, suggestReschedule, adaptScheduleForBadDay, generateDailySchedule } = useActivityStore();
 
   const [selectedDate, _setSelectedDate] = useState(new Date());
   const [showRecommendations, _setShowRecommendations] = useState(false);
-  const [___editingActivity, _setEditingActivity] = useState<string | null>(null);
+  const [editingActivity, _setEditingActivity] = useState<string | null>(null);
   const [completionNote, _setCompletionNote] = useState('');
   const [moodImpact, _setMoodImpact] = useState<number>(0);
   const [adaptedForLowEnergy, _setAdaptedForLowEnergy] = useState(false);
 
   // Generate daily schedule on mount and date change
   useEffect(() => {
-    generateDailySchedule(_selectedDate);
+    generateDailySchedule(selectedDate);
   }, [selectedDate, generateDailySchedule]);
 
   // Get today&apos;s activities
@@ -103,9 +103,9 @@ export function ActivityTracker({
   // Handle activity completion
   const handleCompleteActivity = (activityId: string) => {
     completeActivity(activityId, moodImpact || undefined, completionNote || undefined);
-    setEditingActivity(null);
-    setCompletionNote('');
-    setMoodImpact(0);
+    _setEditingActivity(null);
+    _setCompletionNote('');
+    _setMoodImpact(0);
   };
 
   // Handle reschedule
@@ -116,8 +116,8 @@ export function ActivityTracker({
   // Handle adapt for low energy
   const handleAdaptForLowEnergy = () => {
     adaptScheduleForBadDay();
-    setAdaptedForLowEnergy(true);
-    setTimeout(() => setAdaptedForLowEnergy(false), 3000);
+    _setAdaptedForLowEnergy(true);
+    setTimeout(() => _setAdaptedForLowEnergy(false), 3000);
   };
 
   return (
@@ -203,7 +203,7 @@ export function ActivityTracker({
             </motion.div>
           ) : (
             todayActivities.map((activity) => {
-              const Icon = getActivityIcon(activity._category);
+              const Icon = getActivityIcon(activity.category);
               const isPastDue = activity.scheduledTime && isPast(new Date(activity.scheduledTime)) && !activity.completed;
               const isEditing = editingActivity === activity.id;
               
@@ -232,7 +232,7 @@ export function ActivityTracker({
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!activity.completed) {
-                          setEditingActivity(activity.id);
+                          _setEditingActivity(activity.id);
                         }
                       }}
                       className="mt-0.5"
@@ -341,7 +341,7 @@ export function ActivityTracker({
                                 {[-3, -2, -1, 0, 1, 2, 3].map((impact) => (
                                   <button
                                     key={impact}
-                                    onClick={() => setMoodImpact(impact)}
+                                    onClick={() => _setMoodImpact(impact)}
                                     className={`
                                       px-3 py-1 rounded-lg text-sm font-medium transition-colors
                                       ${moodImpact === impact 
@@ -366,7 +366,7 @@ export function ActivityTracker({
                               </label>
                               <textarea
                                 value={completionNote}
-                                onChange={(e) => setCompletionNote(e.target.value)}
+                                onChange={(e) => _setCompletionNote(e.target.value)}
                                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none"
                                 rows={2}
                                 placeholder="How did it go? Any observations?"
@@ -376,9 +376,9 @@ export function ActivityTracker({
                             <div className="flex justify-end space-x-2">
                               <button
                                 onClick={() => {
-                                  setEditingActivity(null);
-                                  setCompletionNote('');
-                                  setMoodImpact(0);
+                                  _setEditingActivity(null);
+                                  _setCompletionNote('');
+                                  _setMoodImpact(0);
                                 }}
                                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-700"
                               >
@@ -407,7 +407,7 @@ export function ActivityTracker({
       {(recommendations.length > 0 || rescheduleSuggestions.length > 0) && (
         <div className="border-t pt-3">
           <button
-            onClick={() => setShowRecommendations(!showRecommendations)}
+            onClick={() => _setShowRecommendations(!showRecommendations)}
             className="flex items-center justify-between w-full text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             <span className="flex items-center space-x-2">

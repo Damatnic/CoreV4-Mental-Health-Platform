@@ -116,8 +116,15 @@ class PerformanceMonitor {
     // Long Task Observer - detect blocking tasks
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
       const longTaskObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          const longTask = entry as unknown; // PerformanceLongTaskTiming not in all TypeScript versions
+        for (const entry of (list as any).getEntries()) {
+          // Type for long task performance entries
+          interface LongTaskEntry {
+            duration: number;
+            name: string;
+            startTime: number;
+            attribution?: any;
+          }
+          const longTask = entry as LongTaskEntry;
           this.recordMetric('long_task', longTask.duration, {
             name: longTask.name,
             startTime: longTask.startTime,
@@ -138,7 +145,7 @@ class PerformanceMonitor {
     // Navigation timing
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('navigation')) {
       const navObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           const navEntry = entry as PerformanceNavigationTiming;
           this.recordNavigationMetrics(navEntry);
         }
@@ -151,7 +158,7 @@ class PerformanceMonitor {
     // Resource timing for bundle monitoring
     if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('resource')) {
       const resourceObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+        for (const entry of (list as any).getEntries()) {
           const resourceEntry = entry as PerformanceResourceTiming;
           this.analyzeResourceLoading(resourceEntry);
         }
@@ -169,7 +176,7 @@ class PerformanceMonitor {
     if ('memory' in performance) {
       // Monitor memory usage every 10 seconds
       setInterval(() => {
-        const memory = (performance as unknown).memory;
+        const memory = (performance as any).memory;
         const usedMemoryMB = memory.usedJSHeapSize / 1048576;
         const totalMemoryMB = memory.totalJSHeapSize / 1048576;
         const limitMemoryMB = memory.jsHeapSizeLimit / 1048576;
@@ -219,7 +226,6 @@ class PerformanceMonitor {
         performance.mark('crisis_button_clicked');
         
         // Use MutationObserver to detect when modal appears
-// @ts-expect-error - MutationObserver is a global API
         const observer = new MutationObserver((mutations) => {
           for (const mutation of mutations) {
             if (mutation.type === 'childList') {
@@ -444,7 +450,7 @@ class PerformanceMonitor {
    */
   private detectDeviceCapabilities(): void {
     // Check for low-end device indicators
-    const memory = (navigator as unknown).deviceMemory;
+    const memory = (navigator as any).deviceMemory;
     const cpuCores = navigator.hardwareConcurrency;
     
     this.isLowEndDevice = (
@@ -464,7 +470,7 @@ class PerformanceMonitor {
    * Detect network type for adaptive loading
    */
   private detectNetworkType(): void {
-    const connection = (navigator as unknown).connection || (navigator as unknown).mozConnection || (navigator as unknown).webkitConnection;
+    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
     
     if (connection) {
       this.networkType = connection.effectiveType || 'unknown';
@@ -496,7 +502,7 @@ class PerformanceMonitor {
     
     // Record optimization activation
     this.recordMetric('low_end_optimizations', 1, {
-      memory: (navigator as unknown).deviceMemory,
+      memory: (navigator as any).deviceMemory,
       cores: navigator.hardwareConcurrency,
     });
   }
@@ -577,7 +583,7 @@ class PerformanceMonitor {
     
     // Trigger garbage collection hint
     if ('gc' in window) {
-      (window as unknown).gc();
+      (window as any).gc();
     }
     
     // Report memory issue
@@ -796,7 +802,7 @@ class PerformanceMonitor {
         return measure.duration;
       }
     } catch (error) {
-    logger.warn(`Failed to measure ${label}:`, error);
+    logger.warn(`Failed to measure ${label}:`, error as string);
     }
     
     return undefined;

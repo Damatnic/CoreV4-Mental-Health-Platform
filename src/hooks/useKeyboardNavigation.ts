@@ -163,7 +163,7 @@ export function useFocusManagement() {
           return aIndex - bIndex;
         }
         
-        return a.compareDocumentPosition(_b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
       });
     };
 
@@ -255,7 +255,7 @@ export function useScreenReaderAnnouncement() {
       height: 1px;
       overflow: hidden;
     `;
-    document.body.appendChild(_div);
+    document.body.appendChild(div);
     announcementRef.current = div;
 
     return () => {
@@ -279,7 +279,7 @@ export function useScreenReaderAnnouncement() {
     }
   }, []);
 
-  return { announce };
+  return { announce: __announce };
 }
 
 // Hook for reduced motion preferences
@@ -310,7 +310,7 @@ export function useAccessibility() {
   return {
     keyboard,
     focus,
-    screenReader,
-    reducedMotion,
+    __screenReader,
+    __reducedMotion,
   };
 }

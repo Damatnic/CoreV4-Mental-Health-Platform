@@ -7,7 +7,7 @@ import { secureStorage } from '../security/SecureLocalStorage';
 import { logger } from '../../utils/logger';
 import { 
   ApiResponse, 
-  _ApiError, 
+  ApiError, 
   User, 
   LoginRequest, 
   LoginResponse,
@@ -126,12 +126,12 @@ export class ApiService {
           try {
             await this.refreshAccessToken();
             return this.axiosInstance(originalRequest);
-          } catch (error) {
+          } catch (refreshErr) {
             this.handleLogout();
             throw new ApiServiceError(
               ErrorCode.AUTHENTICATION_ERROR,
               'Session expired. Please log in again.',
-              refreshError
+              refreshErr instanceof Error ? refreshErr : new Error('Token refresh failed')
             );
           }
         }
@@ -180,9 +180,9 @@ export class ApiService {
     }
 
     const status = error.response.status;
-    const data = error.response.data as unknown;
+    const data = error.response.data as { message?: string; errors?: any; retryAfter?: number; estimatedTime?: number };
 
-    switch (_status) {
+    switch (status) {
       case 400:
         return new ApiServiceError(
           ErrorCode.VALIDATION_ERROR,
@@ -380,9 +380,9 @@ export class ApiService {
         { headers: { 'Skip-Auth': 'true' } }
       );
       
-      const { accessToken, refreshToken, _user } = response.data;
+      const { accessToken, refreshToken, user } = response.data;
       this.saveTokensToStorage(accessToken, refreshToken);
-      secureStorage.setItem('current_user', JSON.stringify(_user));
+      secureStorage.setItem('current_user', JSON.stringify(user));
       
       return response.data;
     } catch (error) {

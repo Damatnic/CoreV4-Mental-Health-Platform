@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Phone, MessageSquare, MapPin, Shield, Heart, Users,
-  AlertCircle, Activity, Brain, _Headphones, _Navigation,
-  _Clock, CheckCircle, _XCircle, ChevronRight, _Volume2,
-  _Zap, _Send, _Copy, Share2, ExternalLink, _Wifi, WifiOff, X
+  AlertCircle, Activity, Brain, Headphones, Navigation,
+  Clock, CheckCircle, XCircle, ChevronRight, Volume2,
+  Zap, Send, Copy, Share2, ExternalLink, Wifi, WifiOff, X
 } from 'lucide-react';
 import { useCrisisAssessment } from '../../../../hooks/useCrisisAssessment';
 import { useGeolocation } from '../../../../hooks/useGeolocation';
@@ -48,16 +48,16 @@ export function CrisisQuickActionsHub({
   emergencyContacts = [],
   safetyPlan
 }: CrisisQuickActionsHubProps) {
-  const { assessmentData, isAssessing, _updateAssessment } = useCrisisAssessment();
+  const { assessmentData, isAssessing, updateAssessment: _updateAssessment } = useCrisisAssessment();
   const { location, error: _locationError, loading } = useGeolocation();
   
-  const [___activeAction, _setActiveAction] = useState<string | null>(null);
-  const [showSafetyPlan, _setShowSafetyPlan] = useState(false);
-  const [___showGroundingExercise, _setShowGroundingExercise] = useState(false);
-  const [___breathingActive, _setBreathingActive] = useState(false);
-  const [___emergencyCallInProgress, _setEmergencyCallInProgress] = useState(false);
-  const [___copiedToClipboard, _setCopiedToClipboard] = useState<string | null>(null);
-  const [___offlineMode, _setOfflineMode] = useState(!navigator.onLine);
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [showSafetyPlan, setShowSafetyPlan] = useState(false);
+  const [showGroundingExercise, setShowGroundingExercise] = useState(false);
+  const [breathingActive, setBreathingActive] = useState(false);
+  const [emergencyCallInProgress, setEmergencyCallInProgress] = useState(false);
+  const [copiedToClipboard, setCopiedToClipboard] = useState<string | null>(null);
+  const [offlineMode, setOfflineMode] = useState(!navigator.onLine);
 
   // Emergency hotlines
   const emergencyHotlines = [
@@ -125,7 +125,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Handle text crisis line
-  const __handleCrisisText   = useCallback((number: string) => {
+  const handleCrisisText = useCallback((number: string) => {
     setActiveAction('texting');
     
     // Attempt to open SMS
@@ -140,7 +140,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Share location for emergency
-  const __shareEmergencyLocation   = useCallback(async () => {
+  const shareEmergencyLocation = useCallback(async () => {
     if (location) {
       const googleMapsUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
       const message = `Emergency: I need help. My location: ${googleMapsUrl}`;
@@ -159,7 +159,7 @@ export function CrisisQuickActionsHub({
   }, [location, onActionTaken]);
 
   // Start grounding exercise
-  const __startGroundingExercise   = useCallback(() => {
+  const startGroundingExercise = useCallback(() => {
     setShowGroundingExercise(true);
     setActiveAction('grounding');
     
@@ -169,7 +169,7 @@ export function CrisisQuickActionsHub({
   }, [onActionTaken]);
 
   // Start breathing exercise
-  const __startBreathingExercise   = useCallback(() => {
+  const startBreathingExercise = useCallback(() => {
     setBreathingActive(true);
     setActiveAction('breathing');
     
@@ -468,7 +468,7 @@ export function CrisisQuickActionsHub({
 
 // Grounding Exercise Modal Component
 function GroundingExerciseModal({ onClose, onComplete }: { onClose: () => void; onComplete: () => void }) {
-  const [step, _setStep] = useState(0);
+  const [step, setStep] = useState(0);
   const steps = [
     { sense: 'See', count: 5, instruction: 'Name 5 things you can see around you' },
     { sense: 'Touch', count: 4, instruction: 'Name 4 things you can touch' },
@@ -541,9 +541,9 @@ function GroundingExerciseModal({ onClose, onComplete }: { onClose: () => void; 
 
 // Breathing Exercise Overlay Component
 function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void; onComplete: () => void }) {
-  const [phase, _setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-  const [count, _setCount] = useState(0);
-  const [cycles, _setCycles] = useState(0);
+  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [count, setCount] = useState(0);
+  const [cycles, setCycles] = useState(0);
 
   useEffect(() => {
     const phases = {
@@ -552,11 +552,11 @@ function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void
       exhale: { duration: 8, next: 'inhale' as const }
     };
 
-    const _timer = setInterval(() => {
+    const timer = setInterval(() => {
       setCount(prev => {
         if (prev >= phases[phase].duration - 1) {
           const nextPhase = phases[phase].next;
-          setPhase(_nextPhase);
+          setPhase(nextPhase);
           
           if (nextPhase === 'inhale') {
             setCycles(c => c + 1);
@@ -572,7 +572,7 @@ function BreathingExerciseOverlay({ onClose, onComplete }: { onClose: () => void
       });
     }, 1000);
 
-    return () => clearInterval(_timer);
+    return () => clearInterval(timer);
   }, [phase, cycles, onComplete, onClose]);
 
   return (
