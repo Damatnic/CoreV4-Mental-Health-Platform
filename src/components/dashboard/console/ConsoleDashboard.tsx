@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Heart, Users, Stethoscope, AlertTriangle, Clock, Shield } from 'lucide-react';
 import { ConsoleWelcomeBar } from './ConsoleWelcomeBar';
 import { ConsoleGrid } from './ConsoleGrid';
-import { ConsoleTile } from './ConsoleTile';
+import { ExpandableConsoleTile } from './ExpandableConsoleTile';
 import { ConsoleUserStats } from './ConsoleUserStats';
 import { ConsoleQuickLinks } from './ConsoleQuickLinks';
 import { useConsoleNavigation } from '../../../hooks/useConsoleNavigation';
@@ -104,27 +104,28 @@ export function ConsoleDashboard() {
           <ConsoleQuickLinks />
         </motion.div>
 
-        {/* Main Feature Tiles - Mobile Touch Optimized */}
+        {/* Main Feature Tiles - Mobile Touch Optimized with Expandable Options */}
         <ConsoleGrid className={`
           ${isMobileDevice ? 'mb-4' : 'mb-8'}
           ${isSmallScreen ? 'grid-mobile-optimized' : ''}
         `}>
-          {/* Crisis Support - Always Prominent */}
-          <ConsoleTile
+          {/* Crisis Support - Always Prominent with Quick Access Options */}
+          <ExpandableConsoleTile
             title="🆘 Crisis Support"
-            description="Immediate help available 24/7"
+            description="Immediate help available 24/7. Tap for quick access to emergency resources."
             icon={<AlertTriangle className="h-6 w-6 text-white" />}
             gradient="crisis"
             size="medium"
             to="/crisis"
             status="24/7 Available"
+            urgent={true}
             delay={5}
           />
 
-          {/* Wellness Hub */}
-          <ConsoleTile
+          {/* Wellness Hub with Expanded Wellness Options */}
+          <ExpandableConsoleTile
             title="🧘 Wellness Hub"
-            description="Your complete mental wellness toolkit"
+            description="Your complete mental wellness toolkit. Track mood, meditate, and more."
             icon={<Heart className="h-6 w-6 text-white" />}
             gradient="wellness"
             size="medium"
@@ -134,10 +135,10 @@ export function ConsoleDashboard() {
             delay={6}
           />
 
-          {/* Community */}
-          <ConsoleTile
+          {/* Community with Social Connection Options */}
+          <ExpandableConsoleTile
             title="💬 Community"
-            description="Connect with supportive peers"
+            description="Connect with supportive peers and join group activities."
             icon={<Users className="h-6 w-6 text-white" />}
             gradient="community"
             size="small"
@@ -146,10 +147,10 @@ export function ConsoleDashboard() {
             delay={7}
           />
 
-          {/* Professionals */}
-          <ConsoleTile
+          {/* Professionals with Care Provider Options */}
+          <ExpandableConsoleTile
             title="👨⚕️ Professionals"
-            description="Licensed therapists & counselors"
+            description="Licensed therapists & counselors ready to help."
             icon={<Stethoscope className="h-6 w-6 text-white" />}
             gradient="professional"
             size="small"

@@ -13,6 +13,7 @@ import { GlobalSearch } from '../navigation/GlobalSearch';
 import { Breadcrumbs, MobileBreadcrumbs } from '../navigation/Breadcrumbs';
 import { FloatingCrisisButton } from '../navigation/FloatingCrisisButton';
 import { MobileNavigation } from './MobileNavigation';
+import { MobileBottomNav } from './MobileBottomNav';
 import { useEnhancedKeyboardNavigation } from '../../hooks/useEnhancedKeyboardNavigation';
 import { useAuth } from '../../hooks/useAuth';
 import { PrivacyBanner, FreeBadge } from './PrivacyBanner';
@@ -272,6 +273,17 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
   } | null>(null);
   const [_notificationCount] = useState(0);
+  
+  // Expandable sidebar state - persist user preference
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(() => {
+    const saved = localStorage.getItem('sidebar-expanded');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+  
+  // Save sidebar state to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebar-expanded', JSON.stringify(isSidebarExpanded));
+  }, [isSidebarExpanded]);
 
   // Enhanced keyboard navigation
   useEnhancedKeyboardNavigation();
@@ -290,10 +302,11 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
     // Normal navigation - Maximum 5 sections with emoji visual anchors
     return [
       { name: '🏠 Home', href: '/', icon: <Home className="h-5 w-5" /> },
-      { name: '🧘 Wellness Tools', href: '/wellness', icon: <Heart className="h-5 w-5" /> },
-      { name: '💬 Community Support', href: '/community', icon: <Users className="h-5 w-5" /> },
-      { name: '👨⚕️ Find Professionals', href: '/professional', icon: <Stethoscope className="h-5 w-5" /> },
-      { name: '⚙️ My Settings', href: '/settings', icon: <Settings className="h-5 w-5" /> },
+      { name: '🤖 AI Therapist', href: '/ai-therapy', icon: <Sparkles className="h-5 w-5" /> },
+      { name: '🧘 Wellness', href: '/wellness', icon: <Heart className="h-5 w-5" /> },
+      { name: '💬 Community', href: '/community', icon: <Users className="h-5 w-5" /> },
+      { name: '👨⚕️ Professionals', href: '/professional', icon: <Stethoscope className="h-5 w-5" /> },
+      { name: '⚙️ Settings', href: '/settings', icon: <Settings className="h-5 w-5" /> },
     ];
   };
 
@@ -398,11 +411,13 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
       {/* Console Sidebar Navigation - Mobile Enhanced */}
       <motion.aside
         animate={{ 
-          width: isMobileMenuOpen ? 300 : 90,
-          x: window.innerWidth < 768 && !isMobileMenuOpen ? -90 : 0 // Hide on mobile when closed
+          width: window.innerWidth < 768 
+            ? (isMobileMenuOpen ? 300 : 0)
+            : (isSidebarExpanded ? 280 : 80),
+          x: window.innerWidth < 768 && !isMobileMenuOpen ? -300 : 0
         }}
         transition={{
-          duration: 0.2,
+          duration: 0.3,
           ease: 'easeInOut'
         }}
         className="bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-r border-gray-700/50 flex-shrink-0 overflow-hidden backdrop-blur-console shadow-console-depth fixed z-50 md:relative md:z-30"
@@ -414,7 +429,15 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
         {/* Sidebar glow effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
         
-        <div className="p-6 relative z-10">
+        <div className="p-4 md:p-6 relative z-10 h-full flex flex-col">
+          {/* Sidebar Toggle Button - Desktop Only */}
+          <button
+            onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+            className="hidden md:flex absolute -right-3 top-8 w-6 h-12 bg-gradient-to-r from-gray-700 to-gray-800 border border-gray-600/50 rounded-r-lg items-center justify-center hover:from-gray-600 hover:to-gray-700 transition-all group z-50 shadow-console-card"
+            aria-label={isSidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            <ChevronLeft className={`w-4 h-4 text-gray-400 group-hover:text-white transition-all duration-300 ${!isSidebarExpanded ? 'rotate-180' : ''}`} />
+          </button>
           {/* Console Logo */}
           <motion.div 
             className="flex items-center mb-10"
@@ -425,18 +448,21 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <motion.div
-              animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
-              className="ml-4 overflow-hidden"
+              animate={{ 
+                opacity: (window.innerWidth < 768 && isMobileMenuOpen) || (window.innerWidth >= 768 && isSidebarExpanded) ? 1 : 0,
+                x: (window.innerWidth < 768 && isMobileMenuOpen) || (window.innerWidth >= 768 && isSidebarExpanded) ? 0 : -10
+              }}
+              className="ml-3 md:ml-4 overflow-hidden"
             >
-              <h1 className="text-xl font-bold text-white mb-1">
+              <h1 className="text-lg md:text-xl font-bold text-white whitespace-nowrap">
                 Astral Core
               </h1>
-              <p className="text-sm text-gray-300">Mental Health Console</p>
+              <p className="text-xs md:text-sm text-gray-300 whitespace-nowrap">Mental Health Console</p>
             </motion.div>
           </motion.div>
 
           {/* Console Navigation */}
-          <nav className="space-y-3">
+          <nav className="space-y-2 md:space-y-3 flex-1">
             {navigation.map((item, index) => {
               const isActiveRoute = isActive(item.href);
               return (
@@ -466,10 +492,13 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
                     </div>
                     
                     <motion.div
-                      animate={{ opacity: isMobileMenuOpen ? 1 : 0, x: isMobileMenuOpen ? 0 : -10 }}
-                      className="ml-4 overflow-hidden relative z-10"
+                      animate={{ 
+                        opacity: (window.innerWidth < 768 && isMobileMenuOpen) || (window.innerWidth >= 768 && isSidebarExpanded) ? 1 : 0,
+                        x: (window.innerWidth < 768 && isMobileMenuOpen) || (window.innerWidth >= 768 && isSidebarExpanded) ? 0 : -10
+                      }}
+                      className="ml-3 md:ml-4 overflow-hidden relative z-10"
                     >
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-xs md:text-sm whitespace-nowrap">
                         {item.name}
                       </span>
                       {isActiveRoute && (
@@ -705,6 +734,9 @@ function EnhancedLayoutContent({ children }: EnhancedLayoutProps) {
           />
         )}
       </AnimatePresence>
+      
+      {/* Mobile Bottom Navigation - Enhanced for better UX */}
+      <MobileBottomNav />
       
       {/* Floating Crisis Button - Mobile Enhanced */}
       <FloatingCrisisButton />

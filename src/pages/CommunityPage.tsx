@@ -5,6 +5,7 @@ import { Users, MessageSquare, Calendar, Award, Shield, Heart, TrendingUp, Activ
 import { CommunityPosts } from '../components/community/CommunityPosts';
 import { SupportGroups } from '../components/community/SupportGroups';
 import { CommunityEvents } from '../components/community/CommunityEvents';
+import { InteractiveCommunityCards } from '../components/community/InteractiveCommunityCards';
 import { useAnonymousAuth } from '../contexts/AnonymousAuthContext';
 import { toast } from 'react-hot-toast';
 
@@ -218,6 +219,18 @@ export function CommunityPage() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Interactive Community Cards - Show on main community page */}
+        {location.pathname === '/community' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mb-8"
+          >
+            <InteractiveCommunityCards />
+          </motion.div>
         )}
 
         {/* Content Area */}

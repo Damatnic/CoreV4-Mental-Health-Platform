@@ -1,0 +1,263 @@
+/* Expandable Console Tiles - Enhanced Mobile Styles */
+
+/* Base expandable tile styles */
+.expandable-tile {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Expanded state */
+.expandable-tile.expanded {
+  z-index: 100;
+  transform: translateY(-2px);
+}
+
+/* Options panel animations */
+.expandable-options {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+/* Option item hover effects */
+.expandable-option {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-out;
+}
+
+.expandable-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+}
+
+.expandable-option:hover::before {
+  transform: translateX(0);
+}
+
+/* Crisis option styles */
+.expandable-option.urgent {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+}
+
+.expandable-option.urgent:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  .expandable-tile {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .expandable-options {
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .expandable-option {
+    min-height: 56px; /* Minimum touch target size */
+    padding: 12px;
+  }
+  
+  /* Smooth scrollbar for mobile */
+  .expandable-options::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .expandable-options::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+  
+  .expandable-options::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 2px;
+  }
+}
+
+/* Touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  .expandable-tile:active {
+    transform: scale(0.98);
+  }
+  
+  .expandable-option:active {
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(0.98);
+  }
+}
+
+/* Accessibility improvements */
+.expandable-tile:focus-visible,
+.expandable-option:focus-visible {
+  outline: 2px solid rgb(59, 130, 246);
+  outline-offset: 2px;
+}
+
+/* Backdrop blur for expanded state */
+.expandable-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 90;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  .expandable-tile,
+  .expandable-options,
+  .expandable-option {
+    animation: none !important;
+    transition: opacity 0.2s ease-out !important;
+  }
+}
+
+/* Loading states */
+.expandable-option.loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.expandable-option.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 2px solid transparent;
+  border-top-color: rgb(59, 130, 246);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Badge animations */
+.expandable-badge {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Icon animations on expand */
+.expandable-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expandable-tile.expanded .expandable-icon {
+  transform: rotate(180deg);
+}
+
+/* Smooth height transitions */
+.expandable-content {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ripple effect for touch */
+.expandable-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Console-style glow effects */
+.console-glow {
+  position: relative;
+}
+
+.console-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, 
+    rgba(59, 130, 246, 0.2),
+    rgba(147, 51, 234, 0.2),
+    rgba(236, 72, 153, 0.2),
+    rgba(59, 130, 246, 0.2)
+  );
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.console-glow:hover::after {
+  opacity: 1;
+}
+
+/* Urgent/crisis tile pulsing */
+.crisis-pulse {
+  animation: crisis-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes crisis-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.2);
+  }
+}

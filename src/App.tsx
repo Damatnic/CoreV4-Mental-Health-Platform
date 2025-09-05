@@ -12,6 +12,8 @@ import { SecurityProvider, withSecurity } from './middleware/securityMiddleware'
 import { ConsoleBootSequence } from './components/console/ConsoleBootSequence';
 // Import accessibility CSS for WCAG 2.1 AA compliance
 import './styles/accessibility.css';
+// Import mobile-responsive CSS for enhanced mobile UX
+import './styles/mobile-responsive.css';
 import { 
   lazyWithPreload, 
   LoadingFallbacks, 

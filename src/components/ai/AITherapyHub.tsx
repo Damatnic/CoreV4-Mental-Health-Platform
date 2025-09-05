@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TherapistSelector, Therapist } from './TherapistSelector';
 import TherapistChat from './TherapistChat';
+import { AITherapistDisclaimer } from './AITherapistDisclaimer';
 import { ArrowLeft } from 'lucide-react';
 
 interface AITherapyHubProps {
@@ -11,6 +12,7 @@ interface AITherapyHubProps {
 const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
   const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
   const [currentView, setCurrentView] = useState<'selector' | 'chat'>('selector');
+  const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(false);
 
   const handleTherapistSelect = (therapist: Therapist) => {
     setSelectedTherapist(therapist);
@@ -22,8 +24,17 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
     setSelectedTherapist(null);
   };
 
+  const handleDisclaimerAccept = () => {
+    setHasAcceptedDisclaimer(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* AI Disclaimer - Shows first time or as reminder */}
+      {!hasAcceptedDisclaimer && (
+        <AITherapistDisclaimer onAccept={handleDisclaimerAccept} />
+      )}
+      
       <AnimatePresence mode="wait">
         {currentView === 'selector' ? (
           <motion.div
@@ -42,6 +53,13 @@ const AITherapyHub: React.FC<AITherapyHubProps> = ({ onClose }) => {
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
+              </div>
+            )}
+            
+            {/* Compact disclaimer reminder */}
+            {hasAcceptedDisclaimer && (
+              <div className="p-4">
+                <AITherapistDisclaimer onAccept={() => {}} isCompact={true} />
               </div>
             )}
             
