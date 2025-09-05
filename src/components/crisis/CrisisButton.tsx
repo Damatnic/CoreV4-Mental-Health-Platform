@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { AlertCircle, Heart, Loader2, MapPin, MessageCircle, Phone } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { logger } from '../../utils/logger';
 
@@ -144,39 +145,49 @@ const CrisisButton: React.FC<CrisisButtonProps> = ({
 
   return (
     <>
-      <button
+      <motion.button
         ref={buttonRef}
         onClick={handleCrisisClick}
         className={`
           inline-flex items-center gap-2 font-semibold rounded-lg
           transition-all duration-200 focus:outline-none focus:ring-2
           focus:ring-red-500 focus:ring-offset-2 touch-manipulation
-          high-contrast touch-target
+          high-contrast touch-target relative overflow-hidden
           ${sizeClasses[size]}
           ${variantClasses[variant]}
           ${className}
         `}
         style={{
-          transitionDuration: '0s',
           backgroundColor: '#ef4444',
           color: '#ffffff',
-          minWidth: '44px',
-          minHeight: '44px',
-          width: '44px',
-          height: '44px',
-          display: 'inline-flex'
+          minWidth: '56px',
+          minHeight: '56px',
+          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.4)'
         }}
-        aria-label="Crisis Help - Get immediate support"
+        aria-label="Crisis Help - Get immediate support - Call 988 or get emergency resources"
         aria-describedby="crisis-description"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        animate={{
+          boxShadow: [
+            '0 8px 32px rgba(239, 68, 68, 0.4)',
+            '0 8px 40px rgba(239, 68, 68, 0.6)',
+            '0 8px 32px rgba(239, 68, 68, 0.4)'
+          ]
+        }}
+        transition={{
+          boxShadow: { duration: 2, repeat: Infinity },
+          scale: { type: 'spring', stiffness: 400, damping: 25 }
+        }}
       >
         <AlertCircle
           className={size === 'small' ? 'w-4 h-4' : size === 'large' ? 'w-6 h-6' : 'w-5 h-5'}
           aria-hidden="true"
         />
         <span>Crisis Help</span>
-      </button>
+      </motion.button>
 
       <span id="crisis-description" className="sr-only">
         Activate this button to get immediate crisis support resources including 988 Suicide & Crisis Lifeline, call 911 for emergencies, text support, and local emergency services
