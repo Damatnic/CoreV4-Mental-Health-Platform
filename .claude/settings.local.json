@@ -112,7 +112,11 @@
       "Bash(timeout 30s npx tsc --noEmit)",
       "Bash(timeout 10s npm run build)",
       "Bash(timeout 60s npm run build)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npx --yes create-next-app@14 astral-core-v5 --typescript --tailwind --app --src-dir --import-alias \"@/*\" --eslint)",
+      "Bash(npx prisma:*)",
+      "Read(//h/Astral Core/AstralCoreV5/**)"
     ],
     "deny": [],
     "ask": []
